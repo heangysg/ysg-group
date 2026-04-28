@@ -1,0 +1,10 @@
+{
+  "name": "YSG Machinery",
+  "short_name": "YSG",
+  "description": "Premium Heavy Equipment Solutions",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#003485",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
+}
