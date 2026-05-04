@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+  background-color: #f9fafb;
+  color: #111827;
+  line-height: 1.5;
+}
+
+/* Ensure all text elements support Khmer */
+p, h1, h2, h3, h4, h5, h6, span, div, button, input, textarea, select, label, a, li {
+  font-family: 'Inter', 'Kantumruy Pro', system-ui, sans-serif;
+}
+
+/* Container */
+.container-custom {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.btn-primary {
+  background-color: #003485;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #002664;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  transform: translateY(-4px);
+}
+
+/* Khmer text specific styles */
+.khmer-text {
+  font-family: 'Kantumruy Pro', 'Inter', system-ui, sans-serif;
+  font-weight: normal;
+  line-height: 1.6;
+}
+
+/* Reduce boldness in Khmer mode - Kantumruy Pro renders heavier than Inter */
+.khmer-mode h1,
+.khmer-mode h2,
+.khmer-mode h3,
+.khmer-mode h4,
+.khmer-mode h5,
+.khmer-mode h6,
+.khmer-mode .font-bold,
+.khmer-mode .font-semibold {
+  font-weight: 500 !important;
+}
+
+.khmer-mode p,
+.khmer-mode span,
+.khmer-mode td,
+.khmer-mode th,
+.khmer-mode label,
+.khmer-mode .font-medium {
+  font-weight: 400 !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: rgba(0, 52, 133, 0.1);
+  color: #003485;
+}
+
+.khmer-mode {
+  line-height: 1.8;
+}
+
+/* Mobile App Specific Utilities */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: white;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
