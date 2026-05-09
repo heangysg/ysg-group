@@ -1,9 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary: #003485;
+  --primary-dark: #002664;
+  --bg-main: #ffffff;
+  --bg-soft: #fcfdfe;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-light: #f1f5f9;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-khmer: var(--font-kantumruy), var(--font-inter), sans-serif;
+}
 
 * {
   margin: 0;
@@ -12,128 +21,97 @@
 }
 
 body {
-  font-family: 'Inter', 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
-  line-height: 1.5;
-}
-
-/* Ensure all text elements support Khmer */
-p, h1, h2, h3, h4, h5, h6, span, div, button, input, textarea, select, label, a, li {
-  font-family: 'Inter', 'Kantumruy Pro', system-ui, sans-serif;
-}
-
-/* Container */
-.container-custom {
-  max-width: 1280px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-@media (min-width: 640px) {
-  .container-custom {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container-custom {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-.btn-primary {
-  background-color: #003485;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #002664;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.card {
-  background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: all 0.2s;
-}
-
-.card:hover {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  transform: translateY(-4px);
-}
-
-/* Khmer text specific styles */
-.khmer-text {
-  font-family: 'Kantumruy Pro', 'Inter', system-ui, sans-serif;
-  font-weight: normal;
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text-main);
   line-height: 1.6;
-}
-
-/* Reduce boldness in Khmer mode - Kantumruy Pro renders heavier than Inter */
-.khmer-mode h1,
-.khmer-mode h2,
-.khmer-mode h3,
-.khmer-mode h4,
-.khmer-mode h5,
-.khmer-mode h6,
-.khmer-mode .font-bold,
-.khmer-mode .font-semibold {
-  font-weight: 500 !important;
-}
-
-.khmer-mode p,
-.khmer-mode span,
-.khmer-mode td,
-.khmer-mode th,
-.khmer-mode label,
-.khmer-mode .font-medium {
-  font-weight: 400 !important;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-::selection {
-  background-color: rgba(0, 52, 133, 0.1);
-  color: #003485;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .khmer-mode {
-  line-height: 1.8;
+  font-family: var(--font-khmer);
 }
 
-/* Mobile App Specific Utilities */
+/* 💎 Minimalist Typography */
+h1, h2, h3, .heading-lux {
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.text-spaced {
+  letter-spacing: 0.2em;
+}
+
+/* 🌫️ Airy Design Tokens - Solid Clarity Version */
+@layer utilities {
+  .shadow-lux {
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+  }
+
+  .shadow-soft-glow {
+    box-shadow: 0 0 25px rgba(0, 52, 133, 0.03);
+  }
+
+  .border-lux {
+    border: 1px solid #f1f5f9;
+  }
+
+  /* ☁️ Breathable Containers - Solid & Clear */
+  .card-minimal {
+    @apply bg-white rounded-[2.5rem] border-lux transition-soft hover:shadow-lux hover:-translate-y-1;
+  }
+
+  .btn-luxury {
+    @apply bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-primary hover:shadow-lux transition-soft;
+  }
+}
+
+/* ☁️ Breathable Containers - Solid White Header */
+.glass-panel {
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* 🏎️ Smooth Micro-Interactions */
+.transition-soft {
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-button {
+  @apply transition-soft active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2;
+}
+
+/* 📱 Native Mobile Layouts */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-  background-color: white;
-}
-
-/* Hide scrollbar but keep functionality */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Khmer Luxury Adjustments */
+.khmer-mode {
+  line-height: 2;
+  letter-spacing: 0;
+}
+
+.khmer-mode * {
+  font-family: 'Kantumruy Pro', var(--font-inter), sans-serif !important;
+  font-weight: 500 !important;
+}
+
+::selection {
+  background-color: rgba(0, 52, 133, 0.08);
+  color: var(--primary);
+}
+
+html {
+  scroll-behavior: smooth;
 }

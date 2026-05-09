@@ -43,68 +43,66 @@ export default function ProductCard({ product }: ProductCardProps) {
   const imageUrl = product.images && product.images[0] ? product.images[0] : product.thumbnail
 
   return (
-    <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col h-full relative">
-        {/* Image Section */}
-        <div className="aspect-[4/3] bg-slate-50 flex items-center justify-center relative overflow-hidden shrink-0">
+    <Link href={`/products/${product.slug}`} className="group block">
+      <div className="card-minimal flex flex-col h-full overflow-hidden bg-white">
+        {/* 🖼️ High-End Image Showcase */}
+        <div className="relative aspect-[4/5] bg-[#FDFDFD] overflow-hidden">
           {imageUrl && imageUrl !== "" ? (
             <img 
               src={imageUrl} 
-              alt={product.name} 
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" 
+              alt={product.name}
+              className="w-full h-full object-cover transition-soft duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="text-slate-200 flex flex-col items-center gap-2">
-              <Package className="w-12 h-12 stroke-[1.5]" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">No Image</span>
+            <div className="w-full h-full flex items-center justify-center bg-slate-50">
+              <Package className="w-16 h-16 text-slate-100" />
             </div>
           )}
           
-          {/* Top Tags */}
-          <div className="absolute top-3 inset-x-3 flex justify-between items-start z-10">
-            <span className="bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest text-slate-900 border border-slate-100 shadow-sm">
-              {product.brand}
+          {/* Subtle Lux Label */}
+          <div className="absolute top-6 left-6 flex flex-col gap-2">
+            <span className="px-4 py-2 bg-white/90 backdrop-blur-md rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-slate-900 shadow-lux border-lux">
+              {product.brand || "Industrial"}
             </span>
-            
             {product.status === "available" && (
-              <div className="flex items-center gap-1.5 bg-emerald-500 text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg shadow-lg shadow-emerald-500/20">
-                <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
-                <span>Available</span>
-              </div>
+              <span className="px-4 py-2 bg-primary/10 backdrop-blur-md rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-primary border border-primary/20">
+                In Stock
+              </span>
             )}
           </div>
 
-          {/* Quick View Icon */}
-          <div className="absolute bottom-3 right-3 p-2 bg-white rounded-lg opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg border border-slate-100">
-            <ArrowUpRight className="w-4 h-4 text-primary" />
+          {/* Quick Action Overlay */}
+          <div className="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-soft flex items-center justify-center">
+            <div className="bg-white/90 backdrop-blur-md px-8 py-3 rounded-2xl shadow-lux transform translate-y-4 group-hover:translate-y-0 transition-soft duration-500">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">View details</span>
+            </div>
           </div>
         </div>
-        
-        {/* Content Section */}
-        <div className="p-4 md:p-6 flex flex-col flex-grow">
-          <div className="space-y-1 mb-3 md:mb-4">
-            <p className="text-[8px] md:text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">
-              {product.model || "Standard Series"}
-            </p>
-            <h3 className="font-bold text-sm md:text-lg text-slate-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug h-10 md:h-14">
+
+        {/* 📝 Minimalist Content */}
+        <div className="p-8 md:p-10 flex flex-col flex-1 space-y-6">
+          <div className="space-y-3">
+            <h3 className="text-xl md:text-3xl font-black text-slate-900 leading-[1.1] tracking-tighter group-hover:text-primary transition-soft line-clamp-2 uppercase">
               {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
             </h3>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">
+              {product.model || "Premium Edition"}
+            </p>
           </div>
-          
-          <div className="mt-auto pt-3 md:pt-5 border-t border-slate-50 flex items-center justify-between">
+
+          <div className="pt-6 mt-auto border-t border-slate-50 flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">{t("price") || "Price"}</span>
-              <div className="flex items-baseline gap-0.5 md:gap-1 text-primary font-bold text-sm md:text-xl">
-                <span className="text-[10px] md:text-xs opacity-60">$</span>
-                {formatPrice(product.price)}
-              </div>
+              <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Starting from</span>
+              <span className="text-2xl md:text-3xl font-black text-primary tracking-tighter leading-none">
+                ${formatPrice(product.price)}
+              </span>
             </div>
             
             <button 
               onClick={handleAddToCart}
-              className="p-2 md:p-2.5 bg-slate-900 text-white rounded-lg md:rounded-xl hover:bg-primary transition-all active:scale-95 shadow-sm"
+              className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-slate-300 group-hover:bg-primary group-hover:text-white transition-soft border-lux shadow-sm hover:shadow-lux"
             >
-              <ShoppingCart className="w-3.5 h-3.5 md:w-4 h-4" />
+              <ShoppingCart className="w-5 h-5" />
             </button>
           </div>
         </div>

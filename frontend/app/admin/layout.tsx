@@ -20,7 +20,8 @@ import {
   User,
   Camera,
   Globe,
-  Plus
+  Plus,
+  ShoppingBag
 } from "lucide-react"
 import { createClient } from "../../lib/supabase/client"
 import { useLanguage } from "../../contexts/LanguageContext"
@@ -29,11 +30,29 @@ import toast, { Toaster } from "react-hot-toast"
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [adminName, setAdminName] = useState("Admin")
+  const [isAdminRole, setIsAdminRole] = useState(false)
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [adminProfileImage, setAdminProfileImage] = useState<string | null>(null)
   const [adminBio, setAdminBio] = useState("")
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  
+  // Notification states
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [search, setSearch] = useState("")
+  const notificationRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
   const [isMobile, setIsMobile] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
@@ -50,10 +69,88 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const user = JSON.parse(userStr)
       setAdminName(user.name || "Admin")
       setIsSuperAdmin(user.isSuperAdmin === true)
-      setAdminProfileImage(user.image || null)
+      setAdminProfileImage(user.avatar || null)
       setAdminBio(user.bio || "")
     }
+
+    fetchNotifications()
+    const interval = setInterval(fetchNotifications, 30000) // Poll every 30s
+    return () => clearInterval(interval)
   }, [pathname, router])
+
+  useEffect(() => {
+    // Real-time subscriptions
+    const supabase = createClient()
+    
+    const inquirySub = supabase
+      .channel('inquiry-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Inquiry' }, () => {
+        fetchNotifications()
+      })
+      .subscribe()
+
+    const orderSub = supabase
+      .channel('order-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Order' }, () => {
+        fetchNotifications()
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(inquirySub)
+      supabase.removeChannel(orderSub)
+    }
+  }, [])
+
+  async function fetchNotifications() {
+    const supabase = createClient()
+    
+    try {
+      // Fetch inquiries and orders in parallel
+      const [{ data: latestInquiries }, { data: latestOrders }] = await Promise.all([
+        supabase.from("Inquiry").select("*").order("createdAt", { ascending: false }).limit(5),
+        supabase.from("Order").select("*").order("createdAt", { ascending: false }).limit(5)
+      ])
+
+      const allNotes: any[] = []
+
+      if (latestInquiries) {
+        latestInquiries.forEach(item => {
+          allNotes.push({
+            id: item.id,
+            type: 'inquiry',
+            title: t("newInquiryReceived"),
+            message: item.message?.slice(0, 50) + (item.message?.length > 50 ? '...' : ''),
+            time: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            icon: Mail,
+            color: 'text-purple-600',
+            bg: 'bg-purple-50',
+            createdAt: new Date(item.createdAt)
+          })
+        })
+      }
+
+      if (latestOrders) {
+        latestOrders.forEach(item => {
+          allNotes.push({
+            id: item.id,
+            type: 'order',
+            title: t("newOrderReceived"),
+            message: `${t("order")} #${item.id.slice(-6).toUpperCase()} - $${item.totalAmount}`,
+            time: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            icon: ShoppingBag,
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-50',
+            createdAt: new Date(item.createdAt)
+          })
+        })
+      }
+
+      setNotifications(allNotes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 8))
+    } catch (err) {
+      console.error("Notifications Fetch Error:", err)
+    }
+  }
 
   useEffect(() => {
     const handleResize = () => {
@@ -88,31 +185,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push("/admin/login")
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setSavingProfile(true)
-    try {
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("upload_preset", "ysg_products")
-
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: "POST", body: formData }
-      )
-      const data = await res.json()
-      
-      if (data.secure_url) {
-        setAdminProfileImage(data.secure_url)
-        toast.success(t("photoUploaded") || "Photo uploaded!")
-      }
-    } catch (err) {
-      toast.error("Upload failed")
-    } finally {
-      setSavingProfile(false)
-    }
+    setSelectedFile(file)
+    // Create a local preview
+    const localUrl = URL.createObjectURL(file)
+    setAdminProfileImage(localUrl)
+    
+    // Reset input so same file can be selected again
+    if (e.target) e.target.value = ""
   }
 
   const saveProfile = async () => {
@@ -122,26 +205,57 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!userStr) return
       const user = JSON.parse(userStr)
 
+      let finalImageUrl = adminProfileImage
+
+      // 1. If there's a new file, upload it now
+      if (selectedFile) {
+        const cloudName = (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dpaq3ova2").trim()
+        const uploadPreset = (process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website").trim()
+
+        const formData = new FormData()
+        formData.append("file", selectedFile)
+        formData.append("upload_preset", uploadPreset)
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          { method: "POST", body: formData }
+        )
+        const data = await res.json()
+        
+        if (res.ok && data.secure_url) {
+          // Optimize the URL before saving to database
+          finalImageUrl = data.secure_url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_face,f_auto,q_auto/")
+          toast.success(t("photoUploaded") || "Photo uploaded!")
+        } else {
+          console.error("Cloudinary Error Detail:", data)
+          const errorMsg = data.error?.message || "Image upload failed"
+          throw new Error(errorMsg)
+        }
+      }
+
+      // 2. Update Database
       const supabase = createClient()
       const { error } = await supabase
         .from("User")
         .update({
           name: adminName,
-          image: adminProfileImage,
-          bio: adminBio
+          avatar: finalImageUrl
         })
         .eq("email", user.email)
 
       if (error) throw error
 
       // Update local storage
-      const updatedUser = { ...user, name: adminName, image: adminProfileImage, bio: adminBio }
+      const updatedUser = { ...user, name: adminName, avatar: finalImageUrl }
       localStorage.setItem("ysg_admin_user", JSON.stringify(updatedUser))
       
+      setAdminProfileImage(finalImageUrl)
+      setSelectedFile(null)
       toast.success(t("profileUpdated") || "Profile updated!")
       setShowProfileModal(false)
-    } catch (err) {
-      toast.error("Failed to update profile")
+    } catch (err: any) {
+      console.error("Save profile error:", err)
+      toast.error(err.message || "Failed to update profile")
     } finally {
       setSavingProfile(false)
     }
@@ -164,9 +278,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-[50]
-        w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out
-        flex flex-col
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:-translate-x-full lg:w-0 lg:opacity-0"}
+        bg-white border-r border-slate-200 transition-all duration-300 ease-in-out
+        flex flex-col overflow-hidden
+        ${sidebarOpen 
+          ? "w-72 translate-x-0 opacity-100" 
+          : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0"}
       `}>
         {/* Logo */}
         <div className="h-20 flex items-center px-8 border-b border-slate-50 shrink-0">
@@ -231,34 +347,118 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
-            <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-400">
-              <Link href="/admin/dashboard" className="hover:text-primary transition-colors">Admin</Link>
-              <span className="text-slate-200">/</span>
-              <span className="text-slate-900 capitalize">{pathname.split("/").pop()?.replace("-", " ")}</span>
+            <div className={`hidden sm:flex items-center gap-2 text-[10px] font-black text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
+              <Link href="/admin/dashboard" className="hover:text-primary transition-colors">{t("admin")}</Link>
+              <span className="text-slate-200 text-[14px] font-normal leading-none -mt-0.5">/</span>
+              <span className="text-slate-900">
+                {pathname === "/admin/dashboard" ? t("dashboard") : 
+                 pathname.includes("/admin/products") ? t("products") :
+                 pathname.includes("/admin/categories") ? t("categories") :
+                 pathname.includes("/admin/inquiries") ? t("inquiries") :
+                 pathname.includes("/admin/orders") ? t("orders") :
+                 pathname.includes("/admin/users") ? t("users") :
+                 pathname.includes("/admin/activity") ? t("activity") :
+                 pathname.includes("/admin/audit-logs") ? t("auditLogs") :
+                 pathname.includes("/admin/settings") ? t("settings") :
+                 pathname.split("/").pop()?.replace("-", " ")}
+              </span>
+            </div>
+            
+            {/* Global Search Bar */}
+            <div className="hidden xl:flex relative group max-w-xs w-full ml-4">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <input 
+                type="text" 
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("search") + "..."}
+                className="w-full pl-11 pr-9 py-2 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-4 focus:ring-primary/5 focus:bg-white focus:border-primary/20 transition-all text-sm font-medium" 
+              />
+              {search && (
+                <button 
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors z-10"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-4 lg:gap-6">
-            {/* Language Switcher */}
+            {/* Language Switcher with Flags */}
             <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-100">
               <button
                 onClick={() => setLanguage("en")}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${language === "en" ? "bg-white text-primary shadow-sm" : "text-slate-400"}`}
+                className={`w-10 h-8 rounded-lg flex items-center justify-center transition-all ${language === "en" ? "bg-white shadow-sm ring-1 ring-slate-200" : "grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
+                title="English"
               >
-                EN
+                <img src="https://flagcdn.com/gb.svg" alt="English" className="w-6 h-auto rounded-sm" />
               </button>
               <button
                 onClick={() => setLanguage("kh")}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${language === "kh" ? "bg-white text-primary shadow-sm" : "text-slate-400"}`}
+                className={`w-10 h-8 rounded-lg flex items-center justify-center transition-all ${language === "kh" ? "bg-white shadow-sm ring-1 ring-slate-200" : "grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
+                title="Khmer"
               >
-                KH
+                <img src="https://flagcdn.com/kh.svg" alt="Khmer" className="w-6 h-auto rounded-sm" />
               </button>
             </div>
 
-            <button className="relative p-2.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
-            </button>
+            {/* Notifications */}
+            <div className="relative" ref={notificationRef}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={`p-2 rounded-xl transition-all relative ${showNotifications ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-primary hover:bg-primary/5'}`}
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.length > 0 && (
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white animate-pulse"></span>
+                )}
+              </button>
+
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-3 lg:w-80 bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
+                  <div className="p-4 border-b border-slate-50 flex items-center justify-between">
+                    <h3 className="font-bold text-slate-900 text-sm">{t("notifications")}</h3>
+                    <button className="text-[10px] font-bold text-primary hover:underline uppercase tracking-widest">{t("markAllRead")}</button>
+                  </div>
+                  <div className="max-h-[350px] overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      <div className="divide-y divide-slate-50">
+                        {notifications.map((note) => (
+                          <div key={note.id} className="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
+                            <div className={`shrink-0 w-10 h-10 rounded-xl ${note.bg} ${note.color} flex items-center justify-center`}>
+                              <note.icon className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-slate-900 truncate">{note.title}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{note.message}</p>
+                              <p className="text-[9px] text-slate-400 mt-1 font-medium">{note.time}</p>
+                            </div>
+                            <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center">
+                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                          <Bell className="w-6 h-6 text-slate-300" />
+                        </div>
+                        <p className="text-xs font-bold text-slate-400">{t("noNewNotifications")}</p>
+                      </div>
+                    )}
+                  </div>
+                  <Link 
+                    href="/admin/activity" 
+                    onClick={() => setShowNotifications(false)}
+                    className="block p-4 bg-slate-50 text-center text-[10px] font-bold text-slate-500 hover:text-primary hover:bg-slate-100 transition-all uppercase tracking-widest"
+                  >
+                    {t("viewAllActivity")}
+                  </Link>
+                </div>
+              )}
+            </div>
 
             <button 
               onClick={() => setShowProfileModal(true)}
@@ -266,7 +466,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
                 {adminProfileImage ? (
-                  <img src={adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-primary flex items-center justify-center text-white font-bold text-sm">
                     {adminName.charAt(0)}
@@ -317,7 +517,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="relative group">
                   <div className="w-24 h-24 rounded-3xl bg-slate-100 border-2 border-slate-100 overflow-hidden shadow-inner flex items-center justify-center">
                     {adminProfileImage ? (
-                      <img src={adminProfileImage} alt="Profile" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                      <img 
+                        src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                      />
                     ) : (
                       <User className="w-10 h-10 text-slate-300" />
                     )}

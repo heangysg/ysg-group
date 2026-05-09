@@ -28,10 +28,7 @@ export default function AdminLogin() {
       if (!res.ok) {
         setError(data.error || "Login failed")
       } else {
-        localStorage.setItem("adminLoggedIn", "true")
-        localStorage.setItem("adminEmail", data.user.email)
-        localStorage.setItem("adminName", data.user.name || data.user.email.split("@")[0])
-        localStorage.setItem("isSuperAdmin", data.user.isSuperAdmin ? "true" : "false")
+        localStorage.setItem("ysg_admin_user", JSON.stringify(data.user))
         
         try {
           await logActivity({

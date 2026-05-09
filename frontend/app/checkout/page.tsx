@@ -1,14 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useCart } from "../../contexts/CartContext"
 import { useLanguage } from "../../contexts/LanguageContext"
 import PublicLayout from "../../components/PublicLayout"
 import { createClient } from "../../lib/supabase/client"
 import toast, { Toaster } from "react-hot-toast"
-import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, CreditCard, Truck, User, Phone, MapPin, Package } from "lucide-react"
+import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, CreditCard, Truck, User, Phone, MapPin, Package, Check } from "lucide-react"
 import Link from "next/link"
+import { generateBakongQR } from "../../lib/bakong"
+import BakongQRModal from "../../components/BakongQRModal"
 
 export default function CheckoutPage() {
   const { items, cartTotal, removeFromCart, updateQuantity, clearCart, isLoaded } = useCart()
@@ -20,8 +22,23 @@ export default function CheckoutPage() {
     customerPhone: "",
     customerEmail: "",
     address: "",
-    paymentMethod: "ABA"
+    paymentMethod: "Bakong"
   })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setFormData(prev => ({
+          ...prev,
+          customerName: user.user_metadata?.full_name || "",
+          customerEmail: user.email || ""
+        }))
+      }
+    }
+    fetchUser()
+  }, [])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -60,9 +77,17 @@ export default function CheckoutPage() {
 
       if (error) throw error
 
-      toast.success("Order placed successfully!")
-      clearCart()
-      router.push(`/checkout/success?id=${data[0].id}`)
+      // Redirect immediately to the stable order page
+
+      if (formData.paymentMethod === "Bakong") {
+        toast.success("Order placed! Opening payment...")
+        clearCart()
+        router.push(`/orders/${data[0].id}`)
+      } else {
+        toast.success("Order placed successfully!")
+        clearCart()
+        router.push(`/orders/${data[0].id}`)
+      }
     } catch (error: any) {
       console.error("Error placing order:", error)
       toast.error("Failed to place order. Please try again.")
@@ -206,17 +231,18 @@ export default function CheckoutPage() {
                 <div className="space-y-3">
                   <p className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">{t("paymentMethod")}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {['ABA', 'Wing', 'Cash'].map((method) => (
+                    {['Bakong', 'ABA', 'Wing', 'Cash'].map((method) => (
                       <button
                         key={method}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method }))}
-                        className={`py-4 rounded-2xl font-black text-sm transition-all border-2 ${
+                        className={`py-4 rounded-2xl font-black text-sm transition-all border-2 flex items-center justify-center gap-2 ${
                           formData.paymentMethod === method 
-                            ? "border-primary bg-primary/5 text-primary" 
+                            ? "border-primary bg-primary/5 text-primary shadow-lg shadow-primary/5" 
                             : "border-gray-100 bg-white text-gray-400 hover:border-gray-200"
                         }`}
                       >
+                        {formData.paymentMethod === method && <Check className="w-4 h-4" />}
                         {method}
                       </button>
                     ))}
@@ -257,6 +283,7 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
     </PublicLayout>
   )
 }

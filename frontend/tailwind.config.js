@@ -12,7 +12,8 @@ module.exports = {
         'primary-dark': '#002664',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        nunito: ['var(--font-nunito)', 'Nunito Sans', 'sans-serif'],
       },
     },
   },

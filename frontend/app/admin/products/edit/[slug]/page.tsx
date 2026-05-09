@@ -46,71 +46,85 @@ export default function EditProduct() {
       router.push("/admin/login")
       return
     }
-    fetchCategories()
-    fetchProduct()
+    
+    async function initialFetch() {
+      setFetching(true)
+      const supabase = createClient()
+      try {
+        // Fetch categories and product in parallel
+        const [catRes, prodRes] = await Promise.all([
+          supabase.from("Category").select("*").order("sortOrder", { ascending: true }),
+          supabase.from("Product").select("*").eq("slug", slug).single()
+        ])
+
+        const allCats = catRes.data || []
+        setCategories(allCats)
+        
+        if (prodRes.error || !prodRes.data) {
+          toast.error("Product not found")
+          router.push("/admin/products")
+          return
+        }
+
+        const data = prodRes.data
+        setProductId(data.id)
+        
+        // Handle images: if images column missing, use thumbnail as fallback for the gallery
+        const initialImages = data.images || (data.thumbnail ? [data.thumbnail] : [])
+        setImages(initialImages)
+
+        // Find the correct Main Category and Subcategory
+        let mainCatId = ""
+        let subCatId = ""
+
+        const assignedCat = allCats.find(c => c.id === data.categoryId)
+        if (assignedCat) {
+          if (assignedCat.parentId) {
+            // The assigned category is actually a subcategory
+            mainCatId = assignedCat.parentId
+            subCatId = assignedCat.id
+          } else {
+            // The assigned category is a main category
+            mainCatId = assignedCat.id
+            subCatId = data.subcategoryId || ""
+          }
+        }
+
+        setFormData({
+          name: data.name || "",
+          nameKhmer: data.nameKhmer || "",
+          brand: data.brand || "",
+          model: data.model || "",
+          price: data.price?.toString() || "",
+          year: data.year?.toString() || "",
+          hours: data.hours?.toString() || "",
+          location: data.location || "",
+          condition: data.condition || "used",
+          description: data.description || "",
+          descriptionKhmer: data.descriptionKhmer || "",
+          shortDescription: data.shortDescription || "",
+          isPublished: data.isPublished ?? true,
+          isFeatured: data.isFeatured ?? false,
+          categoryId: mainCatId,
+          subcategoryId: subCatId
+        })
+
+        // Fetch subcategories for the identified main category
+        if (mainCatId) {
+          const subs = allCats.filter(c => c.parentId === mainCatId)
+          setSubcategories(subs)
+        }
+      } catch (err) {
+        console.error("Edit Product Fetch Error:", err)
+      } finally {
+        setFetching(false)
+      }
+    }
+
+    initialFetch()
   }, [slug])
 
-  async function fetchCategories() {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("Category")
-      .select("*")
-      .order("sortOrder", { ascending: true })
-    setCategories(data || [])
-  }
 
-  async function fetchSubcategories(categoryId: string) {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("Category")
-      .select("*")
-      .eq("parentId", categoryId)
-      .eq("isActive", true)
-      .order("sortOrder", { ascending: true })
-    setSubcategories(data || [])
-  }
-
-  async function fetchProduct() {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from("Product")
-      .select("*")
-      .eq("slug", slug)
-      .single()
-
-    if (error || !data) {
-      toast.error("Product not found")
-      router.push("/admin/products")
-      return
-    }
-
-    setProductId(data.id)
-    setImages(data.images || [])
-    setFormData({
-      name: data.name || "",
-      nameKhmer: data.nameKhmer || "",
-      brand: data.brand || "",
-      model: data.model || "",
-      price: data.price?.toString() || "",
-      year: data.year?.toString() || "",
-      hours: data.hours?.toString() || "",
-      location: data.location || "",
-      condition: data.condition || "used",
-      description: data.description || "",
-      descriptionKhmer: data.descriptionKhmer || "",
-      shortDescription: data.shortDescription || "",
-      isPublished: data.isPublished ?? true,
-      isFeatured: data.isFeatured ?? false,
-      categoryId: data.categoryId || "",
-      subcategoryId: data.subcategoryId || ""
-    })
-
-    if (data.categoryId) {
-      fetchSubcategories(data.categoryId)
-    }
-
-    setFetching(false)
-  }
 
   const generateSlug = (name: string) => {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
@@ -144,7 +158,8 @@ export default function EditProduct() {
   const handleCategoryChange = (categoryId: string) => {
     setFormData({...formData, categoryId, subcategoryId: ""})
     if (categoryId) {
-      fetchSubcategories(categoryId)
+      const subs = categories.filter(c => c.parentId === categoryId)
+      setSubcategories(subs)
     } else {
       setSubcategories([])
     }
@@ -175,9 +190,9 @@ export default function EditProduct() {
         shortDescription: formData.shortDescription,
         isPublished: formData.isPublished,
         isFeatured: formData.isFeatured,
-        categoryId: formData.categoryId || null,
-        subcategoryId: formData.subcategoryId || null,
-        images: images,
+        categoryId: formData.subcategoryId || formData.categoryId || null,
+        subcategoryId: null,
+        thumbnail: images[0] || null, // Use the first image as thumbnail
         updatedAt: new Date().toISOString()
       })
       .eq("id", productId)

@@ -42,29 +42,17 @@ export default function AddProduct() {
       router.push("/admin/login")
       return
     }
-    fetchCategories()
+    fetchAllCategories()
   }, [])
 
-  async function fetchCategories() {
+  async function fetchAllCategories() {
     const supabase = createClient()
     const { data } = await supabase
       .from("Category")
       .select("*")
-      .is("parentId", null)
       .eq("isActive", true)
       .order("sortOrder", { ascending: true })
     setCategories(data || [])
-  }
-
-  async function fetchSubcategories(categoryId: string) {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("Category")
-      .select("*")
-      .eq("parentId", categoryId)
-      .eq("isActive", true)
-      .order("sortOrder", { ascending: true })
-    setSubcategories(data || [])
   }
 
   const generateSlug = (name: string) => {
@@ -75,7 +63,8 @@ export default function AddProduct() {
     setSelectedCategory(categoryId)
     setFormData({...formData, categoryId, subcategoryId: ""})
     if (categoryId) {
-      fetchSubcategories(categoryId)
+      const subs = categories.filter((c: any) => c.parentId === categoryId)
+      setSubcategories(subs)
     } else {
       setSubcategories([])
     }
@@ -131,9 +120,9 @@ export default function AddProduct() {
         shortDescription: formData.shortDescription,
         isPublished: formData.isPublished,
         isFeatured: formData.isFeatured,
-        categoryId: formData.categoryId || null,
-        subcategoryId: formData.subcategoryId || null,
-        images: images,
+        categoryId: formData.subcategoryId || formData.categoryId || null,
+        subcategoryId: null,
+        thumbnail: images[0] || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }])

@@ -8,13 +8,11 @@ import {
   FolderOpen, 
   Mail, 
   TrendingUp, 
-  Eye, 
   ShoppingCart, 
   ChevronRight,
   Plus,
   ArrowUpRight,
-  Clock,
-  CheckCircle2
+  Clock
 } from "lucide-react"
 import { useLanguage } from "../../../contexts/LanguageContext"
 
@@ -35,33 +33,40 @@ export default function AdminDashboard() {
   }, [])
 
   async function fetchData() {
+    setLoading(true)
     const supabase = createClient()
     
-    // Fetch counts
-    const { count: productsCount } = await supabase.from("Product").select("*", { count: "exact", head: true })
-    const { count: categoriesCount } = await supabase.from("Category").select("*", { count: "exact", head: true })
-    const { count: inquiriesCount } = await supabase.from("Inquiry").select("*", { count: "exact", head: true })
-    const { count: ordersCount, data: ordersData } = await supabase.from("Order").select("totalAmount", { count: "exact" })
-    
-    // Calculate revenue
-    const totalRevenue = ordersData?.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0) || 0
-    
-    // Recent orders
-    const { data: recent } = await supabase
-      .from("Order")
-      .select("*")
-      .order("createdAt", { ascending: false })
-      .limit(5)
-
-    setStats({
-      products: productsCount || 0,
-      categories: categoriesCount || 0,
-      inquiries: inquiriesCount || 0,
-      orders: ordersCount || 0,
-      revenue: totalRevenue
-    })
-    setRecentOrders(recent || [])
-    setLoading(false)
+    try {
+      // Fetch all stats in parallel for speed
+      const [
+        { count: productsCount },
+        { count: categoriesCount },
+        { count: inquiriesCount },
+        { count: ordersCount, data: ordersData },
+        { data: recent }
+      ] = await Promise.all([
+        supabase.from("Product").select("*", { count: "exact", head: true }),
+        supabase.from("Category").select("*", { count: "exact", head: true }),
+        supabase.from("Inquiry").select("*", { count: "exact", head: true }),
+        supabase.from("Order").select("totalAmount", { count: "exact" }),
+        supabase.from("Order").select("*").order("createdAt", { ascending: false }).limit(5)
+      ])
+      
+      const totalRevenue = ordersData?.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0) || 0
+      
+      setStats({
+        products: productsCount || 0,
+        categories: categoriesCount || 0,
+        inquiries: inquiriesCount || 0,
+        orders: ordersCount || 0,
+        revenue: totalRevenue
+      })
+      setRecentOrders(recent || [])
+    } catch (err) {
+      console.error("Dashboard Fetch Error:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const statCards = [
@@ -79,11 +84,35 @@ export default function AdminDashboard() {
     }).format(price)
   }
 
+  const getStatusLabel = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'pending': return t("pending")
+      case 'paid': return t("paid") || "Paid"
+      case 'confirmed': return t("confirmed")
+      case 'shipping': return t("shipping")
+      case 'completed': return t("completed")
+      case 'cancelled': return t("cancelled")
+      default: return status
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'bg-amber-50 text-amber-600'
+      case 'paid': return 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+      case 'confirmed': return 'bg-blue-50 text-blue-600'
+      case 'shipping': return 'bg-purple-50 text-purple-600'
+      case 'completed': return 'bg-emerald-50 text-emerald-600'
+      case 'cancelled': return 'bg-rose-50 text-rose-600'
+      default: return 'bg-slate-50 text-slate-600'
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Gathering Data...</p>
+        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t("gatheringData")}</p>
       </div>
     )
   }
@@ -159,15 +188,15 @@ export default function AdminDashboard() {
                       <span className="text-xs font-bold text-slate-900">#{order.id.slice(0, 8)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-xs font-bold text-slate-700">{order.customerName || "Walk-in Customer"}</p>
+                      <p className="text-xs font-bold text-slate-700">{order.customerName || t("walkInCustomer")}</p>
                       <p className="text-[10px] text-slate-400 font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-xs font-bold text-slate-900">{formatPrice(order.totalAmount)}</span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 uppercase tracking-wider">
-                        {order.status || "Completed"}
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider ${getStatusColor(order.status)}`}>
+                        {getStatusLabel(order.status)}
                       </span>
                     </td>
                   </tr>
@@ -191,11 +220,11 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-900">
-                    {i % 2 === 0 ? "New product added" : "New inquiry received"}
+                    {i % 2 === 0 ? t("newProductAdded") : t("newInquiryReceived")}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="w-3 h-3 text-slate-300" />
-                    <p className="text-[10px] text-slate-400 font-medium">2 hours ago</p>
+                    <p className="text-[10px] text-slate-400 font-medium">{t("twoHoursAgo")}</p>
                   </div>
                 </div>
               </div>

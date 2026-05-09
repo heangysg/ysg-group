@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { createClient } from "../../../lib/supabase/client"
 import { logActivity } from "../../../lib/audit"
-import { Plus, Eye, Edit, Trash2, Search, Filter, Package, ChevronRight, MoreHorizontal } from "lucide-react"
+import { Plus, Eye, Edit, Trash2, Search, Filter, Package, ChevronRight, MoreHorizontal, X } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../contexts/LanguageContext"
 
@@ -17,24 +17,33 @@ export default function AdminProducts() {
   const { t, language } = useLanguage()
 
   useEffect(() => {
-    fetchCategories()
+    async function initialFetch() {
+      setLoading(true)
+      const supabase = createClient()
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          supabase.from("Category").select("*").order("sortOrder", { ascending: true }),
+          supabase.from("Product").select("*").order("createdAt", { ascending: false }).limit(50)
+        ])
+        setCategories(catRes.data || [])
+        setProducts(prodRes.data || [])
+      } catch (err) {
+        console.error("Initial Fetch Error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    initialFetch()
   }, [])
 
   useEffect(() => {
-    fetchProducts()
+    // Only refetch if search or filter changes after initial load
+    if (!loading) {
+      fetchProducts()
+    }
   }, [search, selectedCategory])
 
-  async function fetchCategories() {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("Category")
-      .select("*")
-      .order("sortOrder", { ascending: true })
-    setCategories(data || [])
-  }
-
   async function fetchProducts() {
-    setLoading(true)
     const supabase = createClient()
     let query = supabase
       .from("Product")
@@ -42,7 +51,7 @@ export default function AdminProducts() {
       .order("createdAt", { ascending: false })
     
     if (search) {
-      query = query.ilike("name", `%${search}%`)
+      query = query.or(`name.ilike.%${search}%,nameKhmer.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`)
     }
     if (selectedCategory) {
       query = query.eq("categoryId", selectedCategory)
@@ -50,7 +59,6 @@ export default function AdminProducts() {
     
     const { data } = await query
     setProducts(data || [])
-    setLoading(false)
   }
 
   async function deleteProduct(id: string, name: string) {
@@ -109,11 +117,19 @@ export default function AdminProducts() {
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder={t("searchProducts")}
+            placeholder={t("search") || "Search..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-slate-700 text-sm outline-none"
+            className="w-full pl-12 pr-10 py-2.5 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-slate-700 text-sm outline-none"
           />
+          {search && (
+            <button 
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors z-10"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
         
         <div className="flex items-center gap-4 w-full md:w-auto">

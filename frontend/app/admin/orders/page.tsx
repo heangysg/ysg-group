@@ -13,6 +13,7 @@ import {
   Truck, 
   CreditCard,
   User,
+  Mail,
   Phone,
   MapPin,
   Calendar,
@@ -97,6 +98,9 @@ export default function AdminOrders() {
 
   const filteredOrders = orders.filter(o => 
     (o.customerName || "").toLowerCase().includes(search.toLowerCase()) || 
+    (o.customerEmail || "").toLowerCase().includes(search.toLowerCase()) || 
+    (o.customerPhone || "").toLowerCase().includes(search.toLowerCase()) || 
+    (o.status || "").toLowerCase().includes(search.toLowerCase()) || 
     o.id.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -122,11 +126,19 @@ export default function AdminOrders() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder={t("searchProducts") || "Search orders..."}
+            placeholder={t("search") || "Search..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-sm"
+            className="w-full pl-12 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-sm"
           />
+          {search && (
+            <button 
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors z-10"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -163,7 +175,7 @@ export default function AdminOrders() {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${getStatusColor(order.status)}`}>
-                      {order.status || "Pending"}
+                      {t(order.status || "pending")}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -189,17 +201,17 @@ export default function AdminOrders() {
             <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900">Order #{selectedOrder.id.slice(0, 8)}</h2>
+                  <h2 className="text-2xl font-bold text-slate-900">{t("orderId")} #{selectedOrder.id.slice(0, 8)}</h2>
                   <p className="text-sm text-slate-400 mt-1">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                 </div>
                 <div className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-widest ${getStatusColor(selectedOrder.status)}`}>
-                  {selectedOrder.status || "Pending"}
+                  {t(selectedOrder.status || "pending")}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Customer Information</h3>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("customerInfo")}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 text-slate-600">
                       <User className="w-4 h-4" />
@@ -216,7 +228,7 @@ export default function AdminOrders() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Shipping Address</h3>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("shippingAddress")}</h3>
                   <div className="flex gap-3 text-slate-600">
                     <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                     <span className="text-sm font-medium leading-relaxed">
@@ -227,24 +239,28 @@ export default function AdminOrders() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Order Items</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("orderItems")}</h3>
                 <div className="space-y-2">
                   {selectedOrder.items?.map((item: any, idx: number) => (
                     <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white rounded-lg border border-slate-200 flex items-center justify-center">
-                          <Package className="w-6 h-6 text-slate-300" />
+                        <div className="w-12 h-12 bg-white rounded-lg border border-slate-200 flex items-center justify-center overflow-hidden">
+                          {item.image ? (
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <Package className="w-6 h-6 text-slate-300" />
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-bold text-slate-900">{item.name}</p>
-                          <p className="text-xs text-slate-400">Qty: {item.quantity}</p>
+                          <p className="text-xs text-slate-400">{t("qty")}: {item.quantity}</p>
                         </div>
                       </div>
                       <span className="text-sm font-bold text-slate-900">{formatPrice(item.price * item.quantity)}</span>
                     </div>
                   ))}
                   <div className="mt-6 flex justify-between items-center p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                    <span className="text-sm font-bold text-slate-900">Total Amount</span>
+                    <span className="text-sm font-bold text-slate-900">{t("totalAmount")}</span>
                     <span className="text-xl font-bold text-primary">{formatPrice(selectedOrder.totalAmount)}</span>
                   </div>
                 </div>
@@ -260,7 +276,7 @@ export default function AdminOrders() {
                 <X className="w-5 h-5" />
               </button>
 
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Update Status</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{t("updateStatus")}</h3>
               <div className="space-y-3 flex-1">
                 {[
                   { id: "pending", icon: Clock, color: "text-amber-600", bg: "bg-amber-100" },
@@ -279,7 +295,7 @@ export default function AdminOrders() {
                     }`}
                   >
                     <status.icon className="w-4 h-4" />
-                    <span className="capitalize">{status.id}</span>
+                    <span className="capitalize">{t(status.id)}</span>
                   </button>
                 ))}
               </div>
@@ -288,7 +304,7 @@ export default function AdminOrders() {
                 onClick={() => setSelectedOrder(null)}
                 className="w-full py-4 mt-8 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold text-sm shadow-sm hover:bg-slate-50 transition-all"
               >
-                Close Details
+                {t("closeDetails")}
               </button>
             </div>
           </div>

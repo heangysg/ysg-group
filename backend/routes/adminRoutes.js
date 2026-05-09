@@ -13,7 +13,9 @@ router.post('/login', authController.login);
 router.get('/create-admin', authController.createAdmin);
 
 // Users
+router.post('/users', userController.createUser);
 router.get('/users', userController.getAllUsers);
 router.patch('/users', userController.updateUser);
+router.get('/audit', userController.getAuditLogs);
 
 module.exports = router;
