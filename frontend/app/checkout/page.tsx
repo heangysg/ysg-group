@@ -233,24 +233,65 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 ml-2">{t("paymentMethod")}</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    {['Bakong', 'ABA', 'Wing', 'Cash'].map((method) => (
-                      <button
-                        key={method}
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method }))}
-                        className={`py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest transition-soft border-2 flex items-center justify-center gap-3 ${
-                          formData.paymentMethod === method 
-                            ? "border-primary bg-primary/5 text-primary shadow-xl shadow-primary/5" 
-                            : "border-slate-50 bg-slate-50/50 text-slate-400 hover:border-slate-100"
-                        }`}
-                      >
-                        {formData.paymentMethod === method && <Check className="w-5 h-5" />}
-                        {method}
-                      </button>
-                    ))}
+                <div className="space-y-8">
+                  <div className="flex flex-col ml-2">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 mb-1">{t("paymentMethod")}</p>
+                    <p className="text-[14px] font-bold text-slate-400 uppercase tracking-tight italic opacity-60">Accepted payment methods</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Bakong KHQR Premium Option */}
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'Bakong' }))}
+                      className={`w-full p-6 rounded-[2.5rem] transition-all duration-300 border-2 text-left flex items-center gap-6 group relative overflow-hidden ${
+                        formData.paymentMethod === 'Bakong'
+                          ? "border-[#E1232E] bg-[#E1232E]/5 shadow-xl shadow-[#E1232E]/5"
+                          : "border-slate-50 bg-slate-50/50 hover:border-slate-200"
+                      }`}
+                    >
+                      {/* Small Red Box for Logo */}
+                      <div className="w-16 h-16 bg-[#E1232E] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#E1232E]/20 transition-transform group-hover:scale-105">
+                        <img 
+                          src="/logo/KHQR Logo.png" 
+                          alt="KHQR" 
+                          className="w-10 h-10 object-contain brightness-0 invert" 
+                        />
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[12px] font-black text-[#E1232E] uppercase tracking-[0.2em]">KHQR</span>
+                          <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                          <span className="text-[16px] font-black text-slate-950 uppercase tracking-tighter">Bakong KHQR</span>
+                        </div>
+                        <p className="text-[13px] font-bold text-slate-400 italic leading-tight">Pay via Cambodia's Bakong QR payment system</p>
+                      </div>
+
+                      {formData.paymentMethod === 'Bakong' && (
+                        <div className="w-8 h-8 bg-[#E1232E] rounded-full flex items-center justify-center text-white shadow-lg animate-in zoom-in duration-300">
+                          <Check className="w-5 h-5" />
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Other Basic Options */}
+                    <div className="grid grid-cols-3 gap-4">
+                      {['ABA', 'Wing', 'Cash'].map((method) => (
+                        <button
+                          key={method}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method }))}
+                          className={`py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest transition-soft border-2 flex items-center justify-center gap-2 ${
+                            formData.paymentMethod === method 
+                              ? "border-primary bg-primary/5 text-primary shadow-xl shadow-primary/5" 
+                              : "border-slate-50 bg-slate-50/50 text-slate-400 hover:border-slate-100"
+                          }`}
+                        >
+                          {method}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

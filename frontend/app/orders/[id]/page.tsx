@@ -23,7 +23,7 @@ export default function OrderDetailsPage() {
 
   useEffect(() => {
     if (!id) return
-    
+
     const fetchOrder = async () => {
       const { data, error } = await supabase
         .from("Order")
@@ -39,7 +39,7 @@ export default function OrderDetailsPage() {
         // If pending, generate QR and auto-open modal
         if (data.status === "pending" && data.paymentMethod === "Bakong") {
           const orderExpiresAt = new Date(data.createdAt).getTime() + (5 * 60 * 1000)
-          
+
           // Use localStorage to securely persist the exact QR code across refreshes
           const cacheKey = `bakong_qr_${data.id}`
           const cachedStr = localStorage.getItem(cacheKey)
@@ -53,11 +53,11 @@ export default function OrderDetailsPage() {
             const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
             const generated = generateBakongQR(data.totalAmount, data.id, expirationToUse)
             const qrPayload = { ...generated, expiresAt: expirationToUse }
-            
+
             setQrData(qrPayload)
             localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
           }
-          
+
           setShowQR(true)
         }
       }
@@ -69,9 +69,9 @@ export default function OrderDetailsPage() {
     // Real-time subscription to order updates
     const subscription = supabase
       .channel(`order-${id}`)
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
         table: 'Order',
         filter: `id=eq.${id}`
       }, (payload) => {
@@ -124,7 +124,7 @@ export default function OrderDetailsPage() {
       const expirationToUse = Date.now() + (5 * 60 * 1000)
       const generated = generateBakongQR(order.totalAmount, order.id, expirationToUse)
       const qrPayload = { ...generated, expiresAt: expirationToUse }
-      
+
       setQrData(qrPayload)
       localStorage.setItem(`bakong_qr_${order.id}`, JSON.stringify(qrPayload))
       toast.success("QR Code Refreshed")
@@ -135,7 +135,7 @@ export default function OrderDetailsPage() {
     <PublicLayout>
       <Toaster position="top-center" />
       <div className="max-w-7xl mx-auto px-6 py-24 md:py-40 bg-nichhy min-h-screen">
-        
+
         {/* 💎 Elite Header Flow */}
         <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10 animate-in fade-in slide-in-from-top duration-700">
           <div className="space-y-6">
@@ -148,12 +148,11 @@ export default function OrderDetailsPage() {
               ORDER <span className="text-primary">#{order.id.toUpperCase()}</span>
             </h1>
           </div>
-          
-          <div className={`px-10 py-5 rounded-full font-black text-[12px] uppercase tracking-[0.3em] flex items-center gap-4 shadow-sm border transition-soft ${
-            order.status === "paid" 
-            ? "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-200/20" 
-            : "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-200/20"
-          }`}>
+
+          <div className={`px-10 py-5 rounded-full font-black text-[12px] uppercase tracking-[0.3em] flex items-center gap-4 shadow-sm border transition-soft ${order.status === "paid"
+              ? "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-200/20"
+              : "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-200/20"
+            }`}>
             {order.status === "paid" ? (
               <>
                 <CheckCircle2 className="w-5 h-5" />
@@ -170,18 +169,18 @@ export default function OrderDetailsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2 space-y-12 animate-in fade-in slide-in-from-left duration-1000">
-            
+
             {/* 🏗️ Luxury Payment Gateway Card */}
             {order.status === "pending" && order.paymentMethod === "Bakong" && (
               <div className="bg-slate-950 rounded-[4rem] p-12 md:p-20 text-white relative overflow-hidden group shadow-2xl shadow-slate-950/20">
                 <div className="relative z-10 space-y-8">
                   <div className="space-y-4">
                     <span className="text-[10px] font-black text-primary uppercase tracking-[0.5em]">Digital Transaction</span>
-                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">Complete Your <br/>Secure Payment</h2>
+                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">Complete Your <br />Secure Payment</h2>
                     <p className="text-slate-400 font-bold italic opacity-80 leading-relaxed max-w-md">Your industrial machinery is reserved. Please process the transaction via Bakong KHQR to finalize your order.</p>
                   </div>
-                  
-                  <button 
+
+                  <button
                     onClick={() => setShowQR(true)}
                     className="bg-white text-slate-950 px-12 py-7 rounded-[2.5rem] font-black text-[13px] uppercase tracking-[0.4em] flex items-center gap-5 hover:bg-slate-100 transition-soft active:scale-95 shadow-2xl shadow-white/10"
                   >
@@ -234,7 +233,7 @@ export default function OrderDetailsPage() {
                   </div>
                 ))}
               </div>
-              
+
               <div className="mt-16 pt-10 border-t border-slate-50 flex justify-between items-center">
                 <span className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px]">Grand Total Investment</span>
                 <span className="text-4xl md:text-5xl font-black text-primary tracking-tighter">{formatPrice(order.totalAmount)}</span>
