@@ -31,27 +31,28 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-slate-950 text-slate-400 pt-24 pb-32 md:pb-12 border-t border-slate-900 font-nunito">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
-          {/* 🏗️ Brand Soul */}
-          <div className="space-y-8">
-            <Link href="/" className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center p-2 shadow-premium group-hover:scale-105 transition-soft">
+    <footer className="bg-white text-slate-500 pt-32 pb-40 md:pb-16 border-t border-slate-50 rounded-t-[4rem] shadow-lux-deep relative z-10">
+      <div className="max-w-[1440px] mx-auto px-10 md:px-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 mb-24">
+          
+          {/* 💎 The Brand Boutique */}
+          <div className="space-y-10">
+            <Link href="/" className="flex items-center gap-5 group">
+              <div className="w-16 h-16 bg-white rounded-[1.5rem] flex items-center justify-center p-3 shadow-sm border border-slate-100 group-hover:scale-105 transition-soft">
                 <img src="/logo.png" alt="YSG Logo" className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col">
-                <span className="text-white font-black text-xl tracking-tight uppercase">YSG MACHINERY</span>
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] opacity-70">Premium Solutions</span>
+                <span className="text-slate-950 font-black text-2xl tracking-tighter uppercase leading-none">YSG MACHINERY</span>
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] mt-2 opacity-60">Industrial Boutique</span>
               </div>
             </Link>
-            <p className="text-[13px] leading-relaxed max-w-xs font-medium text-slate-500">
-              Setting the global standard for heavy machinery excellence. We provide specialized industrial solutions for the world's most ambitious projects.
+            <p className="text-[14px] leading-relaxed max-w-xs font-bold italic text-slate-400 opacity-80">
+              Setting the global standard for industrial excellence. We provide elite machinery solutions for the world's most ambitious projects.
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {[Globe, Camera, Send, Play].map((Icon, i) => (
-                <a key={i} href="#" className="w-11 h-11 rounded-2xl bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-soft border border-transparent hover:border-primary/20 group">
-                  <Icon className="w-5 h-5 group-hover:scale-110 transition-soft" />
+                <a key={i} href="#" className="w-12 h-12 rounded-[1.2rem] bg-slate-50 flex items-center justify-center text-slate-900 hover:bg-primary hover:text-white transition-soft border border-slate-100 group">
+                  <Icon className="w-5.5 h-5.5 group-hover:scale-110 transition-soft" />
                 </a>
               ))}
             </div>
@@ -60,12 +61,12 @@ export default function Footer() {
           {/* Navigation Segments */}
           {sections.map((section, i) => (
             <div key={i}>
-              <h3 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-8">{section.title}</h3>
-              <ul className="space-y-5">
+              <h3 className="text-slate-950 font-black text-[12px] uppercase tracking-[0.3em] mb-10">{section.title}</h3>
+              <ul className="space-y-6">
                 {section.links.map((link, j) => (
                   <li key={j}>
-                    <Link href={link.href} className="text-[13px] font-bold text-slate-500 hover:text-white transition-soft flex items-center gap-3 group">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-soft" />
+                    <Link href={link.href} className="text-[14px] font-black text-slate-400 hover:text-primary transition-soft flex items-center gap-4 group uppercase tracking-widest">
+                      <div className="w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-soft" />
                       {link.name}
                     </Link>
                   </li>
@@ -74,41 +75,41 @@ export default function Footer() {
             </div>
           ))}
 
-          {/* Modern Contact Hub */}
-          <div className="space-y-8">
-            <h3 className="text-white font-black text-xs uppercase tracking-[0.2em] mb-8">{t("contactUs") || "Contact"}</h3>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="w-11 h-11 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-                  <MapPin className="w-5 h-5 text-primary" />
+          {/* Boutique Contact Hub */}
+          <div className="space-y-10">
+            <h3 className="text-slate-950 font-black text-[12px] uppercase tracking-[0.3em] mb-10">{t("contactUs") || "Contact Specialist"}</h3>
+            <div className="space-y-8">
+              <div className="flex gap-6 group">
+                <div className="w-14 h-14 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-primary/5 transition-soft">
+                  <MapPin className="w-6 h-6 text-primary" />
                 </div>
-                <div className="text-[13px]">
-                  <p className="text-white font-black mb-1 tracking-wide">Headquarters</p>
-                  <p className="font-medium text-slate-500 leading-relaxed">Industrial Zone, Phnom Penh, Cambodia</p>
+                <div className="text-[14px]">
+                  <p className="text-slate-950 font-black mb-1 tracking-tight uppercase">Headquarters</p>
+                  <p className="font-bold text-slate-400 leading-relaxed italic">Phnom Penh, Cambodia</p>
                 </div>
               </div>
-              <div className="flex gap-4">
-                <div className="w-11 h-11 rounded-2xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-                  <Phone className="w-5 h-5 text-primary" />
+              <div className="flex gap-6 group">
+                <div className="w-14 h-14 rounded-[1.2rem] bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-primary/5 transition-soft">
+                  <Phone className="w-6 h-6 text-primary" />
                 </div>
-                <div className="text-[13px]">
-                  <p className="text-white font-black mb-1 tracking-wide">Sales Hotline</p>
-                  <p className="font-medium text-slate-500">+855 12 345 678</p>
+                <div className="text-[14px]">
+                  <p className="text-slate-950 font-black mb-1 tracking-tight uppercase">Sales Hotline</p>
+                  <p className="font-bold text-slate-400 leading-relaxed italic">+855 12 345 678</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 💳 Bottom Bar: Clean & Minimal */}
-        <div className="pt-12 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-[11px] font-bold tracking-wider text-slate-600">
-            © {currentYear} YSG MACHINERY SOLUTIONS. ALL RIGHTS RESERVED.
+        {/* 🚀 Precise Bottom Bar */}
+        <div className="pt-16 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-10">
+          <p className="text-[11px] font-black tracking-[0.3em] text-slate-300 uppercase">
+            © {currentYear} YSG INDUSTRIAL SOLUTIONS. DEFINING EXCELLENCE.
           </p>
-          <div className="flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-            <Link href="/privacy" className="hover:text-white transition-soft">Privacy</Link>
-            <Link href="/terms" className="hover:text-white transition-soft">Terms</Link>
-            <Link href="/sitemap" className="hover:text-white transition-soft">Sitemap</Link>
+          <div className="flex items-center gap-12 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+            <Link href="/privacy" className="hover:text-primary transition-soft">Privacy</Link>
+            <Link href="/terms" className="hover:text-primary transition-soft">Terms</Link>
+            <Link href="/sitemap" className="hover:text-primary transition-soft">Sitemap</Link>
           </div>
         </div>
       </div>

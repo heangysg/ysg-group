@@ -71,58 +71,40 @@ export default function PublicLayout({
   }, [pathname])
 
   return (
-    <div className={`min-h-screen bg-white selection:bg-primary/10 selection:text-primary ${language === "kh" ? "khmer-mode" : ""}`}>
-      {/* 📱 Premium App-Native Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-[200] animate-in fade-in duration-500">
-          {/* Solid Backdrop: Clarity Mode */}
-          <div 
-            className="absolute inset-0 bg-slate-900/60"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          
-          {/* Menu Content: Pure White & Sharp Dock */}
-          <div className="absolute top-0 right-0 w-[75%] max-w-xs h-full bg-white shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
-            
-            {/* 1. Branded Header */}
-            <div className="p-5 flex items-center justify-between border-b border-slate-50">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
-                  <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
-                </div>
-                <span className="text-[13px] font-bold text-slate-900 tracking-tighter uppercase">YSG MACHINERY</span>
+    <div className={`min-h-screen bg-nichhy selection:bg-primary selection:text-white ${language === "kh" ? "khmer-mode" : ""}`}>
+      {/* 📱 Boutique Slide-out Sidebar (Right) */}
+      <div className={`fixed inset-0 z-[200] transition-opacity duration-500 ${mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        
+        {/* Sidebar Panel */}
+        <div className={`absolute top-0 right-0 bottom-0 w-[320px] bg-white shadow-2xl transition-transform duration-500 ease-out border-l border-slate-100 flex flex-col ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}>
+          {/* Header */}
+          <div className="p-10 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-sm">
+                <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
               </div>
-              <button 
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-900 active:scale-90 transition-soft border border-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <span className="text-[14px] font-black text-slate-950 tracking-tighter uppercase">YSG PORTAL</span>
             </div>
+            <button 
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-950 active:scale-90 transition-soft"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-            {/* 2. User Profile: Only if Logged In */}
-            {user && (
-              <div className="p-5 bg-slate-50/30">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm overflow-hidden">
-                    {user?.user_metadata?.avatar_url ? (
-                      <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <UserIcon className="w-5 h-5 text-slate-200" />
-                    )}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Authenticated</span>
-                    <span className="text-sm font-bold text-slate-900 tracking-tight truncate max-w-[140px]">
-                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-            {/* 3. High-Contrast Navigation */}
-            <div className="flex-1 overflow-y-auto py-4 px-3 no-scrollbar">
-              <nav className="flex flex-col gap-0.5">
+          {/* Navigation Links */}
+          <div className="flex-1 overflow-y-auto px-8 py-4 no-scrollbar">
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-6">Menu Exploration</p>
+              <nav className="flex flex-col gap-1">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href
                   const Icon = item.icon
@@ -131,86 +113,86 @@ export default function PublicLayout({
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center gap-3.5 px-5 py-2 rounded-xl text-[15px] font-bold uppercase tracking-widest transition-soft ${
+                      className={`flex items-center gap-6 px-6 py-5 rounded-2xl text-[14px] font-black uppercase tracking-[0.2em] transition-soft group ${
                         isActive 
-                          ? "bg-primary/5 text-primary" 
-                          : "text-slate-900 active:bg-slate-50"
+                          ? "bg-primary text-white shadow-xl shadow-primary/20" 
+                          : "text-slate-950 hover:bg-slate-50"
                       }`}
                     >
-                      <Icon className={`w-5.5 h-5.5 ${isActive ? "text-primary" : "text-slate-900"}`} />
+                      <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-primary opacity-30 group-hover:opacity-100"}`} />
                       {item.name}
                     </Link>
                   )
                 })}
               </nav>
             </div>
+          </div>
 
-            {/* 4. Bottom Footer Actions */}
-            <div className="p-4 border-t border-slate-50 space-y-2">
-              <button
-                onClick={() => {
-                  setLanguage(language === "en" ? "kh" : "en")
-                  setMobileMenuOpen(false)
-                }}
-                className="flex items-center gap-3 px-5 py-2.5 rounded-xl text-[15px] font-bold uppercase tracking-widest text-slate-900 hover:bg-slate-50 transition-soft w-full text-left"
+          {/* Bottom Profile/Actions */}
+          <div className="p-8 border-t border-slate-50 bg-slate-50/30 space-y-4">
+            {user ? (
+              <div className="flex items-center gap-5 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm mb-4">
+                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center overflow-hidden border border-slate-100">
+                  {user.user_metadata?.avatar_url ? (
+                    <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <UserIcon className="w-6 h-6 text-primary/20" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-black text-slate-950 truncate">{user.user_metadata?.full_name || user.email?.split('@')[0]}</p>
+                  <button onClick={handleLogout} className="text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline">Sign Out</button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center p-5 rounded-2xl bg-primary text-white font-black text-[11px] uppercase tracking-[0.3em] shadow-lg shadow-primary/20 transition-soft active:scale-95"
               >
-                <div className="flex items-center gap-3">
-                  <Globe className="w-5.5 h-5.5 text-primary" />
-                  {language === "en" ? "ភាសាខ្មែរ" : "English"}
-                </div>
-                <div className="w-6 h-4 rounded-sm overflow-hidden shadow-sm ml-auto">
-                  <img 
-                    src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
-                    alt="flag"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </button>
+                Sign In
+              </Link>
+            )}
 
-              {user ? (
-                <button
-                  onClick={() => {
-                    handleLogout()
-                    setMobileMenuOpen(false)
-                  }}
-                  className="w-full flex items-center justify-center gap-3 p-3.5 rounded-xl bg-white border border-slate-100 text-red-500 font-bold text-xs uppercase tracking-widest active:scale-95 transition-soft shadow-sm"
-                >
-                  <LogOut className="w-4 h-4" />
-                  {t("logout")}
-                </button>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center p-3.5 rounded-xl bg-slate-900 text-white font-bold text-xs uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-soft"
-                >
-                  Access Account
-                </Link>
-              )}
-            </div>
+            <button
+              onClick={() => {
+                setLanguage(language === "en" ? "kh" : "en")
+                setMobileMenuOpen(false)
+              }}
+              className="w-full flex items-center gap-4 px-6 py-4 bg-white border border-slate-100 rounded-2xl text-[11px] font-black uppercase tracking-widest text-slate-950 hover:bg-slate-50 transition-soft"
+            >
+              <div className="w-6 h-4 rounded-sm overflow-hidden border border-slate-200">
+                <img 
+                  src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
+                  alt="flag"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="flex-1 text-left">{language === "en" ? "ភាសាខ្មែរ" : "English"}</span>
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* 🚀 Slim & Sharp Minimalist Header */}
+      {/* 🚀 Slim & Sharp Boutique Header */}
       {!hideNav && (
-        <header className={`fixed top-0 left-0 right-0 z-[100] transition-soft bg-white border-b border-slate-100 ${
-          scrolled ? "h-14 md:h-16 shadow-sm" : "h-16 md:h-20"
+        <header className={`fixed top-0 left-0 right-0 z-[100] transition-soft ${
+          scrolled ? "bg-white/80 backdrop-blur-xl h-16 shadow-lux-deep" : "bg-transparent h-20 md:h-24"
         }`}>
           <div className="max-w-[1440px] mx-auto px-6 md:px-12 h-full">
             <div className="flex justify-between items-center h-full">
               
               {/* Logo: Compact & Sharp */}
-              <Link href="/" className="flex items-center gap-3 group">
-                <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-50 group-hover:scale-105 transition-soft">
-                  <img src="/logo.png" alt="Logo" className="w-6 h-6 md:w-7 md:h-7 object-contain" />
+              <Link href="/" className="flex items-center gap-4 group">
+                <div className="relative w-11 h-11 md:w-14 md:h-14 flex items-center justify-center bg-white rounded-[1.2rem] shadow-sm border border-slate-100 group-hover:scale-105 transition-soft">
+                  <img src="/logo.png" alt="Logo" className="w-7 h-7 md:w-9 md:h-9 object-contain" />
                 </div>
                 <div className="flex flex-col leading-none">
-                  <span className="text-[14px] md:text-[16px] font-bold tracking-tighter text-slate-900 uppercase">
+                  <span className="text-[14px] md:text-[20px] font-black tracking-tighter text-primary uppercase">
                     YSG MACHINERY
                   </span>
-                  <span className="text-[7px] md:text-[8px] font-bold tracking-[0.2em] text-slate-400 uppercase mt-0.5">
-                    Premium Solutions
+                  <span className="text-[8px] md:text-[10px] font-black tracking-[0.4em] text-slate-400 uppercase mt-1">
+                    Elite Industrial Boutique
                   </span>
                 </div>
               </Link>
@@ -223,10 +205,10 @@ export default function PublicLayout({
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`px-5 py-2 rounded-lg text-[15px] font-bold uppercase tracking-widest transition-soft ${
+                      className={`px-5 py-2.5 rounded-xl text-[14px] font-bold uppercase tracking-[0.1em] transition-soft ${
                         isActive 
                           ? "text-primary bg-primary/5" 
-                          : "text-slate-900 hover:text-primary hover:bg-slate-50"
+                          : "text-slate-500 hover:text-primary hover:bg-slate-50/50"
                       }`}
                     >
                       {item.name}
@@ -239,66 +221,62 @@ export default function PublicLayout({
               <div className="hidden lg:flex items-center gap-6">
                 <button
                   onClick={() => setLanguage(language === "en" ? "kh" : "en")}
-                  className="flex items-center gap-2.5 px-4 py-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg transition-soft border border-slate-50"
+                  className="flex items-center gap-2.5 px-4 py-2 bg-slate-50 hover:bg-slate-100 rounded-xl transition-soft border border-slate-100"
                 >
-                  <div className="w-4 h-3 rounded-sm overflow-hidden shadow-sm">
+                  <div className="w-5 h-3.5 rounded-sm overflow-hidden shadow-sm border border-slate-200">
                     <img 
                       src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
                       alt={language}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[12px] font-bold text-slate-900 tracking-widest uppercase">
+                  <span className="text-[11px] font-bold text-slate-900 tracking-widest uppercase">
                     {language === "en" ? "KH" : "EN"}
                   </span>
                 </button>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   {user ? (
-                    <div className="relative group">
-                      <button className="flex items-center gap-2.5 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-primary transition-soft shadow-sm">
-                        <div className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center overflow-hidden">
-                          {user.user_metadata?.avatar_url ? (
-                            <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                          ) : (
-                            <UserIcon className="w-3 h-3" />
-                          )}
-                        </div>
-                        <span className="text-[13px] font-bold uppercase tracking-widest">{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
-                      </button>
-                    </div>
+                    <Link href="/account" className="flex items-center gap-2.5 px-5 py-2.5 bg-primary text-white rounded-xl hover:bg-primary-dark transition-soft shadow-lg shadow-primary/20">
+                      <div className="w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center overflow-hidden">
+                        {user.user_metadata?.avatar_url ? (
+                          <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <UserIcon className="w-3.5 h-3.5" />
+                        )}
+                      </div>
+                      <span className="text-[12px] font-bold uppercase tracking-widest">{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
+                    </Link>
                   ) : (
-                    <Link href="/login" className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[13px] font-bold uppercase tracking-[0.15em] hover:bg-primary transition-soft shadow-sm">
+                    <Link href="/login" className="px-6 py-2.5 bg-primary text-white rounded-xl text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-primary-dark transition-soft shadow-lg shadow-primary/20">
                       {t("login")}
                     </Link>
                   )}
 
-                  <Link href="/checkout" className="relative group">
-                    <div className="p-2 bg-white text-slate-900 rounded-xl shadow-sm hover:bg-slate-50 transition-soft border border-slate-50">
-                      <ShoppingCart className="w-4.5 h-4.5 text-primary" />
-                      {cartCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-primary text-white text-[8px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-white">
-                          {cartCount}
-                        </span>
-                      )}
-                    </div>
+                  <Link href="/checkout" className="relative group p-2.5 bg-white text-slate-900 rounded-xl shadow-sm hover:bg-slate-50 transition-soft border border-slate-100">
+                    <ShoppingCart className="w-4.5 h-4.5 text-primary" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                        {cartCount}
+                      </span>
+                    )}
                   </Link>
                 </div>
               </div>
 
-              {/* Mobile Actions: Compact */}
-              <div className="flex lg:hidden items-center gap-3">
-                <Link href="/checkout" className="relative p-2.5 bg-slate-900 text-white rounded-xl">
+              {/* Mobile Actions: Precise */}
+              <div className="flex lg:hidden items-center gap-2.5">
+                <Link href="/checkout" className="relative p-2.5 bg-primary text-white rounded-xl shadow-lg shadow-primary/20 active:scale-90 transition-soft">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[8px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                    <span className="absolute -top-1.5 -right-1.5 bg-white text-primary text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary">
                       {cartCount}
                     </span>
                   )}
                 </Link>
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="p-2.5 bg-white text-slate-900 rounded-xl border border-slate-100 shadow-sm"
+                  className="p-2.5 bg-white text-slate-900 rounded-xl border border-slate-100 shadow-sm active:scale-90 transition-soft"
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
@@ -308,8 +286,13 @@ export default function PublicLayout({
         </header>
       )}
 
+      {/* 🚀 Floating Support Action */}
+      <Link href="/contact" className="btn-fab md:hidden">
+        <Mail className="w-6 h-6" />
+      </Link>
+
       {/* Main Content Area */}
-      <main className={`transition-soft ${!hideNav ? "pt-20 md:pt-28 pb-20 md:pb-0" : ""} min-h-screen`}>
+      <main className={`transition-all ${!hideNav ? "pt-14 md:pt-28 pb-20 md:pb-0" : ""} min-h-screen`}>
         <div className="max-w-[1440px] mx-auto">
           {children}
         </div>

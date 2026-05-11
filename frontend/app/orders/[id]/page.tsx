@@ -38,8 +38,26 @@ export default function OrderDetailsPage() {
         setOrder(data)
         // If pending, generate QR and auto-open modal
         if (data.status === "pending" && data.paymentMethod === "Bakong") {
-          const generated = generateBakongQR(data.totalAmount, data.id)
-          setQrData(generated)
+          const orderExpiresAt = new Date(data.createdAt).getTime() + (5 * 60 * 1000)
+          
+          // Use localStorage to securely persist the exact QR code across refreshes
+          const cacheKey = `bakong_qr_${data.id}`
+          const cachedStr = localStorage.getItem(cacheKey)
+          let cachedQR = cachedStr ? JSON.parse(cachedStr) : null
+
+          // If we have a cached QR and it hasn't expired, use it immediately
+          if (cachedQR && Date.now() < cachedQR.expiresAt) {
+            setQrData(cachedQR)
+          } else {
+            // Otherwise generate a new one and cache it
+            const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
+            const generated = generateBakongQR(data.totalAmount, data.id, expirationToUse)
+            const qrPayload = { ...generated, expiresAt: expirationToUse }
+            
+            setQrData(qrPayload)
+            localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
+          }
+          
           setShowQR(true)
         }
       }
@@ -103,8 +121,12 @@ export default function OrderDetailsPage() {
 
   const refreshQR = () => {
     if (order) {
-      const generated = generateBakongQR(order.totalAmount, order.id)
-      setQrData(generated)
+      const expirationToUse = Date.now() + (5 * 60 * 1000)
+      const generated = generateBakongQR(order.totalAmount, order.id, expirationToUse)
+      const qrPayload = { ...generated, expiresAt: expirationToUse }
+      
+      setQrData(qrPayload)
+      localStorage.setItem(`bakong_qr_${order.id}`, JSON.stringify(qrPayload))
       toast.success("QR Code Refreshed")
     }
   }
@@ -112,136 +134,158 @@ export default function OrderDetailsPage() {
   return (
     <PublicLayout>
       <Toaster position="top-center" />
-      <div className="max-w-4xl mx-auto px-4 py-12 md:py-20 font-sans">
-        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <Link href="/" className="text-slate-400 hover:text-primary transition-colors">Home</Link>
-              <ArrowRight className="w-4 h-4 text-slate-300" />
-              <span className="text-slate-900 font-bold">Order Details</span>
+      <div className="max-w-7xl mx-auto px-6 py-24 md:py-40 bg-nichhy min-h-screen">
+        
+        {/* 💎 Elite Header Flow */}
+        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10 animate-in fade-in slide-in-from-top duration-700">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">
+              <Link href="/" className="hover:text-primary transition-soft">Home</Link>
+              <ArrowRight className="w-4 h-4" />
+              <span className="text-slate-950">Order Review</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
-              Order #{order.id.slice(0, 8).toUpperCase()}
+            <h1 className="text-5xl md:text-7xl font-black text-slate-950 tracking-tighter uppercase leading-[0.9]">
+              ORDER <span className="text-primary">#{order.id.toUpperCase()}</span>
             </h1>
           </div>
           
-          <div className={`px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-3 ${
+          <div className={`px-10 py-5 rounded-full font-black text-[12px] uppercase tracking-[0.3em] flex items-center gap-4 shadow-sm border transition-soft ${
             order.status === "paid" 
-            ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
-            : "bg-amber-50 text-amber-600 border border-amber-100"
+            ? "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-emerald-200/20" 
+            : "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-200/20"
           }`}>
             {order.status === "paid" ? (
               <>
                 <CheckCircle2 className="w-5 h-5" />
-                {t("paid") || "Paid"}
+                {t("paid") || "Payment Received"}
               </>
             ) : (
               <>
-                <Clock className="w-5 h-5 animate-pulse" />
-                {t("pending") || "Payment Pending"}
+                <div className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
+                {t("pending") || "Awaiting Payment"}
               </>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            {/* Payment Section for Pending Orders */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <div className="lg:col-span-2 space-y-12 animate-in fade-in slide-in-from-left duration-1000">
+            
+            {/* 🏗️ Luxury Payment Gateway Card */}
             {order.status === "pending" && order.paymentMethod === "Bakong" && (
-              <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden group">
-                <div className="relative z-10">
-                  <h2 className="text-2xl font-black mb-4">Complete Your Payment</h2>
-                  <p className="text-slate-400 mb-8 max-w-md">Your machinery is reserved. Please complete the payment via Bakong KHQR to start processing your order.</p>
+              <div className="bg-slate-950 rounded-[4rem] p-12 md:p-20 text-white relative overflow-hidden group shadow-2xl shadow-slate-950/20">
+                <div className="relative z-10 space-y-8">
+                  <div className="space-y-4">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.5em]">Digital Transaction</span>
+                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">Complete Your <br/>Secure Payment</h2>
+                    <p className="text-slate-400 font-bold italic opacity-80 leading-relaxed max-w-md">Your industrial machinery is reserved. Please process the transaction via Bakong KHQR to finalize your order.</p>
+                  </div>
+                  
                   <button 
                     onClick={() => setShowQR(true)}
-                    className="bg-white text-slate-900 px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-slate-100 transition-all active:scale-95 shadow-xl shadow-white/10"
+                    className="bg-white text-slate-950 px-12 py-7 rounded-[2.5rem] font-black text-[13px] uppercase tracking-[0.4em] flex items-center gap-5 hover:bg-slate-100 transition-soft active:scale-95 shadow-2xl shadow-white/10"
                   >
-                    <CreditCard className="w-5 h-5" />
+                    <CreditCard className="w-6 h-6" />
                     Pay with Bakong KHQR
                   </button>
                 </div>
-                {/* Background Decoration */}
-                <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-all" />
-              </div>
-            )}
-
-            {/* Success Message for Paid Orders */}
-            {order.status === "paid" && (
-              <div className="bg-emerald-50 border border-emerald-100 rounded-[2.5rem] p-8 md:p-10 text-center">
-                <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-white shadow-lg shadow-emerald-200">
-                  <CheckCircle2 className="w-8 h-8" />
+                {/* Decorative Elements */}
+                <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] group-hover:bg-primary/20 transition-soft" />
+                <div className="absolute top-10 right-10 opacity-10">
+                  <Package className="w-40 h-40" />
                 </div>
-                <h2 className="text-2xl font-black text-emerald-900 mb-2">Payment Successful!</h2>
-                <p className="text-emerald-700">Thank you for your purchase. Your machinery order is now being processed by our team.</p>
               </div>
             )}
 
-            {/* Order Items */}
-            <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-10">
-              <h3 className="text-xl font-black text-slate-900 mb-8 flex items-center gap-3">
-                <Package className="w-6 h-6 text-primary" />
-                Order Items
+            {/* 🌿 Success Boutique Message */}
+            {order.status === "paid" && (
+              <div className="bg-white border border-slate-100 rounded-[4rem] p-12 md:p-20 text-center shadow-lux-deep">
+                <div className="w-24 h-24 bg-emerald-500 rounded-[2rem] flex items-center justify-center mx-auto mb-10 text-white shadow-2xl shadow-emerald-500/30">
+                  <CheckCircle2 className="w-12 h-12" />
+                </div>
+                <h2 className="text-4xl font-black text-slate-950 uppercase tracking-tighter mb-4">Payment Successful</h2>
+                <p className="text-slate-500 font-bold italic opacity-80">Thank you for your investment. Your industrial machinery is now being prepared for logistics.</p>
+              </div>
+            )}
+
+            {/* 📦 Order Content Card */}
+            <div className="bg-white border border-slate-100 rounded-[4rem] p-12 md:p-20 shadow-lux-deep">
+              <h3 className="text-2xl font-black text-slate-950 mb-12 uppercase tracking-tighter flex items-center gap-5">
+                <div className="w-1.5 h-8 bg-primary rounded-full" />
+                Equipment Manifest
               </h3>
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {order.items?.map((item: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-4 py-4 border-b border-slate-50 last:border-0">
-                    <div className="w-16 h-16 bg-slate-50 rounded-xl overflow-hidden flex-shrink-0">
+                  <div key={idx} className="flex items-center gap-10 py-8 border-b border-slate-50 last:border-0 group">
+                    <div className="w-24 h-24 bg-slate-50 rounded-[1.5rem] overflow-hidden flex-shrink-0 border border-slate-100 group-hover:scale-95 transition-soft">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex-1">
-                      <h4 className="font-black text-slate-900">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</h4>
-                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{item.brand} • Qty: {item.quantity}</p>
+                    <div className="flex-1 space-y-2">
+                      <h4 className="text-xl font-black text-slate-950 uppercase tracking-tight group-hover:text-primary transition-soft">
+                        {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
+                      </h4>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] opacity-60">
+                        {item.brand} • Unit Qty: {item.quantity}
+                      </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-black text-slate-900">{formatPrice(item.price * item.quantity)}</p>
+                      <p className="text-xl font-black text-slate-950 tracking-tighter">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
               </div>
               
-              <div className="mt-10 pt-8 border-t border-slate-50 flex justify-between items-center">
-                <span className="text-slate-400 font-bold uppercase tracking-widest text-sm">Total Amount</span>
-                <span className="text-3xl font-black text-primary">{formatPrice(order.totalAmount)}</span>
+              <div className="mt-16 pt-10 border-t border-slate-50 flex justify-between items-center">
+                <span className="text-slate-400 font-black uppercase tracking-[0.4em] text-[10px]">Grand Total Investment</span>
+                <span className="text-4xl md:text-5xl font-black text-primary tracking-tighter">{formatPrice(order.totalAmount)}</span>
               </div>
             </div>
           </div>
 
-          <div className="space-y-8">
-            {/* Shipping Details */}
-            <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100">
-              <h3 className="text-lg font-black text-slate-900 mb-6">Shipping Details</h3>
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <User className="w-5 h-5 text-slate-400 shrink-0" />
+          {/* 🚚 Logistics & Support */}
+          <div className="space-y-12 animate-in fade-in slide-in-from-right duration-1000">
+            <div className="bg-white rounded-[3.5rem] p-12 border border-slate-100 shadow-lux-deep">
+              <h3 className="text-xl font-black text-slate-950 mb-10 uppercase tracking-tighter">Logistics Profile</h3>
+              <div className="space-y-10">
+                <div className="flex gap-6 group">
+                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-soft">
+                    <User className="w-6 h-6" />
+                  </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Customer</p>
-                    <p className="font-bold text-slate-900">{order.customerName}</p>
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-1">Customer</p>
+                    <p className="font-black text-slate-950 text-lg tracking-tight">{order.customerName}</p>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <Phone className="w-5 h-5 text-slate-400 shrink-0" />
+                <div className="flex gap-6 group">
+                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-soft">
+                    <Phone className="w-6 h-6" />
+                  </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Contact</p>
-                    <p className="font-bold text-slate-900">{order.customerPhone}</p>
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-1">Secure Contact</p>
+                    <p className="font-black text-slate-950 text-lg tracking-tight">{order.customerPhone}</p>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <MapPin className="w-5 h-5 text-slate-400 shrink-0" />
+                <div className="flex gap-6 group">
+                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-soft">
+                    <MapPin className="w-6 h-6" />
+                  </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Delivery Address</p>
-                    <p className="font-bold text-slate-900 leading-relaxed">{order.address}</p>
+                    <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-1">Site Delivery Address</p>
+                    <p className="font-black text-slate-950 leading-relaxed text-lg tracking-tight">{order.address}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Need Help */}
-            <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8">
-              <h3 className="text-lg font-black text-slate-900 mb-4">Need Help?</h3>
-              <p className="text-sm text-slate-500 mb-6">If you have any questions about your order or payment, please contact our 24/7 support.</p>
-              <a href="tel:+85512345678" className="block w-full py-4 bg-slate-100 rounded-2xl text-center font-black text-sm hover:bg-slate-200 transition-colors">
-                Contact Support
-              </a>
+            <div className="bg-slate-950 rounded-[3.5rem] p-12 text-white relative overflow-hidden group shadow-2xl shadow-slate-950/20">
+              <div className="relative z-10">
+                <h3 className="text-xl font-black mb-4 uppercase tracking-tighter">Need Assistance?</h3>
+                <p className="text-slate-400 text-sm font-bold italic opacity-80 leading-relaxed mb-8">If you have technical questions regarding your order or logistics, our elite support is active 24/7.</p>
+                <a href="tel:+85512345678" className="block w-full py-6 bg-white text-slate-950 rounded-[2rem] text-center font-black text-[12px] uppercase tracking-[0.3em] hover:bg-slate-100 transition-soft active:scale-95 shadow-xl shadow-white/5">
+                  Contact Specialist
+                </a>
+              </div>
+              <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-[60px]" />
             </div>
           </div>
         </div>
@@ -255,6 +299,7 @@ export default function OrderDetailsPage() {
           amount={order.totalAmount}
           orderId={order.id}
           md5={qrData.md5}
+          expiresAt={qrData.expiresAt}
           onSuccess={() => {
             setShowQR(false)
             // Order state will auto-update via real-time subscription

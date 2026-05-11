@@ -23,6 +23,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (language === "kh") {
+      document.documentElement.classList.add("khmer-mode")
+    } else {
+      document.documentElement.classList.remove("khmer-mode")
+    }
+  }, [language])
+
   const setLanguageWrapper = (lang: Language) => {
     setLanguage(lang)
     localStorage.setItem("adminLanguage", lang)

@@ -15,21 +15,35 @@ interface BakongQRModalProps {
   amount: number
   orderId: string
   md5: string
+  expiresAt?: number
   onSuccess?: () => void
   onExpire?: () => void
 }
 
-export default function BakongQRModal({ isOpen, onClose, qrString, amount, orderId, md5, onSuccess, onExpire }: BakongQRModalProps) {
+export default function BakongQRModal({ isOpen, onClose, qrString, amount, orderId, md5, expiresAt, onSuccess, onExpire }: BakongQRModalProps) {
   const { t } = useLanguage()
   const [isChecking, setIsChecking] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(180) // 3 minutes
+  const [timeLeft, setTimeLeft] = useState(300)
   const supabase = createClient()
-  const merchantName = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_NAME || "YSG MACHINERY"
+  const merchantName = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_NAME || "YSG"
 
   // 1. Countdown Timer Effect
   useEffect(() => {
     if (!isOpen) return
-    setTimeLeft(180)
+    
+    // Calculate initial time left
+    let initialTime = 300
+    if (expiresAt) {
+      const remaining = Math.floor((expiresAt - Date.now()) / 1000)
+      initialTime = remaining > 0 ? remaining : 0
+    }
+    setTimeLeft(initialTime)
+
+    if (initialTime <= 0) {
+      if (onExpire) onExpire()
+      return
+    }
+
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -41,7 +55,7 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [isOpen, onExpire])
+  }, [isOpen, onExpire, expiresAt])
 
   // 2. Automated Polling Effect (Every 5 seconds)
   useEffect(() => {
@@ -86,110 +100,90 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
       <Toaster position="top-center" />
       
-      <div className="w-full max-w-[340px] animate-in zoom-in-95 duration-300 relative">
+      <div className="w-full max-w-[290px] animate-in zoom-in-95 duration-300 relative">
         {/* Close Button */}
         <button 
           onClick={onClose} 
-          className="absolute -top-10 right-0 p-2 text-white/60 hover:text-white transition-all"
+          className="absolute -top-12 right-0 p-2 text-white/60 hover:text-white transition-all"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6" />
         </button>
 
-        {/* The Card Container - Aiming for compact 20:29 feel */}
-        <div className="bg-white rounded-[1.5rem] overflow-hidden shadow-2xl relative border border-white/20 font-nunito">
+        {/* The Card Container */}
+        <div className="bg-white rounded-[1.5rem] overflow-hidden shadow-2xl relative font-sans">
           
-          {/* 1. Header: Compact Bakong Red */}
-          <div className="bg-[#E1232E] h-[64px] flex items-center justify-center relative">
+          {/* 1. Header: Bakong Red */}
+          <div className="bg-[#E1232E] h-[70px] flex items-center justify-center relative">
+            {/* Right Side Downward Tail */}
+            <div className="absolute top-full right-0 w-0 h-0 border-t-[20px] border-t-[#E1232E] border-l-[28px] border-l-transparent" />
+            
             <img 
               src="/logo/KHQR Logo.png" 
               alt="KHQR" 
-              className="h-8 object-contain"
+              className="h-6 object-contain"
             />
           </div>
 
-          {/* 2. Folded Corner Effect */}
-          <div className="absolute top-[64px] right-0 w-12 h-12 pointer-events-none z-10">
-            <div className="absolute top-0 right-0 w-0 h-0 border-t-[24px] border-t-[#E1232E] border-l-[24px] border-l-transparent" />
-          </div>
-
-          {/* 3. Card Body - Compact Padding */}
-          <div className="p-6 pt-8 flex flex-col items-center">
+          {/* 3. Card Body */}
+          <div className="p-6 pt-5 flex flex-col">
             {/* Merchant Name */}
-            <h2 className="text-xl font-black text-black tracking-tight text-center uppercase leading-tight mb-6">
+            <h2 className="text-[14px] font-semibold text-slate-500 uppercase tracking-tight leading-tight mb-2 mt-2">
               {merchantName}
             </h2>
 
-            {/* Amount - Large but compact */}
-            <div className="text-center mb-6">
-              <div className="text-4xl font-black text-black flex items-center justify-center gap-0.5">
-                <span className="text-xl font-bold mt-1">$</span>
-                {amount.toLocaleString()}
+            {/* Amount - Large and left aligned */}
+            <div className="mb-4">
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-[36px] font-semibold text-slate-900 leading-none tracking-tight">
+                  {amount}
+                </span>
+                <span className="text-[14px] font-semibold text-slate-500">
+                  USD
+                </span>
               </div>
             </div>
 
-            {/* QR Code Container - Balanced sizing */}
-            <div className="relative bg-white p-3 rounded-2xl border border-slate-100 shadow-inner">
+            {/* Dashed Separator */}
+            <div className="w-full border-t border-dashed border-slate-300 mb-6"></div>
+
+            {/* QR Code Container */}
+            <div className="relative flex justify-center w-full mb-6">
               <QRCodeSVG 
                 value={qrString} 
-                size={180}
+                size={190}
                 level="H"
                 includeMargin={false}
-                imageSettings={{
-                  src: "https://bakong.nbc.gov.kh/images/logo.svg",
-                  x: undefined,
-                  y: undefined,
-                  height: 36,
-                  width: 36,
-                  excavate: true,
-                }}
               />
-            </div>
-
-            {/* Expiry Timer - Integrated */}
-            <div className="mt-6 flex flex-col items-center">
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${
-                timeLeft < 60 ? "bg-red-50 text-red-500 border-red-100 animate-pulse" : "bg-slate-50 text-slate-500 border-slate-100"
-              }`}>
-                Expires: {formatTime(timeLeft)}
+              {/* Custom Black Disc with White $ */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36px] h-[36px] bg-black rounded-full border-[3px] border-white flex items-center justify-center shadow-sm">
+                <span className="text-white text-[18px] font-bold mt-0.5">
+                  $
+                </span>
               </div>
             </div>
 
-            {/* Dynamic Status Indicator */}
-            <div className="w-full mt-6 space-y-4">
-              <div className={`w-full py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2.5 border-2 ${
-                isChecking 
-                ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
-                : "bg-slate-50 border-slate-100 text-slate-400"
-              }`}>
-                {isChecking ? (
-                  <>
-                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                    Success
-                  </>
-                ) : (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-[#E1232E]" />
-                    Waiting for pay...
-                  </>
-                )}
-              </div>
-              
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center justify-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                  <Info className="w-3 h-3" />
-                  Instant Network Sync
-                </div>
-              </div>
+            {/* Expiry Timer */}
+            <div className="flex flex-col items-center">
+              <span className="text-slate-500 font-medium text-[13px]">
+                Expires in: {formatTime(timeLeft)}
+              </span>
             </div>
+            
+            {/* Hidden Polling Status for debugging/UX if needed, but removed visual clutter */}
+            {isChecking && (
+               <div className="absolute bottom-4 right-4 flex items-center gap-2 text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                 <Loader2 className="w-3 h-3 animate-spin" /> Verifying...
+               </div>
+            )}
           </div>
         </div>
       </div>

@@ -16,33 +16,41 @@ export default function AboutPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-12 md:pt-20 px-4">
+      <main className="pb-32 pt-24 md:pt-40 px-6 bg-nichhy min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-3xl mb-20">
-            <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tight">{t("about")} YSG Machinery</h1>
-            <p className="text-gray-500 text-lg md:text-xl leading-relaxed">
-              YSG Machinery is a leading provider of premium heavy equipment solutions, dedicated to excellence in construction, mining, and industrial sectors since 2010.
+          
+          {/* 💎 Boutique Brand Intro */}
+          <div className="max-w-4xl mb-24 animate-in fade-in slide-in-from-top duration-700">
+            <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] block mb-6">Our Legacy</span>
+            <h1 className="text-5xl md:text-8xl font-black text-slate-950 mb-10 tracking-tighter leading-[0.9] uppercase">
+              {t("about")} <br/> <span className="text-primary">YSG MACHINERY</span>
+            </h1>
+            <p className="text-slate-500 text-xl md:text-2xl font-bold italic opacity-80 leading-relaxed max-w-2xl">
+              YSG Machinery is the premier destination for elite industrial equipment, setting the standard for excellence across Southeast Asia since 2010.
             </p>
           </div>
 
-          <div className="relative rounded-[3rem] overflow-hidden bg-gray-900 p-8 md:p-16 mb-24">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent z-0" />
-            <div className="relative z-10 max-w-2xl space-y-6">
-              <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">Your Trusted Partner Since 2010</h2>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                With over a decade of experience, we have built a reputation for reliability, quality, and exceptional customer service, serving businesses across Southeast Asia and beyond.
+          {/* 🏗️ Heavy Industrial Boutique Banner */}
+          <div className="relative rounded-[4rem] overflow-hidden bg-white border border-slate-100 shadow-lux-deep p-12 md:p-24 mb-32 group animate-in fade-in zoom-in duration-1000">
+            <div className="absolute top-0 right-0 w-1/3 h-full bg-slate-50/50 -skew-x-12 translate-x-1/2 group-hover:translate-x-1/3 transition-soft duration-1000" />
+            <div className="relative z-10 max-w-2xl space-y-8">
+              <div className="w-16 h-1.5 bg-primary rounded-full" />
+              <h2 className="text-4xl md:text-6xl font-black text-slate-950 leading-none uppercase tracking-tighter">Your Trusted <br/>Partner Since 2010</h2>
+              <p className="text-slate-500 text-lg md:text-xl font-bold italic opacity-80 leading-relaxed">
+                With over a decade of elite experience, we have engineered a reputation for absolute reliability, quality, and world-class industrial service.
               </p>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          {/* 🧩 Modular Boutique Values */}
+          <div className="grid md:grid-cols-2 gap-12 animate-in fade-in slide-in-from-bottom duration-1000">
             {values.map((item, i) => (
-              <div key={i} className="bg-gray-50 p-10 rounded-[2rem] border border-gray-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 group">
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary mb-6 shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                  <item.icon className="w-8 h-8" />
+              <div key={i} className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-sm hover:shadow-lux-deep transition-soft group">
+                <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-primary mb-10 shadow-sm border border-slate-100 group-hover:bg-primary group-hover:text-white transition-soft">
+                  <item.icon className="w-10 h-10" />
                 </div>
-                <h3 className="font-black text-2xl text-gray-900 mb-4 tracking-tight">{item.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-lg">{item.desc}</p>
+                <h3 className="font-black text-3xl text-slate-950 mb-6 tracking-tighter uppercase">{item.title}</h3>
+                <p className="text-slate-500 font-bold italic opacity-80 leading-relaxed text-lg">{item.desc}</p>
               </div>
             ))}
           </div>

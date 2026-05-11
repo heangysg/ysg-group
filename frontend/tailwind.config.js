@@ -13,6 +13,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        khmer: ['var(--font-kantumruy)', 'sans-serif'],
         nunito: ['var(--font-nunito)', 'Nunito Sans', 'sans-serif'],
       },
     },

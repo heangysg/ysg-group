@@ -1,6 +1,6 @@
 import { BakongKHQR, MerchantInfo } from 'bakong-khqr';
 
-export const generateBakongQR = (amount: number, orderId: string) => {
+export const generateBakongQR = (amount: number, orderId: string, expiresAtTimestamp?: number) => {
   const merchantInfo = new MerchantInfo();
   
   // Use environment variables for security
@@ -14,8 +14,13 @@ export const generateBakongQR = (amount: number, orderId: string) => {
   merchantInfo.billNumber = orderId.slice(0, 20); // Bakong limit
   merchantInfo.storeLabel = process.env.NEXT_PUBLIC_BAKONG_STORE_LABEL || "SITE-D";
   merchantInfo.terminalLabel = process.env.NEXT_PUBLIC_BAKONG_TERMINAL_LABEL || "WEB-D";
-  // Set expiration for dynamic QR (3 mins from now)
-  (merchantInfo as any).expirationTimestamp = Date.now() + (3 * 60 * 1000);
+  
+  // Deterministic expiration or default to 5 mins from now
+  if (expiresAtTimestamp) {
+    (merchantInfo as any).expirationTimestamp = expiresAtTimestamp;
+  } else {
+    (merchantInfo as any).expirationTimestamp = Date.now() + (5 * 60 * 1000);
+  }
 
   if (!merchantInfo.bakongAccountID) {
     console.error("Bakong QR Generation Failed: Bakong Account ID is missing in .env");

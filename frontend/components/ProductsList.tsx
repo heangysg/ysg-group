@@ -175,7 +175,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
             {/* Product Grid */}
             <div className="flex-1">
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {[1, 2, 3, 4, 5, 6].map(n => (
                     <div key={n} className="aspect-[4/5] bg-slate-50 rounded-2xl animate-pulse" />
                   ))}
@@ -187,7 +187,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                   <p className="text-slate-400 text-sm mt-1">Try adjusting your filters or search terms.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
+                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-10">
                   {filteredProducts.map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}

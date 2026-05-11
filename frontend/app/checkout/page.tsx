@@ -61,9 +61,14 @@ export default function CheckoutPage() {
     const supabase = createClient()
 
     try {
+      // Generate a Secure Boutique Short ID (10 chars, Alphanumeric)
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+      const shortId = Array.from({ length: 10 }, () => alphabet.charAt(Math.floor(Math.random() * alphabet.length))).join('')
+      
       const { data, error } = await supabase
         .from("Order")
         .insert({
+          id: shortId,
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           customerEmail: formData.customerEmail,
@@ -129,69 +134,69 @@ export default function CheckoutPage() {
   return (
     <PublicLayout>
       <Toaster position="top-right" />
-      <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Cart Items */}
-          <div className="flex-1 space-y-8">
-            <div className="flex items-center justify-between">
-              <h1 className="text-4xl font-black text-gray-900 tracking-tight">{t("shoppingCart")}</h1>
-              <span className="text-gray-400 font-bold">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
+      <div className="max-w-7xl mx-auto px-6 py-24 md:py-40 bg-nichhy min-h-screen">
+        <div className="flex flex-col lg:flex-row gap-20">
+          {/* 🛒 Elite Shopping Cart Items */}
+          <div className="flex-1 space-y-12 animate-in fade-in slide-in-from-left duration-700">
+            <div className="flex items-center justify-between px-4">
+              <h1 className="text-4xl md:text-6xl font-black text-slate-950 tracking-tighter uppercase">{t("shoppingCart")}</h1>
+              <span className="text-slate-400 font-black text-[11px] uppercase tracking-[0.3em]">{items.length} {items.length === 1 ? 'UNIT' : 'UNITS'}</span>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {items.map((item) => (
-                <div key={item.id} className="bg-white border border-gray-100 rounded-[2rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl hover:shadow-gray-100 transition-all duration-500">
-                  <div className="w-full sm:w-32 h-32 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+                <div key={item.id} className="bg-white border border-slate-100/50 rounded-[3rem] p-10 flex flex-col sm:flex-row gap-10 hover:shadow-lux-deep transition-soft group">
+                  <div className="w-full sm:w-44 h-44 bg-slate-50 rounded-[2rem] overflow-hidden flex-shrink-0 flex items-center justify-center border border-slate-100 transition-soft group-hover:scale-95">
                     {item.image ? (
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     ) : (
-                      <Package className="w-10 h-10 text-gray-200" />
+                      <Package className="w-14 h-14 text-slate-200" />
                     )}
                   </div>
-                  <div className="flex-1 flex flex-col justify-between">
+                  <div className="flex-1 flex flex-col justify-between py-2">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">{item.brand}</p>
-                        <h3 className="text-xl font-black text-gray-900">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</h3>
-                        <p className="text-sm text-gray-400 font-medium">{item.model}</p>
+                      <div className="space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-1">{item.brand}</p>
+                        <h3 className="text-2xl md:text-3xl font-black text-slate-950 uppercase tracking-tighter leading-none group-hover:text-primary transition-soft">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</h3>
+                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] opacity-60">{item.model}</p>
                       </div>
-                      <button onClick={() => removeFromCart(item.id)} className="p-2 text-gray-300 hover:text-red-500 transition-colors">
-                        <Trash2 className="w-5 h-5" />
+                      <button onClick={() => removeFromCart(item.id)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-300 hover:text-red-500 hover:bg-red-50 transition-soft">
+                        <Trash2 className="w-6 h-6" />
                       </button>
                     </div>
                     
-                    <div className="flex justify-between items-end mt-4">
-                      <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-1 px-3">
-                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 text-gray-400 hover:text-gray-900">
-                          <Minus className="w-4 h-4" />
+                    <div className="flex justify-between items-end mt-10">
+                      <div className="flex items-center gap-4 bg-slate-50 rounded-[1.5rem] p-2 px-6 border border-slate-100">
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-2 text-slate-400 hover:text-slate-950 transition-soft active:scale-75">
+                          <Minus className="w-5 h-5" />
                         </button>
-                        <span className="w-8 text-center font-black text-sm">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 text-gray-400 hover:text-gray-900">
-                          <Plus className="w-4 h-4" />
+                        <span className="w-10 text-center font-black text-lg text-slate-950">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-2 text-slate-400 hover:text-slate-950 transition-soft active:scale-75">
+                          <Plus className="w-5 h-5" />
                         </button>
                       </div>
-                      <p className="text-xl font-black text-primary">{formatPrice(item.price * item.quantity)}</p>
+                      <p className="text-2xl md:text-3xl font-black text-primary tracking-tighter">{formatPrice(item.price * item.quantity)}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <Link href="/products" className="inline-flex items-center gap-2 text-primary font-black hover:gap-3 transition-all">
-              <ArrowLeft className="w-5 h-5" />
+            <Link href="/products" className="inline-flex items-center gap-4 text-slate-400 font-black text-[11px] uppercase tracking-[0.3em] hover:text-primary hover:gap-6 transition-soft group px-4">
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-soft" />
               {t("backToProducts")}
             </Link>
           </div>
 
-          {/* Checkout Form */}
-          <div className="lg:w-[450px]">
-            <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 md:p-10 shadow-2xl shadow-gray-100 sticky top-32">
-              <h2 className="text-2xl font-black text-gray-900 mb-8">{t("checkoutDetails")}</h2>
+          {/* 🏗️ Heavy Industrial Boutique Checkout Summary */}
+          <div className="lg:w-[500px] animate-in fade-in slide-in-from-right duration-1000">
+            <div className="bg-white border border-slate-100/50 rounded-[4rem] p-12 md:p-16 shadow-lux-deep sticky top-32">
+              <h2 className="text-3xl font-black text-slate-950 mb-12 uppercase tracking-tighter">{t("checkoutDetails")}</h2>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <form onSubmit={handleSubmit} className="space-y-10">
+                <div className="space-y-5">
+                  <div className="group relative">
+                    <User className="absolute left-8 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-primary transition-soft" />
                     <input 
                       type="text" 
                       name="customerName"
@@ -199,11 +204,11 @@ export default function CheckoutPage() {
                       required
                       value={formData.customerName}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all font-medium"
+                      className="w-full pl-20 pr-10 py-7 bg-slate-50/80 border border-slate-100 rounded-[2rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-soft font-black text-slate-950 placeholder:text-slate-300 text-[18px]"
                     />
                   </div>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <div className="group relative">
+                    <Phone className="absolute left-8 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-primary transition-soft" />
                     <input 
                       type="tel" 
                       name="customerPhone"
@@ -211,11 +216,11 @@ export default function CheckoutPage() {
                       required
                       value={formData.customerPhone}
                       onChange={handleInputChange}
-                      className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all font-medium"
+                      className="w-full pl-20 pr-10 py-7 bg-slate-50/80 border border-slate-100 rounded-[2rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-soft font-black text-slate-950 placeholder:text-slate-300 text-[18px]"
                     />
                   </div>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-6 w-5 h-5 text-gray-400" />
+                  <div className="group relative">
+                    <MapPin className="absolute left-8 top-8 w-6 h-6 text-slate-300 group-focus-within:text-primary transition-soft" />
                     <textarea 
                       name="address"
                       placeholder={t("address")}
@@ -223,42 +228,42 @@ export default function CheckoutPage() {
                       value={formData.address}
                       onChange={handleInputChange}
                       rows={3}
-                      className="w-full pl-12 pr-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all font-medium resize-none"
+                      className="w-full pl-20 pr-10 py-7 bg-slate-50/80 border border-slate-100 rounded-[2.5rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-soft font-black text-slate-950 placeholder:text-slate-300 text-[18px] resize-none"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <p className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">{t("paymentMethod")}</p>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-6">
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 ml-2">{t("paymentMethod")}</p>
+                  <div className="grid grid-cols-2 gap-4">
                     {['Bakong', 'ABA', 'Wing', 'Cash'].map((method) => (
                       <button
                         key={method}
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method }))}
-                        className={`py-4 rounded-2xl font-black text-sm transition-all border-2 flex items-center justify-center gap-2 ${
+                        className={`py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest transition-soft border-2 flex items-center justify-center gap-3 ${
                           formData.paymentMethod === method 
-                            ? "border-primary bg-primary/5 text-primary shadow-lg shadow-primary/5" 
-                            : "border-gray-100 bg-white text-gray-400 hover:border-gray-200"
+                            ? "border-primary bg-primary/5 text-primary shadow-xl shadow-primary/5" 
+                            : "border-slate-50 bg-slate-50/50 text-slate-400 hover:border-slate-100"
                         }`}
                       >
-                        {formData.paymentMethod === method && <Check className="w-4 h-4" />}
+                        {formData.paymentMethod === method && <Check className="w-5 h-5" />}
                         {method}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-gray-100 space-y-3">
-                  <div className="flex justify-between text-gray-500 font-bold">
+                <div className="pt-10 border-t border-slate-50 space-y-4">
+                  <div className="flex justify-between text-slate-400 font-black text-[11px] uppercase tracking-[0.2em]">
                     <span>{t("subtotal")}</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-500 font-bold">
+                  <div className="flex justify-between text-slate-400 font-black text-[11px] uppercase tracking-[0.2em]">
                     <span>{t("shipping")}</span>
-                    <span className="text-green-500 uppercase text-xs tracking-widest">Free</span>
+                    <span className="text-green-500">FREE OF CHARGE</span>
                   </div>
-                  <div className="flex justify-between text-gray-900 text-2xl font-black pt-2">
+                  <div className="flex justify-between text-slate-950 text-3xl font-black pt-4 tracking-tighter uppercase">
                     <span>{t("total")}</span>
                     <span className="text-primary">{formatPrice(cartTotal)}</span>
                   </div>
@@ -267,10 +272,10 @@ export default function CheckoutPage() {
                 <button 
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-primary text-white py-5 rounded-[1.5rem] font-black text-lg shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-3"
+                  className="w-full bg-primary text-white py-7 rounded-[2.5rem] font-black text-[13px] uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 hover:bg-primary-dark hover:-translate-y-1 transition-soft active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-5 mt-4"
                 >
                   {loading ? (
-                    <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                    <div className="w-7 h-7 border-3 border-white/20 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
                       <CreditCard className="w-6 h-6" />
