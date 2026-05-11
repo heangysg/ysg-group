@@ -48,16 +48,22 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
-          if (onExpire) onExpire()
           return 0
         }
         return prev - 1
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [isOpen, onExpire, expiresAt])
+  }, [isOpen, expiresAt])
 
-  // 2. Automated Polling Effect (Every 5 seconds)
+  // 2. Trigger onExpire when timer hits zero
+  useEffect(() => {
+    if (isOpen && timeLeft === 0 && onExpire) {
+      onExpire()
+    }
+  }, [timeLeft, isOpen, onExpire])
+
+  // 3. Automated Polling Effect (Every 5 seconds)
   useEffect(() => {
     if (!isOpen || !md5) return
 

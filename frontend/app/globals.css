@@ -3,116 +3,60 @@
 @tailwind utilities;
 
 :root {
-  --primary: #003485;
-  --primary-dark: #002664;
-  --bg-main: #f9f7f4;
-  --bg-card: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-light: rgba(0, 52, 133, 0.05);
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-khmer: var(--font-kantumruy), var(--font-inter), sans-serif;
-  --radius-lux: 3rem;
+  --primary: #E1232E;
+  --primary-dark: #C11B25;
+  --bg-main: #FFFFFF;
+  --bg-subtle: #F8FAFC;
+  --text-main: #0F172A;
+  --text-muted: #64748B;
+  
+  --font-heading: var(--font-outfit), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
 }
 
-.bg-nichhy {
-  background-color: var(--bg-main);
-}
-
-.shadow-lux-deep {
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.05), 0 18px 36px -18px rgba(0, 0, 0, 0.08);
-}
-
-.rounded-lux {
-  border-radius: var(--radius-lux);
-}
-
-.border-lux {
-  border: 1px solid var(--border-light);
-}
-
-.transition-soft {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  font-family: var(--font-sans);
-  line-height: 1.6;
-  font-size: 15px;
-  overflow-x: hidden;
-  overscroll-behavior-y: none;
-}
-
-.khmer-mode {
-  font-family: var(--font-khmer);
-  line-height: 1.6;
-}
-
-/* 💎 Minimalist Typography - Solid Bold Standard */
-h1, h2, h3, h4, h5, h6, .heading-lux, button, input, select, textarea {
-  letter-spacing: -0.01em;
-  font-weight: 700 !important;
-  color: var(--text-main);
-}
-
-.text-spaced {
-  letter-spacing: 0.2em;
-}
-
-/* 🌫️ Boutique Design Tokens - Solid Clarity Version */
-@layer utilities {
-  .shadow-lux {
-    box-shadow: 0 15px 35px -5px rgba(0, 52, 133, 0.08);
+@layer base {
+  body {
+    @apply bg-white text-slate-900;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 15px;
   }
+  
+  h1 { @apply text-4xl md:text-6xl font-bold tracking-tight; font-family: var(--font-heading); }
+  h2 { @apply text-3xl md:text-5xl font-bold tracking-tight; font-family: var(--font-heading); }
+  h3 { @apply text-2xl md:text-3xl font-bold tracking-tight; font-family: var(--font-heading); }
+  h4 { @apply text-xl md:text-2xl font-bold tracking-tight; font-family: var(--font-heading); }
+}
 
-  .shadow-floating {
-    box-shadow: 0 20px 50px -15px rgba(0, 52, 133, 0.12);
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white font-semibold transition-all duration-300 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/10 active:scale-[0.98];
   }
-
-  .border-lux {
-    border: 1px solid #E1E9F4;
-  }
-
-  /* ☁️ Breathable Containers - Solid & Clear */
-  .card-minimal {
-    @apply bg-white rounded-[2rem] border-lux transition-soft hover:shadow-lux;
-  }
-
-  .btn-luxury {
-    @apply bg-primary text-white px-8 py-4 rounded-2xl font-bold text-[11px] uppercase tracking-widest hover:bg-primary-dark transition-soft shadow-lg shadow-primary/20;
+  
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-xl border border-slate-100 shadow-sm;
   }
 
   .btn-fab {
-    @apply fixed bottom-24 right-6 z-[150] w-14 h-14 bg-primary text-white rounded-2xl shadow-floating flex items-center justify-center active:scale-90 transition-all duration-300;
+    @apply fixed bottom-24 right-6 z-[150] w-12 h-12 bg-white text-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all duration-300 border border-slate-100;
   }
 }
 
-/* 🏎️ Smooth Micro-Interactions */
+.shadow-lux {
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-lux-deep {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+}
+
 .transition-soft {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
 }
 
-.app-button {
-  @apply transition-soft active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer;
-}
-
-/* 📱 Native Mobile Layouts */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.pb-safe-offset-4 {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);
+.bg-nichhy {
+  background: #ffffff;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -125,19 +69,4 @@ h1, h2, h3, h4, h5, h6, .heading-lux, button, input, select, textarea {
 
 .khmer-mode {
   font-family: var(--font-kantumruy), sans-serif !important;
-}
-
-.khmer-mode * {
-  font-family: var(--font-kantumruy), sans-serif !important;
-  letter-spacing: 0 !important;
-}
-
-::selection {
-  background-color: var(--primary);
-  color: #ffffff;
-}
-
-html {
-  scroll-behavior: smooth;
-  height: 100%;
 }

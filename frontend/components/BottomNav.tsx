@@ -19,8 +19,8 @@ export default function BottomNav() {
   ]
 
   return (
-    <nav className="fixed bottom-6 left-0 right-0 z-[100] md:hidden px-6 transition-soft">
-      <div className="max-w-md mx-auto bg-white rounded-[3rem] shadow-lux-deep border border-slate-100/50 backdrop-blur-xl flex items-center justify-around h-20 px-4">
+    <nav className="fixed bottom-8 left-0 right-0 z-[100] md:hidden px-6">
+      <div className="max-w-md mx-auto bg-white/80 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-200 flex items-center justify-around h-[76px] px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
           const Icon = item.icon
@@ -29,30 +29,30 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center flex-1 min-w-0 transition-soft relative h-full group ${
+              className={`flex flex-col items-center justify-center flex-1 transition-all duration-500 relative h-full ${
                 isActive ? "text-primary" : "text-slate-400"
               }`}
             >
-              <div className="relative flex flex-col items-center gap-1.5">
-                <div className={`transition-soft ${isActive ? "scale-110 -translate-y-1" : "group-active:scale-90"}`}>
-                  <Icon className={`w-6 h-6 transition-soft ${isActive ? "stroke-[2.5] text-primary" : "stroke-[2] opacity-30"}`} />
+              <div className="flex flex-col items-center gap-1 relative">
+                <div className={`transition-all duration-500 ${isActive ? "scale-110 -translate-y-0.5" : "hover:text-slate-600"}`}>
+                  <Icon className={`w-6 h-6 ${isActive ? "stroke-[2.5]" : "stroke-[2]"}`} />
                 </div>
                 
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
+                  <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
                     {item.badge}
                   </span>
                 )}
                 
-                <span className={`text-[9px] font-black uppercase tracking-[0.2em] transition-soft ${
-                  isActive ? "text-slate-950 scale-105" : "text-slate-400"
+                <span className={`text-[9px] font-bold uppercase tracking-widest transition-all duration-500 ${
+                  isActive ? "opacity-100 scale-105" : "opacity-40"
                 }`}>
                   {item.name}
                 </span>
               </div>
               
               {isActive && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full shadow-lg shadow-primary/20 animate-in zoom-in duration-500" />
+                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full shadow-lg shadow-primary/40 animate-in zoom-in duration-500" />
               )}
             </Link>
           )

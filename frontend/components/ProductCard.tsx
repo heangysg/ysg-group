@@ -44,14 +44,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="flex flex-col h-full overflow-hidden bg-white rounded-2xl md:rounded-[2.5rem] shadow-lux-deep border border-slate-100/50 transition-soft group-hover:-translate-y-1">
-        {/* 🖼️ High-End Image Showcase (Nichhy Style) */}
-        <div className="relative aspect-square bg-slate-50 overflow-hidden">
+      <div className="flex flex-col h-full overflow-hidden bg-white rounded-[2.5rem] transition-all duration-700 hover:shadow-lux-deep border border-slate-100 relative">
+        {/* 🖼️ High-Impact Image */}
+        <div className="relative aspect-[16/10] bg-slate-50 overflow-hidden">
           {imageUrl && imageUrl !== "" ? (
             <img 
               src={imageUrl} 
               alt={product.name}
-              className="w-full h-full object-cover transition-soft duration-1000 group-hover:scale-105"
+              className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-slate-100">
@@ -59,45 +59,48 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
           
-          {/* Subtle Lux Label */}
-          <div className="absolute top-4 left-4 md:top-6 md:left-6 flex flex-col gap-2">
-            <span className="px-3 py-1.5 md:px-4 md:py-2 bg-white/90 backdrop-blur-md rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em] text-slate-950 shadow-sm border border-slate-100">
+          {/* Badge: Bright & Sharp */}
+          <div className="absolute top-5 left-5">
+            <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[9px] font-bold uppercase tracking-[0.2em] text-slate-950 shadow-sm border border-slate-100">
               {product.brand || "Industrial"}
             </span>
           </div>
-
-          {/* Quick Action Overlay */}
-          <div className="absolute inset-0 bg-slate-950/5 opacity-0 group-hover:opacity-100 transition-soft flex items-center justify-center">
-            <div className="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-xl shadow-lux-deep transform translate-y-4 group-hover:translate-y-0 transition-soft duration-500">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-950">View Details</span>
-            </div>
-          </div>
         </div>
 
-        {/* 📝 Minimalist Content */}
-        <div className="p-4 md:p-8 flex flex-col flex-1 space-y-4 md:space-y-6">
-          <div className="space-y-1.5 md:space-y-2">
-            <h3 className="text-sm md:text-xl font-black text-slate-950 leading-tight tracking-tighter group-hover:text-primary transition-soft line-clamp-1 uppercase">
+        {/* 📝 Info Grid */}
+        <div className="p-6 flex flex-col flex-1">
+          <div className="space-y-1 mb-4">
+            <h3 className="text-[16px] font-bold text-slate-900 leading-tight tracking-tight line-clamp-1 uppercase group-hover:text-primary transition-colors">
               {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
             </h3>
-            <p className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">
-              {product.model || "Premium Edition"}
-            </p>
+            <div className="flex items-center gap-2">
+               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                 {product.model || "Standard"}
+               </span>
+               <div className="w-1 h-1 bg-slate-200 rounded-full" />
+               <div className="flex items-center gap-1">
+                 <MapPin className="w-3 h-3 text-slate-300" />
+                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{product.location || "Cambodia"}</span>
+               </div>
+            </div>
           </div>
 
-          <div className="pt-4 md:pt-6 mt-auto border-t border-slate-50 flex items-center justify-between">
+          <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[7px] md:text-[8px] font-black text-slate-300 uppercase tracking-widest mb-0.5 md:mb-1">Price Est.</span>
-              <span className="text-lg md:text-2xl font-black text-primary tracking-tighter leading-none">
-                ${formatPrice(product.price)}
-              </span>
+              <span className="text-[8px] font-bold text-slate-300 uppercase tracking-[0.2em] mb-1">Price Est.</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-lg font-bold text-slate-900 tracking-tighter">$</span>
+                <span className="text-xl font-bold text-slate-900 tracking-tighter">
+                  {formatPrice(product.price)}
+                </span>
+              </div>
             </div>
             
             <button 
               onClick={handleAddToCart}
-              className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-soft border border-slate-100 shadow-sm hover:shadow-lux-deep active:scale-95"
+              className="w-11 h-11 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/10 active:scale-95 border border-slate-100"
             >
-              <ShoppingCart className="w-4.5 h-4.5 md:w-6 md:h-6" />
+              <ShoppingCart className="w-5 h-5" />
             </button>
           </div>
         </div>
