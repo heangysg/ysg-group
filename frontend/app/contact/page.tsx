@@ -28,103 +28,95 @@ export default function ContactPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-32 pt-24 md:pt-40 px-6 bg-nichhy min-h-screen">
+      <main className="pb-32 pt-6 md:pt-10 px-6 bg-white min-h-screen">
         <Toaster position="top-center" />
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-20 items-start">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
             
             {/* 💎 Elite Contact Info */}
-            <div className="space-y-16 animate-in fade-in slide-in-from-left duration-700">
+            <div className="space-y-12 animate-in fade-in slide-in-from-left duration-700">
               <div className="space-y-6">
-                <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] block">Support Portal</span>
-                <h1 className="text-5xl md:text-7xl font-black text-slate-950 leading-[0.9] tracking-tighter uppercase">
+                <div className="flex items-center gap-3">
+                  <div className="h-px w-8 bg-primary" />
+                  <span className="text-[10px] font-medium text-primary uppercase tracking-[0.2em]">{t("contactUs") || "Contact Us"}</span>
+                </div>
+                <h1 className="text-2xl md:text-4xl font-medium text-slate-900 tracking-tight uppercase leading-tight">
                   {t("contact")}
                 </h1>
-                <p className="text-slate-500 text-lg md:text-xl font-bold italic opacity-80 leading-relaxed max-w-xl">
-                  Have questions about our machinery? Our elite team is here to help you find the perfect industrial solution.
+                <p className="text-slate-600 font-normal leading-relaxed max-w-xl">
+                  {language === "kh" 
+                    ? "ប្រសិនបើអ្នកមានចម្ងល់អំពីលក្ខណៈពិសេស ឬចាប់អារម្មណ៍លើផលិតផលពីគេហទំព័ររបស់យើង សូមកុំស្ទាក់ស្ទើរក្នុងការទាក់ទងមកយើងតាមរយៈលេខទូរស័ព្ទ ឬអ៊ីមែល។ យើងខ្ញុំសូមអរគុណយ៉ាងជ្រាលជ្រៅចំពោះការចាប់អារម្មណ៍របស់អ្នកចំពោះផលិតផលរបស់យើង។" 
+                    : "If you have any feature inquiry or you are interested in products from our website, please don't hesitate to contact us through phone number or our email. We truly appreciate for your interested with our products."}
                 </p>
               </div>
 
-              <div className="grid gap-10">
-                <div className="flex gap-8 items-center group p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-lux-deep transition-soft">
-                  <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-soft shadow-sm border border-slate-100">
-                    <Phone className="w-8 h-8" />
+              <div className="grid gap-4">
+                {[
+                  { icon: Phone, label: t("phone"), value: "010 / 011 / 012 / 070: 309 302", color: "text-primary" },
+                  { icon: Mail, label: t("email"), value: "yeungshigroup123@gmail.com", color: "text-primary" },
+                  { icon: MapPin, label: t("location"), value: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.", color: "text-primary" },
+                  { icon: Clock, label: language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours", value: "8:00 am – 5:30 pm (Mon – Sat)", color: "text-primary" }
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-6 items-center p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary/20 transition-all group">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm border border-slate-100 group-hover:bg-primary group-hover:text-white transition-all">
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-[9px] font-medium uppercase tracking-widest text-slate-500 mb-1">{item.label}</h4>
+                      <p className="text-[16px] md:text-[18px] font-normal text-slate-700 tracking-tight">{item.value}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-2">{t("phone")}</h4>
-                    <p className="text-2xl font-black text-slate-950 tracking-tight group-hover:text-primary transition-soft">+855 12 345 678</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-8 items-center group p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-lux-deep transition-soft">
-                  <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-soft shadow-sm border border-slate-100">
-                    <Mail className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-2">{t("email")}</h4>
-                    <p className="text-2xl font-black text-slate-950 tracking-tight group-hover:text-primary transition-soft">sales@ysgmachinery.com</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-8 items-center group p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-lux-deep transition-soft">
-                  <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-soft shadow-sm border border-slate-100">
-                    <MapPin className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-2">{t("location")}</h4>
-                    <p className="text-2xl font-black text-slate-950 tracking-tight group-hover:text-primary transition-soft">Phnom Penh, Cambodia</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* 🏗️ Heavy Industrial Boutique Form */}
-            <div className="bg-white rounded-[4rem] p-12 md:p-20 border border-slate-100 shadow-lux-deep animate-in fade-in slide-in-from-right duration-1000">
-              <form onSubmit={handleSubmit} className="space-y-10">
-                <div className="grid gap-10">
-                  <div className="space-y-3">
-                    <label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">{t("customerName")} *</label>
+            {/* 🏗️ Professional Contact Form */}
+            <div className="bg-white rounded-[2rem] p-8 md:p-12 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-right duration-1000">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("customerName")} *</label>
                     <input 
                       type="text" 
                       required 
-                      className="w-full px-10 py-7 bg-slate-50/80 border border-slate-100 rounded-[2rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-soft outline-none font-black text-slate-950 placeholder:text-slate-300 text-[18px]" 
-                      placeholder="Your Name"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px]" 
+                      placeholder={language === "kh" ? "ឈ្មោះពេញរបស់អ្នក" : "Your Full Name"}
                       value={formData.name} 
                       onChange={(e) => setFormData({...formData, name: e.target.value})} 
                     />
                   </div>
                   
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">{t("email")} *</label>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("email")} *</label>
                       <input 
                         type="email" 
                         required 
-                        className="w-full px-10 py-7 bg-slate-50/80 border border-slate-100 rounded-[2rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-soft outline-none font-black text-slate-950 placeholder:text-slate-300 text-[18px]" 
-                        placeholder="Email Address"
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px]" 
+                        placeholder={language === "kh" ? "អាសយដ្ឋានអ៊ីមែល" : "Email Address"}
                         value={formData.email} 
                         onChange={(e) => setFormData({...formData, email: e.target.value})} 
                       />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">{t("phone")}</label>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("phone")}</label>
                       <input 
                         type="tel" 
-                        className="w-full px-10 py-7 bg-slate-50/80 border border-slate-100 rounded-[2rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-soft outline-none font-black text-slate-950 placeholder:text-slate-300 text-[18px]" 
-                        placeholder="Phone Number"
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px]" 
+                        placeholder={language === "kh" ? "លេខទូរស័ព្ទ" : "Phone Number"}
                         value={formData.phone} 
                         onChange={(e) => setFormData({...formData, phone: e.target.value})} 
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 px-2">{t("message")} *</label>
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("message")} *</label>
                     <textarea 
-                      rows={6} 
+                      rows={5} 
                       required 
-                      className="w-full px-10 py-8 bg-slate-50/80 border border-slate-100 rounded-[2.5rem] focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-soft outline-none font-black text-slate-950 placeholder:text-slate-300 text-[18px] resize-none" 
-                      placeholder="How can we help you?"
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px] resize-none" 
+                      placeholder={language === "kh" ? "តើអ្នកចង់ឱ្យយើងជួយអ្វីខ្លះចំពោះអាជីវកម្មរបស់អ្នក?" : "How can we help your business?"}
                       value={formData.message} 
                       onChange={(e) => setFormData({...formData, message: e.target.value})} 
                     />
@@ -134,14 +126,14 @@ export default function ContactPage() {
                 <button 
                   type="submit" 
                   disabled={loading} 
-                  className="w-full bg-primary text-white py-7 rounded-[2.5rem] font-black uppercase tracking-[0.4em] text-[13px] shadow-2xl shadow-primary/30 hover:bg-primary-dark hover:-translate-y-1 transition-soft flex items-center justify-center gap-5 disabled:opacity-50 mt-10"
+                  className="w-full bg-slate-950 text-white py-4 rounded-xl font-medium uppercase tracking-widest text-[11px] shadow-lg hover:bg-primary transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-6"
                 >
                   {loading ? (
-                    <div className="animate-spin rounded-full h-7 w-7 border-3 border-white/20 border-t-white" />
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white" />
                   ) : (
                     <>
                       {language === "kh" ? "បញ្ជូនសារ" : "Send Message"}
-                      <Send className="w-6 h-6" />
+                      <Send className="w-4 h-4" />
                     </>
                   )}
                 </button>

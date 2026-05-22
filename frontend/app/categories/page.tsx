@@ -31,36 +31,41 @@ export default function CategoriesPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-32 px-4 pt-12 md:pt-24 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <main className="pb-24 pt-6 md:pt-10 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
           {/* Hero Header */}
-          <div className="mb-20 text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-[10px] font-bold uppercase tracking-widest mb-6 border border-primary/10">
-              <Package className="w-3 h-3" />
-              {t("ourDepartments") || "Our Departments"}
+          <div className="mb-16 md:mb-24 text-center max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <div className="h-px w-8 bg-primary" />
+              <span className="text-[10px] font-medium text-primary uppercase tracking-[0.2em]">
+                {t("ourDepartments") || "Industrial Departments"}
+              </span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6 tracking-tight">{t("categories")}</h1>
-            <p className="text-slate-500 text-lg md:text-xl font-medium leading-relaxed">
-              Explore our comprehensive range of high-performance machinery, specialized equipment, and genuine spare parts.
+            <h1 className="text-2xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight uppercase">
+              {t("categories")}
+            </h1>
+            <p className="text-slate-600 font-normal leading-relaxed">
+              {language === "kh" 
+                ? "ស្វែងរកផលិតផលជាច្រើនរបស់យើង រួមមានគ្រឿងចក្រដែលមានប្រសិទ្ធភាពខ្ពស់ ឧបករណ៍ឯកទេស និងគ្រឿងបន្លាស់ពិតប្រាកដ។" 
+                : "Explore our comprehensive range of high-performance machinery, specialized equipment, and genuine spare parts."}
             </p>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="aspect-[4/5] bg-slate-50 rounded-3xl animate-pulse" />
+                <div key={n} className="aspect-[4/5] bg-slate-50 rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {mainCategories.map((mainCat: any) => {
                 const subCats = categories.filter(c => c.parentId === mainCat.id)
                 
                 return (
                   <div key={mainCat.id} className="group flex flex-col">
-                    {/* Main Category Card */}
                     <Link href={`/categories/${mainCat.slug}`} className="block relative h-full">
-                      <div className="bg-white rounded-3xl overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 flex flex-col h-full group">
+                      <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-500 flex flex-col h-full group">
                         {/* Image Header */}
                         <div className="aspect-[16/10] bg-slate-50 relative overflow-hidden">
                           {mainCat.image ? (
@@ -71,43 +76,43 @@ export default function CategoriesPage() {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-200">
-                              <Package className="w-16 h-16 stroke-[1]" />
+                              <Package className="w-12 h-12 stroke-[1.5]" />
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                          <div className="absolute bottom-6 left-6 right-6">
-                            <h3 className="text-2xl font-bold text-white tracking-tight">
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+                          <div className="absolute bottom-5 left-6 right-6">
+                            <h3 className="text-[18px] md:text-[20px] font-medium text-white tracking-tight uppercase">
                               {language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}
                             </h3>
                           </div>
                         </div>
 
                         {/* Content Section */}
-                        <div className="p-8 flex flex-col flex-grow">
+                        <div className="p-6 md:p-8 flex flex-col flex-grow">
                           <div className="space-y-4 mb-8">
-                            <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">
-                              {mainCat.description || `Browse our latest ${mainCat.name.toLowerCase()} solutions for your business needs.`}
+                            <p className="text-slate-600 text-[13px] font-normal leading-relaxed line-clamp-2">
+                              {mainCat.description || (language === "kh" ? `ស្វែងរកដំណោះស្រាយដ៏ល្អបំផុតនៅក្នុងប្រភេទ ${mainCat.nameKhmer || mainCat.name}។` : `Explore elite solutions in the ${mainCat.name.toLowerCase()} category.`)}
                             </p>
                             
                             {/* Subcategories List */}
                             <div className="flex flex-wrap gap-2">
                               {subCats.slice(0, 3).map((sub) => (
-                                <span key={sub.id} className="px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                                <span key={sub.id} className="px-2.5 py-1 bg-slate-50 text-slate-500 rounded-lg text-[9px] font-medium uppercase tracking-wider border border-slate-50">
                                   {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
                                 </span>
                               ))}
                               {subCats.length > 3 && (
-                                <span className="px-3 py-1 bg-slate-50 text-slate-400 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                                  +{subCats.length - 3} More
+                                <span className="px-2.5 py-1 bg-slate-50 text-slate-400 rounded-lg text-[9px] font-medium uppercase tracking-wider">
+                                  +{subCats.length - 3}
                                 </span>
                               )}
                             </div>
                           </div>
 
                           <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
-                            <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("viewCollection") || "View Collection"}</span>
-                            <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center group-hover:bg-primary transition-colors">
-                              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            <span className="text-[10px] font-medium text-slate-900 uppercase tracking-widest">{t("viewCollection") || "View Collection"}</span>
+                            <div className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center group-hover:bg-primary transition-colors">
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                             </div>
                           </div>
                         </div>

@@ -99,12 +99,12 @@ export default function AdminProducts() {
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t("products")}</h1>
+          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">{t("products")}</h1>
           <p className="text-sm text-slate-500 mt-1">{t("manageProductInventory")}</p>
         </div>
         <Link
           href="/admin/products/new"
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
         >
           <Plus className="w-4 h-4" />
           {t("addProduct")}
@@ -156,18 +156,18 @@ export default function AdminProducts() {
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading Inventory...</p>
+            <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">Loading Inventory...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("productInfo")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("category")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("price")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("status")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
+                  <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("productInfo")}</th>
+                  <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("category")}</th>
+                  <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("price")}</th>
+                  <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("status")}</th>
+                  <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -187,7 +187,7 @@ export default function AdminProducts() {
                           )}
                         </div>
                         <div>
-                          <h4 className="text-sm font-bold text-slate-900">
+                          <h4 className="text-sm font-medium text-slate-900">
                             {language === "kh" ? product.nameKhmer || product.name : product.name}
                           </h4>
                           <p className="text-[10px] font-medium text-slate-400 mt-0.5 tracking-tight">#{product.id.slice(0, 8)}</p>
@@ -195,7 +195,7 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                      <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                         {(() => {
                           const cat = categories.find(c => c.id === product.categoryId);
                           if (!cat) return t("general");
@@ -204,7 +204,7 @@ export default function AdminProducts() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-bold text-slate-900">{formatPrice(product.price)}</p>
+                      <p className="text-sm font-medium text-slate-900">{formatPrice(product.price)}</p>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">

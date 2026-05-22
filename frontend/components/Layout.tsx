@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/90 backdrop-blur-md shadow-md" : "bg-white border-b"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold text-[#003485]">
+            <Link href="/" className="text-2xl font-medium text-[#003485]">
               YSG<span className="text-black">Machinery</span>
             </Link>
             
@@ -72,7 +72,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     pathname === item.href
-                      ? "bg-blue-50 text-[#003485] font-semibold"
+                      ? "bg-blue-50 text-[#003485] font-medium"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
@@ -93,11 +93,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">YSG Machinery</h3>
+              <h3 className="text-xl font-medium mb-4">YSG Machinery</h3>
               <p className="text-gray-400 text-sm">Premium heavy equipment solutions since 2010</p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <h4 className="font-medium mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li><Link href="/products" className="hover:text-white">Products</Link></li>
                 <li><Link href="/categories" className="hover:text-white">Categories</Link></li>
@@ -105,7 +105,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
+              <h4 className="font-medium mb-4">Contact</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li>sales@ysgmachinery.com</li>
                 <li>+855 XX XXX XXXX</li>
@@ -113,7 +113,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Hours</h4>
+              <h4 className="font-medium mb-4">Hours</h4>
               <ul className="space-y-2 text-sm text-gray-400">
                 <li>Mon-Fri: 8:00 - 17:00</li>
                 <li>Sat: 8:00 - 12:00</li>

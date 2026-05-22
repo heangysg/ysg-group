@@ -139,7 +139,7 @@ export default function UsersManagementPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading Personnel...</p>
+        <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">Loading Personnel...</p>
       </div>
     )
   }
@@ -150,12 +150,12 @@ export default function UsersManagementPage() {
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t("adminManagement")}</h1>
+          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">{t("adminManagement")}</h1>
           <p className="text-sm text-slate-500 mt-1">{t("createAndManageAdmins")}</p>
         </div>
         <button
           onClick={openAddModal}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
         >
           <UserPlus className="w-4 h-4" />
           {t("addNewAdmin")}
@@ -167,10 +167,10 @@ export default function UsersManagementPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("user")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("emailAddress")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("role")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("user")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("emailAddress")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("role")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -185,7 +185,7 @@ export default function UsersManagementPage() {
                           <User className="w-5 h-5 text-slate-400" />
                         )}
                       </div>
-                      <span className="text-sm font-bold text-slate-900">{user.name}</span>
+                      <span className="text-sm font-medium text-slate-900">{user.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -194,7 +194,7 @@ export default function UsersManagementPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <div className={`w-1.5 h-1.5 rounded-full ${user.isSuperAdmin ? "bg-primary" : "bg-emerald-500"}`} />
-                      <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">
+                      <span className="text-xs font-medium text-slate-600 uppercase tracking-widest">
                         {user.isSuperAdmin ? t("superadmin") : t("admin")}
                       </span>
                     </div>
@@ -222,7 +222,7 @@ export default function UsersManagementPage() {
             <div className="p-8 border-b border-slate-100">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
+                  <h2 className="text-2xl font-medium text-slate-900">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
                   <p className="text-sm text-slate-400 mt-1">
                     {isEditing ? t("updateCredentialsProfile") : t("createCredentialsNewAdmin")}
                   </p>
@@ -245,7 +245,7 @@ export default function UsersManagementPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 pb-4 text-sm font-bold transition-all relative ${
+                      className={`flex items-center gap-2 pb-4 text-sm font-medium transition-all relative ${
                         activeTab === tab.id ? "text-primary" : "text-slate-400 hover:text-slate-600"
                       }`}
                     >
@@ -271,27 +271,27 @@ export default function UsersManagementPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
                       <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-slate-900"
+                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
+                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
                       <input
                         type="email"
                         required
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-slate-900"
+                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">
+                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">
                         {t("password")} {isEditing && <span className="text-[8px] opacity-60 italic">{t("leaveBlankToKeep")}</span>}
                       </label>
                       <input
@@ -299,7 +299,7 @@ export default function UsersManagementPage() {
                         required={!isEditing}
                         value={formData.password}
                         onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-slate-900"
+                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900"
                       />
                     </div>
                     <div className="flex items-center gap-4">
@@ -311,7 +311,7 @@ export default function UsersManagementPage() {
                         <div className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${formData.isSuperAdmin ? "left-7" : "left-1"}`} />
                       </button>
                       <div className="flex flex-col">
-                        <span className="text-xs font-bold text-slate-900">{t("makeSuperadmin")}</span>
+                        <span className="text-xs font-medium text-slate-900">{t("makeSuperadmin")}</span>
                         <span className="text-[10px] text-slate-400 font-medium">{t("grantsFullAccess")}</span>
                       </div>
                     </div>
@@ -321,14 +321,14 @@ export default function UsersManagementPage() {
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all"
+                      className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 transition-all"
                     >
                       {t("cancel")}
                     </button>
                     <button
                       type="submit"
                       disabled={saving}
-                      className="flex-1 py-4 px-6 rounded-2xl bg-primary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
+                      className="flex-1 py-4 px-6 rounded-2xl bg-primary text-white font-medium text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
                     >
                       {saving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                       {isEditing ? t("saveChanges") : t("addNewAdmin")}
@@ -340,7 +340,7 @@ export default function UsersManagementPage() {
                   {historyLoading ? (
                     <div className="py-12 flex flex-col items-center justify-center">
                       <RefreshCw className="w-8 h-8 text-primary animate-spin mb-4" />
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fetching Personnel Logs...</p>
+                      <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Fetching Personnel Logs...</p>
                     </div>
                   ) : userHistory.length === 0 ? (
                     <div className="py-12 text-center bg-slate-50 rounded-[2.5rem] border border-slate-100">
@@ -352,18 +352,18 @@ export default function UsersManagementPage() {
                       {userHistory.map((log, idx) => (
                         <div key={idx} className="p-5 bg-white border border-slate-100 rounded-3xl shadow-sm hover:shadow-md transition-all">
                           <div className="flex items-center justify-between mb-2">
-                            <span className={`text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-widest ${
+                            <span className={`text-[10px] font-medium px-3 py-1 rounded-lg uppercase tracking-widest ${
                               log.action === 'login' ? 'bg-blue-50 text-blue-600' :
                               log.action === 'create' ? 'bg-emerald-50 text-emerald-600' :
                               log.action === 'delete' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
                             }`}>
                               {log.action}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-bold">
+                            <span className="text-[10px] text-slate-400 font-medium">
                               {new Date(log.created_at || log.time).toLocaleString()}
                             </span>
                           </div>
-                          <p className="text-sm font-bold text-slate-900">{log.details?.name || log.entity_type || log.entityType}</p>
+                          <p className="text-sm font-medium text-slate-900">{log.details?.name || log.entity_type || log.entityType}</p>
                           <p className="text-[10px] text-slate-400 mt-1 font-medium">{log.details?.reason || log.details?.details || ""}</p>
                         </div>
                       ))}

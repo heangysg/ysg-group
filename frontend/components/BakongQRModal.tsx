@@ -19,7 +19,7 @@ interface BakongQRModalProps {
   onSuccess?: () => void
   onExpire?: () => void
 }
-
+  
 export default function BakongQRModal({ isOpen, onClose, qrString, amount, orderId, md5, expiresAt, onSuccess, onExpire }: BakongQRModalProps) {
   const { t } = useLanguage()
   const [isChecking, setIsChecking] = useState(false)
@@ -30,7 +30,7 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
   // 1. Countdown Timer Effect
   useEffect(() => {
     if (!isOpen) return
-    
+
     // Calculate initial time left
     let initialTime = 300
     if (expiresAt) {
@@ -69,12 +69,12 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
 
     const pollInterval = setInterval(async () => {
       const isPaid = await checkBakongTransaction(md5)
-      
+
       if (isPaid) {
         clearInterval(pollInterval)
         handleSuccess()
       }
-    }, 5000)
+    }, 3000)
 
     return () => clearInterval(pollInterval)
   }, [isOpen, md5])
@@ -86,15 +86,13 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
         .from("Order")
         .update({ status: "paid" })
         .eq("id", orderId)
-      
+
       if (error) throw error
-      
-      toast.success("Payment Received Successfully!")
-      
+
       if (onSuccess) {
-        setTimeout(onSuccess, 2000)
+        setTimeout(onSuccess, 500)
       } else {
-        setTimeout(onClose, 2000)
+        setTimeout(onClose, 500)
       }
     } catch (err) {
       console.error("Auto-verify failed:", err)
@@ -114,11 +112,11 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
       <Toaster position="top-center" />
-      
+
       <div className="w-full max-w-[290px] animate-in zoom-in-95 duration-300 relative">
         {/* Close Button */}
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="absolute -top-12 right-0 p-2 text-white/60 hover:text-white transition-all"
         >
           <X className="w-6 h-6" />
@@ -126,15 +124,15 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
 
         {/* The Card Container */}
         <div className="bg-white rounded-[1.5rem] overflow-hidden shadow-2xl relative font-sans">
-          
+
           {/* 1. Header: Bakong Red */}
           <div className="bg-[#E1232E] h-[70px] flex items-center justify-center relative">
             {/* Right Side Downward Tail */}
             <div className="absolute top-full right-0 w-0 h-0 border-t-[20px] border-t-[#E1232E] border-l-[28px] border-l-transparent" />
-            
-            <img 
-              src="/logo/KHQR Logo.png" 
-              alt="KHQR" 
+
+            <img
+              src="/logo/KHQR Logo.png"
+              alt="KHQR"
               className="h-6 object-contain"
             />
           </div>
@@ -142,17 +140,17 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
           {/* 3. Card Body */}
           <div className="p-6 pt-5 flex flex-col">
             {/* Merchant Name */}
-            <h2 className="text-[14px] font-semibold text-slate-500 uppercase tracking-tight leading-tight mb-2 mt-2">
+            <h2 className="text-[14px] font-medium text-slate-500 uppercase tracking-tight leading-tight mb-2 mt-2">
               {merchantName}
             </h2>
 
             {/* Amount - Large and left aligned */}
             <div className="mb-4">
               <div className="flex items-baseline gap-1.5">
-                <span className="text-[36px] font-semibold text-slate-900 leading-none tracking-tight">
+                <span className="text-[36px] font-medium text-slate-900 leading-none tracking-tight">
                   {amount}
                 </span>
-                <span className="text-[14px] font-semibold text-slate-500">
+                <span className="text-[14px] font-medium text-slate-500">
                   USD
                 </span>
               </div>
@@ -163,15 +161,15 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
 
             {/* QR Code Container */}
             <div className="relative flex justify-center w-full mb-6">
-              <QRCodeSVG 
-                value={qrString} 
+              <QRCodeSVG
+                value={qrString}
                 size={190}
                 level="H"
                 includeMargin={false}
               />
               {/* Custom Black Disc with White $ */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36px] h-[36px] bg-black rounded-full border-[3px] border-white flex items-center justify-center shadow-sm">
-                <span className="text-white text-[18px] font-bold mt-0.5">
+                <span className="text-white text-[18px] font-medium mt-0.5">
                   $
                 </span>
               </div>
@@ -183,12 +181,12 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
                 Expires in: {formatTime(timeLeft)}
               </span>
             </div>
-            
+
             {/* Hidden Polling Status for debugging/UX if needed, but removed visual clutter */}
             {isChecking && (
-               <div className="absolute bottom-4 right-4 flex items-center gap-2 text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                 <Loader2 className="w-3 h-3 animate-spin" /> Verifying...
-               </div>
+              <div className="absolute bottom-4 right-4 flex items-center gap-2 text-emerald-500 bg-emerald-50 px-3 py-1 rounded-full text-xs font-medium animate-pulse">
+                <Loader2 className="w-3 h-3 animate-spin" /> Verifying...
+              </div>
             )}
           </div>
         </div>

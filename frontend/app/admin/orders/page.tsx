@@ -108,7 +108,7 @@ export default function AdminOrders() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading Transactions...</p>
+        <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">Loading Transactions...</p>
       </div>
     )
   }
@@ -119,7 +119,7 @@ export default function AdminOrders() {
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t("orders")}</h1>
+          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">{t("orders")}</h1>
           <p className="text-sm text-slate-500 mt-1">{t("manageOrders")}</p>
         </div>
         <div className="relative w-full md:w-80">
@@ -147,12 +147,12 @@ export default function AdminOrders() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("orderId")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("customer")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("date")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("amount")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">{t("status")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("orderId")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("customer")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("date")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("amount")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("status")}</th>
+                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -162,19 +162,19 @@ export default function AdminOrders() {
                 </tr>
               ) : filteredOrders.map((order) => (
                 <tr key={order.id} className="group hover:bg-slate-50 transition-all duration-200">
-                  <td className="px-6 py-4 font-bold text-slate-900 text-sm">#{order.id.slice(0, 8)}</td>
+                  <td className="px-6 py-4 font-medium text-slate-900 text-sm">#{order.id.slice(0, 8)}</td>
                   <td className="px-6 py-4">
-                    <p className="text-sm font-bold text-slate-700">{order.customerName || "Customer"}</p>
+                    <p className="text-sm font-medium text-slate-700">{order.customerName || "Customer"}</p>
                     <p className="text-[10px] text-slate-400 font-medium">{order.customerEmail}</p>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 font-bold text-slate-900 text-sm">
+                  <td className="px-6 py-4 font-medium text-slate-900 text-sm">
                     {formatPrice(order.totalAmount)}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${getStatusColor(order.status)}`}>
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider ${getStatusColor(order.status)}`}>
                       {t(order.status || "pending")}
                     </span>
                   </td>
@@ -201,17 +201,17 @@ export default function AdminOrders() {
             <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900">{t("orderId")} #{selectedOrder.id.slice(0, 8)}</h2>
+                  <h2 className="text-2xl font-medium text-slate-900">{t("orderId")} #{selectedOrder.id.slice(0, 8)}</h2>
                   <p className="text-sm text-slate-400 mt-1">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                 </div>
-                <div className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-widest ${getStatusColor(selectedOrder.status)}`}>
+                <div className={`px-4 py-1.5 rounded-xl text-xs font-medium uppercase tracking-widest ${getStatusColor(selectedOrder.status)}`}>
                   {t(selectedOrder.status || "pending")}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("customerInfo")}</h3>
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t("customerInfo")}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 text-slate-600">
                       <User className="w-4 h-4" />
@@ -228,7 +228,7 @@ export default function AdminOrders() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("shippingAddress")}</h3>
+                  <h3 className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t("shippingAddress")}</h3>
                   <div className="flex gap-3 text-slate-600">
                     <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                     <span className="text-sm font-medium leading-relaxed">
@@ -239,7 +239,7 @@ export default function AdminOrders() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("orderItems")}</h3>
+                <h3 className="text-xs font-medium text-slate-400 uppercase tracking-widest">{t("orderItems")}</h3>
                 <div className="space-y-2">
                   {selectedOrder.items?.map((item: any, idx: number) => (
                     <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
@@ -252,16 +252,16 @@ export default function AdminOrders() {
                           )}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-900">{item.name}</p>
+                          <p className="text-sm font-medium text-slate-900">{item.name}</p>
                           <p className="text-xs text-slate-400">{t("qty")}: {item.quantity}</p>
                         </div>
                       </div>
-                      <span className="text-sm font-bold text-slate-900">{formatPrice(item.price * item.quantity)}</span>
+                      <span className="text-sm font-medium text-slate-900">{formatPrice(item.price * item.quantity)}</span>
                     </div>
                   ))}
                   <div className="mt-6 flex justify-between items-center p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                    <span className="text-sm font-bold text-slate-900">{t("totalAmount")}</span>
-                    <span className="text-xl font-bold text-primary">{formatPrice(selectedOrder.totalAmount)}</span>
+                    <span className="text-sm font-medium text-slate-900">{t("totalAmount")}</span>
+                    <span className="text-xl font-medium text-primary">{formatPrice(selectedOrder.totalAmount)}</span>
                   </div>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function AdminOrders() {
                 <X className="w-5 h-5" />
               </button>
 
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{t("updateStatus")}</h3>
+              <h3 className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">{t("updateStatus")}</h3>
               <div className="space-y-3 flex-1">
                 {[
                   { id: "pending", icon: Clock, color: "text-amber-600", bg: "bg-amber-100" },
@@ -288,7 +288,7 @@ export default function AdminOrders() {
                   <button
                     key={status.id}
                     onClick={() => updateOrderStatus(selectedOrder.id, status.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       selectedOrder.status === status.id 
                         ? `${status.bg} ${status.color} ring-2 ring-white shadow-md` 
                         : "bg-white text-slate-600 hover:bg-slate-100"
@@ -302,7 +302,7 @@ export default function AdminOrders() {
               
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="w-full py-4 mt-8 rounded-2xl bg-white border border-slate-200 text-slate-600 font-bold text-sm shadow-sm hover:bg-slate-50 transition-all"
+                className="w-full py-4 mt-8 rounded-2xl bg-white border border-slate-200 text-slate-600 font-medium text-sm shadow-sm hover:bg-slate-50 transition-all"
               >
                 {t("closeDetails")}
               </button>

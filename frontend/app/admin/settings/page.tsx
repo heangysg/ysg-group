@@ -32,7 +32,7 @@ export default function AdminSettings() {
       <Toaster position="top-right" />
       
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t("settings")}</h1>
+        <h1 className="text-2xl font-medium text-gray-900">{t("settings")}</h1>
         <p className="text-sm text-gray-600 mt-1">{t("websiteConfiguration")}</p>
       </div>
 

@@ -7,7 +7,7 @@ export default function LanguageTest() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Language Test Page</h1>
+      <h1 className="text-2xl font-medium mb-4">Language Test Page</h1>
       
       <div className="bg-white rounded-xl p-6 mb-6">
         <p className="text-lg mb-4">
@@ -31,30 +31,30 @@ export default function LanguageTest() {
       </div>
 
       <div className="bg-white rounded-xl p-6">
-        <h2 className="font-bold text-lg mb-3">Translation Results:</h2>
+        <h2 className="font-medium text-lg mb-3">Translation Results:</h2>
         <div className="space-y-4">
           <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-            <span className="font-semibold">Dashboard:</span>
+            <span className="font-medium">Dashboard:</span>
             <span>{t("dashboard")}</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-            <span className="font-semibold">Products:</span>
+            <span className="font-medium">Products:</span>
             <span>{t("products")}</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-            <span className="font-semibold">Categories:</span>
+            <span className="font-medium">Categories:</span>
             <span>{t("categories")}</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-            <span className="font-semibold">Inquiries:</span>
+            <span className="font-medium">Inquiries:</span>
             <span>{t("inquiries")}</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-            <span className="font-semibold">Settings:</span>
+            <span className="font-medium">Settings:</span>
             <span>{t("settings")}</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-            <span className="font-semibold">Logout:</span>
+            <span className="font-medium">Logout:</span>
             <span>{t("logout")}</span>
           </div>
         </div>

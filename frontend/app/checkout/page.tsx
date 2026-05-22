@@ -109,10 +109,10 @@ export default function CheckoutPage() {
               <ShoppingBag className="w-8 h-8" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">{t("emptyCart")}</h2>
+              <h2 className="text-xl font-medium text-slate-900 tracking-tight">{t("emptyCart")}</h2>
               <p className="text-[14px] text-slate-500 font-medium">Your cart is currently empty.</p>
             </div>
-            <Link href="/products" className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 py-3.5 rounded-xl font-bold text-[12px] uppercase tracking-widest transition-all hover:bg-primary shadow-lg">
+            <Link href="/products" className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 py-3.5 rounded-xl font-medium text-[12px] uppercase tracking-widest transition-all hover:bg-primary shadow-lg">
               <ArrowLeft className="w-4 h-4" />
               {t("browseEquipment")}
             </Link>
@@ -126,14 +126,14 @@ export default function CheckoutPage() {
     <PublicLayout>
       <Toaster position="top-center" />
       <div className="bg-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-6 py-12 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 pt-6 md:pt-10 pb-12 md:pb-24">
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
             
             {/* 🛒 Shopping Cart Section */}
             <div className="w-full lg:flex-1 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl md:text-4xl font-bold text-slate-900 tracking-tight uppercase">{t("shoppingCart")}</h1>
-                <span className="px-3 py-1 bg-slate-50 rounded-lg text-[9px] font-bold text-slate-400 uppercase tracking-widest border border-slate-100">
+                <h1 className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tight uppercase">{t("shoppingCart")}</h1>
+                <span className="px-3 py-1 bg-slate-50 rounded-lg text-[9px] font-medium text-slate-400 uppercase tracking-widest border border-slate-100">
                   {items.length} {items.length === 1 ? 'UNIT' : 'UNITS'}
                 </span>
               </div>
@@ -149,11 +149,11 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0 space-y-0.5">
-                      <p className="text-[8px] font-bold uppercase tracking-widest text-primary">{item.brand}</p>
-                      <h3 className="text-[14px] md:text-[16px] font-bold text-slate-900 uppercase tracking-tight truncate">
+                      <p className="text-[8px] font-medium uppercase tracking-widest text-primary">{item.brand}</p>
+                      <h3 className="text-[14px] md:text-[16px] font-medium text-slate-900 uppercase tracking-tight truncate">
                         {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                       </h3>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{item.model}</p>
+                      <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{item.model}</p>
                     </div>
                     
                     <div className="flex flex-col items-end gap-2 md:gap-3">
@@ -164,7 +164,7 @@ export default function CheckoutPage() {
                         <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-0.5 text-slate-400 hover:text-slate-900">
                           <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="w-5 text-center font-bold text-[13px] text-slate-900">{item.quantity}</span>
+                        <span className="w-5 text-center font-medium text-[13px] text-slate-900">{item.quantity}</span>
                         <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-0.5 text-slate-400 hover:text-slate-900">
                           <Plus className="w-3.5 h-3.5" />
                         </button>
@@ -174,7 +174,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <Link href="/products" className="inline-flex items-center gap-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors">
+              <Link href="/products" className="inline-flex items-center gap-2 text-slate-400 font-medium text-[10px] uppercase tracking-widest hover:text-primary transition-colors">
                 <ArrowLeft className="w-3.5 h-3.5" />
                 {t("backToProducts")}
               </Link>
@@ -183,7 +183,7 @@ export default function CheckoutPage() {
             {/* 🏗️ Checkout Details Section */}
             <div className="w-full lg:w-[420px] space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <div className="bg-slate-50 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 sticky top-20">
-                <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-8 uppercase tracking-widest">{t("checkoutDetails")}</h2>
+                <h2 className="text-lg md:text-xl font-medium text-slate-900 mb-8 uppercase tracking-widest">{t("checkoutDetails")}</h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
                   <div className="space-y-3">
@@ -196,7 +196,7 @@ export default function CheckoutPage() {
                         required
                         value={formData.customerName}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-bold text-slate-900 placeholder:text-slate-300 text-[13px]"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-300 text-[13px]"
                       />
                     </div>
                     <div className="relative group">
@@ -208,7 +208,7 @@ export default function CheckoutPage() {
                         required
                         value={formData.customerPhone}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-bold text-slate-900 placeholder:text-slate-300 text-[13px]"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-300 text-[13px]"
                       />
                     </div>
                     <div className="relative group">
@@ -220,14 +220,14 @@ export default function CheckoutPage() {
                         value={formData.address}
                         onChange={handleInputChange}
                         rows={3}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-bold text-slate-900 placeholder:text-slate-300 text-[13px] resize-none"
+                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-300 text-[13px] resize-none"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex flex-col ml-1">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-0.5">
+                      <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-slate-400 mb-0.5">
                         {language === "kh" ? "វិធីសាស្ត្រទូទាត់" : "Payment Method"}
                       </p>
                       <p className="text-[11px] font-medium text-slate-300 italic">
@@ -246,9 +246,9 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0 space-y-0.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold text-[#E1232E] uppercase tracking-widest">KHQR</span>
+                          <span className="text-[10px] font-medium text-[#E1232E] uppercase tracking-widest">KHQR</span>
                           <div className="w-1 h-1 bg-slate-200 rounded-full" />
-                          <span className="text-[13px] md:text-[14px] font-bold text-slate-900 uppercase tracking-tight truncate">Bakong KHQR</span>
+                          <span className="text-[13px] md:text-[14px] font-medium text-slate-900 uppercase tracking-tight truncate">Bakong KHQR</span>
                         </div>
                         <p className="text-[11px] font-medium text-slate-400 truncate">
                           {language === "kh" ? "ការទូទាត់តាម Bakong" : "Cambodia's Bakong Payment"}
@@ -261,17 +261,17 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="pt-6 border-t border-slate-200 space-y-2.5">
-                    <div className="flex justify-between text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                    <div className="flex justify-between text-slate-400 font-medium text-[10px] uppercase tracking-widest">
                       <span>{t("subtotal")}</span>
                       <span>{formatPrice(cartTotal)}</span>
                     </div>
-                    <div className="flex justify-between text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                    <div className="flex justify-between text-slate-400 font-medium text-[10px] uppercase tracking-widest">
                       <span>{t("shipping")}</span>
-                      <span className="text-emerald-500 font-bold tracking-widest">
+                      <span className="text-emerald-500 font-medium tracking-widest">
                         {language === "kh" ? "ឥតគិតថ្លៃ" : "FREE"}
                       </span>
                     </div>
-                    <div className="flex justify-between text-slate-900 text-xl md:text-2xl font-bold pt-3 tracking-tighter uppercase">
+                    <div className="flex justify-between text-slate-900 text-xl md:text-2xl font-medium pt-3 tracking-tighter uppercase">
                       <span>{t("total")}</span>
                       <span className="text-primary">{formatPrice(cartTotal)}</span>
                     </div>
@@ -280,7 +280,7 @@ export default function CheckoutPage() {
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-slate-950 text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg hover:bg-primary transition-all duration-300 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                    className="w-full bg-slate-950 text-white py-4 rounded-xl font-medium text-[11px] uppercase tracking-widest shadow-lg hover:bg-primary transition-all duration-300 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
                   >
                     {loading ? (
                       <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />

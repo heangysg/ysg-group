@@ -87,7 +87,7 @@ export default function ActivityPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t("loading")}</p>
+        <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">{t("loading")}</p>
       </div>
     )
   }
@@ -103,7 +103,7 @@ export default function ActivityPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t("viewAllActivity")}</h1>
+            <h1 className="text-2xl font-medium text-slate-900 tracking-tight">{t("viewAllActivity")}</h1>
             <p className="text-sm text-slate-500 mt-1">{t("trackSystemUpdates") || "Track all system updates and interactions"}</p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function ActivityPage() {
 
       <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-8 border-b border-slate-50 bg-slate-50/50">
-          <h2 className="font-bold text-slate-900">{t("recentActivity") || "Recent Activity"}</h2>
+          <h2 className="font-medium text-slate-900">{t("recentActivity") || "Recent Activity"}</h2>
         </div>
         
         <div className="divide-y divide-slate-100">
@@ -124,8 +124,8 @@ export default function ActivityPage() {
                 
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-3">
-                    <h3 className="font-bold text-slate-900">{activity.title}</h3>
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-widest rounded-md">
+                    <h3 className="font-medium text-slate-900">{activity.title}</h3>
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-semibold uppercase tracking-widest rounded-md">
                       {t(activity.type) || activity.type}
                     </span>
                   </div>
@@ -136,13 +136,13 @@ export default function ActivityPage() {
                       <span className="text-xs text-slate-400 font-medium">{activity.time}</span>
                     </div>
                     <span className="text-slate-200">|</span>
-                    <span className="text-xs font-bold text-primary">{activity.customer}</span>
+                    <span className="text-xs font-medium text-primary">{activity.customer}</span>
                   </div>
                 </div>
 
                 <Link 
                   href={activity.type === 'order' ? `/admin/orders` : `/admin/inquiries`}
-                  className="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-xs hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm active:scale-95"
+                  className="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-medium text-xs hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm active:scale-95"
                 >
                   {t("viewDetails") || "View Details"}
                 </Link>
@@ -153,7 +153,7 @@ export default function ActivityPage() {
               <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
                 <Clock className="w-10 h-10 text-slate-200" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">{t("noActivityFound") || "No activity found"}</h3>
+              <h3 className="text-lg font-medium text-slate-900">{t("noActivityFound") || "No activity found"}</h3>
               <p className="text-slate-400 mt-2">{t("activityWillShowUp") || "Your activity history will appear here once users interact with your platform."}</p>
             </div>
           )}

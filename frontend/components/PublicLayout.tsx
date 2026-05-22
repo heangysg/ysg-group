@@ -78,12 +78,9 @@ export default function PublicLayout({
           mobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}>
           <div className="p-6 flex items-center justify-between border-b border-slate-50">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-100">
-                <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
-              </div>
-              <span className="text-[12px] font-bold text-slate-900 tracking-tight uppercase">YSG Portal</span>
-            </div>
+            <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+              <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-10 w-auto object-contain" />
+            </Link>
             <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-slate-400 hover:text-slate-950 transition-colors">
               <X className="w-5 h-5" />
             </button>
@@ -99,10 +96,10 @@ export default function PublicLayout({
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-[13px] font-semibold transition-all duration-300 ${
+                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-[13px] font-medium transition-all duration-300 ${
                       isActive 
                         ? "bg-slate-50 text-primary" 
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-950"
+                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-950"
                     }`}
                   >
                     <Icon className={`w-4.5 h-4.5 ${isActive ? "text-primary" : "text-slate-400"}`} />
@@ -124,15 +121,15 @@ export default function PublicLayout({
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[13px] font-bold text-slate-900 truncate">{user.user_metadata?.full_name || user.email?.split('@')[0]}</p>
-                  <button onClick={handleLogout} className="text-[10px] font-bold text-primary uppercase hover:underline">Sign Out</button>
+                  <p className="text-[13px] font-medium text-slate-900 truncate">{user.user_metadata?.full_name || user.email?.split('@')[0]}</p>
+                  <button onClick={handleLogout} className="text-[10px] font-medium text-primary uppercase hover:underline">Sign Out</button>
                 </div>
               </div>
             ) : (
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center py-4 rounded-xl bg-slate-950 text-white font-bold text-[12px] uppercase tracking-widest hover:bg-primary transition-all duration-300"
+                className="w-full flex items-center justify-center py-4 rounded-xl bg-slate-950 text-white font-medium text-[12px] uppercase tracking-widest hover:bg-primary transition-all duration-300"
               >
                 Sign In
               </Link>
@@ -143,7 +140,7 @@ export default function PublicLayout({
                 setLanguage(language === "en" ? "kh" : "en")
                 setMobileMenuOpen(false)
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-xl text-[11px] font-bold uppercase tracking-widest text-slate-900 hover:bg-slate-50 transition-all duration-300"
+              className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-xl text-[11px] font-medium uppercase tracking-widest text-slate-900 hover:bg-slate-50 transition-all duration-300"
             >
               <div className="w-5 h-3 rounded-sm overflow-hidden border border-slate-200">
                 <img 
@@ -166,17 +163,9 @@ export default function PublicLayout({
           <div className="max-w-6xl mx-auto px-6 h-full">
             <div className="flex justify-between items-center h-full">
               
-              <Link href="/" className="flex items-center gap-3 group">
-                <div className="relative w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-100 group-hover:border-primary/20 transition-all duration-300">
-                  <img src="/logo.png" alt="Logo" className="w-6 h-6 md:w-7 md:h-7 object-contain" />
-                </div>
-                <div className="flex flex-col leading-none">
-                  <span className="text-[15px] md:text-[18px] font-bold tracking-tight text-slate-900 uppercase">
-                    YSG Machinery
-                  </span>
-                  <span className="text-[9px] font-bold tracking-[0.2em] text-slate-400 uppercase mt-0.5">
-                    Industrial Solutions
-                  </span>
+              <Link href="/" className="flex items-center group">
+                <div className="relative flex items-center justify-center group-hover:opacity-90 transition-all duration-300">
+                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-12 md:h-14 w-auto object-contain" />
                 </div>
               </Link>
 
@@ -187,10 +176,10 @@ export default function PublicLayout({
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`px-4 py-2 rounded-lg text-[13px] font-semibold transition-all duration-300 ${
+                      className={`px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 ${
                         isActive 
                           ? "text-primary bg-primary/5" 
-                          : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                          : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"
                       }`}
                     >
                       {item.name}
@@ -211,7 +200,7 @@ export default function PublicLayout({
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[10px] font-bold text-slate-900 uppercase">
+                  <span className="text-[10px] font-medium text-slate-900 uppercase">
                     {language === "en" ? "KH" : "EN"}
                   </span>
                 </button>
@@ -220,18 +209,18 @@ export default function PublicLayout({
                   {user ? (
                     <Link href="/account" className="flex items-center gap-2.5 px-4 py-2 bg-slate-950 text-white rounded-xl hover:bg-primary transition-all duration-300">
                       <UserIcon className="w-4 h-4" />
-                      <span className="text-[12px] font-bold uppercase">{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
+                      <span className="text-[12px] font-medium uppercase">{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
                     </Link>
                   ) : (
-                    <Link href="/login" className="px-5 py-2.5 bg-slate-950 text-white rounded-xl text-[12px] font-bold uppercase hover:bg-primary transition-all duration-300">
+                    <Link href="/login" className="px-5 py-2.5 bg-slate-950 text-white rounded-xl text-[12px] font-medium uppercase hover:bg-primary transition-all duration-300">
                       {t("login")}
                     </Link>
                   )}
 
                   <Link href="/checkout" className="relative p-2.5 bg-white text-slate-900 rounded-xl shadow-sm border border-slate-100 hover:border-primary/20 transition-all duration-300">
-                    <ShoppingCart className="w-4.5 h-4.5 text-slate-600" />
+                    <ShoppingCart className="w-5 h-5 text-slate-600" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-primary text-white text-[9px] font-bold w-4.5 h-4.5 flex items-center justify-center rounded-full border-2 border-white">
+                      <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] font-medium min-w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm px-1">
                         {cartCount}
                       </span>
                     )}
@@ -243,7 +232,7 @@ export default function PublicLayout({
                 <Link href="/checkout" className="relative p-2.5 bg-slate-950 text-white rounded-xl active:scale-95 transition-all duration-300">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[9px] font-bold w-4.5 h-4.5 flex items-center justify-center rounded-full border-2 border-slate-950">
+                    <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] font-medium min-w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-slate-950 shadow-sm px-1">
                       {cartCount}
                     </span>
                   )}
@@ -260,7 +249,7 @@ export default function PublicLayout({
         </header>
       )}
 
-      <main className={`transition-all ${!hideNav ? "pt-12 md:pt-24 pb-20 md:pb-0" : ""} min-h-screen`}>
+      <main className={`transition-all ${!hideNav ? "pt-20 pb-20 md:pb-0" : ""} min-h-screen`}>
         <div className="max-w-6xl mx-auto">
           {children}
         </div>

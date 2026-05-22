@@ -44,7 +44,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="flex flex-col h-full overflow-hidden bg-white rounded-[2.5rem] transition-all duration-700 hover:shadow-lux-deep border border-slate-100 relative">
+      <div className="flex flex-col h-full overflow-hidden bg-white rounded-[2.5rem] transition-all duration-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl border border-slate-100/50 relative">
         {/* 🖼️ High-Impact Image */}
         <div className="relative aspect-[16/10] bg-slate-50 overflow-hidden">
           {imageUrl && imageUrl !== "" ? (
@@ -61,7 +61,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           
           {/* Badge: Bright & Sharp */}
           <div className="absolute top-5 left-5">
-            <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[9px] font-bold uppercase tracking-[0.2em] text-slate-950 shadow-sm border border-slate-100">
+            <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[9px] font-medium uppercase tracking-[0.2em] text-slate-950 shadow-sm border border-slate-100">
               {product.brand || "Industrial"}
             </span>
           </div>
@@ -70,27 +70,27 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* 📝 Info Grid */}
         <div className="p-6 flex flex-col flex-1">
           <div className="space-y-1 mb-4">
-            <h3 className="text-[16px] font-bold text-slate-900 leading-tight tracking-tight line-clamp-1 uppercase group-hover:text-primary transition-colors">
+            <h3 className="text-[15px] font-medium text-slate-900 leading-tight tracking-tight line-clamp-1 uppercase group-hover:text-primary transition-colors">
               {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
             </h3>
             <div className="flex items-center gap-2">
-               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+               <span className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">
                  {product.model || "Standard"}
                </span>
                <div className="w-1 h-1 bg-slate-200 rounded-full" />
                <div className="flex items-center gap-1">
-                 <MapPin className="w-3 h-3 text-slate-300" />
-                 <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{product.location || "Cambodia"}</span>
+                 <MapPin className="w-3 h-3 text-slate-400" />
+                 <span className="text-[9px] font-medium text-slate-600 uppercase tracking-wider">{product.location || "Cambodia"}</span>
                </div>
             </div>
           </div>
 
           <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[8px] font-bold text-slate-300 uppercase tracking-[0.2em] mb-1">Price Est.</span>
+              <span className="text-[8px] font-medium text-slate-500 uppercase tracking-[0.2em] mb-1">Price Est.</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-lg font-bold text-slate-900 tracking-tighter">$</span>
-                <span className="text-xl font-bold text-slate-900 tracking-tighter">
+                <span className="text-lg font-medium text-slate-900 tracking-tighter">$</span>
+                <span className="text-xl font-medium text-slate-900 tracking-tighter">
                   {formatPrice(product.price)}
                 </span>
               </div>

@@ -288,10 +288,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="h-20 flex items-center px-8 border-b border-slate-50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-white font-black text-xl">G</span>
+              <span className="text-white font-semibold text-xl">G</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-tight">
+              <h1 className="text-sm font-medium text-slate-900 tracking-tight leading-tight">
                 {isSuperAdmin ? t("superadmin") : t("admin")} {t("panel")}
               </h1>
               <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">
@@ -310,7 +310,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={item.name}
                 href={item.href}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all
+                  flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all
                   ${isActive 
                     ? "bg-primary text-white shadow-lg shadow-primary/20" 
                     : "text-slate-400 hover:text-slate-900 hover:bg-slate-50"}
@@ -327,7 +327,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-6 border-t border-slate-50">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl font-bold text-sm transition-all"
+            className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl font-medium text-sm transition-all"
           >
             <LogOut className="w-5 h-5" />
             {t("logout")}
@@ -347,7 +347,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
-            <div className={`hidden sm:flex items-center gap-2 text-[10px] font-black text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
+            <div className={`hidden sm:flex items-center gap-2 text-[10px] font-semibold text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
               <Link href="/admin/dashboard" className="hover:text-primary transition-colors">{t("admin")}</Link>
               <span className="text-slate-200 text-[14px] font-normal leading-none -mt-0.5">/</span>
               <span className="text-slate-900">
@@ -420,8 +420,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {showNotifications && (
                 <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-3 lg:w-80 bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
                   <div className="p-4 border-b border-slate-50 flex items-center justify-between">
-                    <h3 className="font-bold text-slate-900 text-sm">{t("notifications")}</h3>
-                    <button className="text-[10px] font-bold text-primary hover:underline uppercase tracking-widest">{t("markAllRead")}</button>
+                    <h3 className="font-medium text-slate-900 text-sm">{t("notifications")}</h3>
+                    <button className="text-[10px] font-medium text-primary hover:underline uppercase tracking-widest">{t("markAllRead")}</button>
                   </div>
                   <div className="max-h-[350px] overflow-y-auto">
                     {notifications.length > 0 ? (
@@ -432,7 +432,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                               <note.icon className="w-5 h-5" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-slate-900 truncate">{note.title}</p>
+                              <p className="text-xs font-medium text-slate-900 truncate">{note.title}</p>
                               <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{note.message}</p>
                               <p className="text-[9px] text-slate-400 mt-1 font-medium">{note.time}</p>
                             </div>
@@ -445,14 +445,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
                           <Bell className="w-6 h-6 text-slate-300" />
                         </div>
-                        <p className="text-xs font-bold text-slate-400">{t("noNewNotifications")}</p>
+                        <p className="text-xs font-medium text-slate-400">{t("noNewNotifications")}</p>
                       </div>
                     )}
                   </div>
                   <Link 
                     href="/admin/activity" 
                     onClick={() => setShowNotifications(false)}
-                    className="block p-4 bg-slate-50 text-center text-[10px] font-bold text-slate-500 hover:text-primary hover:bg-slate-100 transition-all uppercase tracking-widest"
+                    className="block p-4 bg-slate-50 text-center text-[10px] font-medium text-slate-500 hover:text-primary hover:bg-slate-100 transition-all uppercase tracking-widest"
                   >
                     {t("viewAllActivity")}
                   </Link>
@@ -468,13 +468,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {adminProfileImage ? (
                   <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-full h-full bg-primary flex items-center justify-center text-white font-medium text-sm">
                     {adminName.charAt(0)}
                   </div>
                 )}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-xs font-bold text-slate-900 leading-none">{adminName}</p>
+                <p className="text-xs font-medium text-slate-900 leading-none">{adminName}</p>
                 <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-tight">
                   {isSuperAdmin ? t("superadmin") : t("admin")}
                 </p>
@@ -499,7 +499,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-10 pb-6 border-b border-slate-50">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{t("myProfile")}</h2>
+                  <h2 className="text-2xl font-medium text-slate-900 tracking-tight">{t("myProfile")}</h2>
                   <p className="text-sm text-slate-400 mt-1">{t("updatePhotoAndHistory")}</p>
                 </div>
                 <button 
@@ -541,19 +541,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
                   <input
                     type="text"
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
-                    className="w-full mt-2 px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-900 outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="w-full mt-2 px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl font-medium text-slate-900 outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
               </div>
 
               {/* Bio Section */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("backgroundHistory")}</label>
+                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("backgroundHistory")}</label>
                 <textarea
                   value={adminBio}
                   onChange={(e) => setAdminBio(e.target.value)}
@@ -565,14 +565,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="pt-2 flex gap-4">
                 <button
                   onClick={() => setShowProfileModal(false)}
-                  className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all"
+                  className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 transition-all"
                 >
                   {t("cancel")}
                 </button>
                 <button
                   onClick={saveProfile}
                   disabled={savingProfile}
-                  className="flex-1 py-4 px-6 rounded-2xl bg-primary text-white font-bold text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="flex-1 py-4 px-6 rounded-2xl bg-primary text-white font-medium text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   {savingProfile ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -237,7 +237,7 @@ export default function EditProduct() {
             <Package className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t("editProduct") || "Edit Product"}</h1>
+            <h1 className="text-2xl font-medium text-gray-900">{t("editProduct") || "Edit Product"}</h1>
             <p className="text-sm text-gray-500 mt-1">{formData.name}</p>
           </div>
         </div>
@@ -247,7 +247,7 @@ export default function EditProduct() {
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100">
         {/* Basic Information */}
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("basicInformation")}</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("basicInformation")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("productNameEnglish")}</label>
@@ -276,7 +276,7 @@ export default function EditProduct() {
 
         {/* Classification */}
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("classification")}</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("classification")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("mainCategory")}</label>
@@ -335,7 +335,7 @@ export default function EditProduct() {
 
         {/* Pricing & Specs */}
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("pricingSpecifications")}</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("pricingSpecifications")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("priceUsd")}</label>
@@ -378,7 +378,7 @@ export default function EditProduct() {
 
         {/* Image Upload Section */}
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("productImages") || "Product Images"}</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("productImages") || "Product Images"}</h2>
           <div className="space-y-4">
             <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-primary transition-colors">
               <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
@@ -417,7 +417,7 @@ export default function EditProduct() {
 
         {/* Description */}
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("description")}</h2>
+          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("description")}</h2>
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("shortDescription")}</label>
@@ -454,7 +454,7 @@ export default function EditProduct() {
             <button type="button" onClick={() => router.back()} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
               {t("cancel")}
             </button>
-            <button type="submit" disabled={loading} className="flex-1 bg-primary text-white py-2.5 rounded-lg font-semibold hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading} className="flex-1 bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2">
               <Save className="w-4 h-4" />
               {loading ? (t("saving") || "Saving...") : (t("saveChanges") || "Save Changes")}
             </button>

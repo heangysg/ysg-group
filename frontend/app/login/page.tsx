@@ -65,12 +65,12 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 group-hover:bg-white group-hover:text-slate-950 transition-all duration-300">
               <ArrowLeft className="w-5 h-5" />
             </div>
-            <span className="font-bold tracking-widest uppercase text-sm group-hover:text-primary transition-colors duration-300">Return to Home</span>
+            <span className="font-medium tracking-widest uppercase text-sm group-hover:text-primary transition-colors duration-300">Return to Home</span>
           </Link>
           
           <div className="space-y-6 max-w-lg">
             <div className="w-20 h-2 bg-primary rounded-full mb-8" />
-            <h1 className="text-5xl font-black leading-[1.1] tracking-tight uppercase">
+            <h1 className="text-5xl font-semibold leading-[1.1] tracking-tight uppercase">
               Heavy Machinery. <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">Unmatched Power.</span>
             </h1>
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm mb-8 lg:hidden">
               <img src="/logo.png" alt="YSG" className="w-10 h-10 object-contain" />
             </div>
-            <h2 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tight">
               {t("login") || "Sign In"}
             </h2>
             <p className="text-slate-500 font-medium">
@@ -100,7 +100,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider ml-1">Email Address</label>
+                <label className="text-xs font-medium text-slate-700 uppercase tracking-wider ml-1">Email Address</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                     <Mail className="w-5 h-5" />
@@ -110,7 +110,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-400"
                     placeholder="name@company.com"
                   />
                 </div>
@@ -118,8 +118,8 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Password</label>
-                  <a href="#" className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">Forgot?</a>
+                  <label className="text-xs font-medium text-slate-700 uppercase tracking-wider">Password</label>
+                  <a href="#" className="text-xs font-medium text-primary hover:text-primary-dark transition-colors">Forgot?</a>
                 </div>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -130,7 +130,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-400"
                     placeholder="••••••••"
                   />
                 </div>
@@ -140,7 +140,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-white py-4 rounded-2xl font-bold tracking-widest uppercase shadow-lg shadow-primary/20 hover:bg-primary-dark hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+              className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-xl shadow-slate-900/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -165,7 +165,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="w-full bg-white text-slate-700 py-4 rounded-2xl font-bold tracking-widest uppercase shadow-sm border border-slate-200 hover:bg-slate-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+            className="w-full bg-white text-slate-700 py-4 rounded-2xl font-medium tracking-widest uppercase shadow-sm border border-slate-200 hover:bg-slate-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -179,7 +179,7 @@ export default function LoginPage() {
           <div className="pt-8 mt-8 border-t border-slate-100 text-center">
             <p className="text-slate-500 font-medium">
               {t("noAccount") || "Don't have an account?"}{" "}
-              <Link href="/register" className="text-primary hover:text-primary-dark font-bold ml-1 transition-colors">
+              <Link href="/register" className="text-primary hover:text-primary-dark font-medium ml-1 transition-colors">
                 {t("registerNow") || "Create one now"}
               </Link>
             </p>

@@ -39,12 +39,12 @@ export default function BottomNav() {
                 </div>
                 
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-medium min-w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm px-1">
                     {item.badge}
                   </span>
                 )}
                 
-                <span className={`text-[9px] font-bold uppercase tracking-widest transition-all duration-500 ${
+                <span className={`text-[9px] font-medium uppercase tracking-widest transition-all duration-500 ${
                   isActive ? "opacity-100 scale-105" : "opacity-40"
                 }`}>
                   {item.name}

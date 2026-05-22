@@ -33,7 +33,7 @@ export default function CheckTables() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Checking Database Tables</h1>
+      <h1 className="text-2xl font-medium mb-4">Checking Database Tables</h1>
       <div className="space-y-2">
         {Object.entries(tables).map(([name, status]) => (
           <div key={name} className="p-2 border rounded">

@@ -215,7 +215,7 @@ export default function AdminCategories() {
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t("categories")}</h1>
+          <h1 className="text-2xl font-medium text-gray-900">{t("categories")}</h1>
           <p className="text-sm text-gray-600 mt-1">{t("manageMainCategories")}</p>
         </div>
         <button
@@ -229,7 +229,7 @@ export default function AdminCategories() {
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 border-b bg-gradient-to-r from-gray-50 to-white">
-          <h2 className="font-semibold text-gray-900">{t("categoryStructure")}</h2>
+          <h2 className="font-medium text-gray-900">{t("categoryStructure")}</h2>
           <p className="text-xs text-gray-500 mt-1">{t("cannotDeleteCategories")}</p>
         </div>
         <div className="divide-y">
@@ -313,7 +313,7 @@ export default function AdminCategories() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
           <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-white border-b px-6 py-4">
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-xl font-medium text-gray-900">
                 {editingItem ? t("edit") : t("addNew")} {modalType === "main" ? t("categoryName") : t("subcategory")}
               </h3>
             </div>

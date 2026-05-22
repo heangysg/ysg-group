@@ -28,12 +28,12 @@ export default function SimpleTest() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Simple Environment Test</h1>
+      <h1 className="text-2xl font-medium mb-4">Simple Environment Test</h1>
       <pre className="p-4 bg-gray-100 rounded-lg whitespace-pre-wrap">
         {result}
       </pre>
       <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-        <p className="font-semibold">Your URL should NOT have /rest/v1/ at the end</p>
+        <p className="font-medium">Your URL should NOT have /rest/v1/ at the end</p>
         <p className="text-sm mt-2">Correct: https://sbxuheaelotoqcdtzrkl.supabase.co</p>
         <p className="text-sm text-red-600">Wrong: https://sbxuheaelotoqcdtzrkl.supabase.co/rest/v1/</p>
       </div>

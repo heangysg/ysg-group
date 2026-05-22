@@ -57,12 +57,13 @@ export default function AccountPage() {
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'pending': return 'bg-amber-50 text-amber-600 border-amber-100'
-      case 'confirmed': return 'bg-blue-50 text-blue-600 border-blue-100'
-      case 'shipping': return 'bg-purple-50 text-purple-600 border-purple-100'
-      case 'completed': return 'bg-emerald-50 text-emerald-600 border-emerald-100'
-      case 'cancelled': return 'bg-rose-50 text-rose-600 border-rose-100'
-      default: return 'bg-slate-50 text-slate-600 border-slate-100'
+      case 'pending': return 'bg-amber-100 text-amber-700 border-amber-200'
+      case 'paid': 
+      case 'completed': return 'bg-emerald-100 text-emerald-700 border-emerald-200'
+      case 'confirmed': return 'bg-blue-100 text-blue-700 border-blue-200'
+      case 'shipping': return 'bg-indigo-100 text-indigo-700 border-indigo-200'
+      case 'cancelled': return 'bg-rose-100 text-rose-700 border-rose-200'
+      default: return 'bg-slate-100 text-slate-700 border-slate-200'
     }
   }
 
@@ -143,7 +144,7 @@ export default function AccountPage() {
     <PublicLayout>
       <main className="min-h-screen bg-white">
         
-        <section className="bg-slate-50 border-b border-slate-100 pt-16 md:pt-32 pb-12 md:pb-20">
+        <section className="bg-slate-50 border-b border-slate-100 pt-6 md:pt-10 pb-12 md:pb-20">
           <div className="max-w-6xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               <div className="relative group">
@@ -163,17 +164,17 @@ export default function AccountPage() {
 
               <div className="text-center md:text-left space-y-3">
                 <div className="space-y-1">
-                  <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight uppercase leading-none">
+                  <h1 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight uppercase leading-none">
                     {user?.user_metadata?.full_name || t("memberUser")}
                   </h1>
-                  <p className="text-[12px] md:text-[14px] font-bold text-slate-400 uppercase tracking-widest">{user?.email}</p>
+                  <p className="text-[12px] md:text-[14px] font-medium text-slate-500 uppercase tracking-widest">{user?.email}</p>
                 </div>
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                   <div className="px-4 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                     Customer
+                   <div className="px-4 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] font-medium text-slate-600 uppercase tracking-widest">
+                     {language === "kh" ? "អតិថិជន" : "Customer"}
                    </div>
-                   <div className="px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-bold text-primary uppercase tracking-widest">
-                     Verified Account
+                   <div className="px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-medium text-primary uppercase tracking-widest">
+                     {language === "kh" ? "គណនីបានបញ្ជាក់" : "Verified Account"}
                    </div>
                 </div>
               </div>
@@ -181,7 +182,7 @@ export default function AccountPage() {
               <div className="flex-1 md:text-right">
                 <button 
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-red-500 border border-slate-100 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-red-50 transition-all shadow-sm active:scale-95"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-red-500 border border-slate-100 rounded-xl font-medium text-[11px] uppercase tracking-widest hover:bg-red-50 transition-all shadow-sm active:scale-95"
                 >
                   <LogOut className="w-4 h-4" />
                   {t("logout")}
@@ -203,7 +204,7 @@ export default function AccountPage() {
                     <button 
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`flex-shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all duration-300 border ${
+                      className={`flex-shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all duration-300 border ${
                         isActive 
                           ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
                           : "bg-white text-slate-500 border-slate-100 hover:border-primary/20 hover:text-slate-900"
@@ -234,8 +235,8 @@ export default function AccountPage() {
                             <stat.icon className="w-6 h-6" />
                           </div>
                           <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                            <p className="text-3xl font-bold text-slate-900 tracking-tighter">{stat.value}</p>
+                            <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tighter">{stat.value}</p>
                           </div>
                         </div>
                       </div>
@@ -244,10 +245,10 @@ export default function AccountPage() {
 
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-slate-900 tracking-tight uppercase">
+                      <h3 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight uppercase">
                         {language === "kh" ? "សកម្មភាពថ្មីៗ" : "Recent Orders"}
                       </h3>
-                      <button onClick={() => setActiveTab("orders")} className="text-[11px] font-bold text-primary uppercase tracking-widest hover:gap-3 flex items-center gap-2 transition-all">
+                      <button onClick={() => setActiveTab("orders")} className="text-[11px] font-medium text-primary uppercase tracking-widest hover:gap-3 flex items-center gap-2 transition-all">
                         {language === "kh" ? "មើលទាំងអស់" : "View All"} <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
@@ -265,11 +266,11 @@ export default function AccountPage() {
                                 <Package className="w-6 h-6 text-slate-300 group-hover:text-primary transition-colors" />
                               </div>
                               <div>
-                                <p className="text-[14px] font-bold text-slate-900 uppercase">#{order.id.slice(0, 8)}</p>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                <p className="text-[14px] font-medium text-slate-900 uppercase">#{order.id.slice(0, 8)}</p>
+                                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
                               </div>
                             </div>
-                            <div className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border ${getStatusColor(order.status)}`}>
+                            <div className={`px-3 py-1 rounded-lg text-[9px] font-medium uppercase tracking-widest border ${getStatusColor(order.status)}`}>
                               {getStatusLabel(order.status)}
                             </div>
                           </Link>
@@ -278,7 +279,7 @@ export default function AccountPage() {
                     ) : (
                       <div className="bg-slate-50 rounded-3xl p-16 text-center border border-dashed border-slate-200">
                         <Package className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{t("noRecentActivity")}</p>
+                        <p className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">{t("noRecentActivity")}</p>
                       </div>
                     )}
                   </div>
@@ -289,39 +290,39 @@ export default function AccountPage() {
                 <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="space-y-10">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">
+                      <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight uppercase">
                         {language === "kh" ? "ព័ត៌មានប្រវត្តិរូប" : "Profile Settings"}
                       </h3>
-                      <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">Manage your personal identification</p>
+                      <p className="text-[12px] font-medium text-slate-500 uppercase tracking-widest">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក" : "Manage your personal identification"}</p>
                     </div>
 
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("fullName")}</label>
                           <input 
                             type="text" 
                             required
                             value={profileData.fullName}
                             onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900"
-                            placeholder="Your Name"
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900"
+                            placeholder={language === "kh" ? "ឈ្មោះរបស់អ្នក" : "Your Name"}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
                           <input 
                             type="email" 
                             disabled
                             value={user?.email}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-300 cursor-not-allowed"
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl font-normal text-slate-400 cursor-not-allowed"
                           />
                         </div>
                       </div>
                       <button 
                         type="submit"
                         disabled={updating}
-                        className="px-10 py-4 bg-primary text-white rounded-xl font-bold uppercase tracking-widest text-[11px] hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                        className="px-10 py-4 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-[11px] hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
                       >
                         {updating ? t("updating") : t("saveChanges")}
                       </button>
@@ -346,14 +347,14 @@ export default function AccountPage() {
                                 <Package className="w-6 h-6 group-hover:text-primary transition-colors" />
                               </div>
                               <div className="space-y-0.5">
-                                <h3 className="text-[14px] md:text-[15px] font-bold text-slate-900 uppercase">#{order.id.slice(0, 8)}</h3>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                <h3 className="text-[14px] md:text-[15px] font-medium text-slate-900 uppercase">#{order.id.slice(0, 8)}</h3>
+                                <p className="text-[9px] font-medium text-slate-500 uppercase tracking-widest">
                                   {new Date(order.createdAt).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                               <span className={`px-3 py-1 rounded-lg text-[8px] font-bold uppercase tracking-widest border shadow-sm ${getStatusColor(order.status)}`}>
+                               <span className={`px-3 py-1 rounded-lg text-[8px] font-medium uppercase tracking-widest border shadow-sm ${getStatusColor(order.status)}`}>
                                  {getStatusLabel(order.status)}
                                </span>
                             </div>
@@ -366,22 +367,22 @@ export default function AccountPage() {
                                   {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[12px] font-bold text-slate-900 truncate uppercase">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</p>
-                                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Price: ${item.price.toLocaleString()} • Qty: {item.quantity}</p>
+                                  <p className="text-[12px] font-medium text-slate-900 truncate uppercase">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</p>
+                                  <p className="text-[9px] font-medium text-slate-500 uppercase tracking-widest">{language === "kh" ? "តម្លៃ:" : "Price:"} ${item.price.toLocaleString()} • {language === "kh" ? "ចំនួន:" : "Qty:"} {item.quantity}</p>
                                 </div>
-                                <p className="text-[12px] font-bold text-slate-900">${(item.price * item.quantity).toLocaleString()}</p>
+                                <p className="text-[12px] font-medium text-slate-900">${(item.price * item.quantity).toLocaleString()}</p>
                               </div>
                             ))}
                           </div>
 
                           <div className="flex items-center justify-between pt-6 border-t border-slate-100">
                             <div className="space-y-0.5">
-                              <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Investment Value</p>
-                              <p className="text-xl font-bold text-slate-900 tracking-tighter">${order.totalAmount?.toLocaleString()}</p>
+                              <p className="text-[8px] font-medium text-slate-400 uppercase tracking-widest">{language === "kh" ? "តម្លៃវិនិយោគ" : "Investment Value"}</p>
+                              <p className="text-xl font-medium text-slate-900 tracking-tighter">${order.totalAmount?.toLocaleString()}</p>
                             </div>
                             <Link 
                               href={`/orders/${order.id}`}
-                              className="px-6 py-3 bg-slate-950 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-primary/5 active:scale-95"
+                              className="px-6 py-3 bg-slate-950 text-white rounded-xl font-medium text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-primary/5 active:scale-95"
                             >
                               {language === "kh" ? "មើលលម្អិត" : "Details"}
                             </Link>
@@ -392,7 +393,7 @@ export default function AccountPage() {
                   ) : (
                     <div className="bg-white rounded-3xl p-20 border border-slate-100 flex flex-col items-center text-center">
                       <Package className="w-16 h-16 text-slate-100 mb-6" />
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{t("noRecentActivity")}</p>
+                      <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{t("noRecentActivity")}</p>
                     </div>
                   )}
                 </div>
@@ -402,33 +403,33 @@ export default function AccountPage() {
                 <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="space-y-10">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">
+                      <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight uppercase">
                         {language === "kh" ? "សុវត្ថិភាពគណនី" : "Account Security"}
                       </h3>
-                      <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">Manage your credentials and access</p>
+                      <p className="text-[12px] font-medium text-slate-500 uppercase tracking-widest">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានសម្ងាត់របស់អ្នក" : "Manage your credentials and access"}</p>
                     </div>
 
                     <form onSubmit={handleUpdatePassword} className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("newPassword")}</label>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("newPassword")}</label>
                           <input 
                             type="password" 
                             required
                             value={passwords.newPassword}
                             onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900"
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900"
                             placeholder="••••••••"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">{t("confirmNewPassword")}</label>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("confirmNewPassword")}</label>
                           <input 
                             type="password" 
                             required
                             value={passwords.confirmPassword}
                             onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900"
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900"
                             placeholder="••••••••"
                           />
                         </div>
@@ -436,7 +437,7 @@ export default function AccountPage() {
                       <button 
                         type="submit"
                         disabled={updating}
-                        className="px-10 py-4 bg-primary text-white rounded-xl font-bold uppercase tracking-widest text-[11px] hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                        className="px-10 py-4 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-[11px] hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
                       >
                         {updating ? t("updating") : t("updatePassword")}
                       </button>

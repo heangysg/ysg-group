@@ -55,7 +55,7 @@ export default function AdminLogin() {
             <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary-dark rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
+            <h1 className="text-2xl font-medium text-gray-900">Admin Login</h1>
             <p className="text-gray-500 mt-2">Access YSG Machinery Management Portal</p>
           </div>
 
@@ -99,7 +99,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition-all disabled:opacity-50"
+              className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-all disabled:opacity-50"
             >
               {loading ? "Logging in..." : "Login"}
             </button>

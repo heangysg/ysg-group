@@ -33,9 +33,9 @@ export default function TestDB() {
 
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Database Connection Test</h1>
+      <h1 className="text-2xl font-medium mb-4">Database Connection Test</h1>
       <div className={`p-4 rounded-lg ${status.includes("?") ? "bg-green-100" : status.includes("?") ? "bg-red-100" : "bg-yellow-100"}`}>
-        <p className="font-semibold">{status}</p>
+        <p className="font-medium">{status}</p>
       </div>
       {data && (
         <pre className="mt-4 p-4 bg-gray-100 rounded-lg overflow-auto text-sm">

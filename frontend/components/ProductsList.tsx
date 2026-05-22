@@ -87,16 +87,16 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-12 md:pt-16 px-4">
-        <div className="max-w-7xl mx-auto">
+      <main className="pb-24 pt-6 md:pt-10 px-2">
+        <div className="max-w-[1400px] mx-auto">
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-px w-8 bg-primary" />
-                <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">{t("ourCollection")}</span>
+                <span className="text-[10px] font-medium text-primary uppercase tracking-[0.2em]">{t("ourCollection")}</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-medium text-slate-900 mb-2 tracking-tight">
                 {(() => {
                   if (selectedCategory === "all") return t("allProducts")
                   const cat = categories.find(c => c.slug === selectedCategory)
@@ -131,11 +131,11 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
             {/* Sidebar Filters - Clean Professional */}
             <aside className={`lg:w-64 space-y-8 ${showFilters ? "block" : "hidden lg:block"}`}>
               <div>
-                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 ml-1">{t("categories")}</h3>
+                <h3 className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-4 ml-1">{t("categories")}</h3>
                 <div className="flex flex-col gap-1">
                   <button
                     onClick={() => handleCategorySelect("all")}
-                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                       selectedCategory === "all" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
                     }`}
                   >
@@ -146,7 +146,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                     <div key={cat.id} className="space-y-1">
                       <button
                         onClick={() => handleCategorySelect(cat.slug)}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                           selectedCategory === cat.slug ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
                         }`}
                       >
@@ -158,7 +158,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                           <button
                             key={sub.id}
                             onClick={() => handleCategorySelect(sub.slug)}
-                            className={`w-full text-left px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                            className={`w-full text-left px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                               selectedCategory === sub.slug ? "text-primary bg-primary/5" : "text-slate-500 hover:text-slate-800"
                             }`}
                           >
@@ -175,19 +175,19 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
             {/* Product Grid */}
             <div className="flex-1">
               {loading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {[1, 2, 3, 4, 5, 6].map(n => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                     <div key={n} className="aspect-[4/5] bg-slate-50 rounded-2xl animate-pulse" />
                   ))}
                 </div>
               ) : filteredProducts.length === 0 ? (
                 <div className="py-24 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
                   <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-slate-900">{t("noProductsFound")}</h3>
+                  <h3 className="text-lg font-medium text-slate-900">{t("noProductsFound")}</h3>
                   <p className="text-slate-400 text-sm mt-1">Try adjusting your filters or search terms.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-10">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4">
                   {filteredProducts.map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
