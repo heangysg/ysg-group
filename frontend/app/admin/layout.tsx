@@ -26,6 +26,7 @@ import {
 import { createClient } from "../../lib/supabase/client"
 import { useLanguage } from "../../contexts/LanguageContext"
 import toast, { Toaster } from "react-hot-toast"
+import imageCompression from "browser-image-compression"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -212,23 +213,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const cloudName = (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dpaq3ova2").trim()
         const uploadPreset = (process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website").trim()
 
+        // Compress profile picture
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 800, // Profile pictures can be smaller
+          useWebWorker: true
+        }
+        const compressedFile = await imageCompression(selectedFile, options)
+
         const formData = new FormData()
-        formData.append("file", selectedFile)
+        formData.append("file", compressedFile, selectedFile.name)
         formData.append("upload_preset", uploadPreset)
 
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
           { method: "POST", body: formData }
         )
-        const data = await res.json()
+        
+        const text = await res.text()
+        console.log("Raw Profile Upload Response:", res.status, res.statusText, text)
+        
+        let data: any = {}
+        try {
+          data = JSON.parse(text)
+        } catch(e) {
+          console.error("Failed to parse JSON")
+        }
         
         if (res.ok && data.secure_url) {
           // Optimize the URL before saving to database
           finalImageUrl = data.secure_url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_face,f_auto,q_auto/")
           toast.success(t("photoUploaded") || "Photo uploaded!")
         } else {
-          console.error("Cloudinary Error Detail:", data)
-          const errorMsg = data.error?.message || "Image upload failed"
+          console.error("Cloudinary Error Detail (Status: " + res.status + "):", data)
+          const errorMsg = data.error?.message || text || "Image upload failed"
           throw new Error(errorMsg)
         }
       }

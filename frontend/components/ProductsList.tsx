@@ -87,7 +87,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-6 md:pt-10 px-2">
+      <main className="pb-24 pt-8 md:pt-12 px-4 md:px-8">
         <div className="max-w-[1400px] mx-auto">
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
@@ -96,7 +96,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                 <div className="h-px w-8 bg-primary" />
                 <span className="text-[10px] font-medium text-primary uppercase tracking-[0.2em]">{t("ourCollection")}</span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-medium text-slate-900 mb-2 tracking-tight">
+              <h1 className="text-3xl md:text-5xl font-medium text-slate-900 mb-4 tracking-tight leading-tight">
                 {(() => {
                   if (selectedCategory === "all") return t("allProducts")
                   const cat = categories.find(c => c.slug === selectedCategory)
@@ -120,7 +120,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
               </div>
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-3 rounded-xl border transition-all md:hidden ${showFilters ? 'bg-primary text-white border-primary' : 'bg-white border-slate-200 text-slate-600'}`}
+                className={`p-3 rounded-xl border transition-all md:hidden ${showFilters ? 'bg-primary text-white border-primary shadow-md' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
               >
                 <Filter className="w-5 h-5" />
               </button>
@@ -135,8 +135,8 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                 <div className="flex flex-col gap-1">
                   <button
                     onClick={() => handleCategorySelect("all")}
-                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      selectedCategory === "all" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
+                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      selectedCategory === "all" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
                     }`}
                   >
                     <span>{t("allProducts")}</span>
@@ -146,8 +146,8 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                     <div key={cat.id} className="space-y-1">
                       <button
                         onClick={() => handleCategorySelect(cat.slug)}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                          selectedCategory === cat.slug ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
+                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+                          selectedCategory === cat.slug ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
                         }`}
                       >
                         <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>

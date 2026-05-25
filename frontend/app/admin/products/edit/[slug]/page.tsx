@@ -7,6 +7,7 @@ import { ArrowLeft, Save, Package, Tag, DollarSign, MapPin, Calendar, Clock, Ima
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../../../lib/audit"
 import { useLanguage } from "../../../../../contexts/LanguageContext"
+import imageCompression from "browser-image-compression"
 
 export default function EditProduct() {
   const params = useParams()
@@ -18,6 +19,8 @@ export default function EditProduct() {
   const [fetching, setFetching] = useState(true)
   const [productId, setProductId] = useState("")
   const [images, setImages] = useState<string[]>([])
+  const [pendingImages, setPendingImages] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [uploadingImage, setUploadingImage] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -130,29 +133,24 @@ export default function EditProduct() {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
-    setUploadingImage(true)
-    const uploaded: string[] = []
-    for (const file of Array.from(files)) {
-      const data = new FormData()
-      data.append("file", file)
-      data.append("upload_preset", "ysg_products")
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: "POST", body: data }
-      )
-      const json = await res.json()
-      if (json.secure_url) uploaded.push(json.secure_url)
-    }
-    setImages(prev => [...prev, ...uploaded])
-    setUploadingImage(false)
-    toast.success(`${uploaded.length} image(s) uploaded!`)
+    
+    const newFiles = Array.from(files)
+    const newPreviews = newFiles.map(file => URL.createObjectURL(file))
+    
+    setPendingImages(prev => [...prev, ...newFiles])
+    setPreviewUrls(prev => [...prev, ...newPreviews])
   }
 
-  const removeImage = (index: number) => {
+  const removeExistingImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const removePendingImage = (index: number) => {
+    setPendingImages(prev => prev.filter((_, i) => i !== index))
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index))
   }
 
   const handleCategoryChange = (categoryId: string) => {
@@ -168,6 +166,39 @@ export default function EditProduct() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
+    // 1. Upload pending images first
+    const uploadedUrls: string[] = []
+    if (pendingImages.length > 0) {
+      for (const file of pendingImages) {
+        try {
+          const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
+          const compressedFile = await imageCompression(file, options)
+          
+          const data = new FormData()
+          data.append("file", compressedFile, file.name)
+          data.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website")
+          
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+            { method: "POST", body: data }
+          )
+          const json = await res.json()
+          if (json.secure_url) {
+            uploadedUrls.push(json.secure_url.replace('/upload/', '/upload/f_auto,q_auto/'))
+          } else {
+            throw new Error(json.error?.message || "Upload failed")
+          }
+        } catch (err: any) {
+          console.error("Compression or upload failed", err)
+          toast.error(`Image upload failed: ${err.message}`)
+          setLoading(false)
+          return // Stop saving product
+        }
+      }
+    }
+
+    const finalImages = [...images, ...uploadedUrls]
 
     const supabase = createClient()
     const newSlug = generateSlug(formData.name)
@@ -192,7 +223,8 @@ export default function EditProduct() {
         isFeatured: formData.isFeatured,
         categoryId: formData.subcategoryId || formData.categoryId || null,
         subcategoryId: null,
-        thumbnail: images[0] || null, // Use the first image as thumbnail
+        images: finalImages,
+        thumbnail: finalImages[0] || null, // Use the first image as thumbnail
         updatedAt: new Date().toISOString()
       })
       .eq("id", productId)
@@ -395,19 +427,36 @@ export default function EditProduct() {
               <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} />
             </label>
 
-            {images.length > 0 && (
+            {(images.length > 0 || previewUrls.length > 0) && (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                {/* Existing Images */}
                 {images.map((url, i) => (
-                  <div key={i} className="relative group">
+                  <div key={`existing-${i}`} className="relative group">
                     <img src={url} alt={`Product ${i+1}`} className="w-full h-24 object-cover rounded-lg border border-gray-200" />
                     <button
                       type="button"
-                      onClick={() => removeImage(i)}
+                      onClick={() => removeExistingImage(i)}
                       className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       ✕
                     </button>
                     {i === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-primary text-white px-1 rounded">Main</span>}
+                  </div>
+                ))}
+                
+                {/* Pending New Images */}
+                {previewUrls.map((url, i) => (
+                  <div key={`pending-${i}`} className="relative group border-2 border-primary/50 rounded-lg overflow-hidden">
+                    <img src={url} alt={`Preview ${i+1}`} className="w-full h-24 object-cover border border-gray-200" />
+                    <button
+                      type="button"
+                      onClick={() => removePendingImage(i)}
+                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ✕
+                    </button>
+                    <span className="absolute bottom-1 right-1 text-[10px] bg-blue-500 text-white px-1 rounded shadow-sm">New</span>
+                    {images.length === 0 && i === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-primary text-white px-1 rounded shadow-sm">Main</span>}
                   </div>
                 ))}
               </div>

@@ -32,7 +32,9 @@ export default function AccountPage() {
           fullName: currentUser.user_metadata?.full_name || "",
           avatarUrl: currentUser.user_metadata?.avatar_url || ""
         })
-        fetchUserOrders(currentUser.email)
+        if (currentUser.email) {
+          fetchUserOrders(currentUser.email)
+        }
       }
       setLoading(false)
     }
@@ -144,45 +146,50 @@ export default function AccountPage() {
     <PublicLayout>
       <main className="min-h-screen bg-white">
         
-        <section className="bg-slate-50 border-b border-slate-100 pt-6 md:pt-10 pb-12 md:pb-20">
-          <div className="max-w-6xl mx-auto px-6">
+        <section className="relative bg-slate-900 pt-12 md:pt-20 pb-16 md:pb-24 overflow-hidden">
+          {/* Subtle Background Pattern */}
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+          
+          <div className="relative max-w-6xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               <div className="relative group">
-                <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-[2.5rem] p-2 shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transition-all duration-500 group-hover:scale-105">
-                  <div className="w-full h-full bg-slate-50 rounded-[2rem] flex items-center justify-center overflow-hidden border border-slate-100">
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-800 rounded-3xl p-1 shadow-2xl shadow-blue-500/10 border border-slate-700 overflow-hidden transition-all duration-500 group-hover:scale-105">
+                  <div className="w-full h-full bg-slate-900 rounded-[1.35rem] flex items-center justify-center overflow-hidden border border-slate-800">
                     {user?.user_metadata?.avatar_url ? (
                       <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
-                      <UserIcon className="w-10 h-10 text-primary/20" />
+                      <UserIcon className="w-10 h-10 text-slate-500" />
                     )}
                   </div>
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 border-4 border-slate-900 cursor-pointer hover:bg-blue-500 transition-colors">
                   <Settings className="w-4 h-4" />
                 </div>
               </div>
 
-              <div className="text-center md:text-left space-y-3">
+              <div className="text-center md:text-left space-y-3 pt-2">
                 <div className="space-y-1">
-                  <h1 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight uppercase leading-none">
+                  <h1 className="text-2xl md:text-3xl font-medium text-white tracking-tight">
                     {user?.user_metadata?.full_name || t("memberUser")}
                   </h1>
-                  <p className="text-[12px] md:text-[14px] font-medium text-slate-500 uppercase tracking-widest">{user?.email}</p>
+                  <p className="text-[13px] font-medium text-slate-400">{user?.email}</p>
                 </div>
                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                   <div className="px-4 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] font-medium text-slate-600 uppercase tracking-widest">
+                   <div className="px-4 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-[11px] font-medium text-slate-300">
                      {language === "kh" ? "អតិថិជន" : "Customer"}
                    </div>
-                   <div className="px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-medium text-primary uppercase tracking-widest">
+                   <div className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-[11px] font-medium text-blue-400 flex items-center gap-1.5">
+                     <Shield className="w-3 h-3" />
                      {language === "kh" ? "គណនីបានបញ្ជាក់" : "Verified Account"}
                    </div>
                 </div>
               </div>
 
-              <div className="flex-1 md:text-right">
+              <div className="flex-1 md:text-right pt-2">
                 <button 
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-red-500 border border-slate-100 rounded-xl font-medium text-[11px] uppercase tracking-widest hover:bg-red-50 transition-all shadow-sm active:scale-95"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800/50 text-slate-300 border border-slate-700 rounded-xl font-medium text-[12px] hover:bg-slate-800 hover:text-white transition-all shadow-sm active:scale-95 backdrop-blur-sm"
                 >
                   <LogOut className="w-4 h-4" />
                   {t("logout")}
@@ -204,13 +211,13 @@ export default function AccountPage() {
                     <button 
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`flex-shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all duration-300 border ${
+                      className={`flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-medium transition-all duration-300 ${
                         isActive 
-                          ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
-                          : "bg-white text-slate-500 border-slate-100 hover:border-primary/20 hover:text-slate-900"
+                          ? "bg-blue-50 text-blue-700 shadow-sm" 
+                          : "bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${isActive ? "text-white" : "text-slate-300"}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
                       <span>{item.label}</span>
                     </button>
                   )
@@ -224,19 +231,19 @@ export default function AccountPage() {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {[
-                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0).toLocaleString()}`, icon: CreditCard, color: "bg-primary" },
-                      { label: t("totalOrders"), value: orders.length, icon: Package, color: "bg-primary" },
-                      { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield, color: "bg-primary" }
+                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0).toLocaleString()}`, icon: CreditCard, color: "bg-blue-600" },
+                      { label: t("totalOrders"), value: orders.length, icon: Package, color: "bg-blue-600" },
+                      { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield, color: "bg-blue-600" }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:border-primary/20 transition-all group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 opacity-50 group-hover:bg-primary/5 transition-colors" />
-                        <div className="relative z-10 space-y-6">
-                          <div className={`w-12 h-12 ${stat.color} text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/10`}>
-                            <stat.icon className="w-6 h-6" />
+                      <div key={i} className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="relative z-10 flex flex-col gap-4">
+                          <div className={`w-12 h-12 ${stat.color} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20`}>
+                            <stat.icon className="w-5 h-5" />
                           </div>
                           <div className="space-y-1">
-                            <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{stat.label}</p>
-                            <p className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tighter">{stat.value}</p>
+                            <p className="text-[13px] font-medium text-slate-500">{stat.label}</p>
+                            <p className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tight">{stat.value}</p>
                           </div>
                         </div>
                       </div>
@@ -245,10 +252,10 @@ export default function AccountPage() {
 
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight uppercase">
+                      <h3 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight">
                         {language === "kh" ? "សកម្មភាពថ្មីៗ" : "Recent Orders"}
                       </h3>
-                      <button onClick={() => setActiveTab("orders")} className="text-[11px] font-medium text-primary uppercase tracking-widest hover:gap-3 flex items-center gap-2 transition-all">
+                      <button onClick={() => setActiveTab("orders")} className="text-[13px] font-medium text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 transition-all">
                         {language === "kh" ? "មើលទាំងអស់" : "View All"} <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
@@ -287,42 +294,42 @@ export default function AccountPage() {
               )}
 
               {activeTab === "profile" && (
-                <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="space-y-10">
                     <div className="space-y-1">
-                      <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight uppercase">
+                      <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight">
                         {language === "kh" ? "ព័ត៌មានប្រវត្តិរូប" : "Profile Settings"}
                       </h3>
-                      <p className="text-[12px] font-medium text-slate-500 uppercase tracking-widest">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក" : "Manage your personal identification"}</p>
+                      <p className="text-[13px] text-slate-500">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក" : "Manage your personal identification"}</p>
                     </div>
 
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                          <label className="text-[13px] font-medium text-slate-700">{t("fullName")}</label>
                           <input 
                             type="text" 
                             required
                             value={profileData.fullName}
                             onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900"
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 shadow-sm"
                             placeholder={language === "kh" ? "ឈ្មោះរបស់អ្នក" : "Your Name"}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
+                          <label className="text-[13px] font-medium text-slate-700">{t("emailAddress")}</label>
                           <input 
                             type="email" 
                             disabled
                             value={user?.email}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl font-normal text-slate-400 cursor-not-allowed"
+                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed shadow-sm"
                           />
                         </div>
                       </div>
                       <button 
                         type="submit"
                         disabled={updating}
-                        className="px-10 py-4 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-[11px] hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                        className="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium text-[14px] hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 active:scale-95"
                       >
                         {updating ? t("updating") : t("saveChanges")}
                       </button>
@@ -400,36 +407,36 @@ export default function AccountPage() {
               )}
 
               {activeTab === "security" && (
-                <div className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="space-y-10">
                     <div className="space-y-1">
-                      <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight uppercase">
+                      <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight">
                         {language === "kh" ? "សុវត្ថិភាពគណនី" : "Account Security"}
                       </h3>
-                      <p className="text-[12px] font-medium text-slate-500 uppercase tracking-widest">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានសម្ងាត់របស់អ្នក" : "Manage your credentials and access"}</p>
+                      <p className="text-[13px] text-slate-500">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានសម្ងាត់របស់អ្នក" : "Manage your credentials and access"}</p>
                     </div>
 
                     <form onSubmit={handleUpdatePassword} className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("newPassword")}</label>
+                          <label className="text-[13px] font-medium text-slate-700">{t("newPassword")}</label>
                           <input 
                             type="password" 
                             required
                             value={passwords.newPassword}
                             onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900"
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 shadow-sm"
                             placeholder="••••••••"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-medium text-slate-500 uppercase tracking-widest ml-1">{t("confirmNewPassword")}</label>
+                          <label className="text-[13px] font-medium text-slate-700">{t("confirmNewPassword")}</label>
                           <input 
                             type="password" 
                             required
                             value={passwords.confirmPassword}
                             onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
-                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900"
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 shadow-sm"
                             placeholder="••••••••"
                           />
                         </div>
@@ -437,7 +444,7 @@ export default function AccountPage() {
                       <button 
                         type="submit"
                         disabled={updating}
-                        className="px-10 py-4 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-[11px] hover:bg-primary-dark transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+                        className="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium text-[14px] hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 active:scale-95"
                       >
                         {updating ? t("updating") : t("updatePassword")}
                       </button>

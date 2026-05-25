@@ -37,12 +37,8 @@ export async function proxy(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    // Protect admin routes - redirect to login if not authenticated
-    if (!user && request.nextUrl.pathname.startsWith('/admin')) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
+    // Admin routes are handled by client-side auth via localStorage
+    // so do not redirect them here using Supabase auth middleware.
   } catch (error) {
     // If Supabase is unreachable (network issue, offline, etc.),
     // log the error but continue serving the page rather than crashing.

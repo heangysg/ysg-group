@@ -23,7 +23,9 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
   const handleAddToCart = () => {
     addToCart(product)
-    toast.success(`${product.name} added to cart!`)
+    const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
+    const message = language === "kh" ? `បានបន្ថែម ${productName} ទៅកន្ត្រក!` : `${productName} added to cart!`
+    toast.success(message)
   }
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
             {/* Image Gallery */}
             <div className="space-y-6">
-              <div className="bg-slate-50 rounded-2xl overflow-hidden aspect-[4/3] border border-slate-100 relative group">
+              <div className="bg-slate-50 rounded-2xl overflow-hidden aspect-[4/3] border border-slate-100 relative group shadow-sm hover:shadow-md transition-all duration-300">
                 {images.length > 0 && images[activeImage] ? (
                   <img 
                     src={images[activeImage]} 

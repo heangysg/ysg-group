@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react"
+import { Mail, Lock, User, ArrowRight } from "lucide-react"
 import { createClient } from "../../lib/supabase/client"
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../contexts/LanguageContext"
+import { motion } from "framer-motion"
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("")
@@ -15,7 +16,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,83 +54,63 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex selection:bg-primary selection:text-white">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 selection:bg-primary/20 selection:text-primary relative overflow-hidden">
       <Toaster position="top-center" />
       
-      {/* Left Panel: Industrial Imagery */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-slate-950 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/90 to-slate-950/95 z-10" />
-        
-        {/* Placeholder for Industrial Image */}
-        <div 
-          className="absolute inset-0 opacity-40 mix-blend-overlay bg-cover bg-center"
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1541888087323-3b10ec8cb619?q=80&w=2070&auto=format&fit=crop")' }}
-        />
-        
-        <div className="relative z-20 flex flex-col justify-between p-16 h-full text-white w-full">
-          <Link href="/" className="inline-flex items-center gap-4 group w-fit">
-            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 group-hover:bg-white group-hover:text-slate-950 transition-all duration-300">
-              <ArrowLeft className="w-5 h-5" />
-            </div>
-            <span className="font-medium tracking-widest uppercase text-sm group-hover:text-primary transition-colors duration-300">Return to Home</span>
-          </Link>
-          
-          <div className="space-y-6 max-w-lg">
-            <div className="w-20 h-2 bg-primary rounded-full mb-8" />
-            <h1 className="text-5xl font-semibold leading-[1.1] tracking-tight uppercase">
-              Join The Fleet. <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/50">Elevate Standards.</span>
-            </h1>
-            <p className="text-lg text-slate-300 font-medium leading-relaxed">
-              Create an account to access premium heavy machinery, dedicated support, and enterprise-grade logistics tracking.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md relative z-10"
+      >
+        <Link href="/" className="flex justify-center mb-8 hover:scale-105 transition-transform duration-300">
+          <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-12 w-auto object-contain" />
+        </Link>
 
-      {/* Right Panel: Registration Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white relative overflow-y-auto">
-        <div className="w-full max-w-md space-y-10">
-          
+        <div className="bg-white rounded-[2rem] shadow-lux border border-slate-100 p-8 sm:p-10">
           {isSubmitted ? (
-            <div className="flex flex-col items-center justify-center text-center space-y-8 animate-in zoom-in duration-500">
-              <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2rem] flex items-center justify-center shadow-sm border border-emerald-100">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex flex-col items-center justify-center text-center space-y-8"
+            >
+              <div className="w-24 h-24 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center shadow-glow border border-primary/20">
                 <Mail className="w-10 h-10" />
               </div>
               <div className="space-y-3">
-                <h2 className="text-3xl font-semibold text-slate-900 tracking-tight">Check Your Inbox</h2>
-                <p className="text-slate-500 font-medium leading-relaxed">
-                  We've sent a verification link to <br/>
-                  <span className="text-slate-900 font-medium">{email}</span>
+                <h2 className={`text-2xl font-bold text-slate-900 tracking-tight uppercase ${language === 'kh' ? 'font-khmer' : ''}`}>{t("checkYourInbox") || "Check Your Inbox"}</h2>
+                <p className={`text-slate-500 font-medium leading-relaxed text-sm ${language === 'kh' ? 'font-khmer' : ''}`}>
+                  {t("weSentLink") || "We've sent a verification link to"} <br/>
+                  <span className="text-slate-900 font-bold">{email}</span>
                 </p>
               </div>
               <Link 
                 href="/login" 
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-medium tracking-widest uppercase shadow-lg shadow-slate-900/20 hover:bg-primary transition-all active:scale-95 flex items-center justify-center gap-3"
+                className={`w-full py-4 bg-slate-900 text-white rounded-2xl font-bold tracking-widest uppercase shadow-lux hover:shadow-glow hover:bg-primary transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-xs ${language === 'kh' ? 'font-khmer' : ''}`}
               >
-                Proceed to Login <ArrowRight className="w-5 h-5" />
+                {t("proceedToLogin") || "Proceed to Login"} <ArrowRight className="w-4 h-4" />
               </Link>
-            </div>
+            </motion.div>
           ) : (
             <>
-              <div className="space-y-4">
-                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm mb-8 lg:hidden">
-                  <img src="/logo.png" alt="YSG" className="w-10 h-10 object-contain" />
-                </div>
-                <h2 className="text-3xl lg:text-4xl font-semibold text-slate-900 tracking-tight">
+              <div className="text-center mb-10">
+                <h1 className={`text-2xl font-bold text-slate-900 tracking-tight ${language === 'en' ? 'uppercase' : ''}`}>
                   {t("register") || "Create Account"}
-                </h2>
-                <p className="text-slate-500 font-medium">
-                  Fill in your details to join the YSG professional network.
+                </h1>
+                <p className={`text-slate-500 font-medium text-sm mt-2 ${language === 'kh' ? 'font-khmer' : ''}`}>
+                  {t("joinYsgNetwork") || "Join the YSG professional network"}
                 </p>
               </div>
 
               <form onSubmit={handleRegister} className="space-y-6">
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-slate-700 uppercase tracking-wider ml-1">Full Name</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <label className={`text-xs font-bold text-slate-700 uppercase tracking-widest ml-1 ${language === 'kh' ? 'font-khmer' : ''}`}>{t("fullNameAuth") || "Full Name"}</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                         <User className="w-5 h-5" />
                       </div>
                       <input
@@ -137,16 +118,16 @@ export default function RegisterPage() {
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
                         placeholder="John Doe"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-slate-700 uppercase tracking-wider ml-1">Email Address</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <label className={`text-xs font-bold text-slate-700 uppercase tracking-widest ml-1 ${language === 'kh' ? 'font-khmer' : ''}`}>{t("emailAuth") || "Email"}</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                         <Mail className="w-5 h-5" />
                       </div>
                       <input
@@ -154,16 +135,16 @@ export default function RegisterPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
                         placeholder="name@company.com"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-slate-700 uppercase tracking-wider ml-1">Password</label>
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <label className={`text-xs font-bold text-slate-700 uppercase tracking-widest ml-1 ${language === 'kh' ? 'font-khmer' : ''}`}>{t("passwordAuth") || "Password"}</label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                         <Lock className="w-5 h-5" />
                       </div>
                       <input
@@ -171,7 +152,7 @@ export default function RegisterPage() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
                         placeholder="••••••••"
                       />
                     </div>
@@ -181,32 +162,32 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-slate-900 text-white py-4 rounded-2xl font-medium tracking-widest uppercase shadow-lg shadow-slate-900/20 hover:bg-primary hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+                  className={`w-full bg-slate-900 text-white py-4 rounded-2xl font-bold tracking-widest uppercase shadow-lux hover:shadow-glow hover:bg-primary transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-xs ${language === 'kh' ? 'font-khmer' : ''}`}
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
                       {t("register") || "Create Account"}
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
               </form>
 
-              <div className="relative">
+              <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-slate-200"></div>
                 </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-slate-500 font-medium">Or continue with</span>
+                <div className={`relative flex justify-center text-xs uppercase tracking-widest font-bold ${language === 'kh' ? 'font-khmer' : ''}`}>
+                  <span className="px-4 bg-white text-slate-400">{t("orContinueWith") || "Or continue with"}</span>
                 </div>
               </div>
 
               <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full bg-white text-slate-700 py-4 rounded-2xl font-medium tracking-widest uppercase shadow-sm border border-slate-200 hover:bg-slate-50 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-white text-slate-700 py-4 rounded-2xl font-bold tracking-widest uppercase shadow-sm border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-xs"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -216,19 +197,17 @@ export default function RegisterPage() {
                 </svg>
                 Google
               </button>
-
-              <div className="pt-8 mt-8 border-t border-slate-100 text-center">
-                <p className="text-slate-500 font-medium">
-                  {t("alreadyHaveAccount") || "Already have an account?"}{" "}
-                  <Link href="/login" className="text-primary hover:text-primary-dark font-medium ml-1 transition-colors">
-                    {t("login") || "Sign in here"}
-                  </Link>
-                </p>
-              </div>
             </>
           )}
         </div>
-      </div>
+        
+        <p className={`text-center text-slate-500 font-medium text-sm mt-8 ${language === 'kh' ? 'font-khmer' : ''}`}>
+          {t("alreadyHaveAccount") || "Already have an account?"}{" "}
+          <Link href="/login" className="text-primary hover:text-primary-dark font-bold ml-1 transition-colors uppercase tracking-wider text-xs">
+            {t("login") || "Sign in"}
+          </Link>
+        </p>
+      </motion.div>
     </div>
   )
 }

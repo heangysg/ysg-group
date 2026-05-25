@@ -179,7 +179,7 @@ export default function OrderDetailsPage() {
                        {language === "kh" ? "ការទូទាត់ជោគជ័យ" : "Payment Successful"}
                      </h2>
                      <p className="text-[14px] text-slate-500 font-medium">
-                       {language === "kh" ? "សូមអរគុណសម្រាប់ការវិនិយោគរបស់អ្នក។ គ្រឿងចក្រឧស្សាហកម្មរបស់អ្នកឥឡូវនេះកំពុងត្រូវបានរៀបចំសម្រាប់ដឹកជញ្ជូន។" : "Thank you for your investment. Your industrial machinery is now being prepared for logistics."}
+                       {language === "kh" ? "សូមអរគុណសម្រាប់ការវិនិយោគរបស់អ្នក។ គ្រឿងម៉ាស៊ីនឧស្សាហកម្មរបស់អ្នកឥឡូវនេះកំពុងត្រូវបានរៀបចំសម្រាប់ដឹកជញ្ជូន។" : "Thank you for your investment. Your industrial machinery is now being prepared for logistics."}
                      </p>
                   </div>
                 </div>
@@ -209,7 +209,7 @@ export default function OrderDetailsPage() {
               <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-100">
                 <h3 className="text-sm font-medium text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-3">
                   <Package className="w-4 h-4 text-primary" />
-                  {language === "kh" ? "បញ្ជីគ្រឿងចក្រ" : "Equipment Manifest"}
+                  {language === "kh" ? "បញ្ជីគ្រឿងម៉ាស៊ីន" : "Equipment Manifest"}
                 </h3>
                 <div className="divide-y divide-slate-50">
                   {order.items?.map((item: any, idx: number) => (

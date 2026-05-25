@@ -10,7 +10,7 @@ export default function AboutPage() {
   const stats = [
     { label: language === "kh" ? "ឆ្នាំនៃបទពិសោធន៍" : "Years Experience", value: "30+" },
     { label: language === "kh" ? "សាខាសរុប" : "Total Branches", value: "10" },
-    { label: language === "kh" ? "ផលិតផលគ្រឿងចក្រ" : "Machinery Units", value: "500+" },
+    { label: language === "kh" ? "ផលិតផលគ្រឿងម៉ាស៊ីន" : "Machinery Units", value: "500+" },
     { label: language === "kh" ? "អតិថិជនជឿជាក់" : "Trusted Clients", value: "15k+" },
   ]
 
@@ -23,7 +23,7 @@ export default function AboutPage() {
     { 
       icon: Target, 
       title: language === "kh" ? "គាំទ្រអាជីវកម្ម" : "Empowering Business", 
-      desc: language === "kh" ? "ជួយអតិថិជនចាប់ផ្តើម និងពង្រីកអាជីវកម្ម តាមរយៈការផ្តល់ជូនគ្រឿងចក្រដែលសមស្របតាមតម្រូវការ។" : "Helping customers start and expand their businesses through specialized machinery solutions." 
+      desc: language === "kh" ? "ជួយអតិថិជនចាប់ផ្តើម និងពង្រីកអាជីវកម្ម តាមរយៈការផ្តល់ជូនគ្រឿងម៉ាស៊ីនដែលសមស្របតាមតម្រូវការ។" : "Helping customers start and expand their businesses through specialized machinery solutions." 
     },
     { 
       icon: Users, 
@@ -172,7 +172,7 @@ export default function AboutPage() {
                </p>
                <div className="pt-6">
                  <button className="px-8 py-4 bg-primary text-white rounded-xl font-medium uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:opacity-90 transition-all">
-                    {language === "kh" ? "ស្វែងរកគ្រឿងចក្រ" : "Explore Equipment"}
+                    {language === "kh" ? "ស្វែងរកគ្រឿងម៉ាស៊ីន" : "Explore Equipment"}
                  </button>
                </div>
             </div>

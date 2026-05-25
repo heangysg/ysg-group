@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --primary: #E1232E;
-  --primary-dark: #C11B25;
+  --primary: #2563EB;
+  --primary-dark: #1D4ED8;
   --bg-main: #FFFFFF;
   --bg-subtle: #F8FAFC;
   --text-main: #0F172A;
@@ -16,39 +16,35 @@
 
 @layer base {
   body {
-    @apply bg-white text-slate-900;
+    @apply bg-slate-50 text-slate-900;
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 15px;
   }
   
-  h1 { @apply text-2xl md:text-4xl font-semibold tracking-tight; font-family: var(--font-heading); }
-  h2 { @apply text-xl md:text-3xl font-semibold tracking-tight; font-family: var(--font-heading); }
-  h3 { @apply text-lg md:text-2xl font-medium tracking-tight; font-family: var(--font-heading); }
-  h4 { @apply text-base md:text-xl font-medium tracking-tight; font-family: var(--font-heading); }
+  h1 { @apply text-2xl md:text-5xl font-semibold tracking-tight; font-family: var(--font-heading); }
+  h2 { @apply text-xl md:text-4xl font-semibold tracking-tight; font-family: var(--font-heading); }
+  h3 { @apply text-lg md:text-3xl font-medium tracking-tight; font-family: var(--font-heading); }
+  h4 { @apply text-base md:text-2xl font-medium tracking-tight; font-family: var(--font-heading); }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white font-semibold transition-all duration-300 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/10 active:scale-[0.98];
+    @apply bg-primary text-white font-semibold transition-all duration-300 hover:bg-primary-dark hover:shadow-glow active:scale-[0.98];
   }
   
   .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-slate-100 shadow-sm;
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-lux;
+  }
+
+  .glass-panel {
+    @apply bg-slate-900/40 backdrop-blur-2xl border border-white/10;
   }
 
   .btn-fab {
-    @apply fixed bottom-24 right-6 z-[150] w-12 h-12 bg-white text-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all duration-300 border border-slate-100;
+    @apply fixed bottom-24 right-6 z-[150] w-12 h-12 bg-slate-900 text-white rounded-full shadow-lux-deep flex items-center justify-center hover:bg-primary active:scale-90 transition-all duration-300 border border-slate-800;
   }
-}
-
-.shadow-lux {
-  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
-}
-
-.shadow-lux-deep {
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
 }
 
 .transition-soft {
@@ -67,6 +63,18 @@
   scrollbar-width: none;
 }
 
-.khmer-mode {
+html.khmer-mode,
+html.khmer-mode body,
+html.khmer-mode * {
   font-family: var(--font-kantumruy), sans-serif !important;
+}
+
+/* Reduce boldness specifically for Khmer font to maintain elegant look */
+html.khmer-mode .font-medium {
+  font-weight: 400 !important;
+}
+
+html.khmer-mode .font-semibold,
+html.khmer-mode .font-bold {
+  font-weight: 500 !important;
 }

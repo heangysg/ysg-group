@@ -30,12 +30,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${inter.variable} ${outfit.variable} ${kantumruy.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
       </head>
-      <body className={`${inter.variable} ${outfit.variable} ${kantumruy.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <LanguageProvider>
           <CartProvider>
             {children}

@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "../../../lib/supabase/client"
-import { Plus, Trash2, Edit, ChevronRight, ChevronDown, Folder } from "lucide-react"
+import { Plus, Trash2, Edit, ChevronRight, ChevronDown, Folder, Image as ImageIcon, X } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../lib/audit"
 import { useLanguage } from "../../../contexts/LanguageContext"
+import imageCompression from "browser-image-compression"
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<any[]>([])
@@ -16,6 +17,9 @@ export default function AdminCategories() {
   const [modalType, setModalType] = useState("main")
   const [selectedParent, setSelectedParent] = useState<any>(null)
   const [editingItem, setEditingItem] = useState<any>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null)
+  const [previewImage, setPreviewImage] = useState<string>("")
   const [formData, setFormData] = useState({
     name: "",
     nameKhmer: "",
@@ -25,7 +29,8 @@ export default function AdminCategories() {
     parentId: "",
     isActive: true,
     isFeatured: false,
-    sortOrder: 0
+    sortOrder: 0,
+    image: ""
   })
   const router = useRouter()
   const { t, language } = useLanguage()
@@ -65,6 +70,20 @@ export default function AdminCategories() {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
   }
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    const file = files[0]
+    setPendingImageFile(file)
+    setPreviewImage(URL.createObjectURL(file))
+  }
+
+  const removeImage = () => {
+    setFormData({ ...formData, image: "" })
+    setPendingImageFile(null)
+    setPreviewImage("")
+  }
+
   const openAddMainModal = () => {
     setModalType("main")
     setEditingItem(null)
@@ -77,8 +96,11 @@ export default function AdminCategories() {
       parentId: "",
       isActive: true,
       isFeatured: false,
-      sortOrder: categories.length
+      sortOrder: categories.length,
+      image: ""
     })
+    setPendingImageFile(null)
+    setPreviewImage("")
     setShowAddModal(true)
   }
 
@@ -95,8 +117,11 @@ export default function AdminCategories() {
       parentId: parent.id,
       isActive: true,
       isFeatured: false,
-      sortOrder: getSubcategories(parent.id).length
+      sortOrder: getSubcategories(parent.id).length,
+      image: ""
     })
+    setPendingImageFile(null)
+    setPreviewImage("")
     setShowAddModal(true)
   }
 
@@ -113,13 +138,47 @@ export default function AdminCategories() {
       parentId: item.parentId || "",
       isActive: item.isActive,
       isFeatured: item.isFeatured || false,
-      sortOrder: item.sortOrder || 0
+      sortOrder: item.sortOrder || 0,
+      image: item.image || ""
     })
+    setPendingImageFile(null)
+    setPreviewImage("")
     setShowAddModal(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setUploadingImage(true)
+    let finalImageUrl = formData.image
+
+    // 1. Upload pending image to Cloudinary if it exists
+    if (pendingImageFile) {
+      try {
+        const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
+        const compressedFile = await imageCompression(pendingImageFile, options)
+        const uploadData = new FormData()
+        uploadData.append("file", compressedFile, pendingImageFile.name)
+        uploadData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website")
+        
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: "POST", body: uploadData
+        })
+        const text = await res.text()
+        let json: any = {}
+        try { json = JSON.parse(text) } catch(e) {}
+        
+        if (res.ok && json.secure_url) {
+          finalImageUrl = json.secure_url.replace('/upload/', '/upload/f_auto,q_auto/')
+        } else {
+          throw new Error(json.error?.message || text || "Cloudinary upload failed")
+        }
+      } catch (err: any) {
+        setUploadingImage(false)
+        toast.error("Failed to upload image: " + err.message)
+        return // Stop saving if image upload fails
+      }
+    }
+
     const supabase = createClient()
     const slug = formData.slug || generateSlug(formData.name)
     
@@ -133,6 +192,7 @@ export default function AdminCategories() {
       isActive: formData.isActive,
       isFeatured: formData.isFeatured,
       sortOrder: formData.sortOrder,
+      image: finalImageUrl || null,
       updatedAt: new Date().toISOString()
     }
 
@@ -163,9 +223,12 @@ export default function AdminCategories() {
       setShowAddModal(false)
       setEditingItem(null)
       setSelectedParent(null)
-      setFormData({ name: "", nameKhmer: "", slug: "", description: "", descriptionKhmer: "", parentId: "", isActive: true, isFeatured: false, sortOrder: 0 })
+      setPendingImageFile(null)
+      setPreviewImage("")
+      setFormData({ name: "", nameKhmer: "", slug: "", description: "", descriptionKhmer: "", parentId: "", isActive: true, isFeatured: false, sortOrder: 0, image: "" })
       fetchCategories()
     }
+    setUploadingImage(false)
   }
 
   const handleDelete = async (item: any, hasChildren: boolean, subItemsCount: number) => {
@@ -336,7 +399,36 @@ export default function AdminCategories() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-                <input type="number" className="w-full px-3 py-2 border rounded-lg" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
+                <input type="number" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
+              </div>
+
+              {/* Image Upload Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category Image</label>
+                {!previewImage && !formData.image ? (
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
+                      <ImageIcon className="w-8 h-8" />
+                      <span className="text-sm">Click to select image</span>
+                    </div>
+                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                  </label>
+                ) : (
+                  <div className="relative group">
+                    <img 
+                      src={previewImage || formData.image} 
+                      alt="Category" 
+                      className="w-full h-40 object-cover rounded-lg border border-gray-200" 
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})} /><span className="text-sm">{t("active")}</span></label>

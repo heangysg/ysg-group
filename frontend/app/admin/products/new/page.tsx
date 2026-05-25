@@ -7,13 +7,16 @@ import { ArrowLeft, Save, Package, Tag, DollarSign, MapPin, Calendar, Clock, Fil
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../../lib/audit"
 import { useLanguage } from "../../../../contexts/LanguageContext"
+import imageCompression from "browser-image-compression"
 
 export default function AddProduct() {
   const [categories, setCategories] = useState<any[]>([])
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState("")
   const [loading, setLoading] = useState(false)
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<string[]>([]) // For legacy compatibility or if needed
+  const [pendingImages, setPendingImages] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [uploadingImage, setUploadingImage] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -70,34 +73,56 @@ export default function AddProduct() {
     }
   }
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
-    setUploadingImage(true)
-    const uploaded: string[] = []
-    for (const file of Array.from(files)) {
-      const data = new FormData()
-      data.append("file", file)
-      data.append("upload_preset", "ysg_products")
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: "POST", body: data }
-      )
-      const json = await res.json()
-      if (json.secure_url) uploaded.push(json.secure_url)
-    }
-    setImages(prev => [...prev, ...uploaded])
-    setUploadingImage(false)
-    toast.success(`${uploaded.length} image(s) uploaded!`)
+    
+    const newFiles = Array.from(files)
+    const newPreviews = newFiles.map(file => URL.createObjectURL(file))
+    
+    setPendingImages(prev => [...prev, ...newFiles])
+    setPreviewUrls(prev => [...prev, ...newPreviews])
   }
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index))
+    setPendingImages(prev => prev.filter((_, i) => i !== index))
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+
+    // 1. Upload pending images first
+    const uploadedUrls: string[] = []
+    if (pendingImages.length > 0) {
+      for (const file of pendingImages) {
+        try {
+          const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
+          const compressedFile = await imageCompression(file, options)
+          
+          const data = new FormData()
+          data.append("file", compressedFile, file.name)
+          data.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website")
+          
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+            { method: "POST", body: data }
+          )
+          const json = await res.json()
+          if (json.secure_url) {
+            uploadedUrls.push(json.secure_url.replace('/upload/', '/upload/f_auto,q_auto/'))
+          } else {
+            throw new Error(json.error?.message || "Upload failed")
+          }
+        } catch (err: any) {
+          console.error("Compression or upload failed", err)
+          toast.error(`Image upload failed: ${err.message}`)
+          setLoading(false)
+          return // Stop saving product
+        }
+      }
+    }
 
     const supabase = createClient()
     const slug = generateSlug(formData.name)
@@ -122,7 +147,8 @@ export default function AddProduct() {
         isFeatured: formData.isFeatured,
         categoryId: formData.subcategoryId || formData.categoryId || null,
         subcategoryId: null,
-        thumbnail: images[0] || null,
+        images: uploadedUrls,
+        thumbnail: uploadedUrls[0] || null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }])
@@ -349,11 +375,11 @@ export default function AddProduct() {
               <input type="file" className="hidden" multiple accept="image/*" onChange={handleImageUpload} disabled={uploadingImage} />
             </label>
 
-            {images.length > 0 && (
+            {previewUrls.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                {images.map((url, i) => (
+                {previewUrls.map((url, i) => (
                   <div key={i} className="relative group">
-                    <img src={url} alt={`Product ${i+1}`} className="w-full h-24 object-cover rounded-lg border border-gray-200" />
+                    <img src={url} alt={`Preview ${i+1}`} className="w-full h-24 object-cover rounded-lg border border-gray-200" />
                     <button
                       type="button"
                       onClick={() => removeImage(i)}
