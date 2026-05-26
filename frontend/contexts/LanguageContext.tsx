@@ -37,7 +37,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }
 
   const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations.en] || key
+    return (translations[language] as any)[key] || key
   }
 
   return (
