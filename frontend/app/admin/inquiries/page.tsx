@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "../../../lib/supabase/client"
-import { Mail, CheckCircle, ArrowLeft } from "lucide-react"
+import { Mail, CheckCircle, ArrowLeft, Clock } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../contexts/LanguageContext"
 
