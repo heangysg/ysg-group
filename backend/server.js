@@ -16,8 +16,17 @@ const PORT = process.env.PORT || 5000;
 // This adds 14+ different HTTP headers to protect against common attacks
 app.use(helmet());
 
-// 2. Cross-Origin Resource Sharing (CORS)
-app.use(cors());
+const allowedOrigins = ['http://localhost:3000', 'https://ysg-group.vercel.app'];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS security'));
+    }
+  },
+  credentials: true,
+}));
 
 // 3. Request Rate Limiting (DDoS Protection)
 // Limit each IP to 100 requests per 15 minutes
