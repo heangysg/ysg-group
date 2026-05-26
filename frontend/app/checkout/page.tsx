@@ -126,7 +126,7 @@ export default function CheckoutPage() {
     <PublicLayout>
       <Toaster position="top-center" />
       <div className="bg-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-6 pt-6 md:pt-10 pb-12 md:pb-24">
+        <div className="max-w-6xl mx-auto px-6 pt-6 md:pt-8 pb-12 md:pb-24">
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
             
             {/* 🛒 Shopping Cart Section */}
@@ -138,14 +138,14 @@ export default function CheckoutPage() {
                 </span>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="bg-white border border-slate-100 rounded-2xl p-4 md:p-6 flex items-center gap-4 md:gap-6 group transition-all duration-300">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-slate-50">
+                  <div key={item.id} className="solid-card bg-white border-2 border-slate-900 p-4 md:p-6 flex items-center gap-4 md:gap-6 group">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 border-2 border-slate-900 overflow-hidden shrink-0 flex items-center justify-center">
                       {item.image ? (
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
-                        <Package className="w-8 h-8 text-slate-200" />
+                        <Package className="w-8 h-8 text-slate-300" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0 space-y-0.5">
@@ -158,15 +158,15 @@ export default function CheckoutPage() {
                     
                     <div className="flex flex-col items-end gap-2 md:gap-3">
                       <button onClick={() => removeFromCart(item.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
-                      <div className="flex items-center gap-2 bg-slate-50 rounded-lg p-1 px-2 border border-slate-100">
-                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-0.5 text-slate-400 hover:text-slate-900">
-                          <Minus className="w-3.5 h-3.5" />
+                      <div className="flex items-center gap-2 bg-slate-50 p-1 px-2 border-2 border-slate-900">
+                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-0.5 text-slate-900 hover:bg-slate-200">
+                          <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-5 text-center font-medium text-[13px] text-slate-900">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-0.5 text-slate-400 hover:text-slate-900">
-                          <Plus className="w-3.5 h-3.5" />
+                        <span className="w-6 text-center font-bold text-[13px] text-slate-900">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-0.5 text-slate-900 hover:bg-slate-200">
+                          <Plus className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -174,21 +174,22 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <Link href="/products" className="inline-flex items-center gap-2 text-slate-400 font-medium text-[10px] uppercase tracking-widest hover:text-primary transition-colors">
-                <ArrowLeft className="w-3.5 h-3.5" />
-                {t("backToProducts")}
-              </Link>
+              <div className="mb-8 mt-6">
+                <Link href="/products" className="inline-flex items-center gap-2 text-slate-500 font-bold text-sm uppercase tracking-widest hover:text-slate-900 transition-colors">
+                  <ArrowLeft className="w-4 h-4" /> {language === "kh" ? "ត្រលប់ទៅកាន់ផលិតផល" : "Back to Products"}
+                </Link>
+              </div>
             </div>
 
             {/* 🏗️ Checkout Details Section */}
             <div className="w-full lg:w-[420px] space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-              <div className="bg-slate-50 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 sticky top-20">
-                <h2 className="text-lg md:text-xl font-medium text-slate-900 mb-8 uppercase tracking-widest">{t("checkoutDetails")}</h2>
+              <div className="solid-card bg-white p-6 md:p-10 sticky top-24">
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-8 uppercase tracking-widest">{t("checkoutDetails")}</h2>
                 
                 <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
                   <div className="space-y-3">
                     <div className="relative group">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
                         type="text" 
                         name="customerName"
@@ -196,11 +197,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.customerName}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-300 text-[13px]"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px] uppercase tracking-widest"
                       />
                     </div>
                     <div className="relative group">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
                         type="tel" 
                         name="customerPhone"
@@ -208,11 +209,11 @@ export default function CheckoutPage() {
                         required
                         value={formData.customerPhone}
                         onChange={handleInputChange}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-300 text-[13px]"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px] uppercase tracking-widest"
                       />
                     </div>
                     <div className="relative group">
-                      <MapPin className="absolute left-4 top-4 w-4 h-4 text-slate-400" />
+                      <MapPin className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
                       <textarea 
                         name="address"
                         placeholder={t("address")}
@@ -220,7 +221,7 @@ export default function CheckoutPage() {
                         value={formData.address}
                         onChange={handleInputChange}
                         rows={3}
-                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-100 rounded-xl focus:border-primary/20 outline-none transition-all font-normal text-slate-900 placeholder:text-slate-300 text-[13px] resize-none"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px] resize-none uppercase tracking-widest"
                       />
                     </div>
                   </div>
@@ -235,9 +236,9 @@ export default function CheckoutPage() {
                       </p>
                     </div>
 
-                    <div className="w-full p-4 md:p-5 rounded-2xl border-2 border-primary bg-white flex items-center gap-3 md:gap-4 group relative shadow-sm">
+                    <div className="w-full p-4 md:p-5 border-2 border-primary bg-slate-50 flex items-center gap-3 md:gap-4 group relative shadow-hard-primary transition-all">
                       {/* Red Box for Logo - Using Official Bakong Red #E1232E */}
-                      <div className="w-12 h-12 bg-[#E1232E] rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/10">
+                      <div className="w-12 h-12 bg-[#E1232E] border-2 border-slate-900 flex items-center justify-center flex-shrink-0">
                         <img 
                           src="/logo/KHQR Logo.png" 
                           alt="KHQR" 
@@ -246,16 +247,16 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0 space-y-0.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-medium text-[#E1232E] uppercase tracking-widest">KHQR</span>
-                          <div className="w-1 h-1 bg-slate-200 rounded-full" />
-                          <span className="text-[13px] md:text-[14px] font-medium text-slate-900 uppercase tracking-tight truncate">Bakong KHQR</span>
+                          <span className="text-[10px] font-bold text-[#E1232E] uppercase tracking-widest">KHQR</span>
+                          <div className="w-1 h-1 bg-slate-300 rounded-none" />
+                          <span className="text-[13px] md:text-[14px] font-bold text-slate-900 uppercase tracking-tight truncate">Bakong KHQR</span>
                         </div>
-                        <p className="text-[11px] font-medium text-slate-400 truncate">
+                        <p className="text-[11px] font-medium text-slate-500 truncate">
                           {language === "kh" ? "ការទូទាត់តាម Bakong" : "Cambodia's Bakong Payment"}
                         </p>
                       </div>
-                      <div className="w-5 h-5 bg-[#E1232E] rounded-full flex items-center justify-center text-white shrink-0">
-                        <Check className="w-3 h-3" />
+                      <div className="w-6 h-6 bg-primary border-2 border-slate-900 flex items-center justify-center text-slate-900 shrink-0">
+                        <Check className="w-4 h-4" />
                       </div>
                     </div>
                   </div>
@@ -280,13 +281,13 @@ export default function CheckoutPage() {
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-slate-950 text-white py-4 rounded-xl font-medium text-[11px] uppercase tracking-widest shadow-lg hover:bg-primary transition-all duration-300 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                    className="btn-primary w-full py-5 text-[12px] flex items-center justify-center gap-3"
                   >
                     {loading ? (
-                      <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
                     ) : (
                       <>
-                        <CreditCard className="w-4 h-4" />
+                        <CreditCard className="w-5 h-5" />
                         {language === "kh" ? "ធ្វើការបញ្ជាទិញ" : t("placeOrder")}
                       </>
                     )}

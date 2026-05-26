@@ -101,25 +101,35 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
   return (
     <PublicLayout>
-      <main className="min-h-screen bg-white pb-24 pt-8 md:pt-12">
+      <main className="min-h-screen bg-white pb-24 pt-6 md:pt-8">
         <Toaster position="top-center" reverseOrder={false} />
         
-        {/* Breadcrumbs */}
-        <div className="max-w-7xl mx-auto px-4 mb-10">
-          <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-slate-400 overflow-x-auto whitespace-nowrap pb-2">
-            <Link href="/" className="hover:text-primary transition-colors">{t("home")}</Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href="/products" className="hover:text-primary transition-colors">{t("products")}</Link>
-            <ChevronRight className="w-3 h-3" />
+        {/* Desktop Breadcrumbs */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4 mb-10">
+          <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-500 overflow-x-auto whitespace-nowrap pb-2">
+            <Link href="/" className="hover:text-slate-900 transition-colors">{t("home")}</Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link href="/products" className="hover:text-slate-900 transition-colors">{t("products")}</Link>
+            <ChevronRight className="w-4 h-4" />
             <span className="text-slate-900">{language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}</span>
           </div>
+        </div>
+
+        {/* Mobile App Style Header */}
+        <div className="md:hidden max-w-7xl mx-auto px-4 mb-6">
+          <Link href="/products" className="inline-flex items-center gap-3 text-slate-900 font-bold text-sm uppercase tracking-widest">
+            <div className="w-10 h-10 flex items-center justify-center bg-slate-50 border-2 border-slate-900 shadow-[2px_2px_0px_#0f172a] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] transition-all">
+              <ArrowLeft className="w-5 h-5" />
+            </div>
+            {language === "kh" ? "ត្រលប់ក្រោយ" : "Back"}
+          </Link>
         </div>
 
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
             {/* Image Gallery */}
             <div className="space-y-6">
-              <div className="bg-slate-50 rounded-2xl overflow-hidden aspect-[4/3] border border-slate-100 relative group shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="bg-slate-50 border-4 border-slate-900 aspect-[4/3] relative group shadow-hard">
                 {images.length > 0 && images[activeImage] ? (
                   <img 
                     src={images[activeImage]} 
@@ -132,8 +142,8 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                     <span className="font-medium uppercase tracking-widest text-xs">No Image Available</span>
                   </div>
                 )}
-                <div className="absolute top-6 left-6">
-                  <span className="bg-white/95 backdrop-blur px-3 py-1 rounded-lg text-[10px] font-medium uppercase tracking-widest shadow-sm border border-slate-100">
+                <div className="absolute top-4 left-4">
+                  <span className="bg-slate-900 text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest shadow-hard-primary border border-primary">
                     {product.brand}
                   </span>
                 </div>
@@ -145,8 +155,8 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                     <button 
                       key={i} 
                       onClick={() => setActiveImage(i)}
-                      className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${
-                        activeImage === i ? "border-primary shadow-md" : "border-transparent hover:border-slate-200"
+                      className={`aspect-square border-2 transition-all ${
+                        activeImage === i ? "border-primary shadow-hard-primary" : "border-slate-200 hover:border-slate-900"
                       }`}
                     >
                       <img src={img} alt={`${product.name} ${i}`} className="w-full h-full object-cover" />
@@ -158,7 +168,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
             {/* Product Info */}
             <div className="flex flex-col">
-              <div className="space-y-6 mb-12">
+              <div className="space-y-4 md:space-y-6 mb-4 md:mb-12">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg text-[9px] font-medium uppercase tracking-widest border border-emerald-100">
                     <ShieldCheck className="w-3.5 h-3.5" />
@@ -192,14 +202,14 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
               <div className="hidden md:grid grid-cols-2 gap-4 mb-12">
                 <button
                   onClick={handleAddToCart}
-                  className="bg-slate-900 text-white py-4 px-8 rounded-xl font-medium uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-900/10 flex items-center justify-center gap-3"
+                  className="bg-slate-900 text-white py-4 px-8 font-bold uppercase tracking-widest hover:bg-slate-800 transition-all active:translate-y-1 shadow-hard-primary border-2 border-slate-900 flex items-center justify-center gap-3"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   {t("placeOrder")}
                 </button>
                 <button
                   onClick={() => setShowInquiry(true)}
-                  className="bg-white text-slate-900 border border-slate-200 py-4 px-8 rounded-xl font-medium uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-3"
+                  className="bg-white text-slate-900 border-2 border-slate-900 py-4 px-8 font-bold uppercase tracking-widest hover:bg-slate-50 transition-all active:translate-y-1 shadow-hard flex items-center justify-center gap-3"
                 >
                   <Send className="w-5 h-5 text-primary" />
                   {t("contactSales")}
@@ -207,17 +217,17 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
               </div>
 
               {/* Mobile Sticky Actions */}
-              <div className="md:hidden fixed bottom-16 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 p-4 z-[90] flex gap-3 safe-area-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+              <div className="md:hidden fixed bottom-[72px] left-0 right-0 bg-white border-t-2 border-slate-900 p-3 z-[90] flex gap-3 shadow-hard-primary">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-[1.5] bg-slate-900 text-white py-4 rounded-2xl font-medium text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
+                  className="btn-primary flex-[1.5] py-3.5 flex items-center justify-center gap-2 text-[10px]"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   {t("placeOrder")}
                 </button>
                 <button
                   onClick={() => setShowInquiry(true)}
-                  className="flex-1 bg-white text-slate-900 border border-slate-200 py-4 rounded-2xl font-medium text-xs uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 bg-slate-50 text-slate-900 border-2 border-slate-900 py-3.5 font-bold text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all active:translate-y-1 shadow-hard flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4 text-primary" />
                   {t("contactSales")}
@@ -225,10 +235,10 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
               </div>
 
               {/* Description */}
-              <div className="space-y-4 pt-10 border-t border-slate-100">
-                <h3 className="text-slate-900 font-medium text-lg uppercase tracking-widest">{t("description")}</h3>
+              <div className="space-y-3 pt-4 md:space-y-4 md:pt-10 border-t-2 border-slate-900">
+                <h3 className="text-slate-900 font-bold text-base md:text-lg uppercase tracking-widest">{t("description")}</h3>
                 <div className="text-slate-500 text-sm leading-relaxed whitespace-pre-line font-medium">
-                  {language === "kh" && product.descriptionKhmer ? product.descriptionKhmer : product.description}
+                  {language === "kh" && product.descriptionKhmer ? product.descriptionKhmer.trim() : product.description?.trim()}
                 </div>
               </div>
             </div>
@@ -255,27 +265,28 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
       {/* Inquiry Modal */}
       {showInquiry && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 relative animate-in fade-in zoom-in duration-200 border border-slate-100">
-            <button onClick={() => setShowInquiry(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-900 bg-slate-50 rounded-xl transition-all">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowInquiry(false)}></div>
+          <div className="solid-card bg-white w-full max-w-lg p-8 relative animate-in fade-in zoom-in duration-200">
+            <button onClick={() => setShowInquiry(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-900 bg-slate-50 border-2 border-transparent hover:border-slate-900 transition-all">
               <X className="w-5 h-5" />
             </button>
             <h2 className="text-2xl font-medium text-slate-900 mb-1">{t("contactSales")}</h2>
             <p className="text-sm text-slate-400 mb-8 font-medium">Get a quote for <span className="text-primary font-medium">{product.name}</span></p>
             <form className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
-                <input type="text" className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-normal text-sm" />
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-widest">{t("fullName") || "Full Name"}</label>
+                <input type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] uppercase tracking-widest" />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-400 uppercase tracking-widest ml-1">{t("phone")}</label>
-                <input type="tel" className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-normal text-sm" />
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-widest">{t("phone") || "Phone Number"}</label>
+                <input type="tel" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] uppercase tracking-widest" />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-400 uppercase tracking-widest ml-1">{t("message")}</label>
-                <textarea rows={4} className="w-full px-5 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-normal text-sm resize-none"></textarea>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-widest">{t("message") || "Message"}</label>
+                <textarea rows={4} className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] resize-none uppercase tracking-widest"></textarea>
               </div>
-              <button type="submit" className="w-full bg-primary text-white py-4 rounded-xl font-medium uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl transition-all mt-4">{t("send") || "Send Message"}</button>
+              <button type="submit" className="btn-primary w-full py-4 text-xs mt-4 flex items-center justify-center gap-2">{t("send") || "Send Message"}</button>
             </form>
           </div>
         </div>

@@ -31,19 +31,19 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white font-semibold transition-all duration-300 hover:bg-primary-dark hover:shadow-glow active:scale-[0.98];
+    @apply bg-primary text-slate-900 font-bold uppercase tracking-widest transition-all duration-300 hover:bg-primary-dark hover:shadow-hard-primary active:translate-y-1 active:shadow-none border-2 border-primary;
   }
   
-  .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-lux;
+  .solid-card {
+    @apply bg-white border-2 border-slate-900 shadow-hard hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all rounded-none;
   }
 
-  .glass-panel {
-    @apply bg-slate-900/40 backdrop-blur-2xl border border-white/10;
+  .solid-panel {
+    @apply bg-slate-900 text-white border-2 border-primary rounded-none;
   }
 
   .btn-fab {
-    @apply fixed bottom-24 right-6 z-[150] w-12 h-12 bg-slate-900 text-white rounded-full shadow-lux-deep flex items-center justify-center hover:bg-primary active:scale-90 transition-all duration-300 border border-slate-800;
+    @apply fixed bottom-24 right-6 z-[150] w-14 h-14 bg-primary text-slate-900 rounded-none shadow-hard-primary flex items-center justify-center hover:bg-primary-dark active:translate-y-1 active:shadow-none transition-all duration-300 border-2 border-slate-900;
   }
 }
 

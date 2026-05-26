@@ -31,14 +31,14 @@ export default function CategoriesPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-6 md:pt-10 bg-white">
+      <main className="pb-24 pt-6 md:pt-8 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           {/* Hero Header */}
           <div className="mb-16 md:mb-24 text-center max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-3 mb-6">
               <div className="h-px w-8 bg-primary" />
-              <span className="text-[10px] font-medium text-primary uppercase tracking-[0.2em]">
-                {t("ourDepartments") || "Industrial Departments"}
+              <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">
+                {t("categories") || "Categories"}
               </span>
             </div>
             <h1 className="text-2xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight uppercase">
@@ -65,54 +65,53 @@ export default function CategoriesPage() {
                 return (
                   <div key={mainCat.id} className="group flex flex-col">
                     <Link href={`/categories/${mainCat.slug}`} className="block relative h-full">
-                      <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-primary/20 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-500 flex flex-col h-full group">
-                        {/* Image Header */}
-                        <div className="aspect-[16/10] bg-slate-50 relative overflow-hidden">
-                          {mainCat.image ? (
-                            <img 
-                              src={mainCat.image} 
-                              alt={mainCat.name} 
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-200">
-                              <Package className="w-12 h-12 stroke-[1.5]" />
+                        <div className="solid-card bg-white border-2 border-slate-900 hover:-translate-y-2 hover:shadow-hard transition-all duration-300 flex flex-col h-full group">
+                          {/* Image Header */}
+                          <div className="aspect-[16/10] bg-slate-50 relative overflow-hidden border-b-2 border-slate-900">
+                            {mainCat.image ? (
+                              <img 
+                                src={mainCat.image} 
+                                alt={mainCat.name} 
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" 
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                <Package className="w-12 h-12 stroke-[1.5]" />
+                              </div>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 bg-slate-900/90 p-4 border-t-2 border-slate-900">
+                              <h3 className="text-lg md:text-xl font-bold text-white tracking-widest uppercase">
+                                {language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}
+                              </h3>
                             </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
-                          <div className="absolute bottom-5 left-6 right-6">
-                            <h3 className="text-[18px] md:text-[20px] font-medium text-white tracking-tight uppercase">
-                              {language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}
-                            </h3>
                           </div>
-                        </div>
 
                         {/* Content Section */}
-                        <div className="p-6 md:p-8 flex flex-col flex-grow">
+                        <div className="p-6 md:p-8 flex flex-col flex-grow bg-slate-50">
                           <div className="space-y-4 mb-8">
-                            <p className="text-slate-600 text-[13px] font-normal leading-relaxed line-clamp-2">
+                            <p className="text-slate-900 text-[13px] font-bold leading-relaxed line-clamp-2">
                               {mainCat.description || (language === "kh" ? `ស្វែងរកដំណោះស្រាយដ៏ល្អបំផុតនៅក្នុងប្រភេទ ${mainCat.nameKhmer || mainCat.name}។` : `Explore elite solutions in the ${mainCat.name.toLowerCase()} category.`)}
                             </p>
                             
                             {/* Subcategories List */}
                             <div className="flex flex-wrap gap-2">
                               {subCats.slice(0, 3).map((sub) => (
-                                <span key={sub.id} className="px-2.5 py-1 bg-slate-50 text-slate-500 rounded-lg text-[9px] font-medium uppercase tracking-wider border border-slate-50">
+                                <span key={sub.id} className="px-3 py-1 bg-white text-slate-900 text-[10px] font-bold uppercase tracking-widest border-2 border-slate-900">
                                   {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
                                 </span>
                               ))}
                               {subCats.length > 3 && (
-                                <span className="px-2.5 py-1 bg-slate-50 text-slate-400 rounded-lg text-[9px] font-medium uppercase tracking-wider">
+                                <span className="px-3 py-1 bg-slate-200 text-slate-900 text-[10px] font-bold uppercase tracking-widest border-2 border-slate-900">
                                   +{subCats.length - 3}
                                 </span>
                               )}
                             </div>
                           </div>
 
-                          <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
-                            <span className="text-[10px] font-medium text-slate-900 uppercase tracking-widest">{t("viewCollection") || "View Collection"}</span>
-                            <div className="w-8 h-8 bg-slate-900 text-white rounded-lg flex items-center justify-center group-hover:bg-primary transition-colors">
-                              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                          <div className="mt-auto pt-6 border-t-2 border-slate-900 flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">{t("viewCollection") || "View Collection"}</span>
+                            <div className="w-10 h-10 bg-slate-900 text-white flex items-center justify-center group-hover:bg-primary group-hover:text-slate-900 transition-colors border-2 border-slate-900">
+                              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </div>
                           </div>
                         </div>

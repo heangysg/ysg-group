@@ -25,7 +25,9 @@ module.exports = {
       boxShadow: {
         'lux': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
         'lux-deep': '0 20px 40px -10px rgba(0, 0, 0, 0.1)',
-        'glow': '0 0 20px rgba(37, 99, 235, 0.3)',
+        'glow': '0 0 20px rgba(37, 99, 235, 0.4)',
+        'hard': '4px 4px 0px 0px rgba(15, 23, 42, 1)',
+        'hard-primary': '4px 4px 0px 0px #2563EB',
       }
     },
   },

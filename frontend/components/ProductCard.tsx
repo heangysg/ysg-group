@@ -46,7 +46,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
-      <div className="flex flex-col h-full bg-white rounded-3xl transition-all duration-500 shadow-sm border border-slate-100 hover:shadow-lux hover:-translate-y-2 hover:border-primary/20 overflow-hidden relative">
+      <div className="solid-card flex flex-col h-full overflow-hidden relative border-t-[6px] border-transparent hover:border-primary">
         
         {/* 🖼️ High-Impact Image */}
         <div className="relative aspect-[4/3] bg-slate-50 overflow-hidden">
@@ -71,12 +71,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Quick Add Button Overlay */}
-          <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
+          <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
              <button 
                 onClick={handleAddToCart}
-                className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center transition-all duration-300 hover:bg-primary hover:text-white shadow-lux active:scale-90"
+                className="w-10 h-10 bg-primary text-slate-900 flex items-center justify-center transition-all duration-300 hover:bg-primary-dark shadow-hard-primary active:translate-y-1 active:shadow-none border-2 border-slate-900"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-5 h-5" />
               </button>
           </div>
         </div>

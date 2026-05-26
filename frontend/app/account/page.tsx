@@ -154,8 +154,8 @@ export default function AccountPage() {
           <div className="relative max-w-6xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
               <div className="relative group">
-                <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-800 rounded-3xl p-1 shadow-2xl shadow-blue-500/10 border border-slate-700 overflow-hidden transition-all duration-500 group-hover:scale-105">
-                  <div className="w-full h-full bg-slate-900 rounded-[1.35rem] flex items-center justify-center overflow-hidden border border-slate-800">
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-slate-900 border-4 border-primary shadow-hard-primary overflow-hidden transition-all duration-500 group-hover:scale-105">
+                  <div className="w-full h-full bg-slate-900 flex items-center justify-center overflow-hidden">
                     {user?.user_metadata?.avatar_url ? (
                       <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                     ) : (
@@ -163,8 +163,8 @@ export default function AccountPage() {
                     )}
                   </div>
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30 border-4 border-slate-900 cursor-pointer hover:bg-blue-500 transition-colors">
-                  <Settings className="w-4 h-4" />
+                <div className="absolute -bottom-3 -right-3 w-10 h-10 bg-primary text-slate-900 border-2 border-slate-900 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors shadow-hard">
+                  <Settings className="w-5 h-5" />
                 </div>
               </div>
 
@@ -175,11 +175,11 @@ export default function AccountPage() {
                   </h1>
                   <p className="text-[13px] font-medium text-slate-400">{user?.email}</p>
                 </div>
-                <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                   <div className="px-4 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-[11px] font-medium text-slate-300">
+                <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-2">
+                   <div className="px-3 py-1 bg-slate-900 border-2 border-slate-700 text-[10px] font-bold uppercase tracking-widest text-slate-300">
                      {language === "kh" ? "អតិថិជន" : "Customer"}
                    </div>
-                   <div className="px-4 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full text-[11px] font-medium text-blue-400 flex items-center gap-1.5">
+                   <div className="px-3 py-1 bg-primary border-2 border-slate-900 text-[10px] font-bold uppercase tracking-widest text-slate-900 flex items-center gap-1.5 shadow-hard-primary">
                      <Shield className="w-3 h-3" />
                      {language === "kh" ? "គណនីបានបញ្ជាក់" : "Verified Account"}
                    </div>
@@ -189,7 +189,7 @@ export default function AccountPage() {
               <div className="flex-1 md:text-right pt-2">
                 <button 
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800/50 text-slate-300 border border-slate-700 rounded-xl font-medium text-[12px] hover:bg-slate-800 hover:text-white transition-all shadow-sm active:scale-95 backdrop-blur-sm"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-50 border-2 border-slate-900 text-slate-900 font-bold uppercase tracking-widest text-[11px] hover:-translate-y-1 transition-all shadow-hard active:translate-y-0 active:shadow-none"
                 >
                   <LogOut className="w-4 h-4" />
                   {t("logout")}
@@ -211,13 +211,13 @@ export default function AccountPage() {
                     <button 
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-medium transition-all duration-300 ${
+                      className={`flex-shrink-0 flex items-center gap-3 px-4 py-3 border-2 border-transparent text-[11px] uppercase tracking-widest font-bold transition-all duration-300 ${
                         isActive 
-                          ? "bg-blue-50 text-blue-700 shadow-sm" 
-                          : "bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          ? "bg-slate-900 text-white border-slate-900 shadow-hard" 
+                          : "bg-transparent text-slate-600 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? "text-primary" : "text-slate-400"}`} />
                       <span>{item.label}</span>
                     </button>
                   )
@@ -235,15 +235,14 @@ export default function AccountPage() {
                       { label: t("totalOrders"), value: orders.length, icon: Package, color: "bg-blue-600" },
                       { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield, color: "bg-blue-600" }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-transparent rounded-full -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div key={i} className="solid-card bg-white p-6 md:p-8 hover:-translate-y-1 transition-all duration-300 group">
                         <div className="relative z-10 flex flex-col gap-4">
-                          <div className={`w-12 h-12 ${stat.color} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20`}>
+                          <div className={`w-12 h-12 bg-primary text-slate-900 border-2 border-slate-900 flex items-center justify-center shadow-hard-primary`}>
                             <stat.icon className="w-5 h-5" />
                           </div>
                           <div className="space-y-1">
-                            <p className="text-[13px] font-medium text-slate-500">{stat.label}</p>
-                            <p className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tight">{stat.value}</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
                           </div>
                         </div>
                       </div>
@@ -266,27 +265,27 @@ export default function AccountPage() {
                           <Link 
                             key={order.id} 
                             href={`/orders/${order.id}`}
-                            className="bg-white border border-slate-100 rounded-2xl p-6 flex items-center justify-between group hover:border-primary/20 transition-all"
+                            className="bg-white border-2 border-slate-900 p-6 flex items-center justify-between group hover:-translate-y-1 hover:shadow-hard transition-all"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-50 group-hover:bg-primary/5 transition-colors">
+                              <div className="w-12 h-12 bg-slate-50 flex items-center justify-center border-2 border-slate-900 group-hover:bg-primary/5 transition-colors">
                                 <Package className="w-6 h-6 text-slate-300 group-hover:text-primary transition-colors" />
                               </div>
                               <div>
-                                <p className="text-[14px] font-medium text-slate-900 uppercase">#{order.id.slice(0, 8)}</p>
-                                <p className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                <p className="text-[14px] font-bold text-slate-900 uppercase">#{order.id.slice(0, 8)}</p>
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString()}</p>
                               </div>
                             </div>
-                            <div className={`px-3 py-1 rounded-lg text-[9px] font-medium uppercase tracking-widest border ${getStatusColor(order.status)}`}>
+                            <div className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest border-2 ${getStatusColor(order.status)}`}>
                               {getStatusLabel(order.status)}
                             </div>
                           </Link>
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-slate-50 rounded-3xl p-16 text-center border border-dashed border-slate-200">
-                        <Package className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                        <p className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">{t("noRecentActivity")}</p>
+                      <div className="bg-slate-50 p-16 text-center border-[4px] border-dashed border-slate-300">
+                        <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{t("noRecentActivity")}</p>
                       </div>
                     )}
                   </div>
@@ -294,7 +293,7 @@ export default function AccountPage() {
               )}
 
               {activeTab === "profile" && (
-                <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="solid-card bg-white p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="space-y-10">
                     <div className="space-y-1">
                       <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight">
@@ -306,30 +305,30 @@ export default function AccountPage() {
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[13px] font-medium text-slate-700">{t("fullName")}</label>
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-700">{t("fullName")}</label>
                           <input 
                             type="text" 
                             required
                             value={profileData.fullName}
                             onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
-                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 shadow-sm"
+                            className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-sm"
                             placeholder={language === "kh" ? "ឈ្មោះរបស់អ្នក" : "Your Name"}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[13px] font-medium text-slate-700">{t("emailAddress")}</label>
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-700">{t("emailAddress")}</label>
                           <input 
                             type="email" 
                             disabled
                             value={user?.email}
-                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed shadow-sm"
+                            className="w-full px-5 py-3 bg-slate-100 border-2 border-slate-200 text-slate-500 font-bold text-sm cursor-not-allowed"
                           />
                         </div>
                       </div>
                       <button 
                         type="submit"
                         disabled={updating}
-                        className="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium text-[14px] hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 active:scale-95"
+                        className="btn-primary px-8 py-4 text-xs flex items-center justify-center disabled:opacity-50"
                       >
                         {updating ? t("updating") : t("saveChanges")}
                       </button>
@@ -341,16 +340,16 @@ export default function AccountPage() {
               {activeTab === "orders" && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
                    {fetchingOrders ? (
-                    <div className="bg-white rounded-3xl p-20 flex items-center justify-center border border-slate-100">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                    <div className="solid-card bg-white p-20 flex items-center justify-center">
+                      <div className="animate-spin rounded-none h-8 w-8 border-4 border-slate-900 border-t-primary" />
                     </div>
                   ) : orders.length > 0 ? (
                     <div className="space-y-4">
                       {orders.map((order) => (
-                        <div key={order.id} className="bg-white rounded-3xl p-5 md:p-8 border border-slate-100 hover:border-primary/20 transition-all group">
+                        <div key={order.id} className="solid-card bg-white p-5 md:p-8 hover:-translate-y-1 hover:shadow-hard transition-all group">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-300 border border-slate-50 group-hover:bg-primary/5 transition-colors">
+                              <div className="w-12 h-12 bg-slate-50 flex items-center justify-center text-slate-300 border-2 border-slate-900 group-hover:bg-primary/5 transition-colors">
                                 <Package className="w-6 h-6 group-hover:text-primary transition-colors" />
                               </div>
                               <div className="space-y-0.5">
@@ -361,7 +360,7 @@ export default function AccountPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                               <span className={`px-3 py-1 rounded-lg text-[8px] font-medium uppercase tracking-widest border shadow-sm ${getStatusColor(order.status)}`}>
+                               <span className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest border-2 bg-white text-slate-900 shadow-sm ${getStatusColor(order.status)}`}>
                                  {getStatusLabel(order.status)}
                                </span>
                             </div>
@@ -369,8 +368,8 @@ export default function AccountPage() {
 
                           <div className="space-y-3 mb-8">
                             {order.items?.map((item: any, idx: number) => (
-                              <div key={idx} className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-slate-50">
-                                <div className="w-10 h-10 bg-white rounded-lg overflow-hidden border border-slate-100 flex-shrink-0">
+                              <div key={idx} className="flex items-center gap-4 p-3 bg-white border-2 border-slate-900">
+                                <div className="w-10 h-10 bg-slate-50 overflow-hidden border-2 border-slate-900 flex-shrink-0">
                                   {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -389,7 +388,7 @@ export default function AccountPage() {
                             </div>
                             <Link 
                               href={`/orders/${order.id}`}
-                              className="px-6 py-3 bg-slate-950 text-white rounded-xl font-medium text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-primary/5 active:scale-95"
+                              className="btn-primary px-6 py-3 text-[10px]"
                             >
                               {language === "kh" ? "មើលលម្អិត" : "Details"}
                             </Link>
@@ -398,16 +397,16 @@ export default function AccountPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="bg-white rounded-3xl p-20 border border-slate-100 flex flex-col items-center text-center">
+                    <div className="solid-card bg-white p-20 flex flex-col items-center text-center">
                       <Package className="w-16 h-16 text-slate-100 mb-6" />
-                      <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">{t("noRecentActivity")}</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{t("noRecentActivity")}</p>
                     </div>
                   )}
                 </div>
               )}
 
               {activeTab === "security" && (
-                <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="solid-card bg-white p-8 md:p-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="space-y-10">
                     <div className="space-y-1">
                       <h3 className="text-xl md:text-2xl font-medium text-slate-900 tracking-tight">
@@ -419,24 +418,24 @@ export default function AccountPage() {
                     <form onSubmit={handleUpdatePassword} className="space-y-8">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[13px] font-medium text-slate-700">{t("newPassword")}</label>
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-700">{t("newPassword")}</label>
                           <input 
                             type="password" 
                             required
                             value={passwords.newPassword}
                             onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
-                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 shadow-sm"
+                            className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-sm"
                             placeholder="••••••••"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[13px] font-medium text-slate-700">{t("confirmNewPassword")}</label>
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-700">{t("confirmNewPassword")}</label>
                           <input 
                             type="password" 
                             required
                             value={passwords.confirmPassword}
                             onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
-                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 shadow-sm"
+                            className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-sm"
                             placeholder="••••••••"
                           />
                         </div>
@@ -444,7 +443,7 @@ export default function AccountPage() {
                       <button 
                         type="submit"
                         disabled={updating}
-                        className="px-8 py-3 bg-blue-600 text-white rounded-xl font-medium text-[14px] hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 disabled:opacity-50 active:scale-95"
+                        className="btn-primary px-8 py-4 text-xs flex items-center justify-center disabled:opacity-50"
                       >
                         {updating ? t("updating") : t("updatePassword")}
                       </button>

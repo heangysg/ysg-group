@@ -285,7 +285,8 @@ export const translations = {
     fullNameAuth: "Full Name",
     emailAuth: "Email",
     passwordAuth: "Password",
-    forgotPasswordAuth: "Forgot?"
+    forgotPasswordAuth: "Forgot?",
+    register: "Create Account"
   },
   kh: {
     activity: "សកម្មភាព",
@@ -558,6 +559,10 @@ export const translations = {
     fullNameAuth: "ឈ្មោះពេញ",
     emailAuth: "អ៊ីមែល",
     passwordAuth: "ពាក្យសម្ងាត់",
-    forgotPasswordAuth: "ភ្លេចពាក្យសម្ងាត់?"
+    forgotPasswordAuth: "ភ្លេចពាក្យសម្ងាត់?",
+    alreadyHaveAccount: "មានគណនីរួចហើយឬ?",
+    signIn: "ចូលគណនី",
+    registerNow: "បង្កើតគណនី",
+    register: "ចុះឈ្មោះ"
   }
 }

@@ -64,7 +64,7 @@ export default function LoginPage() {
           <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-12 w-auto object-contain" />
         </Link>
 
-        <div className="bg-white rounded-[2rem] shadow-lux border border-slate-100 p-8 sm:p-10">
+        <div className="solid-card bg-white p-8 sm:p-10">
           <div className="text-center mb-10">
             <h1 className={`text-2xl font-bold text-slate-900 tracking-tight ${language === 'en' ? 'uppercase' : ''}`}>
               {t("welcomeBack") || "Welcome Back"}
@@ -87,7 +87,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
                     placeholder="name@company.com"
                   />
                 </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
                     placeholder="••••••••"
                   />
                 </div>
@@ -117,7 +117,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full bg-slate-900 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-primary transition-all shadow-lux hover:shadow-glow active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 ${language === 'kh' ? 'font-khmer' : ''}`}
+              className={`btn-primary w-full py-4 text-[11px] flex items-center justify-center gap-3 disabled:opacity-50 ${language === 'kh' ? 'font-khmer' : ''}`}
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -142,7 +142,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="w-full bg-white text-slate-700 py-4 rounded-2xl font-bold tracking-widest uppercase shadow-sm border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-xs"
+            className="w-full bg-white text-slate-900 py-4 font-bold tracking-widest uppercase border-2 border-slate-900 shadow-hard hover:bg-slate-50 hover:translate-y-1 transition-all active:translate-y-2 active:shadow-none flex items-center justify-center gap-3 text-xs"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

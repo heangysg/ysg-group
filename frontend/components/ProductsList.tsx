@@ -115,12 +115,12 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                   placeholder={t("searchProducts")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-sm"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-sm"
                 />
               </div>
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-3 rounded-xl border transition-all md:hidden ${showFilters ? 'bg-primary text-white border-primary shadow-md' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                className={`p-3 border-2 transition-all md:hidden ${showFilters ? 'bg-slate-900 text-white border-slate-900 shadow-hard' : 'bg-white border-slate-900 text-slate-900 hover:bg-slate-50'}`}
               >
                 <Filter className="w-5 h-5" />
               </button>
@@ -135,8 +135,8 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                 <div className="flex flex-col gap-1">
                   <button
                     onClick={() => handleCategorySelect("all")}
-                    className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
-                      selectedCategory === "all" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
+                    className={`flex items-center justify-between px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 border-2 ${
+                      selectedCategory === "all" ? "bg-slate-900 text-white border-slate-900 shadow-hard" : "border-transparent text-slate-600 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     <span>{t("allProducts")}</span>
@@ -146,8 +146,8 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                     <div key={cat.id} className="space-y-1">
                       <button
                         onClick={() => handleCategorySelect(cat.slug)}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
-                          selectedCategory === cat.slug ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50"
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 border-2 ${
+                          selectedCategory === cat.slug ? "bg-slate-900 text-white border-slate-900 shadow-hard" : "border-transparent text-slate-600 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
                         <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
@@ -158,8 +158,8 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                           <button
                             key={sub.id}
                             onClick={() => handleCategorySelect(sub.slug)}
-                            className={`w-full text-left px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                              selectedCategory === sub.slug ? "text-primary bg-primary/5" : "text-slate-500 hover:text-slate-800"
+                            className={`w-full text-left px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all border-l-4 ${
+                              selectedCategory === sub.slug ? "border-primary text-slate-900 bg-slate-100" : "border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300"
                             }`}
                           >
                             • {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
@@ -177,11 +177,11 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
               {loading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-4">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-                    <div key={n} className="aspect-[4/5] bg-slate-50 rounded-2xl animate-pulse" />
+                    <div key={n} className="aspect-[4/5] bg-slate-50 border-2 border-slate-200 animate-pulse" />
                   ))}
                 </div>
               ) : filteredProducts.length === 0 ? (
-                <div className="py-24 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                <div className="py-24 text-center bg-slate-50 border-[4px] border-dashed border-slate-300">
                   <Package className="w-16 h-16 text-slate-200 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-slate-900">{t("noProductsFound")}</h3>
                   <p className="text-slate-400 text-sm mt-1">Try adjusting your filters or search terms.</p>

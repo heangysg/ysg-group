@@ -86,14 +86,14 @@ export default function PublicLayout({
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute top-0 right-0 bottom-0 w-[280px] bg-white shadow-lux-deep flex flex-col"
+              className="absolute top-0 right-0 bottom-0 w-[280px] bg-slate-50 border-l-[4px] border-slate-900 flex flex-col shadow-[-10px_0_0_#0f172a]"
             >
-              <div className="p-6 flex items-center justify-between border-b border-slate-100">
+              <div className="p-6 flex items-center justify-between border-b-[4px] border-slate-900 bg-white">
                 <Link href="/" onClick={() => setMobileMenuOpen(false)}>
                   <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-10 w-auto object-contain" />
                 </Link>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all">
-                  <X className="w-5 h-5" />
+                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-slate-900 border-2 border-slate-900 hover:bg-primary transition-all shadow-[2px_2px_0_#0f172a] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
@@ -112,13 +112,13 @@ export default function PublicLayout({
                         <Link
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                          className={`flex items-center gap-4 px-4 py-3.5 text-[11px] uppercase tracking-widest font-bold transition-all duration-300 border-2 ${
                             isActive 
-                              ? "bg-primary text-white shadow-glow" 
-                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              ? "bg-primary text-slate-900 border-slate-900 shadow-hard-primary" 
+                              : "border-transparent text-slate-600 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
                           }`}
                         >
-                          <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-400"}`} />
+                          <Icon className={`w-5 h-5 ${isActive ? "text-slate-900" : "text-slate-400"}`} />
                           {item.name}
                         </Link>
                       </motion.div>
@@ -127,10 +127,10 @@ export default function PublicLayout({
                 </nav>
               </div>
 
-              <div className="p-6 border-t border-slate-100 space-y-4 bg-slate-50">
+              <div className="p-6 border-t-[4px] border-slate-900 space-y-4 bg-slate-100">
                 {user ? (
-                  <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                    <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border border-slate-200">
+                  <div className="flex items-center gap-4 p-4 bg-white border-2 border-slate-900 shadow-hard">
+                    <div className="w-10 h-10 bg-slate-100 border-2 border-slate-900 flex items-center justify-center overflow-hidden">
                       {user.user_metadata?.avatar_url ? (
                         <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
@@ -146,7 +146,7 @@ export default function PublicLayout({
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-center py-4 rounded-xl bg-slate-900 text-white font-bold text-[11px] uppercase tracking-widest hover:bg-primary hover:shadow-glow transition-all duration-300"
+                    className="btn-primary w-full flex items-center justify-center py-4 text-[11px]"
                   >
                     Sign In
                   </Link>
@@ -157,9 +157,9 @@ export default function PublicLayout({
                     setLanguage(language === "en" ? "kh" : "en")
                     setMobileMenuOpen(false)
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest text-slate-700 hover:bg-slate-100 transition-all duration-300 shadow-sm"
+                  className="w-full flex items-center gap-3 px-4 py-3.5 bg-white border-2 border-slate-900 text-xs font-bold uppercase tracking-widest text-slate-900 hover:shadow-hard hover:-translate-y-1 transition-all duration-300"
                 >
-                  <div className="w-6 h-4 rounded-sm overflow-hidden border border-slate-200 shadow-sm">
+                  <div className="w-7 h-5 border border-slate-200">
                     <img 
                       src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
                       alt="flag"
@@ -174,10 +174,10 @@ export default function PublicLayout({
         )}
       </AnimatePresence>
 
-      {/* 🚀 Slim & Professional Header */}
+      {/* 🚀 Heavy Industrial Header */}
       {!hideNav && (
-        <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-          scrolled ? "bg-white/80 backdrop-blur-xl h-16 md:h-20 shadow-lux border-b border-slate-100" : "bg-transparent h-24"
+        <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
+          scrolled ? "bg-slate-950 h-16 md:h-20 shadow-hard border-b-[4px] border-primary" : "bg-slate-900/95 h-24 border-b-2 border-slate-800"
         }`}>
           <div className="max-w-7xl mx-auto px-6 h-full">
             <div className="flex justify-between items-center h-full">
@@ -188,26 +188,19 @@ export default function PublicLayout({
                 </div>
               </Link>
 
-              <nav className="hidden lg:flex items-center gap-2 bg-white/40 backdrop-blur-md px-2 py-1.5 rounded-2xl border border-white/60 shadow-sm">
+              <nav className="hidden lg:flex items-center gap-1">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`relative px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
+                      className={`relative px-5 py-6 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                         isActive 
-                          ? "text-primary" 
-                          : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+                          ? "text-primary bg-slate-900 border-b-4 border-primary" 
+                          : "text-slate-300 hover:text-white hover:bg-slate-800 border-b-4 border-transparent"
                       }`}
                     >
-                      {isActive && (
-                        <motion.div 
-                          layoutId="activeTab"
-                          className="absolute inset-0 bg-white rounded-xl shadow-sm border border-slate-100"
-                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                        />
-                      )}
                       <span className="relative z-10">{item.name}</span>
                     </Link>
                   )
@@ -217,36 +210,36 @@ export default function PublicLayout({
               <div className="hidden lg:flex items-center gap-4">
                 <button
                   onClick={() => setLanguage(language === "en" ? "kh" : "en")}
-                  className="flex items-center gap-2 px-3 py-2 bg-white/60 backdrop-blur-md hover:bg-white rounded-xl transition-all duration-300 border border-slate-200 shadow-sm hover:shadow-md"
+                  className="flex items-center gap-2 px-3 py-2 bg-slate-50 border-2 border-slate-900 hover:-translate-y-1 hover:shadow-hard transition-all duration-300"
                 >
-                  <div className="w-5 h-3.5 rounded-[2px] overflow-hidden shadow-sm">
+                  <div className="w-5 h-3.5 border border-slate-200">
                     <img 
                       src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
                       alt={language}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[10px] font-bold text-slate-800 uppercase tracking-widest">
+                  <span className="text-[10px] font-bold text-slate-900 uppercase tracking-widest">
                     {language === "en" ? "KH" : "EN"}
                   </span>
                 </button>
 
                 <div className="flex items-center gap-3">
                   {user ? (
-                    <Link href="/account" className="flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-primary transition-all duration-300 shadow-lux hover:shadow-glow hover:-translate-y-0.5">
+                    <Link href="/account" className="btn-primary flex items-center gap-2.5 px-6 py-2.5 text-xs">
                       <UserIcon className="w-4 h-4" />
-                      <span className="text-xs font-bold uppercase tracking-widest">{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
+                      <span>{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
                     </Link>
                   ) : (
-                    <Link href="/login" className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-primary transition-all duration-300 shadow-lux hover:shadow-glow hover:-translate-y-0.5">
+                    <Link href="/login" className="btn-primary px-6 py-2.5 text-xs">
                       {t("login")}
                     </Link>
                   )}
 
-                  <Link href="/checkout" className="relative p-3 bg-white text-slate-900 rounded-xl shadow-sm border border-slate-200 hover:border-primary hover:text-primary transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+                  <Link href="/checkout" className="relative p-2.5 bg-slate-50 text-slate-900 border-2 border-slate-900 hover:-translate-y-1 transition-all duration-300 hover:border-primary">
                     <ShoppingCart className="w-5 h-5" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold min-w-[20px] h-[20px] flex items-center justify-center rounded-full border-2 border-white shadow-sm px-1">
+                      <span className="absolute -top-2 -right-2 bg-primary text-slate-900 text-[10px] font-bold min-w-[20px] h-[20px] flex items-center justify-center border-2 border-slate-900 px-1">
                         {cartCount}
                       </span>
                     )}
@@ -255,17 +248,17 @@ export default function PublicLayout({
               </div>
 
               <div className="flex lg:hidden items-center gap-3">
-                <Link href="/checkout" className="relative p-2.5 bg-white text-slate-900 rounded-xl shadow-sm border border-slate-200 active:scale-95 transition-all duration-300">
+                <Link href="/checkout" className="relative p-2.5 bg-slate-50 text-slate-900 border-2 border-slate-900 active:translate-y-1 transition-all duration-300">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-white shadow-sm px-1">
+                    <span className="absolute -top-2 -right-2 bg-primary text-slate-900 text-[10px] font-bold min-w-[20px] h-[20px] flex items-center justify-center border-2 border-slate-900 px-1">
                       {cartCount}
                     </span>
                   )}
                 </Link>
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="p-2.5 bg-slate-900 text-white rounded-xl active:scale-95 transition-all duration-300 shadow-sm"
+                  className="p-2.5 bg-slate-900 text-white border-2 border-slate-900 active:translate-y-1 transition-all duration-300"
                 >
                   <Menu className="w-5 h-5" />
                 </button>

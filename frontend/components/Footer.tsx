@@ -37,7 +37,7 @@ export default function Footer() {
           
           <div className="space-y-8">
             <Link href="/" className="flex items-center group">
-              <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-14 w-auto object-contain brightness-0 invert group-hover:opacity-80 transition-opacity duration-300" />
+              <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-14 w-auto object-contain group-hover:opacity-80 transition-opacity duration-300" />
             </Link>
             <p className="text-sm leading-relaxed max-w-xs font-normal text-slate-500">
               ក្រុមហ៊ុនយ៉ាងស៊ីគ្រុប — Yeung Shi Group Co., Ltd. Premium industrial machinery and equipment supplier in Cambodia.
@@ -49,7 +49,7 @@ export default function Footer() {
                   "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
                   "#",
                   "#"
-                ][i]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all duration-300 border border-slate-800 shadow-sm">
+                ][i]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-900 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-slate-900 transition-all duration-300 border-2 border-slate-800 hover:border-slate-900 hover:-translate-y-1 hover:shadow-hard-primary">
                   <Icon className="w-4.5 h-4.5 transition-transform duration-500 group-hover:scale-110" />
                 </a>
               ))}
@@ -76,7 +76,7 @@ export default function Footer() {
             <h3 className="text-white font-bold text-xs uppercase tracking-[0.2em] mb-8">{t("contactUs") || "Contact Specialist"}</h3>
             <div className="space-y-6">
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border border-slate-800 transition-colors group-hover:border-primary/50 group-hover:bg-primary/10">
+                <div className="w-10 h-10 bg-slate-900 flex items-center justify-center shrink-0 border-2 border-slate-800 transition-all group-hover:border-primary group-hover:bg-primary/10">
                   <MapPin className="w-4.5 h-4.5 text-primary group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-sm">
@@ -85,7 +85,7 @@ export default function Footer() {
                 </div>
               </div>
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border border-slate-800 transition-colors group-hover:border-primary/50 group-hover:bg-primary/10">
+                <div className="w-10 h-10 bg-slate-900 flex items-center justify-center shrink-0 border-2 border-slate-800 transition-all group-hover:border-primary group-hover:bg-primary/10">
                   <Clock className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-sm">
@@ -94,7 +94,7 @@ export default function Footer() {
                 </div>
               </div>
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border border-slate-800 transition-colors group-hover:border-primary/50 group-hover:bg-primary/10">
+                <div className="w-10 h-10 bg-slate-900 flex items-center justify-center shrink-0 border-2 border-slate-800 transition-all group-hover:border-primary group-hover:bg-primary/10">
                   <Phone className="w-4.5 h-4.5 text-primary group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-sm">
@@ -103,7 +103,7 @@ export default function Footer() {
                 </div>
               </div>
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border border-slate-800 transition-colors group-hover:border-primary/50 group-hover:bg-primary/10">
+                <div className="w-10 h-10 bg-slate-900 flex items-center justify-center shrink-0 border-2 border-slate-800 transition-all group-hover:border-primary group-hover:bg-primary/10">
                   <Mail className="w-4.5 h-4.5 text-primary group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-sm">

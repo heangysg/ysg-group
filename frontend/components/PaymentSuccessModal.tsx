@@ -25,13 +25,13 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount }
       />
       
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg bg-white rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-500 ease-out">
+      <div className="solid-card relative w-full max-w-lg bg-white overflow-hidden animate-in zoom-in-95 fade-in duration-500 ease-out">
         <div className="p-8 md:p-12 text-center space-y-8">
           
           {/* Success Icon */}
           <div className="relative mx-auto w-24 h-24">
             <div className="absolute inset-0 bg-emerald-500/10 rounded-full animate-ping duration-[2000ms]" />
-            <div className="relative flex items-center justify-center w-24 h-24 bg-emerald-500 text-white rounded-full shadow-xl shadow-emerald-500/30">
+            <div className="relative flex items-center justify-center w-24 h-24 bg-emerald-500 text-white shadow-xl shadow-emerald-500/30">
               <CheckCircle2 className="w-12 h-12" />
             </div>
           </div>
@@ -48,7 +48,7 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount }
           </div>
 
           {/* Mini Summary */}
-          <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 divide-y divide-slate-200/50">
+          <div className="bg-slate-50 border-2 border-slate-900 p-6 divide-y-2 divide-slate-900/10">
             <div className="flex justify-between items-center pb-4">
               <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">{language === "kh" ? "លេខបញ្ជាទិញ" : "Order ID"}</span>
               <span className="text-[13px] font-medium text-slate-900 uppercase tracking-tight">#{orderId.slice(0, 10)}</span>
@@ -61,15 +61,15 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount }
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Link 
-              href="/account"
-              className="flex-1 px-8 py-4 bg-slate-950 text-white rounded-xl font-medium text-[11px] uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-slate-200/50 active:scale-95 flex items-center justify-center gap-2"
+              href={`/orders/${orderId}`}
+              className="btn-primary flex-[1.5] py-4 text-[11px] flex items-center justify-center gap-2"
             >
               <Package className="w-4 h-4" />
               {language === "kh" ? "មើលការបញ្ជាទិញ" : "View My Orders"}
             </Link>
             <Link 
               href="/"
-              className="flex-1 px-8 py-4 bg-white text-slate-900 border border-slate-200 rounded-xl font-medium text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 py-4 bg-slate-50 text-slate-900 border-2 border-slate-900 font-bold text-[11px] uppercase tracking-widest hover:bg-slate-100 transition-all hover:-translate-y-1 hover:shadow-hard flex items-center justify-center gap-2"
             >
               <Home className="w-4 h-4" />
               {language === "kh" ? "ត្រឡប់ទៅដើម" : "Back to Home"}

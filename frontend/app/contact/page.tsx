@@ -28,7 +28,7 @@ export default function ContactPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-32 pt-6 md:pt-10 px-6 bg-white min-h-screen">
+      <main className="pb-32 pt-6 md:pt-8 px-6 bg-white min-h-screen">
         <Toaster position="top-center" />
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
@@ -38,7 +38,7 @@ export default function ContactPage() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="h-px w-8 bg-primary" />
-                  <span className="text-[10px] font-medium text-primary uppercase tracking-[0.2em]">{t("contactUs") || "Contact Us"}</span>
+                  <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">{t("contactUs") || "Contact Us"}</span>
                 </div>
                 <h1 className="text-2xl md:text-4xl font-medium text-slate-900 tracking-tight uppercase leading-tight">
                   {t("contact")}
@@ -57,13 +57,13 @@ export default function ContactPage() {
                   { icon: MapPin, label: t("location"), value: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.", color: "text-primary" },
                   { icon: Clock, label: language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours", value: "8:00 am – 5:30 pm (Mon – Sat)", color: "text-primary" }
                 ].map((item, i) => (
-                  <div key={i} className="flex gap-6 items-center p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary/20 transition-all group">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm border border-slate-100 group-hover:bg-primary group-hover:text-white transition-all">
+                  <div key={i} className="solid-card flex gap-6 items-center p-6 bg-slate-50 group hover:bg-primary transition-all">
+                    <div className="w-12 h-12 bg-slate-900 flex items-center justify-center text-primary border-2 border-slate-900 group-hover:bg-white transition-all shadow-hard">
                       <item.icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-[9px] font-medium uppercase tracking-widest text-slate-500 mb-1">{item.label}</h4>
-                      <p className="text-[16px] md:text-[18px] font-normal text-slate-700 tracking-tight">{item.value}</p>
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-900 mb-1">{item.label}</h4>
+                      <p className="text-[16px] md:text-[18px] font-bold text-slate-900 tracking-tight">{item.value}</p>
                     </div>
                   </div>
                 ))}
@@ -71,15 +71,15 @@ export default function ContactPage() {
             </div>
 
             {/* 🏗️ Professional Contact Form */}
-            <div className="bg-white rounded-[2rem] p-8 md:p-12 border border-slate-100 shadow-sm animate-in fade-in slide-in-from-right duration-1000">
+            <div className="solid-card bg-white p-8 md:p-12 animate-in fade-in slide-in-from-right duration-1000">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("customerName")} *</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">{t("customerName")} *</label>
                     <input 
                       type="text" 
                       required 
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px]" 
+                      className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:shadow-hard outline-none transition-all font-bold text-slate-900 text-[15px]" 
                       placeholder={language === "kh" ? "ឈ្មោះពេញរបស់អ្នក" : "Your Full Name"}
                       value={formData.name} 
                       onChange={(e) => setFormData({...formData, name: e.target.value})} 
@@ -88,21 +88,21 @@ export default function ContactPage() {
                   
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("email")} *</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">{t("email")} *</label>
                       <input 
                         type="email" 
                         required 
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px]" 
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:shadow-hard outline-none transition-all font-bold text-slate-900 text-[15px]" 
                         placeholder={language === "kh" ? "អាសយដ្ឋានអ៊ីមែល" : "Email Address"}
                         value={formData.email} 
                         onChange={(e) => setFormData({...formData, email: e.target.value})} 
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("phone")}</label>
+                      <label className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">{t("phone")}</label>
                       <input 
                         type="tel" 
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px]" 
+                        className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:shadow-hard outline-none transition-all font-bold text-slate-900 text-[15px]" 
                         placeholder={language === "kh" ? "លេខទូរស័ព្ទ" : "Phone Number"}
                         value={formData.phone} 
                         onChange={(e) => setFormData({...formData, phone: e.target.value})} 
@@ -111,11 +111,11 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-medium uppercase tracking-widest text-slate-500 ml-1">{t("message")} *</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-slate-900 ml-1">{t("message")} *</label>
                     <textarea 
                       rows={5} 
                       required 
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-normal text-slate-900 text-[15px] resize-none" 
+                      className="w-full px-6 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:shadow-hard outline-none transition-all font-bold text-slate-900 text-[15px] resize-none" 
                       placeholder={language === "kh" ? "តើអ្នកចង់ឱ្យយើងជួយអ្វីខ្លះចំពោះអាជីវកម្មរបស់អ្នក?" : "How can we help your business?"}
                       value={formData.message} 
                       onChange={(e) => setFormData({...formData, message: e.target.value})} 
@@ -126,7 +126,7 @@ export default function ContactPage() {
                 <button 
                   type="submit" 
                   disabled={loading} 
-                  className="w-full bg-slate-950 text-white py-4 rounded-xl font-medium uppercase tracking-widest text-[11px] shadow-lg hover:bg-primary transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-6"
+                  className="btn-primary w-full bg-slate-900 text-white py-4 font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 disabled:opacity-50 mt-6 border-2 border-slate-900 hover:-translate-y-1 hover:shadow-hard-white transition-all"
                 >
                   {loading ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white" />

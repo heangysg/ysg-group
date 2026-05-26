@@ -70,26 +70,26 @@ export default function RegisterPage() {
           <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-12 w-auto object-contain" />
         </Link>
 
-        <div className="bg-white rounded-[2rem] shadow-lux border border-slate-100 p-8 sm:p-10">
+        <div className="solid-card bg-white p-8 sm:p-10">
           {isSubmitted ? (
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="flex flex-col items-center justify-center text-center space-y-8"
             >
-              <div className="w-24 h-24 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center shadow-glow border border-primary/20">
+              <div className="w-24 h-24 bg-white text-primary border-2 border-slate-900 flex items-center justify-center shadow-hard">
                 <Mail className="w-10 h-10" />
               </div>
               <div className="space-y-3">
-                <h2 className={`text-2xl font-bold text-slate-900 tracking-tight uppercase ${language === 'kh' ? 'font-khmer' : ''}`}>{t("checkYourInbox") || "Check Your Inbox"}</h2>
-                <p className={`text-slate-500 font-medium leading-relaxed text-sm ${language === 'kh' ? 'font-khmer' : ''}`}>
+                <h2 className={`text-2xl font-bold text-slate-900 tracking-widest uppercase ${language === 'kh' ? 'font-khmer' : ''}`}>{t("checkYourInbox") || "Check Your Inbox"}</h2>
+                <p className={`text-slate-900 font-bold leading-relaxed text-sm ${language === 'kh' ? 'font-khmer' : ''}`}>
                   {t("weSentLink") || "We've sent a verification link to"} <br/>
-                  <span className="text-slate-900 font-bold">{email}</span>
+                  <span className="text-primary tracking-widest">{email}</span>
                 </p>
               </div>
               <Link 
                 href="/login" 
-                className={`w-full py-4 bg-slate-900 text-white rounded-2xl font-bold tracking-widest uppercase shadow-lux hover:shadow-glow hover:bg-primary transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-xs ${language === 'kh' ? 'font-khmer' : ''}`}
+                className={`btn-primary w-full py-4 text-xs flex items-center justify-center gap-3 border-2 border-slate-900 hover:-translate-y-1 hover:shadow-hard-white transition-all ${language === 'kh' ? 'font-khmer' : ''}`}
               >
                 {t("proceedToLogin") || "Proceed to Login"} <ArrowRight className="w-4 h-4" />
               </Link>
@@ -118,7 +118,7 @@ export default function RegisterPage() {
                         required
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
                         placeholder="John Doe"
                       />
                     </div>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
                         placeholder="name@company.com"
                       />
                     </div>
@@ -152,7 +152,7 @@ export default function RegisterPage() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
                         placeholder="••••••••"
                       />
                     </div>
@@ -162,7 +162,7 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full bg-slate-900 text-white py-4 rounded-2xl font-bold tracking-widest uppercase shadow-lux hover:shadow-glow hover:bg-primary transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-xs ${language === 'kh' ? 'font-khmer' : ''}`}
+                  className={`btn-primary w-full py-4 text-[11px] flex items-center justify-center gap-3 disabled:opacity-50 ${language === 'kh' ? 'font-khmer' : ''}`}
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -187,7 +187,7 @@ export default function RegisterPage() {
               <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full bg-white text-slate-700 py-4 rounded-2xl font-bold tracking-widest uppercase shadow-sm border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-xs"
+                className="w-full bg-white text-slate-900 py-4 font-bold tracking-widest uppercase border-2 border-slate-900 shadow-hard hover:bg-slate-50 hover:translate-y-1 transition-all active:translate-y-2 active:shadow-none flex items-center justify-center gap-3 text-xs"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
