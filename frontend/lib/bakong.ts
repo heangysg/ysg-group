@@ -1,3 +1,4 @@
+// @ts-expect-error missing type definitions for bakong-khqr
 import { BakongKHQR, MerchantInfo } from 'bakong-khqr';
 
 export const generateBakongQR = (amount: number, orderId: string, expiresAtTimestamp?: number) => {
