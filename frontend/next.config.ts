@@ -27,7 +27,12 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const defaultBackendUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://ysg-group.onrender.com' 
+      : 'http://localhost:5000';
+      
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || defaultBackendUrl;
+    
     return [
       {
         source: '/api/:path*',
