@@ -19,21 +19,41 @@ export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("all")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const { t } = useLanguage()
 
   useEffect(() => {
-    fetchLogs()
-  }, [])
+    setCurrentPage(1)
+    fetchLogs(1)
+  }, [filter])
 
-  async function fetchLogs() {
+  useEffect(() => {
+    fetchLogs(currentPage)
+  }, [currentPage])
+
+  async function fetchLogs(page: number) {
+    setLoading(true)
     const supabase = createClient()
-    const { data } = await supabase
+    const pageSize = 10
+    const start = (page - 1) * pageSize
+    const end = start + pageSize - 1
+
+    let query = supabase
       .from("audit_logs")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
-      .limit(100)
+
+    if (filter !== "all") {
+      query = query.eq("entity_type", filter)
+    }
+
+    const { data, count } = await query.range(start, end)
     
     setLogs(data || [])
+    if (count !== null) {
+      setTotalPages(Math.ceil(count / pageSize) || 1)
+    }
     setLoading(false)
   }
 
@@ -54,29 +74,31 @@ export default function AuditLogsPage() {
     }
   }
 
-  const filteredLogs = filter === "all" ? logs : logs.filter(log => log.entity_type === filter)
+  // Note: we don't need client-side filter anymore as we moved it to server-side
+  const filteredLogs = logs
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-medium text-gray-900">{t("auditLogs")}</h1>
-        <p className="text-sm text-gray-600 mt-1">{t("trackActivities")}</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("auditLogs")}</h1>
+        <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("trackActivities")}</p>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      {/* Filters */}
+      <div className="flex gap-4 mb-8 flex-wrap">
         <button
           onClick={() => setFilter("all")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-            filter === "all" ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+          className={`px-5 py-3 border-2 border-slate-900 font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            filter === "all" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           {t("allActivities")}
         </button>
         <button
           onClick={() => setFilter("product")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
-            filter === "product" ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+          className={`px-5 py-3 border-2 border-slate-900 font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            filter === "product" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           <Package className="w-4 h-4" />
@@ -84,8 +106,8 @@ export default function AuditLogsPage() {
         </button>
         <button
           onClick={() => setFilter("category")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
-            filter === "category" ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+          className={`px-5 py-3 border-2 border-slate-900 font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            filter === "category" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           <FolderOpen className="w-4 h-4" />
@@ -93,8 +115,8 @@ export default function AuditLogsPage() {
         </button>
         <button
           onClick={() => setFilter("inquiry")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
-            filter === "inquiry" ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+          className={`px-5 py-3 border-2 border-slate-900 font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2 ${
+            filter === "inquiry" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           <Mail className="w-4 h-4" />
@@ -103,51 +125,51 @@ export default function AuditLogsPage() {
       </div>
 
       {/* Logs Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="solid-card bg-white p-0 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+          <table className="w-full text-left">
+            <thead className="bg-primary border-b-2 border-slate-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t("user")}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t("action")}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entity</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t("details")}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t("date")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("user")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("action")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">Entity</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("details")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("date")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y-2 divide-slate-900">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">{t("loading")}</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-widest text-xs">{t("loading")}</td></tr>
               ) : filteredLogs.length === 0 ? (
-                <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">{t("noActivityFound")}</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-widest text-xs">{t("noActivityFound")}</td></tr>
               ) : (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50">
+                  <tr key={log.id} className="hover:bg-primary/5 transition-all">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-900">{log.user_email}</span>
+                        <User className="w-4 h-4 text-slate-900" />
+                        <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{log.user_email}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         {getActionIcon(log.action)}
-                        <span className="text-sm text-gray-700 capitalize">{log.action}</span>
+                        <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">{log.action}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         {getEntityIcon(log.entity_type)}
-                        <span className="text-sm text-gray-700 capitalize">{log.entity_type}</span>
+                        <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">{log.entity_type}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                         {log.details?.name || log.entity_id?.slice(0, 8) || "-"}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
                         {new Date(log.created_at).toLocaleString()}
                       </span>
                     </td>
@@ -157,6 +179,29 @@ export default function AuditLogsPage() {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="p-4 border-t-2 border-slate-900 bg-slate-50 flex items-center justify-between">
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-white border-2 border-slate-900 font-bold text-xs uppercase tracking-widest shadow-hard hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+            >
+              {t("previous") || "Previous"}
+            </button>
+            <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 bg-white border-2 border-slate-900 font-bold text-xs uppercase tracking-widest shadow-hard hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+            >
+              {t("next") || "Next"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -294,30 +294,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       {/* Sidebar */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-[50]
-        bg-white border-r border-slate-200 transition-all duration-300 ease-in-out
-        flex flex-col overflow-hidden
-        ${sidebarOpen 
-          ? "w-72 translate-x-0 opacity-100" 
-          : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0"}
-      `}>
-        {/* Logo */}
-        <div className="h-20 flex items-center px-8 border-b border-slate-50 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-white font-semibold text-xl">G</span>
-            </div>
-            <div>
-              <h1 className="text-sm font-medium text-slate-900 tracking-tight leading-tight">
-                {isSuperAdmin ? t("superadmin") : t("admin")} {t("panel")}
-              </h1>
-              <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-0.5">
-                {t("managementPortal")}
-              </p>
-            </div>
+    <aside className={`
+      fixed lg:static inset-y-0 left-0 z-[50]
+      bg-white border-r-2 border-slate-900 transition-all duration-300 ease-in-out
+      flex flex-col overflow-hidden
+      ${sidebarOpen 
+        ? "w-72 translate-x-0 opacity-100" 
+        : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0"}
+    `}>
+      {/* Logo */}
+      <div className="h-20 flex items-center px-8 border-b-2 border-slate-900 shrink-0 bg-primary">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-slate-900 rounded-none flex items-center justify-center shadow-hard border-2 border-slate-900">
+            <span className="text-white font-bold text-xl uppercase">G</span>
+          </div>
+          <div>
+            <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-tight uppercase">
+              {isSuperAdmin ? t("superadmin") : t("admin")} {t("panel")}
+            </h1>
+            <p className="text-xs font-bold text-slate-900 uppercase tracking-widest mt-0.5">
+              {t("managementPortal")}
+            </p>
           </div>
         </div>
+      </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-6 space-y-2 custom-scrollbar">
@@ -328,44 +328,44 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={item.name}
                 href={item.href}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all
+                  flex items-center gap-3 px-4 py-3 font-bold text-xs uppercase tracking-widest transition-all border-2
                   ${isActive 
-                    ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                    : "text-slate-400 hover:text-slate-900 hover:bg-slate-50"}
+                    ? "bg-primary text-slate-900 border-slate-900 shadow-hard" 
+                    : "text-slate-600 border-transparent hover:text-slate-900 hover:border-slate-900"}
                 `}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-400"}`} />
+                <item.icon className={`w-5 h-5 ${isActive ? "text-slate-900" : "text-slate-500"}`} />
                 {item.name}
               </Link>
             )
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="p-6 border-t border-slate-50">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl font-medium text-sm transition-all"
-          >
-            <LogOut className="w-5 h-5" />
-            {t("logout")}
-          </button>
-        </div>
+      {/* Logout */}
+      <div className="p-6 border-t-2 border-slate-900">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-4 py-3 text-red-600 border-2 border-transparent hover:border-red-600 hover:shadow-hard-red bg-red-50 font-bold uppercase tracking-widest text-xs transition-all"
+        >
+          <LogOut className="w-5 h-5" />
+          {t("logout")}
+        </button>
+      </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-slate-200 px-6 lg:px-8 flex items-center justify-between shrink-0 z-[30]">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2.5 bg-slate-50 text-slate-600 rounded-xl hover:bg-slate-100 transition-all active:scale-95"
-            >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+    {/* Main Content */}
+    <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-slate-50">
+      {/* Header */}
+      <header className="h-20 bg-white border-b-2 border-slate-900 px-6 lg:px-8 flex items-center justify-between shrink-0 z-[30]">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2.5 bg-slate-50 text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+          >
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
             <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
-            <div className={`hidden sm:flex items-center gap-2 text-[10px] font-semibold text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
+            <div className={`hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
               <Link href="/admin/dashboard" className="hover:text-primary transition-colors">{t("admin")}</Link>
               <span className="text-slate-200 text-[14px] font-normal leading-none -mt-0.5">/</span>
               <span className="text-slate-900">
@@ -382,64 +382,64 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </span>
             </div>
             
-            {/* Global Search Bar */}
-            <div className="hidden xl:flex relative group max-w-xs w-full ml-4">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-              <input 
-                type="text" 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("search") + "..."}
-                className="w-full pl-11 pr-9 py-2 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-4 focus:ring-primary/5 focus:bg-white focus:border-primary/20 transition-all text-sm font-medium" 
-              />
-              {search && (
-                <button 
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 transition-colors z-10"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+          {/* Global Search Bar */}
+          <div className="hidden xl:flex relative group max-w-xs w-full ml-4">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+            <input 
+              type="text" 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("search") + "..."}
+              className="w-full pl-11 pr-9 py-2 bg-slate-50 border-2 border-slate-900 outline-none focus:bg-white transition-all text-xs font-bold uppercase tracking-widest placeholder:text-slate-400" 
+            />
+            {search && (
+              <button 
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-900 hover:text-red-600 transition-colors z-10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
           </div>
 
-          <div className="flex items-center gap-4 lg:gap-6">
-            {/* Language Switcher with Flags */}
-            <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-100">
-              <button
-                onClick={() => setLanguage("en")}
-                className={`w-10 h-8 rounded-lg flex items-center justify-center transition-all ${language === "en" ? "bg-white shadow-sm ring-1 ring-slate-200" : "grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
-                title="English"
-              >
-                <img src="https://flagcdn.com/gb.svg" alt="English" className="w-6 h-auto rounded-sm" />
-              </button>
-              <button
-                onClick={() => setLanguage("kh")}
-                className={`w-10 h-8 rounded-lg flex items-center justify-center transition-all ${language === "kh" ? "bg-white shadow-sm ring-1 ring-slate-200" : "grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
-                title="Khmer"
-              >
-                <img src="https://flagcdn.com/kh.svg" alt="Khmer" className="w-6 h-auto rounded-sm" />
-              </button>
-            </div>
+        <div className="flex items-center gap-4 lg:gap-6">
+          {/* Language Switcher with Flags */}
+          <div className="flex items-center bg-slate-50 border-2 border-slate-900 p-1 shadow-hard">
+            <button
+              onClick={() => setLanguage("en")}
+              className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "en" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
+              title="English"
+            >
+              <img src="https://flagcdn.com/gb.svg" alt="English" className="w-6 h-auto" />
+            </button>
+            <button
+              onClick={() => setLanguage("kh")}
+              className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "kh" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
+              title="Khmer"
+            >
+              <img src="https://flagcdn.com/kh.svg" alt="Khmer" className="w-6 h-auto" />
+            </button>
+          </div>
 
             {/* Notifications */}
             <div className="relative" ref={notificationRef}>
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
-                className={`p-2 rounded-xl transition-all relative ${showNotifications ? 'bg-primary/10 text-primary' : 'text-slate-400 hover:text-primary hover:bg-primary/5'}`}
+                className={`p-2 transition-all border-2 ${showNotifications ? 'bg-primary text-slate-900 border-slate-900 shadow-hard' : 'text-slate-900 border-transparent hover:border-slate-900 hover:shadow-hard'}`}
               >
                 <Bell className="w-5 h-5" />
                 {notifications.length > 0 && (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white animate-pulse"></span>
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 border-2 border-slate-900 animate-pulse"></span>
                 )}
               </button>
 
               {/* Notification Dropdown */}
               {showNotifications && (
-                <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-3 lg:w-80 bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
-                  <div className="p-4 border-b border-slate-50 flex items-center justify-between">
-                    <h3 className="font-medium text-slate-900 text-sm">{t("notifications")}</h3>
-                    <button className="text-[10px] font-medium text-primary hover:underline uppercase tracking-widest">{t("markAllRead")}</button>
+                <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-4 lg:w-80 bg-white border-2 border-slate-900 shadow-hard overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
+                  <div className="p-4 border-b-2 border-slate-900 flex items-center justify-between bg-primary">
+                    <h3 className="font-bold text-slate-900 uppercase tracking-widest text-xs">{t("notifications")}</h3>
+                    <button className="text-xs font-bold text-slate-900 hover:text-white transition-colors uppercase tracking-widest">{t("markAllRead")}</button>
                   </div>
                   <div className="max-h-[350px] overflow-y-auto">
                     {notifications.length > 0 ? (
@@ -451,7 +451,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-medium text-slate-900 truncate">{note.title}</p>
-                              <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{note.message}</p>
+                              <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">{note.message}</p>
                               <p className="text-[9px] text-slate-400 mt-1 font-medium">{note.time}</p>
                             </div>
                             <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -470,7 +470,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Link 
                     href="/admin/activity" 
                     onClick={() => setShowNotifications(false)}
-                    className="block p-4 bg-slate-50 text-center text-[10px] font-medium text-slate-500 hover:text-primary hover:bg-slate-100 transition-all uppercase tracking-widest"
+                    className="block p-4 border-t-2 border-slate-900 bg-slate-50 text-center text-xs font-bold text-slate-900 hover:bg-slate-900 hover:text-white transition-all uppercase tracking-widest"
                   >
                     {t("viewAllActivity")}
                   </Link>
@@ -480,24 +480,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <button 
               onClick={() => setShowProfileModal(true)}
-              className="flex items-center gap-3 p-1.5 pr-4 hover:bg-slate-50 rounded-2xl transition-all border border-transparent hover:border-slate-100"
+              className="flex items-center gap-3 p-1.5 pr-4 hover:bg-slate-50 transition-all border-2 border-transparent hover:border-slate-900 hover:shadow-hard group"
             >
-              <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 bg-slate-100 border-2 border-slate-900 flex items-center justify-center overflow-hidden">
                 {adminProfileImage ? (
                   <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-primary flex items-center justify-center text-white font-medium text-sm">
+                  <div className="w-full h-full bg-primary flex items-center justify-center text-white font-bold uppercase text-lg">
                     {adminName.charAt(0)}
                   </div>
                 )}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-xs font-medium text-slate-900 leading-none">{adminName}</p>
-                <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-tight">
+                <p className="text-xs font-bold text-slate-900 leading-none uppercase tracking-wider">{adminName}</p>
+                <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">
                   {isSuperAdmin ? t("superadmin") : t("admin")}
                 </p>
               </div>
-              <ChevronDown className="w-4 h-4 text-slate-300 hidden md:block" />
+              <ChevronDown className="w-4 h-4 text-slate-900 hidden md:block group-hover:translate-y-0.5 transition-transform" />
             </button>
           </div>
         </header>
@@ -512,17 +512,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Profile Modal */}
       {showProfileModal && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl border border-white/20 animate-in zoom-in-95 duration-200">
-            <div className="p-10 pb-6 border-b border-slate-50">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+          <div className="solid-card bg-white w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-8 border-b-2 border-slate-900 bg-primary">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-medium text-slate-900 tracking-tight">{t("myProfile")}</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">My Profile</h2>
                   <p className="text-sm text-slate-400 mt-1">{t("updatePhotoAndHistory")}</p>
                 </div>
                 <button 
                   onClick={() => setShowProfileModal(false)}
-                  className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 transition-all"
+                  className="p-3 bg-white border-2 border-slate-900 text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -533,7 +533,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {/* Profile Image Section */}
               <div className="flex items-center gap-8">
                 <div className="relative group">
-                  <div className="w-24 h-24 rounded-3xl bg-slate-100 border-2 border-slate-100 overflow-hidden shadow-inner flex items-center justify-center">
+                  <div className="w-24 h-24 bg-slate-100 border-2 border-slate-900 overflow-hidden shadow-hard flex items-center justify-center">
                     {adminProfileImage ? (
                       <img 
                         src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} 
@@ -541,12 +541,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         className="w-full h-full object-cover transition-transform group-hover:scale-110" 
                       />
                     ) : (
-                      <User className="w-10 h-10 text-slate-300" />
+                      <User className="w-10 h-10 text-slate-900" />
                     )}
                   </div>
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute -bottom-2 -right-2 p-2.5 bg-primary text-white rounded-xl shadow-lg shadow-primary/30 hover:scale-110 active:scale-95 transition-all"
+                    className="absolute -bottom-3 -right-3 p-3 bg-primary text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
@@ -559,41 +559,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                  <label className="text-base font-medium text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
                   <input
                     type="text"
                     value={adminName}
                     onChange={(e) => setAdminName(e.target.value)}
-                    className="w-full mt-2 px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl font-medium text-slate-900 outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="w-full mt-2 px-5 py-3.5 bg-slate-50 border-2 border-slate-900 font-bold text-slate-900 outline-none focus:bg-white transition-all uppercase tracking-widest text-[11px]"
                   />
                 </div>
               </div>
 
               {/* Bio Section */}
               <div className="space-y-2">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("backgroundHistory")}</label>
+                <label className="text-base font-medium text-slate-400 uppercase tracking-widest ml-1">{t("backgroundHistory")}</label>
                 <textarea
                   value={adminBio}
                   onChange={(e) => setAdminBio(e.target.value)}
                   placeholder={t("writeBio")}
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl font-medium text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all h-32 resize-none"
+                  className="w-full mt-2 px-5 py-4 bg-slate-50 border-2 border-slate-900 font-bold text-slate-900 outline-none focus:bg-white transition-all h-32 resize-none uppercase tracking-widest text-[11px]"
                 />
               </div>
 
-              <div className="pt-2 flex gap-4">
+              <div className="pt-4 flex gap-4">
                 <button
                   onClick={() => setShowProfileModal(false)}
-                  className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 transition-all"
+                  className="flex-1 py-4 px-6 border-2 border-slate-900 text-slate-900 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 hover:shadow-hard transition-all bg-white"
                 >
                   {t("cancel")}
                 </button>
                 <button
                   onClick={saveProfile}
                   disabled={savingProfile}
-                  className="flex-1 py-4 px-6 rounded-2xl bg-primary text-white font-medium text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                  className="flex-1 btn-primary py-4 px-6 flex items-center justify-center gap-3 text-xs"
                 >
                   {savingProfile ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
                       <Plus className="w-5 h-5" />

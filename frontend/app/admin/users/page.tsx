@@ -150,51 +150,51 @@ export default function UsersManagementPage() {
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">{t("adminManagement")}</h1>
-          <p className="text-sm text-slate-500 mt-1">{t("createAndManageAdmins")}</p>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("adminManagement")}</h1>
+          <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("createAndManageAdmins")}</p>
         </div>
         <button
           onClick={openAddModal}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-medium text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+          className="btn-primary px-6 py-3 flex items-center gap-2 text-xs"
         >
           <UserPlus className="w-4 h-4" />
           {t("addNewAdmin")}
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="solid-card bg-white p-0 overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("user")}</th>
-                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("emailAddress")}</th>
-                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest">{t("role")}</th>
-                <th className="px-6 py-4 text-xs font-medium text-slate-500 uppercase tracking-widest text-right">{t("actions")}</th>
+              <tr className="bg-primary border-b-2 border-slate-900">
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("user")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("emailAddress")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("role")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest text-right">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y-2 divide-slate-900">
               {users.map((user) => (
-                <tr key={user.id} className="group hover:bg-slate-50 transition-all">
+                <tr key={user.id} className="group hover:bg-primary/5 transition-all">
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white border-2 border-slate-900 shadow-hard flex items-center justify-center overflow-hidden">
                         {user.image ? (
                           <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                         ) : (
-                          <User className="w-5 h-5 text-slate-400" />
+                          <User className="w-5 h-5 text-slate-900" />
                         )}
                       </div>
-                      <span className="text-sm font-medium text-slate-900">{user.name}</span>
+                      <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">{user.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-slate-600">{user.email}</span>
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{user.email}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${user.isSuperAdmin ? "bg-primary" : "bg-emerald-500"}`} />
-                      <span className="text-xs font-medium text-slate-600 uppercase tracking-widest">
+                      <div className={`w-2 h-2 border-2 border-slate-900 shadow-hard ${user.isSuperAdmin ? "bg-primary" : "bg-emerald-500"}`} />
+                      <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
                         {user.isSuperAdmin ? t("superadmin") : t("admin")}
                       </span>
                     </div>
@@ -202,7 +202,7 @@ export default function UsersManagementPage() {
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => openEditModal(user)}
-                      className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all"
+                      className="p-2 bg-white text-slate-900 border-2 border-transparent hover:border-slate-900 hover:shadow-hard transition-all"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -216,20 +216,20 @@ export default function UsersManagementPage() {
 
       {/* Admin Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-200 flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="solid-card bg-white w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-8 border-b border-slate-100">
+            <div className="p-8 border-b-2 border-slate-900 bg-primary">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-medium text-slate-900">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
-                  <p className="text-sm text-slate-400 mt-1">
+                  <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
+                  <p className="text-xs font-bold text-slate-900 mt-2 uppercase tracking-widest">
                     {isEditing ? t("updateCredentialsProfile") : t("createCredentialsNewAdmin")}
                   </p>
                 </div>
                 <button 
                   onClick={() => setShowModal(false)} 
-                  className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 transition-all"
+                  className="p-3 bg-white text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -237,7 +237,7 @@ export default function UsersManagementPage() {
 
               {/* Tabs */}
               {isEditing && (
-                <div className="flex gap-6 mt-8">
+                <div className="flex gap-8 mt-8">
                   {[
                     { id: "details", label: t("details"), icon: User },
                     { id: "history", label: t("backgroundHistory"), icon: History }
@@ -245,13 +245,13 @@ export default function UsersManagementPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 pb-4 text-sm font-medium transition-all relative ${
-                        activeTab === tab.id ? "text-primary" : "text-slate-400 hover:text-slate-600"
+                      className={`flex items-center gap-2 pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${
+                        activeTab === tab.id ? "text-slate-900" : "text-slate-900/60 hover:text-slate-900"
                       }`}
                     >
                       <tab.icon className="w-4 h-4" />
                       {tab.label}
-                      {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                      {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-900" />}
                     </button>
                   ))}
                 </div>
@@ -261,37 +261,37 @@ export default function UsersManagementPage() {
             {/* Body */}
             <div className="p-8 overflow-y-auto custom-scrollbar max-h-[60vh]">
               {activeTab === "details" ? (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
                   {error && (
-                    <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 text-sm font-medium">
-                      <AlertCircle className="w-4 h-4" />
+                    <div className="p-4 bg-red-50 border-2 border-red-900 shadow-hard flex items-center gap-3 text-red-900 text-xs font-bold uppercase tracking-widest">
+                      <AlertCircle className="w-5 h-5" />
                       {error}
                     </div>
                   )}
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                      <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullName")}</label>
                       <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900"
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
+                      <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
                       <input
                         type="email"
                         required
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900"
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">
+                      <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">
                         {t("password")} {isEditing && <span className="text-[8px] opacity-60 italic">{t("leaveBlankToKeep")}</span>}
                       </label>
                       <input
@@ -299,72 +299,73 @@ export default function UsersManagementPage() {
                         required={!isEditing}
                         value={formData.password}
                         onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900"
+                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                       />
                     </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ ...formData, isSuperAdmin: !formData.isSuperAdmin })}
-                        className={`w-14 h-8 rounded-full transition-all relative ${formData.isSuperAdmin ? "bg-primary shadow-lg shadow-primary/20" : "bg-slate-200"}`}
-                      >
-                        <div className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${formData.isSuperAdmin ? "left-7" : "left-1"}`} />
-                      </button>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-slate-900">{t("makeSuperadmin")}</span>
-                        <span className="text-[10px] text-slate-400 font-medium">{t("grantsFullAccess")}</span>
-                      </div>
+                    <div className="flex items-center gap-6">
+                      <label className="flex items-center gap-4 cursor-pointer group">
+                        <input 
+                          type="checkbox" 
+                          checked={formData.isSuperAdmin} 
+                          onChange={(e) => setFormData({ ...formData, isSuperAdmin: e.target.checked })}
+                          className="w-6 h-6 border-2 border-slate-900 accent-primary shadow-hard" 
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("makeSuperadmin")}</span>
+                          <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">{t("grantsFullAccess")}</span>
+                        </div>
+                      </label>
                     </div>
                   </div>
 
-                  <div className="pt-6 flex gap-4">
+                  <div className="pt-8 flex gap-6 border-t-2 border-slate-900">
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="flex-1 py-4 px-6 rounded-2xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50 transition-all"
+                      className="flex-1 py-4 px-6 bg-white border-2 border-slate-900 text-slate-900 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 hover:shadow-hard transition-all"
                     >
                       {t("cancel")}
                     </button>
                     <button
                       type="submit"
                       disabled={saving}
-                      className="flex-1 py-4 px-6 rounded-2xl bg-primary text-white font-medium text-sm shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
+                      className="flex-1 btn-primary py-4 px-6 flex items-center justify-center gap-3 text-xs"
                     >
-                      {saving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+                      {saving ? <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                       {isEditing ? t("saveChanges") : t("addNewAdmin")}
                     </button>
                   </div>
                 </form>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {historyLoading ? (
-                    <div className="py-12 flex flex-col items-center justify-center">
-                      <RefreshCw className="w-8 h-8 text-primary animate-spin mb-4" />
-                      <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Fetching Personnel Logs...</p>
+                    <div className="py-16 flex flex-col items-center justify-center">
+                      <div className="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-6" />
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Fetching Personnel Logs...</p>
                     </div>
                   ) : userHistory.length === 0 ? (
-                    <div className="py-12 text-center bg-slate-50 rounded-[2.5rem] border border-slate-100">
-                      <History className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                      <p className="text-sm text-slate-400 italic font-medium">{t("noActivityFound")}</p>
+                    <div className="solid-card bg-white p-16 text-center border-2 border-slate-900 border-dashed">
+                      <History className="w-12 h-12 text-slate-400 mx-auto mb-6" />
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{t("noActivityFound")}</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {userHistory.map((log, idx) => (
-                        <div key={idx} className="p-5 bg-white border border-slate-100 rounded-3xl shadow-sm hover:shadow-md transition-all">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-[10px] font-medium px-3 py-1 rounded-lg uppercase tracking-widest ${
-                              log.action === 'login' ? 'bg-blue-50 text-blue-600' :
-                              log.action === 'create' ? 'bg-emerald-50 text-emerald-600' :
-                              log.action === 'delete' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'
+                        <div key={idx} className="p-6 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all group">
+                          <div className="flex items-center justify-between mb-4">
+                            <span className={`text-xs font-bold px-3 py-1.5 border-2 shadow-hard uppercase tracking-widest ${
+                              log.action === 'login' ? 'bg-blue-50 text-blue-900 border-blue-900' :
+                              log.action === 'create' ? 'bg-emerald-50 text-emerald-900 border-emerald-900' :
+                              log.action === 'delete' ? 'bg-red-50 text-red-900 border-red-900' : 'bg-amber-50 text-amber-900 border-amber-900'
                             }`}>
                               {log.action}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-medium">
+                            <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">
                               {new Date(log.created_at || log.time).toLocaleString()}
                             </span>
                           </div>
-                          <p className="text-sm font-medium text-slate-900">{log.details?.name || log.entity_type || log.entityType}</p>
-                          <p className="text-[10px] text-slate-400 mt-1 font-medium">{log.details?.reason || log.details?.details || ""}</p>
+                          <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">{log.details?.name || log.entity_type || log.entityType}</p>
+                          <p className="text-xs text-slate-500 mt-2 font-bold uppercase tracking-widest">{log.details?.reason || log.details?.details || ""}</p>
                         </div>
                       ))}
                     </div>

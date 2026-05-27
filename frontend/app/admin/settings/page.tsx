@@ -28,51 +28,51 @@ export default function AdminSettings() {
   }
 
   return (
-    <div className="p-6">
+    <div>
       <Toaster position="top-right" />
       
-      <div className="mb-6">
-        <h1 className="text-2xl font-medium text-gray-900">{t("settings")}</h1>
-        <p className="text-sm text-gray-600 mt-1">{t("websiteConfiguration")}</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("settings")}</h1>
+        <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("websiteConfiguration")}</p>
       </div>
 
       <div className="max-w-2xl">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t("siteName")}</label>
+        <form onSubmit={handleSubmit} className="solid-card bg-white p-8 space-y-8">
+          <div className="space-y-2">
+            <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("siteName")}</label>
             <input
               type="text"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+              className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
               value={settings.siteName}
               onChange={(e) => setSettings({...settings, siteName: e.target.value})}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t("siteEmail")}</label>
+          <div className="space-y-2">
+            <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("siteEmail")}</label>
             <input
               type="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+              className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
               value={settings.siteEmail}
               onChange={(e) => setSettings({...settings, siteEmail: e.target.value})}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t("phoneNumber") || "Phone Number"}</label>
+          <div className="space-y-2">
+            <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("phoneNumber") || "Phone Number"}</label>
             <input
               type="text"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+              className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
               value={settings.sitePhone}
               onChange={(e) => setSettings({...settings, sitePhone: e.target.value})}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t("address") || "Address"}</label>
+          <div className="space-y-2">
+            <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("address") || "Address"}</label>
             <textarea
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+              rows={4}
+              className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none"
               value={settings.siteAddress}
               onChange={(e) => setSettings({...settings, siteAddress: e.target.value})}
             />
@@ -81,9 +81,9 @@ export default function AdminSettings() {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+            className="btn-primary w-full sm:w-auto px-8 py-4 flex items-center justify-center gap-3 text-xs"
           >
-            <Save className="w-4 h-4" />
+            {loading ? <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
             {loading ? t("saving") || "Saving..." : t("saveSettings")}
           </button>
         </form>

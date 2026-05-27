@@ -276,83 +276,83 @@ export default function AdminCategories() {
     <div>
       <Toaster position="top-right" />
       
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-medium text-gray-900">{t("categories")}</h1>
-          <p className="text-sm text-gray-600 mt-1">{t("manageMainCategories")}</p>
+          <h1 className="text-3xl font-bold text-slate-900 uppercase tracking-tight">{t("categories")}</h1>
+          <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("manageMainCategories")}</p>
         </div>
         <button
           onClick={openAddMainModal}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+          className="btn-primary px-6 py-3 flex items-center gap-2 text-xs"
         >
           <Plus className="w-4 h-4" />
           {t("addMainCategory")}
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b bg-gradient-to-r from-gray-50 to-white">
-          <h2 className="font-medium text-gray-900">{t("categoryStructure")}</h2>
-          <p className="text-xs text-gray-500 mt-1">{t("cannotDeleteCategories")}</p>
+      <div className="solid-card bg-white overflow-hidden p-0">
+        <div className="p-6 border-b-2 border-slate-900 bg-primary">
+          <h2 className="font-bold text-slate-900 uppercase tracking-widest text-lg">{t("categoryStructure")}</h2>
+          <p className="text-xs font-bold text-slate-900 mt-1 uppercase tracking-widest">{t("cannotDeleteCategories")}</p>
         </div>
-        <div className="divide-y">
+        <div className="divide-y-2 divide-slate-900">
           {categories.map((cat: any) => {
             const subItems = getSubcategories(cat.id)
             const isExpanded = expanded[cat.id]
             const hasChildren = subItems.length > 0
             return (
               <div key={cat.id}>
-                <div className="flex items-center justify-between p-4 hover:bg-gray-50 transition">
-                  <div className="flex items-center gap-3 flex-1">
+                <div className="flex items-center justify-between p-4 hover:bg-primary/5 transition-all group">
+                  <div className="flex items-center gap-4 flex-1">
                     {hasChildren && (
-                      <button onClick={() => toggleExpand(cat.id)} className="p-1 hover:bg-gray-200 rounded">
+                      <button onClick={() => toggleExpand(cat.id)} className="p-1 border-2 border-slate-900 shadow-hard bg-white hover:translate-y-0.5 transition-all">
                         {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       </button>
                     )}
-                    {!hasChildren && <div className="w-6" />}
+                    {!hasChildren && <div className="w-8" />}
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-gray-900">{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${cat.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="font-bold text-slate-900 uppercase text-lg">{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
+                        <span className={`text-xs font-bold px-2.5 py-1 uppercase tracking-widest border-2 shadow-hard ${cat.isActive ? 'bg-emerald-50 text-emerald-900 border-emerald-900' : 'bg-slate-100 text-slate-900 border-slate-900'}`}>
                           {cat.isActive ? t('active') : t('inactive')}
                         </span>
-                        {cat.isFeatured && <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full">{t('featured')}</span>}
+                        {cat.isFeatured && <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 text-amber-900 border-2 border-amber-900 shadow-hard uppercase tracking-widest">{t('featured')}</span>}
                       </div>
-                      {cat.description && <div className="text-xs text-gray-500 mt-0.5">{cat.description}</div>}
+                      {cat.description && <div className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">{cat.description}</div>}
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => openAddSubModal(cat)} className="px-2 py-1 text-xs bg-green-50 text-green-600 rounded hover:bg-green-100 transition flex items-center gap-1">
+                    <button onClick={() => openAddSubModal(cat)} className="px-3 py-1.5 text-xs font-bold uppercase tracking-widest bg-emerald-50 border-2 border-emerald-900 text-emerald-900 shadow-hard hover:translate-y-0.5 transition-all flex items-center gap-2">
                       <Plus className="w-3 h-3" />
                       {t("addSub")}
                     </button>
-                    <button onClick={() => openEditModal(cat)} className="p-1 text-blue-600 hover:text-blue-800">
-                      <Edit className="w-4 h-4" />
+                    <button onClick={() => openEditModal(cat)} className="p-1.5 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-0.5 transition-all">
+                      <Edit className="w-4 h-4 text-slate-900" />
                     </button>
-                    <button onClick={() => handleDelete(cat, hasChildren, subItems.length)} className="p-1 text-red-600 hover:text-red-800">
-                      <Trash2 className="w-4 h-4" />
+                    <button onClick={() => handleDelete(cat, hasChildren, subItems.length)} className="p-1.5 bg-white border-2 border-slate-900 shadow-hard hover:shadow-hard-red hover:border-red-600 transition-all">
+                      <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
                   </div>
                 </div>
                 {isExpanded && hasChildren && (
-                  <div className="bg-gray-50 pl-12 border-t">
+                  <div className="bg-slate-50 pl-14 border-t-2 border-slate-900 divide-y-2 divide-slate-900">
                     {subItems.map((sub: any) => (
-                      <div key={sub.id} className="flex items-center justify-between p-3 border-b last:border-0 hover:bg-gray-100 transition">
+                      <div key={sub.id} className="flex items-center justify-between p-4 hover:bg-white transition-all group">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-medium text-gray-900">{language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${sub.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="font-bold text-slate-900 uppercase">{language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}</span>
+                            <span className={`text-xs font-bold px-2.5 py-1 uppercase tracking-widest border-2 shadow-hard ${sub.isActive ? 'bg-emerald-50 text-emerald-900 border-emerald-900' : 'bg-slate-100 text-slate-900 border-slate-900'}`}>
                               {sub.isActive ? t('active') : t('inactive')}
                             </span>
                           </div>
-                          {sub.description && <div className="text-xs text-gray-500 mt-0.5">{sub.description}</div>}
+                          {sub.description && <div className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">{sub.description}</div>}
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => openEditModal(sub)} className="p-1 text-blue-600 hover:text-blue-800">
-                            <Edit className="w-4 h-4" />
+                          <button onClick={() => openEditModal(sub)} className="p-1.5 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-0.5 transition-all">
+                            <Edit className="w-4 h-4 text-slate-900" />
                           </button>
-                          <button onClick={() => handleDelete(sub, false, 0)} className="p-1 text-red-600 hover:text-red-800">
-                            <Trash2 className="w-4 h-4" />
+                          <button onClick={() => handleDelete(sub, false, 0)} className="p-1.5 bg-white border-2 border-slate-900 shadow-hard hover:shadow-hard-red hover:border-red-600 transition-all">
+                            <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
                         </div>
                       </div>
@@ -373,70 +373,87 @@ export default function AdminCategories() {
 
       {/* Add/Edit Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
-          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b px-6 py-4">
-              <h3 className="text-xl font-medium text-gray-900">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
+          <div className="solid-card bg-white max-w-lg w-full max-h-[90vh] overflow-y-auto p-0 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-primary border-b-2 border-slate-900 px-8 py-6 z-10 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-slate-900 uppercase tracking-widest">
                 {editingItem ? t("edit") : t("addNew")} {modalType === "main" ? t("categoryName") : t("subcategory")}
               </h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="p-2 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+              >
+                <X className="w-5 h-5 text-slate-900" />
+              </button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category Name (English) *</label>
-                <input type="text" required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category Name (Khmer)</label>
-                <input type="text" className="w-full px-3 py-2 border rounded-lg" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description (English)</label>
-                <textarea rows={2} className="w-full px-3 py-2 border rounded-lg" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description (Khmer)</label>
-                <textarea rows={2} className="w-full px-3 py-2 border rounded-lg" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
-                <input type="number" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
-              </div>
+            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryName")} (English) *</label>
+                  <input type="text" required className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryName")} (Khmer)</label>
+                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("description")} (English)</label>
+                  <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("description")} (Khmer)</label>
+                  <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
+                </div>
+                <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">Sort Order</label>
+                  <input type="number" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
+                </div>
 
-              {/* Image Upload Section */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category Image</label>
-                {!previewImage && !formData.image ? (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                    <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
-                      <ImageIcon className="w-8 h-8" />
-                      <span className="text-sm">Click to select image</span>
+                {/* Image Upload Section */}
+                <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryImage") || "Category Image"}</label>
+                  {!previewImage && !formData.image ? (
+                    <label className="flex flex-col items-center justify-center w-full h-32 bg-slate-50 border-2 border-dashed border-slate-900 cursor-pointer hover:bg-white transition-all">
+                      <div className="flex flex-col items-center justify-center gap-3 text-slate-900">
+                        <ImageIcon className="w-8 h-8" />
+                        <span className="text-xs font-bold uppercase tracking-widest">{t("clickToSelectImage")}</span>
+                      </div>
+                      <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                    </label>
+                  ) : (
+                    <div className="relative group p-2 border-2 border-slate-900 bg-slate-50">
+                      <img 
+                        src={previewImage || formData.image} 
+                        alt="Category" 
+                        className="w-full h-40 object-cover border-2 border-slate-900" 
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-4 right-4 p-2 bg-white text-red-600 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                  )}
+                </div>
+                <div className="flex gap-8 pt-2">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})} className="w-5 h-5 border-2 border-slate-900 accent-primary" />
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("active")}</span>
                   </label>
-                ) : (
-                  <div className="relative group">
-                    <img 
-                      src={previewImage || formData.image} 
-                      alt="Category" 
-                      className="w-full h-40 object-cover rounded-lg border border-gray-200" 
-                    />
-                    <button
-                      type="button"
-                      onClick={removeImage}
-                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="w-5 h-5 border-2 border-slate-900 accent-primary" />
+                    <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("featured")}</span>
+                  </label>
+                </div>
               </div>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2"><input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})} /><span className="text-sm">{t("active")}</span></label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} /><span className="text-sm">{t("featured")}</span></label>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">{t("cancel")}</button>
-                <button type="submit" className="flex-1 bg-primary text-white py-2 rounded-lg hover:bg-primary-dark">{editingItem ? t("update") : t("create")}</button>
+              
+              <div className="flex gap-4 pt-6 border-t-2 border-slate-900">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-6 py-4 border-2 border-slate-900 bg-white font-bold text-xs text-slate-900 uppercase tracking-widest hover:bg-slate-50 hover:shadow-hard transition-all">{t("cancel")}</button>
+                <button type="submit" disabled={uploadingImage} className="flex-1 btn-primary py-4 px-6 font-bold text-xs flex items-center justify-center gap-2">
+                  {uploadingImage ? <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> : (editingItem ? t("update") : t("create"))}
+                </button>
               </div>
             </form>
           </div>

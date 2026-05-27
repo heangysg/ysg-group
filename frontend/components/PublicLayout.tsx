@@ -10,6 +10,7 @@ import { createClient } from "../lib/supabase/client"
 import BottomNav from "./BottomNav"
 import Footer from "./Footer"
 import { motion, AnimatePresence } from "framer-motion"
+import { Toaster } from "react-hot-toast"
 
 export default function PublicLayout({ 
   children, 
@@ -269,6 +270,7 @@ export default function PublicLayout({
       )}
 
       <main className={`transition-all ${!hideNav ? "pt-20 md:pt-24 pb-20 md:pb-0" : ""} min-h-screen`}>
+        <Toaster position="top-center" />
         {children}
       </main>
 

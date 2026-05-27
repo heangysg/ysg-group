@@ -29,7 +29,7 @@ export default function AdminInquiries() {
       .from("Inquiry")
       .select("*")
       .order("createdAt", { ascending: false })
-    
+
     if (error) {
       console.error("Error fetching inquiries:", error)
     } else {
@@ -44,7 +44,7 @@ export default function AdminInquiries() {
       .from("Inquiry")
       .update({ status })
       .eq("id", id)
-    
+
     if (error) {
       toast.error(t("errorUpdatingStatus") || "Error updating status")
     } else {
@@ -67,83 +67,84 @@ export default function AdminInquiries() {
       <Toaster position="top-right" />
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <button
             onClick={() => router.back()}
-            className="p-2.5 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary/20 transition-all shadow-sm"
+            className="p-3 bg-white border-2 border-slate-900 text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-medium text-slate-900 tracking-tight">{t("customerInquiries")}</h1>
-            <p className="text-sm text-slate-500 mt-1">{t("manageInquiriesDesc") || "Respond to customer questions and machinery requests"}</p>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("customerInquiries")}</h1>
+            <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("manageInquiriesDesc") || "Respond to customer questions and machinery requests"}</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-8">
         {inquiries.map((inquiry: any) => (
-          <div key={inquiry.id} className="bg-white rounded-[2rem] border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-all">
-            <div className="p-8">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+          <div key={inquiry.id} className="solid-card bg-white p-0 flex flex-col">
+            <div className="p-8 border-b-2 border-slate-900 bg-primary">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <div className="w-14 h-14 bg-white border-2 border-slate-900 shadow-hard text-slate-900 flex items-center justify-center">
                     <Mail className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-slate-900 text-lg">{inquiry.name || inquiry.customerName || t("walkInCustomer")}</h3>
-                    <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
+                    <h3 className="font-bold text-slate-900 text-xl uppercase tracking-wider">{inquiry.name || inquiry.customerName || t("walkInCustomer")}</h3>
+                    <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-slate-900 font-bold uppercase tracking-widest">
                       <span>{inquiry.email}</span>
-                      <span className="text-slate-200">|</span>
+                      <span className="text-slate-900">|</span>
                       <span>{inquiry.phone || t("noPhoneProvided") || "No phone"}</span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-3 w-full md:w-auto">
+
+                <div className="flex items-center gap-4 w-full md:w-auto">
                   {inquiry.status !== "replied" && (
                     <button
                       onClick={() => updateStatus(inquiry.id, "replied")}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl font-medium text-xs hover:bg-emerald-100 transition-all"
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-emerald-50 text-emerald-900 border-2 border-emerald-900 shadow-hard font-bold text-xs uppercase tracking-widest hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                     >
                       <CheckCircle className="w-4 h-4" />
                       {t("markReplied")}
                     </button>
                   )}
-                  <span className={`px-4 py-2.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest ${
-                    inquiry.status === "new" ? "bg-amber-50 text-amber-600 border border-amber-100" :
-                    inquiry.status === "read" ? "bg-blue-50 text-blue-600 border border-blue-100" :
-                    "bg-slate-50 text-slate-600 border border-slate-100"
-                  }`}>
+                  <span className={`px-5 py-3 border-2 shadow-hard text-xs font-bold uppercase tracking-widest ${inquiry.status === "new" ? "bg-amber-50 text-amber-900 border-amber-900" :
+                    inquiry.status === "read" ? "bg-blue-50 text-blue-900 border-blue-900" :
+                      "bg-slate-50 text-slate-900 border-slate-900"
+                    }`}>
                     {inquiry.status || "new"}
                   </span>
                 </div>
               </div>
+            </div>
 
-              <div className="p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
-                <p className="text-slate-700 leading-relaxed text-sm whitespace-pre-wrap">{inquiry.message}</p>
-              </div>
+            <div className="p-8 bg-slate-50">
+              <p className="text-slate-900 leading-relaxed text-sm whitespace-pre-wrap font-bold">{inquiry.message}</p>
+            </div>
 
-              <div className="mt-6 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium uppercase tracking-widest">
-                  <Clock className="w-3.5 h-3.5" />
-                  {new Date(inquiry.createdAt).toLocaleString(language === 'kh' ? 'km-KH' : 'en-US')}
-                </div>
+            <div className="px-8 py-4 bg-white border-t-2 border-slate-900 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-bold uppercase tracking-widest">
+                <Clock className="w-3.5 h-3.5" />
+                {new Date(inquiry.createdAt).toLocaleString(language === 'kh' ? 'km-KH' : 'en-US')}
               </div>
             </div>
           </div>
         ))}
-        
+
         {inquiries.length === 0 && (
-          <div className="bg-white rounded-[2.5rem] border border-slate-200 p-20 text-center shadow-sm">
-            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <Mail className="w-10 h-10 text-slate-200" />
+          <div className="solid-card bg-white p-20 text-center">
+            <div className="w-24 h-24 bg-primary border-2 border-slate-900 shadow-hard flex items-center justify-center mx-auto mb-8">
+              <Mail className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900">{t("noActivityFound")}</h3>
-            <p className="text-slate-400 mt-2">{t("noInquiriesDesc") || "Customer messages will appear here once they contact you."}</p>
+            <h3 className="text-2xl font-bold text-slate-900 uppercase tracking-widest">{t("noActivityFound")}</h3>
+            <p className="text-slate-500 mt-4 font-bold uppercase tracking-widest text-xs">{t("noInquiriesDesc") || "Customer messages will appear here once they contact you."}</p>
           </div>
         )}
       </div>
     </div>
   )
 }
+
+// មហាជនលាត់មាត់គ្រប់គ្នាក្រោយពីឃើញពូណុយ ធ្វើខ្លួនបែបនេះដែលមើលទៅស្រដៀងនឹងជុងគុកសមាជិកក្រុម BTS​ដែលជា ក្រុមKpopដ៏ល្បីរបស់កូរ៉េខាងត្បូង

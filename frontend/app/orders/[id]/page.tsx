@@ -48,7 +48,7 @@ export default function OrderDetailsPage() {
             setQrData(cachedQR)
           } else {
             const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
-            const generated = generateBakongQR(data.totalAmount, data.id, expirationToUse)
+            const generated = await generateBakongQR(data.totalAmount, data.id, expirationToUse)
             const qrPayload = { ...generated, expiresAt: expirationToUse }
             setQrData(qrPayload)
             localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
@@ -115,10 +115,10 @@ export default function OrderDetailsPage() {
     }).format(price)
   }
 
-  const refreshQR = () => {
+  const refreshQR = async () => {
     if (order) {
       const expirationToUse = Date.now() + (5 * 60 * 1000)
-      const generated = generateBakongQR(order.totalAmount, order.id, expirationToUse)
+      const generated = await generateBakongQR(order.totalAmount, order.id, expirationToUse)
       const qrPayload = { ...generated, expiresAt: expirationToUse }
       setQrData(qrPayload)
       localStorage.setItem(`bakong_qr_${order.id}`, JSON.stringify(qrPayload))

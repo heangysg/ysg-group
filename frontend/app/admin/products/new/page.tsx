@@ -172,50 +172,49 @@ export default function AddProduct() {
       <Toaster position="top-right" />
       
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center gap-6">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition"
+          className="self-start p-3 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all text-slate-900"
         >
-          <ArrowLeft className="w-4 h-4" />
-          {t("backToProducts")}
+          <ArrowLeft className="w-5 h-5" />
         </button>
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-primary/10 rounded-xl">
-            <Package className="w-6 h-6 text-primary" />
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-primary border-2 border-slate-900 shadow-hard">
+            <Package className="w-6 h-6 text-slate-900" />
           </div>
           <div>
-            <h1 className="text-2xl font-medium text-gray-900">{t("addProduct")}</h1>
-            <p className="text-sm text-gray-500 mt-1">{t("fillInDetails")}</p>
+            <h1 className="text-3xl font-bold text-slate-900 uppercase tracking-tight">{t("addProduct")}</h1>
+            <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("fillInDetails")}</p>
           </div>
         </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100">
+      <form onSubmit={handleSubmit} className="solid-card bg-white p-0 overflow-hidden">
         {/* Basic Information Section */}
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("basicInformation")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("productNameEnglish")}</label>
+        <div className="p-8 border-b-2 border-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("basicInformation")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("productNameEnglish")}</label>
               <div className="relative">
-                <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Tag className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="text"
                   required
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-wide"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  placeholder="e.g., Hitachi ZX200-3"
+                  placeholder="E.G., HITACHI ZX200-3"
                 />
               </div>
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("productNameKhmer")}</label>
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("productNameKhmer")}</label>
               <input
                 type="text"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
                 value={formData.nameKhmer}
                 onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})}
                 placeholder="ឧ. ម៉ាស៊ីនត្រងទឹក និងវេចខ្ចប់"
@@ -225,28 +224,28 @@ export default function AddProduct() {
         </div>
 
         {/* Classification Section */}
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("classification")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("mainCategory")}</label>
+        <div className="p-8 border-b-2 border-slate-900 bg-primary/5">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("classification")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("mainCategory")}</label>
               <select
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                className="w-full px-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-sm text-slate-900 uppercase tracking-widest"
                 value={formData.categoryId}
                 onChange={(e) => handleCategoryChange(e.target.value)}
               >
                 <option value="">{t("selectCategory")}</option>
-                {categories.map((cat: any) => (
+                {categories.filter((c: any) => !c.parentId).map((cat: any) => (
                   <option key={cat.id} value={cat.id}>
                     {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
                   </option>
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("subcategory")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("subcategory")}</label>
               <select
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                className="w-full px-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest disabled:opacity-50"
                 value={formData.subcategoryId}
                 onChange={(e) => setFormData({...formData, subcategoryId: e.target.value})}
                 disabled={!selectedCategory}
@@ -259,116 +258,116 @@ export default function AddProduct() {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("brand")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("brand")}</label>
               <div className="relative">
-                <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Tag className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="text"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg"
+                  className="w-full pl-12 pr-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                   value={formData.brand}
                   onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                  placeholder="e.g., Caterpillar, Hitachi, Komatsu"
+                  placeholder="E.G., CATERPILLAR, HITACHI"
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("model")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("model")}</label>
               <input
                 type="text"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg"
+                className="w-full px-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                 value={formData.model}
                 onChange={(e) => setFormData({...formData, model: e.target.value})}
-                placeholder="e.g., ZX200-3, 950H"
+                placeholder="E.G., ZX200-3, 950H"
               />
             </div>
           </div>
         </div>
 
         {/* Pricing & Specifications Section */}
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("pricingSpecifications")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("priceUsd")}</label>
+        <div className="p-8 border-b-2 border-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("pricingSpecifications")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("priceUsd")}</label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <DollarSign className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="number"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg"
+                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                   value={formData.price}
                   onChange={(e) => setFormData({...formData, price: e.target.value})}
                   placeholder="0.00"
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("year")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("year")}</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="number"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg"
+                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                   value={formData.year}
                   onChange={(e) => setFormData({...formData, year: e.target.value})}
                   placeholder="2020"
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("hours")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("hours")}</label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="number"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg"
+                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                   value={formData.hours}
                   onChange={(e) => setFormData({...formData, hours: e.target.value})}
-                  placeholder="Operating hours"
+                  placeholder="OPERATING HOURS"
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("location")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("location")}</label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="text"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg"
+                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                   value={formData.location}
                   onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  placeholder="e.g., Phnom Penh, Cambodia"
+                  placeholder="PHNOM PENH, CAMBODIA"
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("condition")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("condition")}</label>
               <select
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                 value={formData.condition}
                 onChange={(e) => setFormData({...formData, condition: e.target.value})}
               >
-                <option value="new">New</option>
-                <option value="used">Used</option>
-                <option value="refurbished">Refurbished</option>
+                <option value="new">NEW</option>
+                <option value="used">USED</option>
+                <option value="refurbished">REFURBISHED</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Image Upload Section */}
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("productImages") || "Product Images"}</h2>
-          <div className="space-y-4">
-            <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 hover:border-primary transition-colors">
-              <div className="flex flex-col items-center justify-center gap-2 text-gray-400">
+        <div className="p-8 border-b-2 border-slate-900 bg-primary/5">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("productImages") || "Product Images"}</h2>
+          <div className="space-y-6">
+            <label className="flex flex-col items-center justify-center w-full h-48 border-4 border-dashed border-slate-900 bg-white cursor-pointer hover:bg-slate-50 transition-colors shadow-hard">
+              <div className="flex flex-col items-center justify-center gap-3 text-slate-900">
                 {uploadingImage ? (
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-900 border-t-transparent" />
                 ) : (
                   <>
-                    <ImageIcon className="w-8 h-8" />
-                    <span className="text-sm">{t("clickToUpload") || "Click to upload images"}</span>
-                    <span className="text-xs text-gray-400">PNG, JPG up to 10MB each</span>
+                    <ImageIcon className="w-10 h-10" />
+                    <span className="text-sm font-bold uppercase tracking-widest">{t("clickToUpload") || "Click to upload images"}</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">PNG, JPG up to 10MB each</span>
                   </>
                 )}
               </div>
@@ -376,18 +375,18 @@ export default function AddProduct() {
             </label>
 
             {previewUrls.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                 {previewUrls.map((url, i) => (
-                  <div key={i} className="relative group">
-                    <img src={url} alt={`Preview ${i+1}`} className="w-full h-24 object-cover rounded-lg border border-gray-200" />
+                  <div key={i} className="relative group border-2 border-slate-900 shadow-hard bg-white">
+                    <img src={url} alt={`Preview ${i+1}`} className="w-full h-28 object-cover" />
                     <button
                       type="button"
                       onClick={() => removeImage(i)}
-                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-white border-2 border-slate-900 text-slate-900 font-bold text-sm flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors z-10"
                     >
                       ✕
                     </button>
-                    {i === 0 && <span className="absolute bottom-1 left-1 text-[10px] bg-primary text-white px-1 rounded">Main</span>}
+                    {i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border-2 border-slate-900 text-slate-900 px-2 py-0.5 font-bold uppercase tracking-widest">Main</span>}
                   </div>
                 ))}
               </div>
@@ -396,34 +395,34 @@ export default function AddProduct() {
         </div>
 
         {/* Description Section */}
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">{t("description")}</h2>
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("shortDescription")}</label>
+        <div className="p-8 border-b-2 border-slate-900">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("description")}</h2>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("shortDescription")}</label>
               <textarea
                 rows={3}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest resize-none"
                 value={formData.shortDescription}
                 onChange={(e) => setFormData({...formData, shortDescription: e.target.value})}
-                placeholder="Brief summary of the product"
+                placeholder="BRIEF SUMMARY OF THE PRODUCT"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("fullDescriptionEnglish")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullDescriptionEnglish")}</label>
               <textarea
                 rows={6}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
                 placeholder="Detailed product description with specifications and features"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t("fullDescriptionKhmer")}</label>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullDescriptionKhmer")}</label>
               <textarea
                 rows={4}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary"
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none"
                 value={formData.descriptionKhmer}
                 onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})}
                 placeholder="ពិពណ៌នាអំពីផលិតផល ជាភាសាខ្មែរ..."
@@ -433,48 +432,46 @@ export default function AddProduct() {
         </div>
 
         {/* Status Section */}
-        <div className="p-6">
-          <div className="flex flex-wrap gap-6">
-            <label className="flex items-center gap-2 cursor-pointer">
+        <div className="p-8">
+          <div className="flex flex-wrap gap-10">
+            <label className="flex items-center gap-4 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.isPublished}
                 onChange={(e) => setFormData({...formData, isPublished: e.target.checked})}
-                className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                className="w-6 h-6 border-2 border-slate-900 accent-primary shadow-hard"
               />
-              <span className="text-sm text-gray-700">{t("publishImmediately")}</span>
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("publishImmediately")}</span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-4 cursor-pointer group">
               <input
                 type="checkbox"
                 checked={formData.isFeatured}
                 onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
-                className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                className="w-6 h-6 border-2 border-slate-900 accent-primary shadow-hard"
               />
-              <span className="text-sm text-gray-700">{t("featureThisProduct")}</span>
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("featureThisProduct")}</span>
             </label>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="p-6 bg-gray-50 rounded-b-xl border-t border-gray-100">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
-            >
-              {t("cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-dark transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              {loading ? t("creatingProduct") : t("createProduct")}
-            </button>
-          </div>
+        <div className="p-8 bg-slate-50 border-t-2 border-slate-900 flex flex-col sm:flex-row gap-6">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-8 py-4 bg-white border-2 border-slate-900 text-slate-900 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 hover:shadow-hard transition-all"
+          >
+            {t("cancel")}
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 btn-primary py-4 px-8 flex items-center justify-center gap-3 text-xs"
+          >
+            {loading ? <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
+            {loading ? t("creatingProduct") : t("createProduct")}
+          </button>
         </div>
       </form>
     </div>
