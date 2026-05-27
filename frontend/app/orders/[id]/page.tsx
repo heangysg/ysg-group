@@ -318,6 +318,7 @@ export default function OrderDetailsPage() {
         onClose={() => setShowSuccessModal(false)}
         orderId={order.id}
         amount={order.totalAmount}
+        items={order.items}
       />
     </PublicLayout>
   )
