@@ -6,16 +6,15 @@ export async function POST(request: Request) {
     const token = process.env.BAKONG_TOKEN || process.env.NEXT_PUBLIC_BAKONG_TOKEN
     const relayToken = process.env.BAKONG_RELAY_TOKEN
 
-    if (!token || !relayToken) {
-      return NextResponse.json({ error: "Bakong Tokens missing on server" }, { status: 500 })
+    if (!relayToken) {
+      return NextResponse.json({ error: "Bakong Relay Token missing on server" }, { status: 500 })
     }
 
     const response = await fetch("https://api.bakongrelay.com/v1/check_transaction_by_md5", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-        "x-api-key": relayToken
+        "Authorization": `Bearer ${relayToken}`
       },
       body: JSON.stringify({ md5 })
     })
