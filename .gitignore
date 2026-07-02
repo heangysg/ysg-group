@@ -47,3 +47,12 @@ backend/node_modules/
 # Scratch/Debug
 scratch/
 frontend/scratch/
+
+# Thesis and Document Files
+/*.txt
+/*.docx
+/*.doc
+/*.png
+/*.mmd
+/diagrams/
+*.txt

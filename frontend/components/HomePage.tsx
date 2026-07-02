@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { createClient } from "../lib/supabase/client"
 import { ArrowRight, Headphones, Package, Shield, Zap } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
@@ -73,7 +74,7 @@ export default function HomePage() {
       {/* 🚀 Dynamic Premium Hero Section */}
       <section className="relative flex items-center justify-center pt-24 md:pt-32 pb-32 md:pb-40 overflow-hidden bg-slate-950 min-h-[85vh]">
         <div className="absolute inset-0 w-full h-full">
-          <img src="/hero-machinery.png" alt="Machinery Hero" className="w-full h-full object-cover opacity-30 grayscale" />
+          <Image src="/hero-machinery.png" alt="Machinery Hero" fill className="object-cover opacity-30 grayscale" priority />
           <div className="absolute inset-0 bg-slate-950/70" />
         </div>
 
@@ -178,7 +179,7 @@ export default function HomePage() {
                     {/* Image */}
                     <div className="w-full h-48 md:h-56 bg-slate-100 overflow-hidden mb-6 flex items-center justify-center border-b-4 border-slate-900">
                       {cat.image ? (
-                        <img src={cat.image} alt={cat.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                        <Image src={cat.image} alt={cat.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                       ) : (
                         <Package className="w-12 h-12 text-slate-300" />
                       )}

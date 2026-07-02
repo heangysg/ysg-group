@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { MapPin, Package, ShoppingCart, ArrowUpRight } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import { useCart } from "../contexts/CartContext"
@@ -52,10 +53,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="relative aspect-[4/3] bg-slate-50 overflow-hidden">
           <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors duration-500 z-10" />
           {imageUrl && imageUrl !== "" ? (
-            <img 
+            <Image 
               src={imageUrl} 
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-slate-100">

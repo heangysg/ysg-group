@@ -60,7 +60,8 @@ export default function UsersManagementPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("/api/admin/users")
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/admin/users`)
       const data = await res.json()
       if (res.ok) setUsers(data.users || [])
     } catch (err) {
@@ -75,7 +76,8 @@ export default function UsersManagementPage() {
     setError("")
     setSaving(true)
     try {
-      const url = "/api/admin/users"
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const url = `${API_URL}/api/admin/users`
       const method = isEditing ? "PATCH" : "POST"
       
       const res = await fetch(url, {
@@ -125,7 +127,8 @@ export default function UsersManagementPage() {
     // Fetch history
     setHistoryLoading(true)
     try {
-      const res = await fetch(`/api/admin/audit?userId=${user.id}`)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/admin/audit?userId=${user.id}`)
       const data = await res.json()
       if (res.ok) setUserHistory(data.logs || [])
     } catch (err) {

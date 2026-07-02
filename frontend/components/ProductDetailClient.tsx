@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { createClient } from "../lib/supabase/client"
 import toast, { Toaster } from "react-hot-toast"
 import PublicLayout from "./PublicLayout"
@@ -131,10 +132,13 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             <div className="space-y-6">
               <div className="bg-slate-50 border-4 border-slate-900 aspect-[4/3] relative group shadow-hard">
                 {images.length > 0 && images[activeImage] ? (
-                  <img 
+                  <Image 
                     src={images[activeImage]} 
                     alt={product.name} 
-                    className="w-full h-full object-cover transition-all duration-700" 
+                    fill
+                    sizes="(max-width: 1200px) 100vw, 50vw"
+                    className="object-cover transition-all duration-700" 
+                    priority
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-4">
@@ -159,7 +163,9 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                         activeImage === i ? "border-primary shadow-hard-primary" : "border-slate-200 hover:border-slate-900"
                       }`}
                     >
-                      <img src={img} alt={`${product.name} ${i}`} className="w-full h-full object-cover" />
+                      <div className="relative w-full h-full">
+                        <Image src={img} alt={`${product.name} ${i}`} fill sizes="20vw" className="object-cover" />
+                      </div>
                     </button>
                   ))}
                 </div>

@@ -1,6 +1,7 @@
 export const generateBakongQR = async (amount: number, orderId: string, expiresAtTimestamp?: number) => {
   try {
-    const response = await fetch("/api/bakong/generate", {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const response = await fetch(`${API_URL}/api/bakong/generate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -29,7 +30,8 @@ export const generateBakongQR = async (amount: number, orderId: string, expiresA
  */
 export const checkBakongTransaction = async (md5: string): Promise<boolean> => {
   try {
-    const response = await fetch("/api/bakong/check-status", {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const response = await fetch(`${API_URL}/api/bakong/check-status`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
