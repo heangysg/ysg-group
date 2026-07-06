@@ -303,15 +303,13 @@ router.post('/upload', authenticateJWT, async (req: AuthRequest, res: Response):
 
     const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
     
+    const formData = new FormData();
+    formData.append('file', image);
+    formData.append('upload_preset', uploadPreset);
+
     const cloudinaryRes = await fetch(cloudinaryUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        file: image,
-        upload_preset: uploadPreset
-      })
+      body: formData
     });
 
     const data = await cloudinaryRes.json();
