@@ -11,6 +11,7 @@ import { useLanguage } from "../contexts/LanguageContext"
 import { useCart } from "../contexts/CartContext"
 import { ArrowLeft, MapPin, Calendar, Clock, CheckCircle2, ChevronRight, Send, X, Package, ShieldCheck, Star, ArrowRight, ShoppingCart, Share2, Copy, Check } from "lucide-react"
 import ProductCard from "./ProductCard"
+import ProductNotFound from "./ProductNotFound"
 
 export default function ProductDetailClient({ initialProduct }: { initialProduct: any }) {
   const { slug } = useParams()
@@ -121,12 +122,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   if (!product) {
     return (
       <PublicLayout>
-        <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          <h1 className="text-2xl font-medium mb-4">Product Not Found</h1>
-          <Link href="/products" className="text-primary hover:underline flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" /> Back to Products
-          </Link>
-        </div>
+        <ProductNotFound />
       </PublicLayout>
     )
   }
