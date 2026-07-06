@@ -304,7 +304,20 @@ router.post('/upload', authenticateJWT, async (req: AuthRequest, res: Response):
     const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
     
     const formData = new FormData();
-    formData.append('file', image);
+    
+    // Parse the data URI to create a Blob
+    const match = image.match(/^data:(image\/\w+);base64,(.+)$/);
+    if (match) {
+      const mimeType = match[1];
+      const base64Data = match[2];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const blob = new Blob([buffer], { type: mimeType });
+      formData.append('file', blob, 'upload.jpg');
+    } else {
+      // Fallback if it's not a standard data URI (e.g., raw base64 or URL)
+      formData.append('file', image);
+    }
+    
     formData.append('upload_preset', uploadPreset);
 
     const cloudinaryRes = await fetch(cloudinaryUrl, {
@@ -316,7 +329,7 @@ router.post('/upload', authenticateJWT, async (req: AuthRequest, res: Response):
 
     if (!cloudinaryRes.ok || !data.secure_url) {
       console.error("Cloudinary Proxy Error:", data);
-      res.status(500).json({ error: "Failed to upload to Cloudinary via proxy" });
+      res.status(500).json({ error: `Cloudinary error: ${data?.error?.message || JSON.stringify(data)}` });
       return;
     }
 
