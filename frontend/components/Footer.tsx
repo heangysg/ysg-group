@@ -10,9 +10,9 @@ export default function Footer() {
   const { t } = useLanguage()
   const currentYear = new Date().getFullYear()
   const [settings, setSettings] = useState<any>({
-    siteAddress: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
-    sitePhone: "010 / 011 / 012 / 070: 309 302",
-    siteEmail: "yeungshigroup123@gmail.com"
+    address: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
+    contact_phone: "010 / 011 / 012 / 070: 309 302",
+    contact_email: "yeungshigroup123@gmail.com"
   })
 
   useEffect(() => {
@@ -104,7 +104,14 @@ export default function Footer() {
                 </div>
                 <div className="text-sm">
                   <p className="text-white font-bold mb-1 uppercase tracking-tight">Headquarters</p>
-                  <p className="font-normal text-slate-500">{settings.siteAddress}</p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-bold tracking-wide leading-relaxed hover:text-primary transition-colors"
+                  >
+                    {settings.address}
+                  </a>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -122,7 +129,12 @@ export default function Footer() {
                 </div>
                 <div className="text-sm">
                   <p className="text-white font-bold mb-1 uppercase tracking-tight">Phone</p>
-                  <p className="font-normal text-slate-500">{settings.sitePhone}</p>
+                  <a
+                    href={`tel:${settings.contact_phone?.replace(/\s/g, "")}`}
+                    className="text-sm font-bold tracking-wide hover:text-primary transition-colors"
+                  >
+                    {settings.contact_phone}
+                  </a>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -131,9 +143,52 @@ export default function Footer() {
                 </div>
                 <div className="text-sm">
                   <p className="text-white font-bold mb-1 uppercase tracking-tight">Email</p>
-                  <p className="font-normal text-slate-500">{settings.siteEmail}</p>
+                  <a
+                    href={`mailto:${settings.contact_email}`}
+                    className="text-sm font-bold tracking-wide hover:text-primary transition-colors"
+                  >
+                    {settings.contact_email}
+                  </a>
                 </div>
               </div>
+              {/* WhatsApp */}
+              {settings.whatsapp_url && (
+                <div className="flex gap-4 group">
+                  <div className="w-10 h-10 bg-slate-900 flex items-center justify-center shrink-0 border-2 border-slate-800 transition-all group-hover:border-green-500 group-hover:bg-green-500/10">
+                    <span className="text-green-400 text-lg">💬</span>
+                  </div>
+                  <div className="text-sm">
+                    <p className="text-white font-bold mb-1 uppercase tracking-tight">WhatsApp</p>
+                    <a
+                      href={`https://wa.me/${settings.whatsapp_url.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-bold tracking-wide hover:text-green-400 transition-colors"
+                    >
+                      {settings.whatsapp_url}
+                    </a>
+                  </div>
+                </div>
+              )}
+              {/* Telegram */}
+              {settings.telegram_url && (
+                <div className="flex gap-4 group">
+                  <div className="w-10 h-10 bg-slate-900 flex items-center justify-center shrink-0 border-2 border-slate-800 transition-all group-hover:border-sky-500 group-hover:bg-sky-500/10">
+                    <span className="text-sky-400 text-lg">✈️</span>
+                  </div>
+                  <div className="text-sm">
+                    <p className="text-white font-bold mb-1 uppercase tracking-tight">Telegram</p>
+                    <a
+                      href={settings.telegram_url.startsWith("http") ? settings.telegram_url : `https://t.me/${settings.telegram_url.replace("@", "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-bold tracking-wide hover:text-sky-400 transition-colors"
+                    >
+                      {settings.telegram_url}
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

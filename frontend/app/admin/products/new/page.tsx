@@ -8,6 +8,7 @@ import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../../lib/audit"
 import { useLanguage } from "../../../../contexts/LanguageContext"
 import imageCompression from "browser-image-compression"
+import { useAutoTranslate } from "../../../../lib/useAutoTranslate"
 
 export default function AddProduct() {
   const [categories, setCategories] = useState<any[]>([])
@@ -38,6 +39,25 @@ export default function AddProduct() {
   })
   const router = useRouter()
   const { t, language } = useLanguage()
+
+  // Auto-translate: Khmer name → English name
+  const { translated: autoName, isTranslating: isTranslatingName } = useAutoTranslate(formData.nameKhmer)
+  // Auto-translate: Khmer description → English description
+  const { translated: autoDesc, isTranslating: isTranslatingDesc } = useAutoTranslate(formData.descriptionKhmer)
+
+  // Apply auto-translated name only if English box is empty
+  useEffect(() => {
+    if (autoName && !formData.name) {
+      setFormData(prev => ({ ...prev, name: autoName }))
+    }
+  }, [autoName])
+
+  // Apply auto-translated description only if English box is empty
+  useEffect(() => {
+    if (autoDesc && !formData.description) {
+      setFormData(prev => ({ ...prev, description: autoDesc }))
+    }
+  }, [autoDesc])
 
   useEffect(() => {
     const userStr = localStorage.getItem("ysg_admin_user")
@@ -199,28 +219,34 @@ export default function AddProduct() {
           <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("basicInformation")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="md:col-span-2 space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("productNameEnglish")}</label>
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("productNameKhmer")} *</label>
+              <input
+                type="text"
+                required
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
+                value={formData.nameKhmer}
+                onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})}
+                placeholder="ឧ. ម៉ាស៊ីនត្រងទឹក និងវេចខ្ចប់"
+              />
+            </div>
+            <div className="md:col-span-2 space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1 flex items-center gap-2">
+                {t("productNameEnglish")}
+                {isTranslatingName && <span className="text-xs text-primary font-normal normal-case tracking-normal animate-pulse">⟳ Auto-translating...</span>}
+              </label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="text"
-                  required
                   className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-wide"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   placeholder="E.G., HITACHI ZX200-3"
                 />
               </div>
-            </div>
-            <div className="md:col-span-2 space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("productNameKhmer")}</label>
-              <input
-                type="text"
-                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
-                value={formData.nameKhmer}
-                onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})}
-                placeholder="ឧ. ម៉ាស៊ីនត្រងទឹក និងវេចខ្ចប់"
-              />
+              {!formData.name && formData.nameKhmer && !isTranslatingName && (
+                <p className="text-xs text-slate-400 ml-1">⚡ Will auto-fill from Khmer input</p>
+              )}
             </div>
           </div>
         </div>
@@ -401,26 +427,6 @@ export default function AddProduct() {
           <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("description")}</h2>
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("shortDescription")}</label>
-              <textarea
-                rows={3}
-                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest resize-none"
-                value={formData.shortDescription}
-                onChange={(e) => setFormData({...formData, shortDescription: e.target.value})}
-                placeholder="BRIEF SUMMARY OF THE PRODUCT"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullDescriptionEnglish")}</label>
-              <textarea
-                rows={6}
-                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none"
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Detailed product description with specifications and features"
-              />
-            </div>
-            <div className="space-y-2">
               <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullDescriptionKhmer")}</label>
               <textarea
                 rows={4}
@@ -429,6 +435,22 @@ export default function AddProduct() {
                 onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})}
                 placeholder="ពិពណ៌នាអំពីផលិតផល ជាភាសាខ្មែរ..."
               />
+            </div>
+            <div className="space-y-2">
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1 flex items-center gap-2">
+                {t("fullDescriptionEnglish")}
+                {isTranslatingDesc && <span className="text-xs text-primary font-normal normal-case tracking-normal animate-pulse">⟳ Auto-translating...</span>}
+              </label>
+              <textarea
+                rows={6}
+                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none"
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Detailed product description with specifications and features"
+              />
+              {!formData.description && formData.descriptionKhmer && !isTranslatingDesc && (
+                <p className="text-xs text-slate-400 ml-1">⚡ Will auto-fill from Khmer description</p>
+              )}
             </div>
           </div>
         </div>

@@ -232,16 +232,16 @@ export default function AdminOrders() {
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="solid-card bg-white w-full max-w-4xl overflow-hidden p-0 flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-start md:items-center justify-center p-4 overflow-y-auto">
+          <div className="relative solid-card bg-white w-full max-w-4xl p-0 flex flex-col md:flex-row my-8 md:my-0 md:max-h-[90vh] md:overflow-hidden animate-in zoom-in-95 duration-200 shrink-0">
             {/* Left: Info */}
-            <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
-              <div className="flex justify-between items-start mb-8">
+            <div className="flex-1 p-5 md:p-8 md:overflow-y-auto custom-scrollbar">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8 pr-12 md:pr-0">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">{t("orderId")} #{selectedOrder.id.slice(0, 8)}</h2>
-                  <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 uppercase tracking-tight leading-snug">{t("orderId")} <br className="md:hidden" />#{selectedOrder.id.slice(0, 8)}</h2>
+                  <p className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                 </div>
-                <div className={`px-4 py-2 border-2 shadow-hard text-xs font-bold uppercase tracking-widest ${getStatusColor(selectedOrder.status)}`}>
+                <div className={`self-start px-4 py-2 border-2 shadow-hard text-xs font-bold uppercase tracking-widest ${getStatusColor(selectedOrder.status)}`}>
                   {t(selectedOrder.status || "pending")}
                 </div>
               </div>
@@ -305,10 +305,10 @@ export default function AdminOrders() {
             </div>
 
             {/* Right: Actions */}
-            <div className="w-full md:w-80 bg-slate-50 border-l-2 border-slate-900 p-8 flex flex-col">
+            <div className="w-full md:w-80 bg-slate-50 border-t-2 md:border-t-0 md:border-l-2 border-slate-900 p-5 md:p-8 flex flex-col md:overflow-y-auto custom-scrollbar">
               <button 
                 onClick={() => setSelectedOrder(null)}
-                className="self-end p-2 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all mb-8"
+                className="absolute top-4 right-4 md:static md:self-end md:mb-8 p-2 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all z-10"
               >
                 <X className="w-5 h-5 text-slate-900" />
               </button>
@@ -336,13 +336,6 @@ export default function AdminOrders() {
                   </button>
                 ))}
               </div>
-              
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="w-full py-4 mt-8 bg-white border-2 border-slate-900 font-bold text-xs text-slate-900 uppercase tracking-widest shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
-              >
-                {t("closeDetails")}
-              </button>
             </div>
           </div>
         </div>

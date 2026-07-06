@@ -15,6 +15,7 @@ export default function CheckoutPage() {
   const { t, language } = useLanguage()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState<1 | 2>(1)
   const [formData, setFormData] = useState({
     customerName: "",
     customerPhone: "",
@@ -49,6 +50,11 @@ export default function CheckoutPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleNextStep = (e: React.FormEvent) => {
+    e.preventDefault()
+    setStep(2)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -182,10 +188,14 @@ export default function CheckoutPage() {
             {/* 🏗️ Checkout Details Section */}
             <div className="w-full lg:w-[420px] space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <div className="solid-card bg-white p-6 md:p-10 sticky top-24">
-                <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-8 uppercase tracking-widest">{t("checkoutDetails")}</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-8 uppercase tracking-widest">
+                  {step === 1 ? t("checkoutDetails") : (language === "kh" ? "ពិនិត្យឡើងវិញនូវការបញ្ជាទិញ" : "Review Your Order")}
+                </h2>
                 
-                <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
-                  <div className="space-y-3">
+                <form onSubmit={step === 1 ? handleNextStep : handleSubmit} className="space-y-6 md:space-y-8">
+                  {step === 1 ? (
+                    <>
+                      <div className="space-y-3">
                     <div className="relative group">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
@@ -258,6 +268,42 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </div>
+                    </>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="bg-slate-50 p-6 border-2 border-slate-900 shadow-hard">
+                        <h3 className="font-bold text-slate-900 uppercase tracking-widest text-sm mb-4">
+                          {language === "kh" ? "ព័ត៌មានលម្អិត" : "Customer Details"}
+                        </h3>
+                        <div className="space-y-3 text-sm text-slate-900">
+                          <p><strong className="uppercase tracking-widest text-xs w-24 inline-block">{t("fullName")}:</strong> {formData.customerName}</p>
+                          <p><strong className="uppercase tracking-widest text-xs w-24 inline-block">{t("phone")}:</strong> {formData.customerPhone}</p>
+                          <p><strong className="uppercase tracking-widest text-xs w-24 inline-block">{t("email")}:</strong> {formData.customerEmail || "N/A"}</p>
+                          <p className="flex items-start"><strong className="uppercase tracking-widest text-xs w-24 shrink-0 inline-block">{t("address")}:</strong> <span className="flex-1">{formData.address}</span></p>
+                        </div>
+                      </div>
+                      
+                      <div className="w-full p-4 md:p-5 border-2 border-primary bg-slate-50 flex items-center gap-3 md:gap-4 shadow-hard-primary">
+                        <div className="w-12 h-12 bg-[#E1232E] border-2 border-slate-900 flex items-center justify-center flex-shrink-0">
+                          <img src="/logo/KHQR Logo.png" alt="KHQR" className="w-8 h-8 object-contain" />
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-0.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[10px] font-bold text-[#E1232E] uppercase tracking-widest">KHQR</span>
+                            <div className="w-1 h-1 bg-slate-300 rounded-none" />
+                            <span className="text-[13px] md:text-[14px] font-bold text-slate-900 uppercase tracking-tight truncate">Bakong KHQR</span>
+                          </div>
+                        </div>
+                        <div className="w-6 h-6 bg-primary border-2 border-slate-900 flex items-center justify-center text-slate-900 shrink-0">
+                          <Check className="w-4 h-4" />
+                        </div>
+                      </div>
+
+                      <button type="button" onClick={() => setStep(1)} className="w-full py-4 bg-white text-slate-900 border-2 border-slate-900 shadow-hard font-bold text-xs uppercase tracking-widest hover:-translate-y-0.5 hover:shadow-hard-lg transition-all">
+                        {language === "kh" ? "កែប្រែព័ត៌មាន" : "Edit Details"}
+                      </button>
+                    </div>
+                  )}
 
                   <div className="pt-6 border-t border-slate-200 space-y-2.5">
                     <div className="flex justify-between text-slate-400 font-medium text-[10px] uppercase tracking-widest">
@@ -286,7 +332,7 @@ export default function CheckoutPage() {
                     ) : (
                       <>
                         <CreditCard className="w-5 h-5" />
-                        {language === "kh" ? "ធ្វើការបញ្ជាទិញ" : t("placeOrder")}
+                        {step === 1 ? (language === "kh" ? "ពិនិត្យការបញ្ជាទិញ" : "Review Order") : (language === "kh" ? "បញ្ជាក់ការបញ្ជាទិញ" : t("placeOrder"))}
                       </>
                     )}
                   </button>

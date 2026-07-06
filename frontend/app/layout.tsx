@@ -12,9 +12,26 @@ const kantumruy = Kantumruy_Pro({
   weight: ["300", "400", "500", "600", "700"]
 })
 
-export const metadata: Metadata = {
-  title: "YSG Machinery - Premium Heavy Equipment Solutions",
-  description: "Quality heavy machinery for construction, mining, and industrial applications",
+export async function generateMetadata(): Promise<Metadata> {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+  let meta_title = "YSG Machinery - Premium Heavy Equipment Solutions"
+  let meta_description = "Quality heavy machinery for construction, mining, and industrial applications"
+
+  try {
+    const res = await fetch(`${API_URL}/api/public/settings`, { next: { revalidate: 60 } })
+    const json = await res.json()
+    if (json.data) {
+      if (json.data.meta_title) meta_title = json.data.meta_title
+      if (json.data.meta_description) meta_description = json.data.meta_description
+    }
+  } catch (error) {
+    console.error("Failed to fetch settings metadata", error)
+  }
+
+  return {
+    title: meta_title,
+    description: meta_description,
+  }
 }
 
 export const viewport: Viewport = {
@@ -31,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${inter.variable} ${outfit.variable} ${kantumruy.variable}`}>
+    <html lang="km" suppressHydrationWarning data-scroll-behavior="smooth" className={`${inter.variable} ${outfit.variable} ${kantumruy.variable}`}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />

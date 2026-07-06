@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import PublicLayout from "../../components/PublicLayout"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { Target, Eye, Award, Users, MapPin, Globe, ShieldCheck, Zap } from "lucide-react"
@@ -7,11 +8,27 @@ import { Target, Eye, Award, Users, MapPin, Globe, ShieldCheck, Zap } from "luci
 export default function AboutPage() {
   const { t, language } = useLanguage()
 
+  const [settings, setSettings] = useState<any>({})
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      try {
+        const res = await fetch(`${API_URL}/api/public/settings`)
+        const data = await res.json()
+        setSettings(data.data || {})
+      } catch (err) {
+        console.error("Failed to fetch settings:", err)
+      }
+    }
+    fetchSettings()
+  }, [])
+
   const stats = [
-    { label: language === "kh" ? "ឆ្នាំនៃបទពិសោធន៍" : "Years Experience", value: "30+" },
-    { label: language === "kh" ? "សាខាសរុប" : "Total Branches", value: "10" },
-    { label: language === "kh" ? "ផលិតផលគ្រឿងម៉ាស៊ីន" : "Machinery Units", value: "5000+" },
-    { label: language === "kh" ? "អតិថិជនជឿជាក់" : "Trusted Clients", value: "15k+" },
+    { label: language === "kh" ? "ឆ្នាំនៃបទពិសោធន៍" : "Years Experience", value: settings?.stat_years || "30+" },
+    { label: language === "kh" ? "សាខាសរុប" : "Total Branches", value: settings?.stat_branches || "10" },
+    { label: language === "kh" ? "ផលិតផលគ្រឿងម៉ាស៊ីន" : "Machinery Units", value: settings?.stat_machinery || "5000+" },
+    { label: language === "kh" ? "អតិថិជនជឿជាក់" : "Trusted Clients", value: settings?.stat_clients || "15k+" },
   ]
 
   const values = [

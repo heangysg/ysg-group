@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "../../lib/supabase/client"
 import toast, { Toaster } from "react-hot-toast"
 import PublicLayout from "../../components/PublicLayout"
@@ -11,6 +11,27 @@ export default function ContactPage() {
   const [loading, setLoading] = useState(false)
   const { t, language } = useLanguage()
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" })
+  const [settings, setSettings] = useState<any>({
+    address: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
+    contact_phone: "010 / 011 / 012 / 070: 309 302",
+    contact_email: "yeungshigroup123@gmail.com"
+  })
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const res = await fetch(`${API_URL}/api/public/settings`)
+        const { data } = await res.json()
+        if (data) {
+          setSettings((prev: any) => ({ ...prev, ...data }))
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings:", err)
+      }
+    }
+    fetchSettings()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,9 +78,9 @@ export default function ContactPage() {
 
               <div className="grid gap-4">
                 {[
-                  { icon: Phone, label: t("phone"), value: "010 / 011 / 012 / 070: 309 302", color: "text-primary" },
-                  { icon: Mail, label: t("email"), value: "yeungshigroup123@gmail.com", color: "text-primary" },
-                  { icon: MapPin, label: t("location"), value: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.", color: "text-primary" },
+                  { icon: Phone, label: t("phone"), value: settings.contact_phone, color: "text-primary" },
+                  { icon: Mail, label: t("email"), value: settings.contact_email, color: "text-primary" },
+                  { icon: MapPin, label: t("location"), value: settings.address, color: "text-primary" },
                   { icon: Clock, label: language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours", value: "8:00 am – 5:30 pm (Mon – Sat)", color: "text-primary" }
                 ].map((item, i) => (
                   <div key={i} className="solid-card flex gap-6 items-center p-6 bg-slate-50 group hover:bg-primary transition-all">

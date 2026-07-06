@@ -15,6 +15,9 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [deleteConfirm, setDeleteConfirm] = useState<{id: string, name: string} | null>(null)
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+  const [bulkActionLoading, setBulkActionLoading] = useState(false)
   const { t, language } = useLanguage()
 
   useEffect(() => {
@@ -83,34 +86,20 @@ export default function AdminProducts() {
   }
 
   async function deleteProduct(id: string, name: string) {
-    if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      const token = localStorage.getItem("ysg_admin_token")
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      const res = await fetch(`${API_URL}/api/admin/crud`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          table: "Product",
-          action: "delete",
-          match: { id }
-        })
-      })
-      
-      if (!res.ok) {
-        toast.error("Failed to delete product")
-      } else {
-        await logActivity({
-          action: "delete",
-          entityType: "product",
-          entityId: id,
-          details: { name }
-        })
-        toast.success("Product deleted successfully")
-        fetchProducts(currentPage)
-      }
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ table: "Product", action: "delete", match: { id } })
+    })
+    setDeleteConfirm(null)
+    if (!res.ok) {
+      toast.error("Failed to delete product")
+    } else {
+      await logActivity({ action: "delete", entityType: "product", entityId: id, details: { name } })
+      toast.success("Product deleted successfully")
+      fetchProducts(currentPage)
     }
   }
 
@@ -122,10 +111,87 @@ export default function AdminProducts() {
     }).format(price)
   }
 
+  const toggleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) setSelectedProducts(products.map(p => p.id))
+    else setSelectedProducts([])
+  }
+
+  const toggleSelect = (id: string) => {
+    if (selectedProducts.includes(id)) setSelectedProducts(selectedProducts.filter(pId => pId !== id))
+    else setSelectedProducts([...selectedProducts, id])
+  }
+
+  const handleBulkAction = async (action: 'delete' | 'publish' | 'unpublish') => {
+    if (selectedProducts.length === 0) return
+    if (action === 'delete' && !confirm(t("confirmBulkDelete") || "Are you sure you want to delete selected products?")) return
+
+    setBulkActionLoading(true)
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    let successCount = 0
+
+    try {
+      await Promise.all(selectedProducts.map(id => {
+        const payload = action === 'delete' 
+          ? { table: "Product", action: "delete", match: { id } }
+          : { table: "Product", action: "update", match: { id }, data: { isPublished: action === 'publish' } }
+        
+        return fetch(`${API_URL}/api/admin/crud`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+          body: JSON.stringify(payload)
+        }).then(r => { if(r.ok) successCount++ })
+      }))
+
+      toast.success(`${successCount} products ${action === 'delete' ? 'deleted' : 'updated'}`)
+      setSelectedProducts([])
+      fetchProducts(currentPage)
+    } catch (err) {
+      toast.error("Bulk action failed")
+    } finally {
+      setBulkActionLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <Toaster position="top-right" />
-      
+
+      {/* ─── Delete Confirmation Modal ─── */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-none p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+            {/* drag handle for mobile */}
+            <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2" />
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-red-50 border-2 border-red-500 shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 uppercase tracking-tight">លុបផលិតផល</h3>
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                  តើអ្នកប្រាកដថាចង់លុប <strong>"{deleteConfirm.name}"</strong> មែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="w-full sm:w-auto px-6 py-3 bg-white border-2 border-slate-900 text-slate-900 text-xs font-bold uppercase tracking-widest shadow-hard hover:translate-y-0.5 hover:shadow-none transition-all"
+              >
+                បោះបង់
+              </button>
+              <button
+                onClick={() => deleteProduct(deleteConfirm.id, deleteConfirm.name)}
+                className="w-full sm:w-auto px-6 py-3 bg-red-600 border-2 border-red-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
+              >
+                លុបចោល
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -140,6 +206,43 @@ export default function AdminProducts() {
           {t("addProduct")}
         </Link>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedProducts.length > 0 && (
+        <div className="solid-card bg-primary p-4 flex flex-wrap items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
+          <div className="flex items-center gap-3">
+            <span className="px-3 py-1 bg-white text-slate-900 font-bold text-sm border-2 border-slate-900 shadow-hard">
+              {selectedProducts.length}
+            </span>
+            <span className="text-slate-900 font-bold uppercase tracking-widest text-sm">
+              {language === "kh" ? "បានជ្រើសរើស" : "Selected"}
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => handleBulkAction('publish')}
+              disabled={bulkActionLoading}
+              className="px-4 py-2 bg-white text-slate-900 font-bold text-xs border-2 border-slate-900 shadow-hard uppercase tracking-widest hover:-translate-y-0.5 transition-all disabled:opacity-50"
+            >
+              {language === "kh" ? "ផ្សព្វផ្សាយ" : "Publish"}
+            </button>
+            <button
+              onClick={() => handleBulkAction('unpublish')}
+              disabled={bulkActionLoading}
+              className="px-4 py-2 bg-slate-100 text-slate-900 font-bold text-xs border-2 border-slate-900 shadow-hard uppercase tracking-widest hover:-translate-y-0.5 transition-all disabled:opacity-50"
+            >
+              {language === "kh" ? "លាក់" : "Unpublish"}
+            </button>
+            <button
+              onClick={() => handleBulkAction('delete')}
+              disabled={bulkActionLoading}
+              className="px-4 py-2 bg-red-600 text-white font-bold text-xs border-2 border-red-700 shadow-hard uppercase tracking-widest hover:-translate-y-0.5 transition-all disabled:opacity-50"
+            >
+              {language === "kh" ? "លុប" : "Delete"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Filters bar */}
       <div className="solid-card bg-white p-4 flex flex-col md:flex-row gap-4 items-center">
@@ -193,6 +296,14 @@ export default function AdminProducts() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-primary border-b-2 border-slate-900">
+                  <th className="px-6 py-4 w-12">
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 border-2 border-slate-900 accent-primary shadow-hard cursor-pointer"
+                      checked={products.length > 0 && selectedProducts.length === products.length}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
                   <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("productInfo")}</th>
                   <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("category")}</th>
                   <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("price")}</th>
@@ -203,6 +314,14 @@ export default function AdminProducts() {
               <tbody className="divide-y-2 divide-slate-900">
                 {products.map((product) => (
                   <tr key={product.id} className="group hover:bg-primary/5 transition-all duration-200">
+                    <td className="px-6 py-4">
+                      <input 
+                        type="checkbox" 
+                        className="w-5 h-5 border-2 border-slate-900 accent-primary shadow-hard cursor-pointer"
+                        checked={selectedProducts.includes(product.id)}
+                        onChange={() => toggleSelect(product.id)}
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-slate-100 overflow-hidden shrink-0 border-2 border-slate-900 shadow-hard transition-transform">
@@ -237,9 +356,17 @@ export default function AdminProducts() {
                       <p className="text-sm font-bold text-slate-900 tracking-wider">{formatPrice(product.price)}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 border-2 border-slate-900 bg-emerald-500 shadow-hard" />
-                        <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("inStock")}</span>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 border-2 border-slate-900 bg-emerald-500 shadow-hard" />
+                          <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("inStock")}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 border-2 border-slate-900 ${product.isPublished !== false ? "bg-blue-500" : "bg-slate-300"} shadow-hard`} />
+                          <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
+                            {product.isPublished !== false ? t("published") || "Published" : t("draft") || "Draft"}
+                          </span>
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -260,7 +387,7 @@ export default function AdminProducts() {
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
-                          onClick={() => deleteProduct(product.id, product.name)}
+                          onClick={() => setDeleteConfirm({ id: product.id, name: product.name })}
                           className="p-2 bg-white text-red-600 border-2 border-transparent hover:border-slate-900 hover:shadow-hard-red transition-all"
                           title="Delete"
                         >

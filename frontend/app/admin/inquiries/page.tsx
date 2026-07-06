@@ -111,6 +111,14 @@ export default function AdminInquiries() {
                 </div>
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
+                  <a
+                    href={`mailto:${inquiry.email}?subject=Re: Inquiry at YSG Machinery`}
+                    onClick={() => updateStatus(inquiry.id, "replied")}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 border-2 border-slate-900 shadow-hard font-bold text-xs uppercase tracking-widest hover:-translate-y-0.5 hover:shadow-hard-lg transition-all"
+                  >
+                    <Mail className="w-4 h-4" />
+                    {language === "kh" ? "ឆ្លើយតប" : "Reply"}
+                  </a>
                   {inquiry.status !== "replied" && (
                     <button
                       onClick={() => updateStatus(inquiry.id, "replied")}

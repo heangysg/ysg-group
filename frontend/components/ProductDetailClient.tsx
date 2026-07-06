@@ -9,7 +9,7 @@ import toast, { Toaster } from "react-hot-toast"
 import PublicLayout from "./PublicLayout"
 import { useLanguage } from "../contexts/LanguageContext"
 import { useCart } from "../contexts/CartContext"
-import { ArrowLeft, MapPin, Calendar, Clock, CheckCircle2, ChevronRight, Send, X, Package, ShieldCheck, Star, ArrowRight, ShoppingCart } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, Clock, CheckCircle2, ChevronRight, Send, X, Package, ShieldCheck, Star, ArrowRight, ShoppingCart, Share2, Copy, Check } from "lucide-react"
 import ProductCard from "./ProductCard"
 
 export default function ProductDetailClient({ initialProduct }: { initialProduct: any }) {
@@ -23,6 +23,22 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   const { addToCart } = useCart()
   const [inquiryForm, setInquiryForm] = useState({ customerName: "", customerPhone: "", message: "" })
   const [submittingInquiry, setSubmittingInquiry] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleShare = async () => {
+    const url = window.location.href
+    const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: productName, text: `Check out ${productName} on YSG Machinery`, url })
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      toast.success(language === "kh" ? "លីងត្រូវបានចម្លង!" : "Link copied to clipboard!")
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   const handleAddToCart = () => {
     addToCart(product)
@@ -222,7 +238,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                 </div>
               </div>
 
-              <div className="hidden md:grid grid-cols-2 gap-4 mb-12">
+              <div className="hidden md:grid grid-cols-2 gap-4 mb-6">
                 <button
                   onClick={handleAddToCart}
                   className="bg-slate-900 text-white py-4 px-8 font-bold uppercase tracking-widest hover:bg-slate-800 transition-all active:translate-y-1 shadow-hard-primary border-2 border-slate-900 flex items-center justify-center gap-3"
@@ -238,6 +254,14 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                   {t("contactSales")}
                 </button>
               </div>
+              {/* Share button */}
+              <button
+                onClick={handleShare}
+                className="hidden md:flex items-center gap-2 mb-12 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-widest"
+              >
+                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
+                {copied ? (language === "kh" ? "ចម្លងហើយ!" : "Copied!") : (language === "kh" ? "ចែករំលែក​ផលិតផល" : "Share Product")}
+              </button>
 
               {/* Mobile Sticky Actions */}
               <div className="md:hidden fixed bottom-[72px] left-0 right-0 bg-white border-t-2 border-slate-900 p-3 z-[90] flex gap-3 shadow-hard-primary">

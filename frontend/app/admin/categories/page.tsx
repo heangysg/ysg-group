@@ -385,20 +385,20 @@ export default function AdminCategories() {
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
               <div className="space-y-4">
                 <div>
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryName")} (Khmer) *</label>
+                  <input type="text" required className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
+                </div>
+                <div>
                   <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryName")} (English) *</label>
                   <input type="text" required className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryName")} (Khmer)</label>
-                  <input type="text" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
+                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("description")} (Khmer)</label>
+                  <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("description")} (English)</label>
                   <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
-                </div>
-                <div>
-                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("description")} (Khmer)</label>
-                  <textarea rows={3} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
                 </div>
                 <div>
                   <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">Sort Order</label>

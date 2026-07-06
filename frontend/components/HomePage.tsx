@@ -14,12 +14,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const { t, language } = useLanguage()
   const [categories, setCategories] = useState<any[]>([])
+  const [settings, setSettings] = useState<any>({})
 
   const stats = [
-    { label: language === "kh" ? "គ្រឿងម៉ាស៊ីនដែលលក់ចេញ" : "Equipment Sold", value: "5000+" },
-    { label: language === "kh" ? "ម៉ាកផលិតផល" : "Trusted Brands", value: "50+" },
-    { label: language === "kh" ? "តំបន់បម្រើសេវា" : "Regions Served", value: "25+" },
-    { label: language === "kh" ? "ឆ្នាំនៃបទពិសោធន៍" : "Years Experience", value: "30+" },
+    { label: language === "kh" ? "គ្រឿងម៉ាស៊ីនដែលលក់ចេញ" : "Equipment Sold", value: settings?.stat_machinery || "5000+" },
+    { label: language === "kh" ? "ម៉ាកផលិតផល" : "Trusted Brands", value: settings?.stat_brands || "50+" },
+    { label: language === "kh" ? "តំបន់បម្រើសេវា" : "Regions Served", value: settings?.stat_regions || "25+" },
+    { label: language === "kh" ? "ឆ្នាំនៃបទពិសោធន៍" : "Years Experience", value: settings?.stat_years || "30+" },
   ]
 
   const features = [
@@ -45,13 +46,15 @@ export default function HomePage() {
       setLoading(true)
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
-        const [prodRes, catRes] = await Promise.all([
+        const [prodRes, catRes, setRes] = await Promise.all([
           fetch(`${API_URL}/api/public/products?featured=true&limit=6`).then(r => r.json()),
-          fetch(`${API_URL}/api/public/categories`).then(r => r.json())
+          fetch(`${API_URL}/api/public/categories`).then(r => r.json()),
+          fetch(`${API_URL}/api/public/settings`).then(r => r.json()).catch(() => ({ data: {} }))
         ])
 
         setFeaturedProducts(prodRes.data || [])
         setCategories(catRes.data || [])
+        setSettings(setRes.data || {})
       } catch (err) {
         console.error("Home Data Fetch Error:", err)
       } finally {

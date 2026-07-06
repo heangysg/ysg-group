@@ -22,6 +22,7 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState(urlCategory)
   const [showFilters, setShowFilters] = useState(false)
+  const [sortBy, setSortBy] = useState("newest")
 
   useEffect(() => {
     if (urlCategory) {
@@ -76,10 +77,18 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
     }
   }
 
-  const filteredProducts = products.filter(p => {
-    const name = (language === "kh" && p.nameKhmer ? p.nameKhmer : p.name).toLowerCase()
-    return name.includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase())
-  })
+  const filteredProducts = products
+    .filter(p => {
+      const name = (language === "kh" && p.nameKhmer ? p.nameKhmer : p.name).toLowerCase()
+      return name.includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase())
+    })
+    .sort((a, b) => {
+      if (sortBy === "price_asc") return (a.price || 0) - (b.price || 0)
+      if (sortBy === "price_desc") return (b.price || 0) - (a.price || 0)
+      if (sortBy === "name_az") return (a.name || "").localeCompare(b.name || "")
+      // newest (default)
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    })
 
   return (
     <PublicLayout>
@@ -103,8 +112,8 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
               <p className="text-slate-500 font-medium">{t("discoverPopular")}</p>
             </div>
             
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="relative flex-grow md:w-72">
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <div className="relative flex-1 min-w-0">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input 
                   type="text" 
@@ -114,9 +123,20 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
                   className="w-full pl-11 pr-4 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-sm"
                 />
               </div>
+              {/* Sort Dropdown — visible on all screen sizes */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="py-3 px-3 bg-white border-2 border-slate-900 outline-none font-bold text-xs text-slate-900 uppercase tracking-wide cursor-pointer flex-shrink-0"
+              >
+                <option value="newest">{language === "kh" ? "ថ្មីបំផុត" : "Newest"}</option>
+                <option value="price_asc">{language === "kh" ? "តម្លៃ↑" : "Price ↑"}</option>
+                <option value="price_desc">{language === "kh" ? "តម្លៃ↓" : "Price ↓"}</option>
+                <option value="name_az">{language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z"}</option>
+              </select>
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-3 border-2 transition-all md:hidden ${showFilters ? 'bg-slate-900 text-white border-slate-900 shadow-hard' : 'bg-white border-slate-900 text-slate-900 hover:bg-slate-50'}`}
+                className={`p-3 border-2 transition-all md:hidden shrink-0 ${showFilters ? 'bg-slate-900 text-white border-slate-900 shadow-hard' : 'bg-white border-slate-900 text-slate-900 hover:bg-slate-50'}`}
               >
                 <Filter className="w-5 h-5" />
               </button>

@@ -57,20 +57,30 @@ export default function AdminDashboard() {
       const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
       
       const [
-        { count: productsCount },
-        { count: categoriesCount },
-        { count: inquiriesCount },
-        { count: ordersCount, data: ordersData },
-        { data: recent }
+        productsRes,
+        categoriesRes,
+        inquiriesRes,
+        ordersRes,
+        recentRes
       ] = await Promise.all([
         fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Product", countExact: true, limit: 0 }) }).then(r => r.json()),
         fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", countExact: true, limit: 0 }) }).then(r => r.json()),
         fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", countExact: true, limit: 0 }) }).then(r => r.json()),
-        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", select: "totalAmount, status, createdAt", countExact: true }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", countExact: true }) }).then(r => r.json()),
         fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json())
       ])
       
-      const totalRevenue = ordersData?.reduce((acc: number, curr: any) => acc + parseFloat(curr.totalAmount || 0), 0) || 0
+      const productsCount = productsRes.count
+      const categoriesCount = categoriesRes.count
+      const inquiriesCount = inquiriesRes.count
+      const ordersCount = ordersRes.count
+      const ordersData = ordersRes.data || []
+      const recent = recentRes.data || []
+
+      if (ordersRes.error) console.error("Orders fetching error:", ordersRes.error)
+
+      const validOrders = ordersData.filter((o: any) => o.status !== 'cancelled' && o.status !== 'failed')
+      const totalRevenue = validOrders.reduce((acc: number, curr: any) => acc + parseFloat(curr.totalAmount || 0), 0) || 0
       
       setStats({
         products: productsCount || 0,

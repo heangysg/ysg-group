@@ -125,7 +125,16 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       values.push(matchVal);
 
       const { rows } = await pgClient.query(query, values);
-      res.json({ data: rows[0], error: null });
+      const updatedRecord = rows[0];
+
+      // Trigger email if Order status was updated
+      if (table === 'Order' && data.status) {
+        // dynamic import or require to avoid circular dependencies if any, but regular import is fine
+        const { sendOrderStatusEmail } = require('../lib/email');
+        sendOrderStatusEmail(updatedRecord).catch((e: any) => console.error("Email trigger failed:", e));
+      }
+
+      res.json({ data: updatedRecord, error: null });
       return;
     }
 
