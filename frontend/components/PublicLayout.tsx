@@ -46,6 +46,13 @@ export default function PublicLayout({
         router.refresh()
       }
     })
+    
+    if (window.location.search.includes('code=') || window.location.hash.includes('access_token=')) {
+      setTimeout(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }, 1000);
+    }
+
     return () => subscription.unsubscribe()
   }, [router])
 
@@ -269,7 +276,7 @@ export default function PublicLayout({
         </header>
       )}
 
-      <main className={`transition-all ${!hideNav ? "pt-20 md:pt-24 pb-20 md:pb-0" : ""} min-h-screen`}>
+      <main className={`transition-all ${!hideNav ? "pt-20 md:pt-24 pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
         <Toaster position="top-center" />
         {children}
       </main>

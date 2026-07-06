@@ -26,7 +26,6 @@ export default function CategoriesPage() {
     fetchCategories()
   }, [])
 
-  // Filter main categories (those without a parent)
   const mainCategories = categories.filter(c => !c.parentId)
 
   return (
@@ -72,7 +71,7 @@ export default function CategoriesPage() {
                               <img 
                                 src={mainCat.image} 
                                 alt={mainCat.name} 
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" 
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-slate-200">

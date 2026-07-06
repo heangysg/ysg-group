@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "../../../lib/supabase/client"
-import { Plus, Trash2, Edit, ChevronRight, ChevronDown, Folder, Image as ImageIcon, X } from "lucide-react"
+import { Plus, Trash2, Edit, ChevronRight, ChevronDown, Folder, Image as ImageIcon, X, Check, Edit2, Loader2, Search } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../lib/audit"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import imageCompression from "browser-image-compression"
+import { uploadImageToSecureProxy } from "../../../lib/upload"
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<any[]>([])
@@ -40,22 +40,23 @@ export default function AdminCategories() {
   }, [])
 
   async function fetchCategories() {
-    const supabase = createClient()
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const token = localStorage.getItem("ysg_admin_token")
+    const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
     
-    const { data: mainCats } = await supabase
-      .from("Category")
-      .select("*")
-      .is("parentId", null)
-      .order("sortOrder", { ascending: true })
+    const [mainRes, subRes] = await Promise.all([
+      fetch(`${API_URL}/api/admin/read`, {
+        method: "POST", headers,
+        body: JSON.stringify({ table: "Category", isNull: ["parentId"], order: { column: "sortOrder", ascending: true } })
+      }).then(r => r.json()),
+      fetch(`${API_URL}/api/admin/read`, {
+        method: "POST", headers,
+        body: JSON.stringify({ table: "Category", isNotNull: ["parentId"], order: { column: "sortOrder", ascending: true } })
+      }).then(r => r.json())
+    ])
     
-    const { data: subCats } = await supabase
-      .from("Category")
-      .select("*")
-      .not("parentId", "is", null)
-      .order("sortOrder", { ascending: true })
-    
-    setCategories(mainCats || [])
-    setSubcategories(subCats || [])
+    setCategories(mainRes.data || [])
+    setSubcategories(subRes.data || [])
   }
 
   const getSubcategories = (parentId: string) => {
@@ -151,35 +152,19 @@ export default function AdminCategories() {
     setUploadingImage(true)
     let finalImageUrl = formData.image
 
-    // 1. Upload pending image to Cloudinary if it exists
     if (pendingImageFile) {
       try {
         const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
         const compressedFile = await imageCompression(pendingImageFile, options)
-        const uploadData = new FormData()
-        uploadData.append("file", compressedFile, pendingImageFile.name)
-        uploadData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website")
         
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
-          method: "POST", body: uploadData
-        })
-        const text = await res.text()
-        let json: any = {}
-        try { json = JSON.parse(text) } catch(e) {}
-        
-        if (res.ok && json.secure_url) {
-          finalImageUrl = json.secure_url.replace('/upload/', '/upload/f_auto,q_auto/')
-        } else {
-          throw new Error(json.error?.message || text || "Cloudinary upload failed")
-        }
+        finalImageUrl = await uploadImageToSecureProxy(compressedFile);
       } catch (err: any) {
         setUploadingImage(false)
         toast.error("Failed to upload image: " + err.message)
-        return // Stop saving if image upload fails
+        return
       }
     }
 
-    const supabase = createClient()
     const slug = formData.slug || generateSlug(formData.name)
     
     const dataToSave = {
@@ -196,18 +181,23 @@ export default function AdminCategories() {
       updatedAt: new Date().toISOString()
     }
 
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
     let error
     if (editingItem) {
-      const { error: updateError } = await supabase
-        .from("Category")
-        .update(dataToSave)
-        .eq("id", editingItem.id)
-      error = updateError
+      const res = await fetch(`${API_URL}/api/admin/crud`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ table: "Category", action: "update", match: { id: editingItem.id }, data: dataToSave })
+      })
+      if (!res.ok) error = new Error("Failed to update")
     } else {
-      const { error: insertError } = await supabase
-        .from("Category")
-        .insert([{ ...dataToSave, createdAt: new Date().toISOString() }])
-      error = insertError
+      const res = await fetch(`${API_URL}/api/admin/crud`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ table: "Category", action: "insert", data: { ...dataToSave, createdAt: new Date().toISOString() } })
+      })
+      if (!res.ok) error = new Error("Failed to insert")
     }
     
     if (error) {
@@ -237,27 +227,33 @@ export default function AdminCategories() {
       return
     }
 
-    const supabase = createClient()
-    
-    // Check for products associated with this category or subcategory
-    const { count: productCount } = await supabase
-      .from("Product")
-      .select("*", { count: "exact", head: true })
-      .or(`categoryId.eq.${item.id},subcategoryId.eq.${item.id}`)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const token = localStorage.getItem("ysg_admin_token")
 
-    if (productCount && productCount > 0) {
+    const productCheck = await fetch(`${API_URL}/api/admin/read`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ 
+        table: "Product", 
+        or: [`categoryId.eq.${item.id}`, `subcategoryId.eq.${item.id}`] 
+      })
+    })
+    const productData = await productCheck.json()
+    const productCount = productData.data?.length || 0
+
+    if (productCount > 0) {
       toast.error(`Cannot delete "${item.name}" because it contains ${productCount} product(s). Please move or delete the products first.`)
       return
     }
     
     if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from("Category")
-        .delete()
-        .eq("id", item.id)
+      const res = await fetch(`${API_URL}/api/admin/crud`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ table: "Category", action: "delete", match: { id: item.id } })
+      })
       
-      if (error) {
+      if (!res.ok) {
         toast.error("Error deleting category")
       } else {
         await logActivity({

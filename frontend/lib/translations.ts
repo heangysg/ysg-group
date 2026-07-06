@@ -178,7 +178,6 @@ export const translations = {
     panel: "Panel",
     superadminManagement: "Superadmin Management",
     adminPortal: "Admin Portal",
-    // Public Site
     home: "Home",
     about: "About",
     contact: "Contact",
@@ -467,7 +466,6 @@ export const translations = {
     panel: "វិបផតថល",
     superadminManagement: "ការគ្រប់គ្រងជាន់ខ្ពស់",
     adminPortal: "ច្រកចូលអ្នកគ្រប់គ្រង",
-    // Public Site
     home: "ទំព័រដើម",
     about: "អំពីយើង",
     contact: "ទំនាក់ទំនង",

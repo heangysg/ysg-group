@@ -17,7 +17,6 @@ import {
   CheckCircle2,
   Trash2
 } from "lucide-react"
-import { createClient } from "../../../lib/supabase/client"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import toast, { Toaster } from "react-hot-toast"
 
@@ -27,7 +26,7 @@ export default function UsersManagementPage() {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [activeTab, setActiveTab] = useState("details") // details, history
+  const [activeTab, setActiveTab] = useState("details")
   const [userHistory, setUserHistory] = useState<any[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [error, setError] = useState("")
@@ -61,7 +60,12 @@ export default function UsersManagementPage() {
   const fetchUsers = async () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${API_URL}/api/admin/users`)
+      const token = localStorage.getItem("ysg_admin_token")
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
       const data = await res.json()
       if (res.ok) setUsers(data.users || [])
     } catch (err) {
@@ -80,9 +84,13 @@ export default function UsersManagementPage() {
       const url = `${API_URL}/api/admin/users`
       const method = isEditing ? "PATCH" : "POST"
       
+      const token = localStorage.getItem("ysg_admin_token")
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(formData)
       })
       const data = await res.json()
@@ -124,11 +132,15 @@ export default function UsersManagementPage() {
     setActiveTab("details")
     setShowModal(true)
     
-    // Fetch history
     setHistoryLoading(true)
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const res = await fetch(`${API_URL}/api/admin/audit?userId=${user.id}`)
+      const token = localStorage.getItem("ysg_admin_token");
+      const res = await fetch(`${API_URL}/api/admin/audit?userId=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await res.json()
       if (res.ok) setUserHistory(data.logs || [])
     } catch (err) {
@@ -304,20 +316,6 @@ export default function UsersManagementPage() {
                         onChange={e => setFormData({ ...formData, password: e.target.value })}
                         className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
                       />
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <label className="flex items-center gap-4 cursor-pointer group">
-                        <input 
-                          type="checkbox" 
-                          checked={formData.isSuperAdmin} 
-                          onChange={(e) => setFormData({ ...formData, isSuperAdmin: e.target.checked })}
-                          className="w-6 h-6 border-2 border-slate-900 accent-primary shadow-hard" 
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("makeSuperadmin")}</span>
-                          <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">{t("grantsFullAccess")}</span>
-                        </div>
-                      </label>
                     </div>
                   </div>
 

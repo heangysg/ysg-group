@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "../../../lib/supabase/client"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import { Mail, Package, ShoppingCart, Clock, ArrowLeft, ShoppingBag } from "lucide-react"
 import Link from "next/link"
@@ -17,19 +16,23 @@ export default function ActivityPage() {
 
   async function fetchActivities() {
     setLoading(true)
-    const supabase = createClient()
-    
     try {
-      // Fetch inquiries and orders in parallel
-      const [{ data: inquiries }, { data: orders }] = await Promise.all([
-        supabase.from("Inquiry").select("*").order("createdAt", { ascending: false }).limit(25),
-        supabase.from("Order").select("*").order("createdAt", { ascending: false }).limit(25)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const token = localStorage.getItem("ysg_admin_token")
+      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+      
+      const [inquiriesRes, ordersRes] = await Promise.all([
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", order: { column: "createdAt", ascending: false }, limit: 25 }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 25 }) }).then(r => r.json())
       ])
+
+      const inquiries = inquiriesRes.data
+      const orders = ordersRes.data
 
     const allActivities: any[] = []
 
     if (inquiries) {
-      inquiries.forEach(item => {
+      inquiries.forEach((item: any) => {
         allActivities.push({
           id: item.id,
           type: 'inquiry',
@@ -52,7 +55,7 @@ export default function ActivityPage() {
     }
 
     if (orders) {
-      orders.forEach(item => {
+      orders.forEach((item: any) => {
         allActivities.push({
           id: item.id,
           type: 'order',
@@ -74,7 +77,6 @@ export default function ActivityPage() {
       })
     }
 
-    // Sort by most recent
     setActivities(allActivities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()))
     } catch (err) {
       console.error("Activity Fetch Error:", err)
@@ -116,7 +118,7 @@ export default function ActivityPage() {
         
         <div className="divide-y divide-slate-100">
           {activities.length > 0 ? (
-            activities.map((activity) => (
+            activities.map((activity: any) => (
               <div key={activity.id} className="p-8 hover:bg-slate-50 transition-all flex flex-col md:flex-row md:items-center gap-6 group">
                 <div className={`shrink-0 w-14 h-14 rounded-2xl ${activity.bg} ${activity.color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
                   <activity.icon className="w-7 h-7" />

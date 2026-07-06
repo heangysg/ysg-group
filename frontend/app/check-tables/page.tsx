@@ -11,7 +11,6 @@ export default function CheckTables() {
     async function check() {
       const supabase = createClient()
       
-      // Try different possible table names from your schema
       const tableNames = ["Product", "products", "product", "Products", "Category", "categories", "Inquiry", "inquiries", "ContactMessage", "contact_messages"]
       const results: any = {}
       

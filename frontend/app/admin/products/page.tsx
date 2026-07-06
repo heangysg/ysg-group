@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { createClient } from "../../../lib/supabase/client"
 import { logActivity } from "../../../lib/audit"
 import { Plus, Eye, Edit, Trash2, Search, Filter, Package, ChevronRight, MoreHorizontal, X } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
@@ -21,11 +20,13 @@ export default function AdminProducts() {
   useEffect(() => {
     async function initialFetch() {
       setLoading(true)
-      const supabase = createClient()
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const token = localStorage.getItem("ysg_admin_token")
+      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
       try {
         const [catRes, prodRes] = await Promise.all([
-          supabase.from("Category").select("*").order("sortOrder", { ascending: true }),
-          supabase.from("Product").select("*").order("createdAt", { ascending: false }).limit(50)
+          fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", order: { column: "sortOrder", ascending: true } }) }).then(r => r.json()),
+          fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Product", order: { column: "createdAt", ascending: false }, limit: 50 }) }).then(r => r.json())
         ])
         setCategories(catRes.data || [])
         setProducts(prodRes.data || [])
@@ -39,7 +40,6 @@ export default function AdminProducts() {
   }, [])
 
   useEffect(() => {
-    // Reset to page 1 when search or filter changes
     setCurrentPage(1)
     if (!loading) {
       fetchProducts(1)
@@ -53,41 +53,53 @@ export default function AdminProducts() {
   }, [currentPage])
 
   async function fetchProducts(page: number) {
-    const supabase = createClient()
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const token = localStorage.getItem("ysg_admin_token")
+    const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
     const pageSize = 10
     const start = (page - 1) * pageSize
-    const end = start + pageSize - 1
 
-    let query = supabase
-      .from("Product")
-      .select("*", { count: "exact" })
-      .order("createdAt", { ascending: false })
+    const body: any = {
+      table: "Product",
+      countExact: true,
+      order: { column: "createdAt", ascending: false },
+      limit: pageSize,
+      offset: start
+    }
     
     if (search) {
-      query = query.or(`name.ilike.%${search}%,nameKhmer.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`)
+      body.or = `name.ilike.%${search}%,nameKhmer.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`
     }
     if (selectedCategory) {
-      query = query.eq("categoryId", selectedCategory)
+      body.eq = { categoryId: selectedCategory }
     }
     
-    query = query.range(start, end)
-    
-    const { data, count } = await query
+    const res = await fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify(body) })
+    const { data, count } = await res.json()
     setProducts(data || [])
-    if (count !== null) {
+    if (count !== null && count !== undefined) {
       setTotalPages(Math.ceil(count / pageSize) || 1)
     }
   }
 
   async function deleteProduct(id: string, name: string) {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from("Product")
-        .delete()
-        .eq("id", id)
+      const token = localStorage.getItem("ysg_admin_token")
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const res = await fetch(`${API_URL}/api/admin/crud`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          table: "Product",
+          action: "delete",
+          match: { id }
+        })
+      })
       
-      if (error) {
+      if (!res.ok) {
         toast.error("Failed to delete product")
       } else {
         await logActivity({

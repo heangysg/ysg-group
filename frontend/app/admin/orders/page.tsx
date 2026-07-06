@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { createClient } from "../../../lib/supabase/client"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import { 
   ShoppingBag, 
@@ -48,39 +46,29 @@ export default function AdminOrders() {
 
   async function fetchOrders(page: number) {
     setLoading(true)
-    const supabase = createClient()
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const token = localStorage.getItem("ysg_admin_token")
+    const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+    
     const pageSize = 10
     const start = (page - 1) * pageSize
-    const end = start + pageSize - 1
     
-    // Try "Order" table first
-    let query = supabase
-      .from("Order")
-      .select("*", { count: "exact" })
-      .neq("status", "pending")
-      .order("createdAt", { ascending: false })
-      
+    const body: any = {
+      table: "Order",
+      countExact: true,
+      neq: { status: "pending" },
+      order: { column: "createdAt", ascending: false },
+      limit: pageSize,
+      offset: start
+    }
+
     if (search) {
-      query = query.or(`customerName.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`)
+      body.or = `customerName.ilike.%${search}%,customerPhone.ilike.%${search}%,customerEmail.ilike.%${search}%`
     }
-    
-    let result = await query.range(start, end)
-    
-    // Fallback to "Orders"
-    if (result.error && (result.error.code === '42P01' || result.error.message?.includes('does not exist'))) {
-       let fallbackQuery = supabase
-        .from("Orders")
-        .select("*", { count: "exact" })
-        .neq("status", "pending")
-        .order("createdAt", { ascending: false })
-        
-       if (search) {
-         fallbackQuery = fallbackQuery.or(`customerName.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`)
-       }
-       
-       result = await fallbackQuery.range(start, end)
-    }
-    
+
+    const res = await fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify(body) })
+    const result = await res.json()
+
     if (result.error) {
       console.error("Orders Fetch Error Details:", result.error)
     } else {
@@ -93,13 +81,15 @@ export default function AdminOrders() {
   }
 
   const updateOrderStatus = async (orderId: string, status: string) => {
-    const supabase = createClient()
-    const { error } = await supabase
-      .from("Order")
-      .update({ status })
-      .eq("id", orderId)
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ table: "Order", action: "update", match: { id: orderId }, data: { status } })
+    })
     
-    if (error) {
+    if (!res.ok) {
       toast.error("Error updating status")
     } else {
       toast.success("Order status updated")

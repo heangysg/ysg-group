@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { createClient } from "../lib/supabase/client"
+
 import { ArrowRight, Headphones, Package, Shield, Zap } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import ProductCard from "./ProductCard"
@@ -43,19 +43,11 @@ export default function HomePage() {
   useEffect(() => {
     async function initialFetch() {
       setLoading(true)
-      const supabase = createClient()
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
         const [prodRes, catRes] = await Promise.all([
-          supabase
-            .from("Product")
-            .select("*")
-            .eq("isPublished", true)
-            .eq("isFeatured", true)
-            .limit(6),
-          supabase
-            .from("Category")
-            .select("*")
-            .order("sortOrder", { ascending: true })
+          fetch(`${API_URL}/api/public/products?featured=true&limit=6`).then(r => r.json()),
+          fetch(`${API_URL}/api/public/categories`).then(r => r.json())
         ])
 
         setFeaturedProducts(prodRes.data || [])
@@ -73,9 +65,8 @@ export default function HomePage() {
     <div className="bg-slate-50 min-h-screen">
       {/* 🚀 Dynamic Premium Hero Section */}
       <section className="relative flex items-center justify-center pt-24 md:pt-32 pb-32 md:pb-40 overflow-hidden bg-slate-950 min-h-[85vh]">
-        <div className="absolute inset-0 w-full h-full">
-          <Image src="/hero-machinery.png" alt="Machinery Hero" fill className="object-cover opacity-30 grayscale" priority />
-          <div className="absolute inset-0 bg-slate-950/70" />
+        <div className="absolute inset-0 bg-slate-950">
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-transparent z-10" />
         </div>
 
         {/* Angled Cutout at bottom */}
@@ -89,21 +80,21 @@ export default function HomePage() {
             className="max-w-3xl space-y-6 md:space-y-8 flex flex-col items-center md:items-start"
           >
             <div className="inline-block bg-primary text-slate-950 font-bold uppercase tracking-widest px-4 py-1 text-[10px] md:text-xs">
-              {language === "kh" ? "គ្រឿងចក្រធុនធ្ងន់ស្តង់ដារ" : "Industrial Grade Machinery"}
+              {language === "kh" ? "ក្រុមហ៊ុន យ៉ាង ស៊ី គ្រុប" : "YEUNG SHI GROUP"}
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black text-white tracking-tighter uppercase leading-[0.9]">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white tracking-tighter uppercase leading-[1.1]">
               {language === "kh" ? (
-                <>កម្លាំងនៃ <br /><span className="text-primary">ឧស្សាហកម្ម</span></>
+                <>ដៃគូដ៏គួរឲ្យទុកចិត្តក្នុងវិស័យ <br /><span className="text-primary">ឧស្សាហកម្ម និងពាណិជ្ជកម្ម</span></>
               ) : (
-                <>Power The <br /><span className="text-primary">Industry</span></>
+                <>Your Trusted Partner in <br /><span className="text-primary">Industry & Trade</span></>
               )}
             </h1>
 
-            <p className="text-base md:text-xl text-slate-300 font-medium max-w-2xl uppercase tracking-wider">
-              {language === "kh"
-                ? "ដំណោះស្រាយឧស្សាហកម្មលំដាប់ខ្ពស់ ដែលត្រូវបានជ្រើសរើសយ៉ាងសម្រិតសម្រាំងសម្រាប់ប្រសិទ្ធភាព។ ស្វែងរកគ្រឿងម៉ាស៊ីនដែលជួយពង្រីកអាជីវកម្មរបស់អ្នក។"
-                : "Elite industrial solutions curated for peak performance and absolute reliability."}
+            <p className="text-lg md:text-xl text-slate-400 font-medium leading-relaxed max-w-3xl">
+              {language === "kh" 
+                ? "ផ្តល់ជូននូវគ្រឿងចក្រស្តង់ដារ គ្រឿងផ្សំអាហារគុណភាពខ្ពស់ និងសេវាកម្មនាំចេញនាំចូលដ៏សម្បូរបែប ដើម្បីជួយពង្រីកអាជីវកម្មរបស់អ្នក។" 
+                : "Providing top-quality machinery, premium flavours, and comprehensive import/export solutions to scale your business."}
             </p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-8">
@@ -160,7 +151,7 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
             {categories.filter(c => !c.parentId).map((cat, idx) => {
               const subCats = categories.filter(sub => sub.parentId === cat.id)
               const displaySubs = subCats.slice(0, 3)
@@ -173,13 +164,13 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="flex"
+                  className="flex min-w-[85vw] md:min-w-0 snap-center"
                 >
                   <div className="solid-card p-6 md:p-8 flex flex-col w-full group">
                     {/* Image */}
-                    <div className="w-full h-48 md:h-56 bg-slate-100 overflow-hidden mb-6 flex items-center justify-center border-b-4 border-slate-900">
+                    <div className="relative w-full h-48 md:h-56 bg-slate-100 overflow-hidden mb-6 flex items-center justify-center border-b-4 border-slate-900">
                       {cat.image ? (
-                        <Image src={cat.image} alt={cat.name} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                        <Image src={cat.image} alt={cat.name} fill className="object-cover transition-all duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                       ) : (
                         <Package className="w-12 h-12 text-slate-300" />
                       )}
@@ -210,7 +201,7 @@ export default function HomePage() {
                         )}
                       </ul>
 
-                      <Link href={`/categories?id=${cat.id}`} className="btn-primary w-full py-4 flex items-center justify-center gap-2 text-[10px]">
+                      <Link href={`/categories/${cat.slug}`} className="btn-primary w-full py-4 flex items-center justify-center gap-2 text-[10px]">
                         {language === 'kh' ? "ស្វែងយល់បន្ថែម" : "View Catalog"}
                         <ArrowRight className="w-4 h-4" />
                       </Link>
@@ -241,7 +232,7 @@ export default function HomePage() {
             </Link>
           </motion.div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
             {loading ? (
               [1, 2, 3, 4].map((n) => <div key={n} className="aspect-[3/4] bg-slate-50 rounded-[2rem] animate-pulse border border-slate-100" />)
             ) : (
@@ -252,6 +243,7 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
+                  className="min-w-[65vw] md:min-w-0 snap-center"
                 >
                   <ProductCard product={product} />
                 </motion.div>

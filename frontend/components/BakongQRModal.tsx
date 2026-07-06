@@ -27,11 +27,9 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
   const supabase = createClient()
   const merchantName = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_NAME || "YSG"
 
-  // 1. Countdown Timer Effect
   useEffect(() => {
     if (!isOpen) return
 
-    // Calculate initial time left
     let initialTime = 300
     if (expiresAt) {
       const remaining = Math.floor((expiresAt - Date.now()) / 1000)
@@ -56,39 +54,45 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
     return () => clearInterval(timer)
   }, [isOpen, expiresAt])
 
-  // 2. Trigger onExpire when timer hits zero
   useEffect(() => {
-    if (isOpen && timeLeft === 0 && onExpire) {
-      onExpire()
+    if (isOpen && timeLeft === 0) {
+      if (onExpire) onExpire()
     }
-  }, [timeLeft, isOpen, onExpire])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft, isOpen])
 
-  // 3. Automated Polling Effect (Every 5 seconds)
   useEffect(() => {
     if (!isOpen || !md5) return
 
-    const pollInterval = setInterval(async () => {
-      const isPaid = await checkBakongTransaction(md5)
+    let isSubscribed = true;
+    let isFetching = false;
 
-      if (isPaid) {
-        clearInterval(pollInterval)
-        handleSuccess()
+    const pollInterval = setInterval(async () => {
+      if (!isSubscribed || isFetching) return;
+      
+      isFetching = true;
+      try {
+        const isPaid = await checkBakongTransaction(md5, orderId)
+        if (isPaid && isSubscribed) {
+          clearInterval(pollInterval)
+          handleSuccess()
+        }
+      } catch (err) {
+        console.error("BakongQRModal polling error:", err);
+      } finally {
+        isFetching = false;
       }
     }, 3000)
 
-    return () => clearInterval(pollInterval)
-  }, [isOpen, md5])
+    return () => {
+      isSubscribed = false;
+      clearInterval(pollInterval)
+    }
+  }, [isOpen, md5, orderId])
 
   const handleSuccess = async () => {
     setIsChecking(true)
     try {
-      const { error } = await supabase
-        .from("Order")
-        .update({ status: "paid" })
-        .eq("id", orderId)
-
-      if (error) throw error
-
       if (onSuccess) {
         setTimeout(onSuccess, 500)
       } else {

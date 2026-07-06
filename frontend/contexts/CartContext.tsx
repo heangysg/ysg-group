@@ -30,7 +30,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Load cart from localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem("ysg_cart")
     if (savedCart) {
@@ -43,7 +42,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsLoaded(true)
   }, [])
 
-  // Save cart to localStorage
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem("ysg_cart", JSON.stringify(items))
@@ -59,7 +57,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         )
       }
 
-      // Robust image selection
       let selectedImage = ""
       if (Array.isArray(product.images) && product.images.length > 0) {
         selectedImage = product.images[0]

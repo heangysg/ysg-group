@@ -28,7 +28,7 @@ export const generateBakongQR = async (amount: number, orderId: string, expiresA
  * @param md5 The MD5 hash of the generated KHQR
  * @returns boolean indicating if payment was successful
  */
-export const checkBakongTransaction = async (md5: string): Promise<boolean> => {
+export const checkBakongTransaction = async (md5: string, orderId: string): Promise<boolean> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     const response = await fetch(`${API_URL}/api/bakong/check-status`, {
@@ -36,12 +36,11 @@ export const checkBakongTransaction = async (md5: string): Promise<boolean> => {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ md5 })
+      body: JSON.stringify({ md5, orderId })
     });
 
     const result = await response.json();
     
-    // responseCode 0 means transaction found and successful
     return result.responseCode === 0;
   } catch (error) {
     console.error("Bakong Status Check Error:", error);

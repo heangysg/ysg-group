@@ -15,6 +15,9 @@
 }
 
 @layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     @apply bg-slate-50 text-slate-900;
     font-family: var(--font-body);
@@ -61,6 +64,10 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.safe-pb {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 html.khmer-mode,

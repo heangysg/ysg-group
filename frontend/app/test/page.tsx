@@ -12,7 +12,6 @@ export default function TestPage() {
       try {
         const supabase = createClient()
         
-        // First, check if we can connect at all
         const { data, error: testError } = await supabase
           .from("Product")
           .select("*")

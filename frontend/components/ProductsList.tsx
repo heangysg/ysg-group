@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "../lib/supabase/client"
+
 import PublicLayout from "./PublicLayout"
 import ProductCard from "./ProductCard"
 import { useLanguage } from "../contexts/LanguageContext"
@@ -23,7 +23,6 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
   const [selectedCategory, setSelectedCategory] = useState(urlCategory)
   const [showFilters, setShowFilters] = useState(false)
 
-  // Sync state with URL
   useEffect(() => {
     if (urlCategory) {
       setSelectedCategory(urlCategory)
@@ -33,39 +32,36 @@ export default function ProductsList({ initialCategory = "all" }: { initialCateg
   useEffect(() => {
     async function fetchData() {
       setLoading(true)
-      const supabase = createClient()
-      
-      // Fetch Categories
-      const { data: catData } = await supabase
-        .from("Category")
-        .select("*")
-        .eq("isActive", true)
-        .order("sortOrder", { ascending: true })
-      setCategories(catData || [])
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch(`${API_URL}/api/public/categories`).then(r => r.json()),
+          fetch(`${API_URL}/api/public/products`).then(r => r.json())
+        ])
+        
+        const catData = catRes.data || []
+        let prodData = prodRes.data || []
 
-      // Fetch Products
-      let query = supabase
-        .from("Product")
-        .select("*")
-        .eq("isPublished", true)
+        setCategories(catData)
 
-      if (selectedCategory !== "all") {
-        const cat = catData?.find(c => c.slug === selectedCategory)
-        if (cat) {
-          if (!cat.parentId) {
-            // Main category selected: include all subcategories
-            const subCatIds = catData?.filter(c => c.parentId === cat.id).map(c => c.id) || []
-            query = query.in("categoryId", [cat.id, ...subCatIds])
-          } else {
-            // Subcategory selected
-            query = query.eq("categoryId", cat.id)
+        if (selectedCategory !== "all") {
+          const cat = catData.find((c: any) => c.slug === selectedCategory)
+          if (cat) {
+            if (!cat.parentId) {
+              const subCatIds = catData.filter((c: any) => c.parentId === cat.id).map((c: any) => c.id)
+              prodData = prodData.filter((p: any) => p.categoryId === cat.id || subCatIds.includes(p.categoryId))
+            } else {
+              prodData = prodData.filter((p: any) => p.categoryId === cat.id)
+            }
           }
         }
-      }
 
-      const { data: prodData } = await query.order("createdAt", { ascending: false })
-      setProducts(prodData || [])
-      setLoading(false)
+        setProducts(prodData)
+      } catch (err) {
+        console.error("ProductsList Fetch Error:", err)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchData()
   }, [selectedCategory])

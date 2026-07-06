@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "../../../lib/supabase/client"
 import { History, User, Package, FolderOpen, Mail, Settings, Trash2, Edit, Plus } from "lucide-react"
 import { useLanguage } from "../../../contexts/LanguageContext"
 
@@ -34,27 +33,44 @@ export default function AuditLogsPage() {
 
   async function fetchLogs(page: number) {
     setLoading(true)
-    const supabase = createClient()
     const pageSize = 10
     const start = (page - 1) * pageSize
-    const end = start + pageSize - 1
 
-    let query = supabase
-      .from("audit_logs")
-      .select("*", { count: "exact" })
-      .order("created_at", { ascending: false })
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const token = localStorage.getItem("ysg_admin_token")
+      
+      const requestBody: any = {
+        table: "audit_logs",
+        order: { column: "created_at", ascending: false },
+        limit: pageSize,
+        offset: start,
+        countExact: true
+      }
 
-    if (filter !== "all") {
-      query = query.eq("entity_type", filter)
+      if (filter !== "all") {
+        requestBody.eq = { entity_type: filter }
+      }
+
+      const res = await fetch(`${API_URL}/api/admin/read`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(requestBody)
+      })
+
+      const result = await res.json()
+      
+      if (res.ok) {
+        setLogs(result.data || [])
+        if (result.count !== null && result.count !== undefined) {
+          setTotalPages(Math.ceil(result.count / pageSize) || 1)
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch audit logs:", err)
+    } finally {
+      setLoading(false)
     }
-
-    const { data, count } = await query.range(start, end)
-    
-    setLogs(data || [])
-    if (count !== null) {
-      setTotalPages(Math.ceil(count / pageSize) || 1)
-    }
-    setLoading(false)
   }
 
   const getActionIcon = (action: string) => {
@@ -74,7 +90,6 @@ export default function AuditLogsPage() {
     }
   }
 
-  // Note: we don't need client-side filter anymore as we moved it to server-side
   const filteredLogs = logs
 
   return (

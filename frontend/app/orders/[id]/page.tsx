@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { createClient } from '../../../lib/supabase/client'
+import { useParams } from 'next/navigation'
 import PublicLayout from '../../../components/PublicLayout'
 import { CheckCircle2, Clock, MapPin, Phone, User, Package, ArrowRight, ArrowLeft, CreditCard, Loader2, Receipt, Truck } from 'lucide-react'
 import { useLanguage } from '../../../contexts/LanguageContext'
@@ -14,73 +13,130 @@ import Link from 'next/link'
 
 export default function OrderDetailsPage() {
   const { id } = useParams()
-  const router = useRouter()
   const { t, language } = useLanguage()
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showQR, setShowQR] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [qrData, setQrData] = useState<any>(null)
-  const supabase = createClient()
 
   useEffect(() => {
     if (!id) return
 
     const fetchOrder = async () => {
-      const { data, error } = await supabase
-        .from("Order")
-        .select("*")
-        .eq("id", id)
-        .single()
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${API_URL}/api/orders/${id}`);
+        const data = await response.json();
 
-      if (error) {
-        console.error("Error fetching order:", error)
-        toast.error("Order not found")
-      } else {
+        if (!response.ok) {
+          throw new Error(data.error || "Order not found");
+        }
+
+        if (typeof data.items === 'string') {
+          try {
+            data.items = JSON.parse(data.items);
+          } catch(e) {}
+        }
+
         setOrder(data)
         if (data.status === "pending" && data.paymentMethod === "Bakong") {
           const orderExpiresAt = new Date(data.createdAt).getTime() + (5 * 60 * 1000)
           const cacheKey = `bakong_qr_${data.id}`
           const cachedStr = localStorage.getItem(cacheKey)
-          let cachedQR = cachedStr ? JSON.parse(cachedStr) : null
-
+          let cachedQR = null;
+          if (cachedStr) {
+            try {
+              cachedQR = JSON.parse(cachedStr);
+            } catch (e) {
+              console.error("Corrupted QR cache");
+              localStorage.removeItem(cacheKey);
+            }
+          }
           if (cachedQR && Date.now() < cachedQR.expiresAt) {
             setQrData(cachedQR)
+            
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+            fetch(`${API_URL}/api/bakong/check-status`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ md5: cachedQR.md5, orderId: data.id })
+            }).then(r => r.json()).then(res => {
+              if (res.responseCode === 0) {
+                setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
+              } else {
+                setShowQR(true)
+              }
+            }).catch(e => {
+              setShowQR(true)
+            })
           } else {
             const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
             const generated = await generateBakongQR(data.totalAmount, data.id, expirationToUse)
-            const qrPayload = { ...generated, expiresAt: expirationToUse }
-            setQrData(qrPayload)
-            localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
+            if (generated && generated.qrString) {
+              const qrPayload = { ...generated, expiresAt: expirationToUse }
+              setQrData(qrPayload)
+              localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
+              setShowQR(true)
+            } else {
+              toast.error(language === "kh" ? "មិនអាចបង្កើតកូដ QR បានទេ" : "Failed to generate payment QR");
+            }
           }
-          setShowQR(true)
         }
+      } catch (err: any) {
+        console.error("Error fetching order:", err)
+        toast.error("Order not found")
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     fetchOrder()
 
-    const subscription = supabase
-      .channel(`order-${id}`)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'Order',
-        filter: `id=eq.${id}`
-      }, (payload) => {
-        setOrder(payload.new)
-        if (payload.new.status === "paid") {
+  }, [id])
+
+  useEffect(() => {
+    if (order?.status !== 'pending' || !qrData || showQR) return;
+
+    let isSubscribed = true;
+    let isFetching = false;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    
+    const intervalId = setInterval(async () => {
+      if (!isSubscribed || isFetching) return;
+      
+      if (Date.now() > qrData.expiresAt) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      isFetching = true;
+      try {
+        const response = await fetch(`${API_URL}/api/bakong/check-status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ md5: qrData.md5, orderId: order.id })
+        });
+        const res = await response.json();
+
+        if (res.responseCode === 0 && isSubscribed) {
+          setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
           setShowQR(false)
           setShowSuccessModal(true)
+          clearInterval(intervalId);
         }
-      })
-      .subscribe()
+      } catch (err) {
+        console.error("Polling error:", err);
+      } finally {
+        isFetching = false;
+      }
+    }, 3000);
 
     return () => {
-      supabase.removeChannel(subscription)
-    }
-  }, [id])
+      isSubscribed = false;
+      clearInterval(intervalId);
+    };
+  }, [order?.status, qrData, order?.id, showQR])
 
   if (loading) {
     return (
@@ -119,10 +175,14 @@ export default function OrderDetailsPage() {
     if (order) {
       const expirationToUse = Date.now() + (5 * 60 * 1000)
       const generated = await generateBakongQR(order.totalAmount, order.id, expirationToUse)
-      const qrPayload = { ...generated, expiresAt: expirationToUse }
-      setQrData(qrPayload)
-      localStorage.setItem(`bakong_qr_${order.id}`, JSON.stringify(qrPayload))
-      toast.success("QR Code Refreshed")
+      if (generated && generated.qrString) {
+        const qrPayload = { ...generated, expiresAt: expirationToUse }
+        setQrData(qrPayload)
+        localStorage.setItem(`bakong_qr_${order.id}`, JSON.stringify(qrPayload))
+        toast.success("QR Code Refreshed", { id: "qr_refresh" })
+      } else {
+        toast.error(language === "kh" ? "មិនអាចបង្កើតកូដ QR ថ្មីបានទេ" : "Failed to refresh payment QR");
+      }
     }
   }
 
@@ -181,21 +241,21 @@ export default function OrderDetailsPage() {
               
               {/* 🏗️ Status Banner */}
               {order.status === "paid" ? (
-                <div className="solid-card bg-emerald-400 p-8 md:p-12 flex flex-col md:flex-row items-start gap-6">
+                <div className="solid-card bg-emerald-400 p-6 md:p-12 flex flex-col md:flex-row items-start gap-6">
                   <div className="w-12 h-12 bg-slate-900 flex items-center justify-center text-emerald-400 shrink-0 border-2 border-slate-900">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
-                     <h2 className="text-xl font-bold text-slate-900 uppercase tracking-widest">
+                     <h2 className="text-xl md:text-2xl font-bold text-slate-900 uppercase tracking-widest leading-tight">
                        {language === "kh" ? "ការទូទាត់ជោគជ័យ" : "Payment Successful"}
                      </h2>
-                     <p className="text-sm text-slate-900 font-bold">
+                     <p className="text-xs md:text-sm text-slate-900 font-bold">
                        {language === "kh" ? "សូមអរគុណសម្រាប់ការវិនិយោគរបស់អ្នក។ គ្រឿងម៉ាស៊ីនឧស្សាហកម្មរបស់អ្នកឥឡូវនេះកំពុងត្រូវបានរៀបចំសម្រាប់ដឹកជញ្ជូន។" : "Thank you for your investment. Your industrial machinery is now being prepared for logistics."}
                      </p>
                   </div>
                 </div>
               ) : (
-                <div className="solid-card bg-primary p-8 md:p-12 text-slate-900 relative overflow-hidden group">
+                <div className="solid-card bg-primary p-6 md:p-12 text-slate-900 relative overflow-hidden group">
                   <div className="relative z-10 space-y-6">
                     <div className="space-y-2">
                       <h2 className="text-2xl font-bold tracking-widest uppercase">
@@ -217,27 +277,27 @@ export default function OrderDetailsPage() {
               )}
 
               {/* 📦 Manifest */}
-              <div className="solid-card bg-white p-8 md:p-12">
+                <div className="solid-card bg-white p-6 md:p-12">
                 <h3 className="text-sm font-bold text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-3">
                   <Package className="w-4 h-4 text-primary" />
                   {language === "kh" ? "បញ្ជីគ្រឿងម៉ាស៊ីន" : "Equipment Manifest"}
                 </h3>
                 <div className="divide-y-2 divide-slate-900">
                   {order.items?.map((item: any, idx: number) => (
-                    <div key={idx} className="py-6 flex items-center gap-6">
-                      <div className="w-16 h-16 bg-slate-50 overflow-hidden shrink-0 border-2 border-slate-900">
+                    <div key={idx} className="py-4 md:py-6 flex items-start md:items-center gap-4 md:gap-6">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 overflow-hidden shrink-0 border-2 border-slate-900 mt-1 md:mt-0">
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
-                      <div className="flex-1 space-y-0.5">
-                        <h4 className="text-[15px] font-bold text-slate-900 uppercase tracking-tight">
+                      <div className="flex-1 space-y-1">
+                        <h4 className="text-sm md:text-[15px] font-bold text-slate-900 uppercase tracking-tight line-clamp-2 leading-tight">
                           {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                         </h4>
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                        <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">
                           {item.brand} • {language === "kh" ? "ចំនួន" : "Qty"}: {item.quantity}
                         </p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-[15px] font-bold text-slate-900">
+                      <div className="text-right shrink-0 mt-1 md:mt-0">
+                        <p className="text-sm md:text-[15px] font-bold text-slate-900">
                           {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
@@ -258,7 +318,7 @@ export default function OrderDetailsPage() {
 
             <div className="lg:col-span-4 space-y-8">
               
-              <div className="solid-card bg-slate-50 p-8">
+              <div className="solid-card bg-slate-50 p-6 md:p-8">
                 <h3 className="text-xs font-bold text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-2">
                   <Truck className="w-4 h-4 text-primary" />
                   {language === "kh" ? "ការដឹកជញ្ជូន" : "Logistics"}
@@ -279,7 +339,7 @@ export default function OrderDetailsPage() {
                 </div>
               </div>
 
-              <div className="solid-card bg-white p-8 space-y-6">
+              <div className="solid-card bg-white p-6 md:p-8 space-y-6">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900">
                   {language === "kh" ? "ត្រូវការជំនួយ?" : "Need Help?"}
                 </h3>
@@ -308,6 +368,9 @@ export default function OrderDetailsPage() {
           onSuccess={() => {
             setShowQR(false)
             setShowSuccessModal(true)
+            if (order) {
+              setOrder({ ...order, status: "paid" })
+            }
           }}
           onExpire={refreshQR}
         />

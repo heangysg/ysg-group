@@ -56,32 +56,30 @@ export default function CheckoutPage() {
     if (items.length === 0) return
 
     setLoading(true)
-    const supabase = createClient()
-
     try {
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-      const shortId = Array.from({ length: 10 }, () => alphabet.charAt(Math.floor(Math.random() * alphabet.length))).join('')
-      
-      const { data, error } = await supabase
-        .from("Order")
-        .insert({
-          id: shortId,
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${API_URL}/api/orders/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           customerName: formData.customerName,
           customerPhone: formData.customerPhone,
           customerEmail: formData.customerEmail,
           address: formData.address,
           paymentMethod: formData.paymentMethod,
-          totalAmount: cartTotal,
-          items: items,
-          status: "pending"
+          items: items
         })
-        .select()
+      })
 
-      if (error) throw error
+      const data = await response.json()
 
-      toast.success("Order placed successfully!")
+      if (!response.ok) throw new Error(data.error || "Failed to checkout")
+
+      toast.success("Order placed successfully!", { duration: 3000 })
       clearCart()
-      router.push(`/orders/${data[0].id}`)
+      router.push(`/orders/${data.order.id}`)
     } catch (error: any) {
       console.error("Error placing order:", error)
       toast.error("Failed to place order. Please try again.")
@@ -124,7 +122,7 @@ export default function CheckoutPage() {
 
   return (
     <PublicLayout>
-      <Toaster position="top-center" />
+      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
       <div className="bg-white min-h-screen">
         <div className="max-w-6xl mx-auto px-6 pt-6 md:pt-8 pb-12 md:pb-24">
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">

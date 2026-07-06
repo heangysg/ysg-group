@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { createClient } from "../../../../../lib/supabase/client"
-import { ArrowLeft, Save, Package, Tag, DollarSign, MapPin, Calendar, Clock, Image as ImageIcon } from "lucide-react"
+import { Plus, X, UploadCloud, ArrowLeft, Loader2, Info, ListPlus, Save, Package, Tag, DollarSign, MapPin, Calendar, Clock, Image as ImageIcon } from "lucide-react"
+import { uploadImageToSecureProxy } from "../../../../../lib/upload"
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../../../lib/audit"
 import { useLanguage } from "../../../../../contexts/LanguageContext"
@@ -52,42 +52,40 @@ export default function EditProduct() {
     
     async function initialFetch() {
       setFetching(true)
-      const supabase = createClient()
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const token = localStorage.getItem("ysg_admin_token")
+      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+
       try {
-        // Fetch categories and product in parallel
         const [catRes, prodRes] = await Promise.all([
-          supabase.from("Category").select("*").order("sortOrder", { ascending: true }),
-          supabase.from("Product").select("*").eq("slug", slug).single()
+          fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", order: { column: "sortOrder", ascending: true } }) }).then(r => r.json()),
+          fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Product", eq: { slug }, limit: 1 }) }).then(r => r.json())
         ])
 
         const allCats = catRes.data || []
         setCategories(allCats)
         
-        if (prodRes.error || !prodRes.data) {
+        if (prodRes.error || !prodRes.data || prodRes.data.length === 0) {
           toast.error("Product not found")
           router.push("/admin/products")
           return
         }
 
-        const data = prodRes.data
+        const data = prodRes.data[0]
         setProductId(data.id)
         
-        // Handle images: if images column missing, use thumbnail as fallback for the gallery
         const initialImages = data.images || (data.thumbnail ? [data.thumbnail] : [])
         setImages(initialImages)
 
-        // Find the correct Main Category and Subcategory
         let mainCatId = ""
         let subCatId = ""
 
-        const assignedCat = allCats.find(c => c.id === data.categoryId)
+        const assignedCat = allCats.find((c: any) => c.id === data.categoryId)
         if (assignedCat) {
           if (assignedCat.parentId) {
-            // The assigned category is actually a subcategory
             mainCatId = assignedCat.parentId
             subCatId = assignedCat.id
           } else {
-            // The assigned category is a main category
             mainCatId = assignedCat.id
             subCatId = data.subcategoryId || ""
           }
@@ -112,9 +110,8 @@ export default function EditProduct() {
           subcategoryId: subCatId
         })
 
-        // Fetch subcategories for the identified main category
         if (mainCatId) {
-          const subs = allCats.filter(c => c.parentId === mainCatId)
+          const subs = allCats.filter((c: any) => c.parentId === mainCatId)
           setSubcategories(subs)
         }
       } catch (err) {
@@ -167,7 +164,6 @@ export default function EditProduct() {
     e.preventDefault()
     setLoading(true)
 
-    // 1. Upload pending images first
     const uploadedUrls: string[] = []
     if (pendingImages.length > 0) {
       for (const file of pendingImages) {
@@ -175,62 +171,61 @@ export default function EditProduct() {
           const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
           const compressedFile = await imageCompression(file, options)
           
-          const data = new FormData()
-          data.append("file", compressedFile, file.name)
-          data.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website")
-          
-          const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-            { method: "POST", body: data }
-          )
-          const json = await res.json()
-          if (json.secure_url) {
-            uploadedUrls.push(json.secure_url.replace('/upload/', '/upload/f_auto,q_auto/'))
-          } else {
-            throw new Error(json.error?.message || "Upload failed")
-          }
+          const secureUrl = await uploadImageToSecureProxy(compressedFile);
+          uploadedUrls.push(secureUrl);
         } catch (err: any) {
           console.error("Compression or upload failed", err)
           toast.error(`Image upload failed: ${err.message}`)
           setLoading(false)
-          return // Stop saving product
+          return
         }
       }
     }
 
     const finalImages = [...images, ...uploadedUrls]
 
-    const supabase = createClient()
     const newSlug = generateSlug(formData.name)
 
-    const { error } = await supabase
-      .from("Product")
-      .update({
-        name: formData.name,
-        nameKhmer: formData.nameKhmer || null,
-        slug: newSlug,
-        brand: formData.brand,
-        model: formData.model,
-        price: parseFloat(formData.price) || 0,
-        year: parseInt(formData.year) || null,
-        hours: parseInt(formData.hours) || null,
-        location: formData.location,
-        condition: formData.condition,
-        description: formData.description,
-        descriptionKhmer: formData.descriptionKhmer || null,
-        shortDescription: formData.shortDescription,
-        isPublished: formData.isPublished,
-        isFeatured: formData.isFeatured,
-        categoryId: formData.subcategoryId || formData.categoryId || null,
-        subcategoryId: null,
-        images: finalImages,
-        thumbnail: finalImages[0] || null, // Use the first image as thumbnail
-        updatedAt: new Date().toISOString()
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        table: "Product",
+        action: "update",
+        match: { id: productId },
+        data: {
+          name: formData.name,
+          nameKhmer: formData.nameKhmer || null,
+          slug: newSlug,
+          brand: formData.brand,
+          model: formData.model,
+          price: parseFloat(formData.price) || 0,
+          year: parseInt(formData.year) || null,
+          hours: parseInt(formData.hours) || null,
+          location: formData.location,
+          condition: formData.condition,
+          description: formData.description,
+          descriptionKhmer: formData.descriptionKhmer || null,
+          shortDescription: formData.shortDescription,
+          isPublished: formData.isPublished,
+          isFeatured: formData.isFeatured,
+          categoryId: formData.subcategoryId || formData.categoryId || null,
+          subcategoryId: null,
+          thumbnail: finalImages[0] || null,
+          updatedAt: new Date().toISOString()
+        }
       })
-      .eq("id", productId)
+    })
 
-    if (error) {
-      toast.error("Error updating product: " + error.message)
+    const jsonRes = await res.json()
+
+    if (!res.ok || jsonRes.error) {
+      toast.error("Error updating product: " + (jsonRes.error || "Unknown error"))
     } else {
       await logActivity({
         action: "update",

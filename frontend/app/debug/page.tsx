@@ -7,7 +7,6 @@ export default function DebugPage() {
   const [testResult, setTestResult] = useState<any>(null)
 
   useEffect(() => {
-    // Check if environment variables are loaded
     setEnvStatus({
       hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
       hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -20,7 +19,6 @@ export default function DebugPage() {
         const { createClient } = await import("../../lib/supabase/client")
         const supabase = createClient()
         
-        // Try to get the schema info
         const { data, error } = await supabase
           .from("Product")
           .select("*")

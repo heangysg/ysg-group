@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { createClient } from "../lib/supabase/client"
+
 import toast, { Toaster } from "react-hot-toast"
 import PublicLayout from "./PublicLayout"
 import { useLanguage } from "../contexts/LanguageContext"
@@ -21,12 +21,34 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   const [activeImage, setActiveImage] = useState(0)
   const { t, language } = useLanguage()
   const { addToCart } = useCart()
+  const [inquiryForm, setInquiryForm] = useState({ customerName: "", customerPhone: "", message: "" })
+  const [submittingInquiry, setSubmittingInquiry] = useState(false)
 
   const handleAddToCart = () => {
     addToCart(product)
     const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
     const message = language === "kh" ? `បានបន្ថែម ${productName} ទៅកន្ត្រក!` : `${productName} added to cart!`
     toast.success(message)
+  }
+
+  const handleInquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmittingInquiry(true)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/public/inquiry`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...inquiryForm, productId: product?.id })
+    })
+    
+    if (!res.ok) {
+      toast.error(language === "kh" ? "ការបញ្ជូនបានបរាជ័យ" : "Failed to send inquiry")
+    } else {
+      toast.success(language === "kh" ? "សារត្រូវបានផ្ញើដោយជោគជ័យ!" : "Inquiry sent successfully!")
+      setShowInquiry(false)
+      setInquiryForm({ customerName: "", customerPhone: "", message: "" })
+    }
+    setSubmittingInquiry(false)
   }
 
   useEffect(() => {
@@ -37,39 +59,34 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
         return
       }
       
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from("Product")
-        .select(`
-          *,
-          Category (
-            id,
-            name,
-            nameKhmer
-          )
-        `)
-        .eq("slug", slug)
-        .single()
-
-      if (error) {
-        toast.error("Product not found")
-      } else {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      try {
+        const res = await fetch(`${API_URL}/api/public/products/${slug}`)
+        if (!res.ok) throw new Error("Product not found")
+        const { data } = await res.json()
         setProduct(data)
         fetchRelated(data.categoryId, data.id)
+      } catch (error) {
+        toast.error("Product not found")
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     async function fetchRelated(categoryId: string, currentId: string) {
-      const supabase = createClient()
-      const { data: related } = await supabase
-        .from("Product")
-        .select("*")
-        .eq("categoryId", categoryId)
-        .neq("id", currentId)
-        .limit(4)
-      
-      setRelatedProducts(related || [])
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      try {
+        const res = await fetch(`${API_URL}/api/public/products`)
+        if (res.ok) {
+          const { data } = await res.json()
+          const related = data
+            .filter((p: any) => p.categoryId === categoryId && p.id !== currentId)
+            .slice(0, 4)
+          setRelatedProducts(related)
+        }
+      } catch (error) {
+        console.error("Failed to fetch related products")
+      }
     }
 
     fetchProduct()
@@ -279,20 +296,20 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             </button>
             <h2 className="text-2xl font-medium text-slate-900 mb-1">{t("contactSales")}</h2>
             <p className="text-sm text-slate-400 mb-8 font-medium">Get a quote for <span className="text-primary font-medium">{product.name}</span></p>
-            <form className="space-y-4">
+            <form onSubmit={handleInquirySubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-widest">{t("fullName") || "Full Name"}</label>
-                <input type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] uppercase tracking-widest" />
+                <input required value={inquiryForm.customerName} onChange={(e) => setInquiryForm({...inquiryForm, customerName: e.target.value})} type="text" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] uppercase tracking-widest" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-widest">{t("phone") || "Phone Number"}</label>
-                <input type="tel" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] uppercase tracking-widest" />
+                <input required value={inquiryForm.customerPhone} onChange={(e) => setInquiryForm({...inquiryForm, customerPhone: e.target.value})} type="tel" className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] uppercase tracking-widest" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-widest">{t("message") || "Message"}</label>
-                <textarea rows={4} className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] resize-none uppercase tracking-widest"></textarea>
+                <textarea required value={inquiryForm.message} onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})} rows={4} className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-900 focus:border-primary outline-none transition-all font-bold text-slate-900 text-[11px] resize-none uppercase tracking-widest"></textarea>
               </div>
-              <button type="submit" className="btn-primary w-full py-4 text-xs mt-4 flex items-center justify-center gap-2">{t("send") || "Send Message"}</button>
+              <button disabled={submittingInquiry} type="submit" className="btn-primary w-full py-4 text-xs mt-4 flex items-center justify-center gap-2">{submittingInquiry ? t("loading") || "Sending..." : t("send") || "Send Message"}</button>
             </form>
           </div>
         </div>

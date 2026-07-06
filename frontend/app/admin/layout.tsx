@@ -23,8 +23,9 @@ import {
   Plus,
   ShoppingBag
 } from "lucide-react"
-import { createClient } from "../../lib/supabase/client"
+import { Check, Loader2, Upload, Trash2, Edit2, Shield, Key, Edit, ListPlus, MessageSquare } from "lucide-react"
 import { useLanguage } from "../../contexts/LanguageContext"
+import { uploadImageToSecureProxy } from "../../lib/upload"
 import toast, { Toaster } from "react-hot-toast"
 import imageCompression from "browser-image-compression"
 
@@ -39,7 +40,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [savingProfile, setSavingProfile] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   
-  // Notification states
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState<any[]>([])
   const [search, setSearch] = useState("")
@@ -62,7 +62,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     const userStr = localStorage.getItem("ysg_admin_user")
-    if (!userStr && pathname !== "/admin/login") {
+    const tokenStr = localStorage.getItem("ysg_admin_token")
+    
+    if ((!userStr || !tokenStr) && pathname !== "/admin/login") {
       router.push("/admin/login")
       return
     }
@@ -74,49 +76,42 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setAdminBio(user.bio || "")
     }
 
+    let isFetching = false;
+    async function pollNotifications() {
+      if (isFetching) return;
+      isFetching = true;
+      try {
+        await fetchNotifications();
+      } finally {
+        isFetching = false;
+      }
+    }
+
     fetchNotifications()
-    const interval = setInterval(fetchNotifications, 30000) // Poll every 30s
+    const interval = setInterval(pollNotifications, 30000) // Poll every 30s
     return () => clearInterval(interval)
   }, [pathname, router])
 
-  useEffect(() => {
-    // Real-time subscriptions
-    const supabase = createClient()
-    
-    const inquirySub = supabase
-      .channel('inquiry-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Inquiry' }, () => {
-        fetchNotifications()
-      })
-      .subscribe()
 
-    const orderSub = supabase
-      .channel('order-realtime')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Order' }, () => {
-        fetchNotifications()
-      })
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(inquirySub)
-      supabase.removeChannel(orderSub)
-    }
-  }, [])
 
   async function fetchNotifications() {
-    const supabase = createClient()
-    
     try {
-      // Fetch inquiries and orders in parallel
-      const [{ data: latestInquiries }, { data: latestOrders }] = await Promise.all([
-        supabase.from("Inquiry").select("*").order("createdAt", { ascending: false }).limit(5),
-        supabase.from("Order").select("*").order("createdAt", { ascending: false }).limit(5)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const token = localStorage.getItem("ysg_admin_token")
+      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+      
+      const [inquiriesRes, ordersRes] = await Promise.all([
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json())
       ])
+
+      const latestInquiries = inquiriesRes.data
+      const latestOrders = ordersRes.data
 
       const allNotes: any[] = []
 
       if (latestInquiries) {
-        latestInquiries.forEach(item => {
+        latestInquiries.forEach((item: any) => {
           allNotes.push({
             id: item.id,
             type: 'inquiry',
@@ -132,7 +127,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
 
       if (latestOrders) {
-        latestOrders.forEach(item => {
+        latestOrders.forEach((item: any) => {
           allNotes.push({
             id: item.id,
             type: 'order',
@@ -191,11 +186,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!file) return
 
     setSelectedFile(file)
-    // Create a local preview
     const localUrl = URL.createObjectURL(file)
     setAdminProfileImage(localUrl)
     
-    // Reset input so same file can be selected again
     if (e.target) e.target.value = ""
   }
 
@@ -208,62 +201,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       let finalImageUrl = adminProfileImage
 
-      // 1. If there's a new file, upload it now
       if (selectedFile) {
-        const cloudName = (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dpaq3ova2").trim()
-        const uploadPreset = (process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website").trim()
-
-        // Compress profile picture
         const options = {
           maxSizeMB: 1,
-          maxWidthOrHeight: 800, // Profile pictures can be smaller
+          maxWidthOrHeight: 800,
           useWebWorker: true
         }
         const compressedFile = await imageCompression(selectedFile, options)
 
-        const formData = new FormData()
-        formData.append("file", compressedFile, selectedFile.name)
-        formData.append("upload_preset", uploadPreset)
-
-        const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-          { method: "POST", body: formData }
-        )
-        
-        const text = await res.text()
-        console.log("Raw Profile Upload Response:", res.status, res.statusText, text)
-        
-        let data: any = {}
         try {
-          data = JSON.parse(text)
-        } catch(e) {
-          console.error("Failed to parse JSON")
-        }
-        
-        if (res.ok && data.secure_url) {
-          // Optimize the URL before saving to database
-          finalImageUrl = data.secure_url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_face,f_auto,q_auto/")
+          const secureUrl = await uploadImageToSecureProxy(compressedFile);
+          finalImageUrl = secureUrl;
           toast.success(t("photoUploaded") || "Photo uploaded!")
-        } else {
-          console.error("Cloudinary Error Detail (Status: " + res.status + "):", data)
-          const errorMsg = data.error?.message || text || "Image upload failed"
-          throw new Error(errorMsg)
+        } catch (error: any) {
+          console.error("Secure Upload Error:", error);
+          throw new Error(error.message || "Image upload failed");
         }
       }
 
-      // 2. Update Database
-      const supabase = createClient()
-      const { error } = await supabase
-        .from("User")
-        .update({
-          name: adminName,
-          avatar: finalImageUrl
-        })
-        .eq("email", user.email)
+      const token = localStorage.getItem("ysg_admin_token")
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const updateRes = await fetch(`${API_URL}/api/admin/users`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ id: user.id, name: adminName, avatar: finalImageUrl })
+      })
 
-      if (error) throw error
+      if (!updateRes.ok) throw new Error("Failed to update profile in database")
 
-      // Update local storage
       const updatedUser = { ...user, name: adminName, avatar: finalImageUrl }
       localStorage.setItem("ysg_admin_user", JSON.stringify(updatedUser))
       

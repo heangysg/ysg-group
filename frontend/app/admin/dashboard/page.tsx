@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { createClient } from "../../../lib/supabase/client"
+import { logActivity } from "../../../lib/audit"
 import { 
   Package, 
   FolderOpen, 
@@ -51,9 +51,11 @@ export default function AdminDashboard() {
 
   async function fetchData() {
     setLoading(true)
-    const supabase = createClient()
-    
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const token = localStorage.getItem("ysg_admin_token")
+      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+      
       const [
         { count: productsCount },
         { count: categoriesCount },
@@ -61,14 +63,14 @@ export default function AdminDashboard() {
         { count: ordersCount, data: ordersData },
         { data: recent }
       ] = await Promise.all([
-        supabase.from("Product").select("*", { count: "exact", head: true }),
-        supabase.from("Category").select("*", { count: "exact", head: true }),
-        supabase.from("Inquiry").select("*", { count: "exact", head: true }),
-        supabase.from("Order").select("totalAmount, status, createdAt", { count: "exact" }),
-        supabase.from("Order").select("*").order("createdAt", { ascending: false }).limit(5)
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Product", countExact: true, limit: 0 }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", countExact: true, limit: 0 }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", countExact: true, limit: 0 }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", select: "totalAmount, status, createdAt", countExact: true }) }).then(r => r.json()),
+        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json())
       ])
       
-      const totalRevenue = ordersData?.reduce((acc: number, curr: any) => acc + (curr.totalAmount || 0), 0) || 0
+      const totalRevenue = ordersData?.reduce((acc: number, curr: any) => acc + parseFloat(curr.totalAmount || 0), 0) || 0
       
       setStats({
         products: productsCount || 0,
@@ -79,7 +81,6 @@ export default function AdminDashboard() {
       })
       setRecentOrders(recent || [])
 
-      // Process Data for Charts
       if (ordersData) {
         const statMap: Record<string, number> = {}
 
@@ -92,7 +93,7 @@ export default function AdminDashboard() {
         const sortedRevMap: Record<string, number> = {}
         sortedOrders.forEach((o: any) => {
           const dateStr = new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-          sortedRevMap[dateStr] = (sortedRevMap[dateStr] || 0) + (o.totalAmount || 0)
+          sortedRevMap[dateStr] = (sortedRevMap[dateStr] || 0) + parseFloat(o.totalAmount || 0)
         })
 
         const revChartData = Object.keys(sortedRevMap).map(key => ({

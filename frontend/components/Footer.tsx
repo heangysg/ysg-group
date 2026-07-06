@@ -4,9 +4,32 @@ import Link from "next/link"
 import { Globe, Camera, Send, Play, Mail, Phone, MapPin, Clock } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 
+import { useEffect, useState } from "react"
+
 export default function Footer() {
   const { t } = useLanguage()
   const currentYear = new Date().getFullYear()
+  const [settings, setSettings] = useState<any>({
+    siteAddress: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
+    sitePhone: "010 / 011 / 012 / 070: 309 302",
+    siteEmail: "yeungshigroup123@gmail.com"
+  })
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const res = await fetch(`${API_URL}/api/public/settings`)
+        const { data } = await res.json()
+        if (data) {
+          setSettings((prev: any) => ({ ...prev, ...data }))
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings:", err)
+      }
+    }
+    fetchSettings()
+  }, [])
 
   const sections = [
     {
@@ -81,7 +104,7 @@ export default function Footer() {
                 </div>
                 <div className="text-sm">
                   <p className="text-white font-bold mb-1 uppercase tracking-tight">Headquarters</p>
-                  <p className="font-normal text-slate-500">Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.</p>
+                  <p className="font-normal text-slate-500">{settings.siteAddress}</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -99,7 +122,7 @@ export default function Footer() {
                 </div>
                 <div className="text-sm">
                   <p className="text-white font-bold mb-1 uppercase tracking-tight">Phone</p>
-                  <p className="font-normal text-slate-500">010 / 011 / 012 / 070: 309 302</p>
+                  <p className="font-normal text-slate-500">{settings.sitePhone}</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -108,7 +131,7 @@ export default function Footer() {
                 </div>
                 <div className="text-sm">
                   <p className="text-white font-bold mb-1 uppercase tracking-tight">Email</p>
-                  <p className="font-normal text-slate-500">yeungshigroup123@gmail.com</p>
+                  <p className="font-normal text-slate-500">{settings.siteEmail}</p>
                 </div>
               </div>
             </div>

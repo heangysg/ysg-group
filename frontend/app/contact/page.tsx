@@ -15,9 +15,14 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const supabase = createClient()
-    const { error } = await supabase.from("ContactMessage").insert([formData])
-    if (error) {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/public/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
+    })
+    
+    if (!res.ok) {
       toast.error(language === "kh" ? "ការបញ្ជូនបានបរាជ័យ" : "Failed to send message")
     } else {
       toast.success(language === "kh" ? "សារត្រូវបានផ្ញើដោយជោគជ័យ!" : "Message sent successfully!")

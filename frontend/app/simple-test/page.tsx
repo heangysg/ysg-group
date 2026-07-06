@@ -8,7 +8,6 @@ export default function SimpleTest() {
   useEffect(() => {
     async function test() {
       try {
-        // Check if env vars are available
         const url = process.env.NEXT_PUBLIC_SUPABASE_URL
         const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
         

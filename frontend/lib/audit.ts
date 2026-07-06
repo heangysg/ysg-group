@@ -9,19 +9,19 @@ export interface AuditLogEntry {
 
 export async function logActivity(entry: AuditLogEntry) {
   try {
-    const supabase = createClient()
-    const userEmail = localStorage.getItem("adminEmail") || "unknown"
+    const token = localStorage.getItem("ysg_admin_token");
+    if (!token) return;
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     
-    await supabase.from("audit_logs").insert({
-      user_email: userEmail,
-      action: entry.action,
-      entity_type: entry.entityType,
-      entity_id: entry.entityId,
-      details: entry.details || {},
-      ip_address: "client-side",
-      user_agent: navigator.userAgent,
-      created_at: new Date().toISOString()
-    })
+    await fetch(`${API_URL}/api/admin/audit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(entry)
+    });
   } catch (error) {
     console.error("Failed to log activity:", error)
   }

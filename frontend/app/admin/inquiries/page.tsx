@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "../../../lib/supabase/client"
 import { Mail, CheckCircle, ArrowLeft, Clock } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../contexts/LanguageContext"
@@ -24,28 +23,39 @@ export default function AdminInquiries() {
 
   async function fetchInquiries() {
     setLoading(true)
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from("Inquiry")
-      .select("*")
-      .order("createdAt", { ascending: false })
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const token = localStorage.getItem("ysg_admin_token")
+    const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+    
+    const res = await fetch(`${API_URL}/api/admin/read`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        table: "Inquiry",
+        order: { column: "createdAt", ascending: false }
+      })
+    })
+    
+    const result = await res.json()
 
-    if (error) {
-      console.error("Error fetching inquiries:", error)
+    if (result.error) {
+      console.error("Error fetching inquiries:", result.error)
     } else {
-      setInquiries(data || [])
+      setInquiries(result.data || [])
     }
     setLoading(false)
   }
 
   async function updateStatus(id: string, status: string) {
-    const supabase = createClient()
-    const { error } = await supabase
-      .from("Inquiry")
-      .update({ status })
-      .eq("id", id)
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ table: "Inquiry", action: "update", match: { id }, data: { status } })
+    })
 
-    if (error) {
+    if (!res.ok) {
       toast.error(t("errorUpdatingStatus") || "Error updating status")
     } else {
       toast.success(t("statusUpdated") || "Status updated!")
@@ -146,5 +156,4 @@ export default function AdminInquiries() {
     </div>
   )
 }
-
-// មហាជនលាត់មាត់គ្រប់គ្នាក្រោយពីឃើញពូណុយ ធ្វើខ្លួនបែបនេះដែលមើលទៅស្រដៀងនឹងជុងគុកសមាជិកក្រុម BTS​ដែលជា ក្រុមKpopដ៏ល្បីរបស់កូរ៉េខាងត្បូង
+

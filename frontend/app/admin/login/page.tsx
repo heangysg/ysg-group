@@ -30,6 +30,7 @@ export default function AdminLogin() {
         setError(data.error || "Login failed")
       } else {
         localStorage.setItem("ysg_admin_user", JSON.stringify(data.user))
+        localStorage.setItem("ysg_admin_token", data.token)
         
         try {
           await logActivity({

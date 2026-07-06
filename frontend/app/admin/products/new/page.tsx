@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "../../../../lib/supabase/client"
-import { ArrowLeft, Save, Package, Tag, DollarSign, MapPin, Calendar, Clock, FileText, Image as ImageIcon } from "lucide-react"
+import { Plus, X, UploadCloud, ArrowLeft, Loader2, Info, ListPlus, Package, Tag, DollarSign, MapPin, Calendar, Clock, FileText, Image as ImageIcon, Save } from "lucide-react"
+import { uploadImageToSecureProxy } from "../../../../lib/upload"
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../../lib/audit"
 import { useLanguage } from "../../../../contexts/LanguageContext"
@@ -14,7 +14,7 @@ export default function AddProduct() {
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState("")
   const [loading, setLoading] = useState(false)
-  const [images, setImages] = useState<string[]>([]) // For legacy compatibility or if needed
+  const [images, setImages] = useState<string[]>([])
   const [pendingImages, setPendingImages] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [uploadingImage, setUploadingImage] = useState(false)
@@ -49,13 +49,17 @@ export default function AddProduct() {
   }, [])
 
   async function fetchAllCategories() {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("Category")
-      .select("*")
-      .eq("isActive", true)
-      .order("sortOrder", { ascending: true })
-    setCategories(data || [])
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const token = localStorage.getItem("ysg_admin_token")
+    const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+
+    const res = await fetch(`${API_URL}/api/admin/read`, {
+      method: "POST", headers,
+      body: JSON.stringify({ table: "Category", eq: { isActive: true }, order: { column: "sortOrder", ascending: true } })
+    })
+    
+    const result = await res.json()
+    setCategories(result.data || [])
   }
 
   const generateSlug = (name: string) => {
@@ -93,7 +97,6 @@ export default function AddProduct() {
     e.preventDefault()
     setLoading(true)
 
-    // 1. Upload pending images first
     const uploadedUrls: string[] = []
     if (pendingImages.length > 0) {
       for (const file of pendingImages) {
@@ -101,60 +104,59 @@ export default function AddProduct() {
           const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
           const compressedFile = await imageCompression(file, options)
           
-          const data = new FormData()
-          data.append("file", compressedFile, file.name)
-          data.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ysg-website")
-          
-          const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-            { method: "POST", body: data }
-          )
-          const json = await res.json()
-          if (json.secure_url) {
-            uploadedUrls.push(json.secure_url.replace('/upload/', '/upload/f_auto,q_auto/'))
-          } else {
-            throw new Error(json.error?.message || "Upload failed")
-          }
+          const secureUrl = await uploadImageToSecureProxy(compressedFile);
+          uploadedUrls.push(secureUrl);
         } catch (err: any) {
           console.error("Compression or upload failed", err)
           toast.error(`Image upload failed: ${err.message}`)
           setLoading(false)
-          return // Stop saving product
+          return
         }
       }
     }
 
-    const supabase = createClient()
     const slug = generateSlug(formData.name)
     
-    const { error } = await supabase
-      .from("Product")
-      .insert([{
-        name: formData.name,
-        nameKhmer: formData.nameKhmer || null,
-        slug: slug,
-        brand: formData.brand,
-        model: formData.model,
-        price: parseFloat(formData.price) || 0,
-        year: parseInt(formData.year) || null,
-        hours: parseInt(formData.hours) || null,
-        location: formData.location,
-        condition: formData.condition,
-        description: formData.description,
-        descriptionKhmer: formData.descriptionKhmer || null,
-        shortDescription: formData.shortDescription,
-        isPublished: formData.isPublished,
-        isFeatured: formData.isFeatured,
-        categoryId: formData.subcategoryId || formData.categoryId || null,
-        subcategoryId: null,
-        images: uploadedUrls,
-        thumbnail: uploadedUrls[0] || null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }])
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        table: "Product",
+        action: "insert",
+        data: {
+          name: formData.name,
+          nameKhmer: formData.nameKhmer || null,
+          slug: slug,
+          brand: formData.brand,
+          model: formData.model,
+          price: parseFloat(formData.price) || 0,
+          year: parseInt(formData.year) || null,
+          hours: parseInt(formData.hours) || null,
+          location: formData.location,
+          condition: formData.condition,
+          description: formData.description,
+          descriptionKhmer: formData.descriptionKhmer || null,
+          shortDescription: formData.shortDescription,
+          isPublished: formData.isPublished,
+          isFeatured: formData.isFeatured,
+          categoryId: formData.subcategoryId || formData.categoryId || null,
+          subcategoryId: null,
+          thumbnail: uploadedUrls[0] || null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      })
+    })
 
-    if (error) {
-      toast.error("Error creating product: " + error.message)
+    const jsonRes = await res.json()
+
+    if (!res.ok || jsonRes.error) {
+      toast.error("Error creating product: " + (jsonRes.error || "Unknown error"))
     } else {
       await logActivity({
         action: "create",
