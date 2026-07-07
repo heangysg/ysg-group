@@ -286,7 +286,7 @@ export default function OrderDetailsPage() {
                   {order.items?.map((item: any, idx: number) => (
                     <div key={idx} className="py-4 md:py-6 flex items-start md:items-center gap-4 md:gap-6">
                       <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 overflow-hidden shrink-0 border-2 border-slate-900 mt-1 md:mt-0">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 space-y-1">
                         <h4 className="text-sm md:text-[15px] font-bold text-slate-900 uppercase tracking-tight line-clamp-2 leading-tight">

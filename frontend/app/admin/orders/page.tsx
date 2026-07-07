@@ -283,7 +283,7 @@ export default function AdminOrders() {
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-white border-2 border-slate-900 flex items-center justify-center overflow-hidden">
                           {item.image ? (
-                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
                             <Package className="w-6 h-6 text-slate-900" />
                           )}

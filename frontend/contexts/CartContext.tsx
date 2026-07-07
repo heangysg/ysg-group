@@ -68,6 +68,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         selectedImage = product.image
       }
 
+      if (selectedImage && selectedImage.includes('cloudinary.com')) {
+        selectedImage = selectedImage.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/');
+      }
+
       return [...prev, {
         id: product.id,
         name: product.name,

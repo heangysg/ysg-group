@@ -75,7 +75,7 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount, 
                 {items.map((item, idx) => (
                   <div key={idx} className="p-4 flex items-center gap-4">
                     <div className="w-14 h-14 bg-slate-100 shrink-0 border-2 border-slate-900 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-slate-900 uppercase truncate">

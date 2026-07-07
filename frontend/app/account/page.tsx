@@ -370,7 +370,7 @@ export default function AccountPage() {
                             {order.items?.map((item: any, idx: number) => (
                               <div key={idx} className="flex items-center gap-4 p-3 bg-white border-2 border-slate-900">
                                 <div className="w-10 h-10 bg-slate-50 overflow-hidden border-2 border-slate-900 flex-shrink-0">
-                                  {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
+                                  {item.image && <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-[12px] font-medium text-slate-900 truncate uppercase">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</p>
