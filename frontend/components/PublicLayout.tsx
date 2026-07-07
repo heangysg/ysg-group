@@ -169,7 +169,7 @@ export default function PublicLayout({
                 >
                   <div className="w-7 h-5 border border-slate-200">
                     <img 
-                      src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
+                      src={language === "en" ? "/image/kh.png" : "/image/gb.png"} 
                       alt="flag"
                       className="w-full h-full object-cover"
                     />
@@ -222,7 +222,7 @@ export default function PublicLayout({
                 >
                   <div className="w-5 h-3.5 border border-slate-200">
                     <img 
-                      src={language === "en" ? "https://flagcdn.com/w40/kh.png" : "https://flagcdn.com/w40/gb.png"} 
+                      src={language === "en" ? "/image/kh.png" : "/image/gb.png"} 
                       alt={language}
                       className="w-full h-full object-cover"
                     />

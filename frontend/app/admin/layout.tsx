@@ -376,14 +376,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "en" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
               title="English"
             >
-              <img src="https://flagcdn.com/gb.svg" alt="English" className="w-6 h-auto" />
+              <img src="/image/gb.png" alt="English" className="w-6 h-auto" />
             </button>
             <button
               onClick={() => setLanguage("kh")}
               className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "kh" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
               title="Khmer"
             >
-              <img src="https://flagcdn.com/kh.svg" alt="Khmer" className="w-6 h-auto" />
+              <img src="/image/kh.png" alt="Khmer" className="w-6 h-auto" />
             </button>
           </div>
 
