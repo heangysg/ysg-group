@@ -159,7 +159,7 @@ export default function AdminSettings() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">📱 WhatsApp Number</label>
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">WhatsApp Number</label>
               <input
                 type="text"
                 className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
@@ -169,7 +169,7 @@ export default function AdminSettings() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">✈️ Telegram Username</label>
+              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">Telegram Username</label>
               <input
                 type="text"
                 className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
