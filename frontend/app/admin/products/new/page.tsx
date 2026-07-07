@@ -121,7 +121,7 @@ export default function AddProduct() {
     if (pendingImages.length > 0) {
       for (const file of pendingImages) {
         try {
-          const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1200, useWebWorker: true }
+          const options = { maxSizeMB: 0.2, maxWidthOrHeight: 600, useWebWorker: true }
           const compressedFile = await imageCompression(file, options)
           
           const secureUrl = await uploadImageToSecureProxy(compressedFile);
