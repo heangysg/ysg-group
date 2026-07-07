@@ -154,7 +154,7 @@ export default function AdminCategories() {
 
     if (pendingImageFile) {
       try {
-        const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
+        const options = { maxSizeMB: 0.1, maxWidthOrHeight: 300, useWebWorker: true }
         const compressedFile = await imageCompression(pendingImageFile, options)
         
         finalImageUrl = await uploadImageToSecureProxy(compressedFile);

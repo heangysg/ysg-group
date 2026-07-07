@@ -203,8 +203,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       if (selectedFile) {
         const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 800,
+          maxSizeMB: 0.1,
+          maxWidthOrHeight: 300,
           useWebWorker: true
         }
         const compressedFile = await imageCompression(selectedFile, options)
@@ -449,7 +449,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <div className="w-10 h-10 bg-slate-100 border-2 border-slate-900 flex items-center justify-center overflow-hidden">
                 {adminProfileImage ? (
-                  <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-primary flex items-center justify-center text-white font-bold uppercase text-lg">
                     {adminName.charAt(0)}
@@ -501,7 +501,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <div className="w-24 h-24 bg-slate-100 border-2 border-slate-900 overflow-hidden shadow-hard flex items-center justify-center">
                     {adminProfileImage ? (
                       <img 
-                        src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} 
+                        src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/") : adminProfileImage} 
                         alt="Profile" 
                         className="w-full h-full object-cover transition-transform group-hover:scale-110" 
                       />

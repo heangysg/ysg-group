@@ -43,7 +43,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     toast.success(message)
   }
 
-  const imageUrl = product.images && product.images[0] ? product.images[0] : product.thumbnail
+  let imageUrl = product.images && product.images[0] ? product.images[0] : product.thumbnail
+  if (imageUrl && imageUrl.includes("cloudinary.com")) {
+    imageUrl = imageUrl.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/")
+  }
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">

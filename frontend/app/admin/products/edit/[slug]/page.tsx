@@ -186,7 +186,7 @@ export default function EditProduct() {
     if (pendingImages.length > 0) {
       for (const file of pendingImages) {
         try {
-          const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true }
+          const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1200, useWebWorker: true }
           const compressedFile = await imageCompression(file, options)
           
           const secureUrl = await uploadImageToSecureProxy(compressedFile);
