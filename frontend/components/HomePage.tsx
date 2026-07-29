@@ -173,7 +173,7 @@ export default function HomePage() {
                     {/* Image */}
                     <div className="relative w-full h-48 md:h-56 bg-slate-100 overflow-hidden mb-6 flex items-center justify-center border-b-4 border-slate-900">
                       {cat.image ? (
-                        <Image src={cat.image} alt={cat.name} fill className="object-cover transition-all duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                        <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105" />
                       ) : (
                         <Package className="w-12 h-12 text-slate-300" />
                       )}

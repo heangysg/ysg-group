@@ -18,7 +18,6 @@ type ProductCardProps = {
     status?: string
     images?: string[]
     thumbnail?: string
-    location?: string
     model?: string
   }
 }
@@ -97,11 +96,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                  {product.model || "Standard"}
                </span>
-               <div className="w-1 h-1 bg-slate-300 rounded-full" />
-               <div className="flex items-center gap-1.5">
-                 <MapPin className="w-3 h-3 text-primary" />
-                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{product.location || "Cambodia"}</span>
-               </div>
+
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-﻿// Database types matching your actual schema
+// Database types matching your actual schema
 export type Product = {
   id: string
   categoryId?: string
@@ -8,8 +8,6 @@ export type Product = {
   nameKhmer?: string
   titleKhmer?: string
   slug: string
-  shortDescription?: string
-  shortDescriptionKhmer?: string
   description?: string
   descriptionKhmer?: string
   model?: string
@@ -19,8 +17,6 @@ export type Product = {
   currency?: string
   stock?: number
   year?: number
-  hours?: number
-  location?: string
   condition?: string
   status?: string
   isFeatured?: boolean
@@ -28,12 +24,8 @@ export type Product = {
   isActive?: boolean
   priceOnRequest?: boolean
   thumbnail?: string
-  brochureUrl?: string
-  videoUrl?: string
   specifications?: any
   features?: string[]
-  viewCount?: number
-  inquiryCount?: number
   metaTitle?: string
   metaDescription?: string
   metaDesc?: string
@@ -52,7 +44,6 @@ export type Category = {
   description?: string
   descriptionKhmer?: string
   image?: string
-  icon?: string
   isFeatured?: boolean
   isActive?: boolean
   sortOrder?: number

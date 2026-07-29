@@ -30,12 +30,9 @@ export default function EditProduct() {
     model: "",
     price: "",
     year: "",
-    hours: "",
-    location: "",
     condition: "used",
     description: "",
     descriptionKhmer: "",
-    shortDescription: "",
     isPublished: true,
     isFeatured: false,
     categoryId: "",
@@ -116,12 +113,9 @@ export default function EditProduct() {
           model: data.model || "",
           price: data.price?.toString() || "",
           year: data.year?.toString() || "",
-          hours: data.hours?.toString() || "",
-          location: data.location || "",
           condition: data.condition || "used",
           description: data.description || "",
           descriptionKhmer: data.descriptionKhmer || "",
-          shortDescription: data.shortDescription || "",
           isPublished: data.isPublished ?? true,
           isFeatured: data.isFeatured ?? false,
           categoryId: mainCatId,
@@ -224,12 +218,9 @@ export default function EditProduct() {
           model: formData.model,
           price: parseFloat(formData.price) || 0,
           year: parseInt(formData.year) || null,
-          hours: parseInt(formData.hours) || null,
-          location: formData.location,
           condition: formData.condition,
           description: formData.description,
           descriptionKhmer: formData.descriptionKhmer || null,
-          shortDescription: formData.shortDescription,
           isPublished: formData.isPublished,
           isFeatured: formData.isFeatured,
           categoryId: formData.subcategoryId || formData.categoryId || null,
@@ -398,20 +389,7 @@ export default function EditProduct() {
                 <input type="number" className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("hours")}</label>
-              <div className="relative">
-                <Clock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
-                <input type="number" className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.hours} onChange={(e) => setFormData({...formData, hours: e.target.value})} />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("location")}</label>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
-                <input type="text" className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.location} onChange={(e) => setFormData({...formData, location: e.target.value})} />
-              </div>
-            </div>
+
             <div className="space-y-2">
               <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("condition")}</label>
               <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.condition} onChange={(e) => setFormData({...formData, condition: e.target.value})}>

@@ -405,34 +405,36 @@ export default function AdminCategories() {
                   <input type="number" className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none font-bold text-xs uppercase tracking-widest transition-all" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
                 </div>
 
-                {/* Image Upload Section */}
-                <div>
-                  <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryImage") || "Category Image"}</label>
-                  {!previewImage && !formData.image ? (
-                    <label className="flex flex-col items-center justify-center w-full h-32 bg-slate-50 border-2 border-dashed border-slate-900 cursor-pointer hover:bg-white transition-all">
-                      <div className="flex flex-col items-center justify-center gap-3 text-slate-900">
-                        <ImageIcon className="w-8 h-8" />
-                        <span className="text-xs font-bold uppercase tracking-widest">{t("clickToSelectImage")}</span>
+                {modalType === "main" && (
+                  <div>
+                    <label className="block text-base font-bold text-slate-700 uppercase tracking-widest mb-2 ml-1">{t("categoryImage") || "Category Image"}</label>
+                    {!previewImage && !formData.image ? (
+                      <label className="flex flex-col items-center justify-center w-full h-32 bg-slate-50 border-2 border-dashed border-slate-900 cursor-pointer hover:bg-white transition-all">
+                        <div className="flex flex-col items-center justify-center gap-3 text-slate-900">
+                          <ImageIcon className="w-8 h-8" />
+                          <span className="text-xs font-bold uppercase tracking-widest">{t("clickToSelectImage")}</span>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                      </label>
+                    ) : (
+                      <div className="relative group p-2 border-2 border-slate-900 bg-slate-50">
+                        <img 
+                          src={previewImage || formData.image} 
+                          alt="Category" 
+                          className="w-full h-40 object-cover border-2 border-slate-900" 
+                        />
+                        <button
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute top-4 right-4 p-2 bg-white text-red-600 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                    </label>
-                  ) : (
-                    <div className="relative group p-2 border-2 border-slate-900 bg-slate-50">
-                      <img 
-                        src={previewImage || formData.image} 
-                        alt="Category" 
-                        className="w-full h-40 object-cover border-2 border-slate-900" 
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="absolute top-4 right-4 p-2 bg-white text-red-600 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex gap-8 pt-2">
                   <label className="flex items-center gap-3 cursor-pointer group">
                     <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})} className="w-5 h-5 border-2 border-slate-900 accent-primary" />

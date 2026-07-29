@@ -3,19 +3,19 @@
 import { useEffect, useState, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { 
-  LayoutDashboard, 
-  Package, 
-  FolderOpen, 
-  Mail, 
-  History, 
-  Users, 
-  Settings, 
-  Menu, 
-  X, 
-  LogOut, 
-  Bell, 
-  Search, 
+import {
+  LayoutDashboard,
+  Package,
+  FolderOpen,
+  Mail,
+  History,
+  Users,
+  Settings,
+  Menu,
+  X,
+  LogOut,
+  Bell,
+  Search,
   ChevronDown,
   User,
   Camera,
@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  
+
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState<any[]>([])
   const [search, setSearch] = useState("")
@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     const userStr = localStorage.getItem("ysg_admin_user")
     const tokenStr = localStorage.getItem("ysg_admin_token")
-    
+
     if ((!userStr || !tokenStr) && pathname !== "/admin/login") {
       router.push("/admin/login")
       return
@@ -99,7 +99,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const token = localStorage.getItem("ysg_admin_token")
       const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
-      
+
       const [inquiriesRes, ordersRes] = await Promise.all([
         fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json()),
         fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json())
@@ -188,7 +188,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setSelectedFile(file)
     const localUrl = URL.createObjectURL(file)
     setAdminProfileImage(localUrl)
-    
+
     if (e.target) e.target.value = ""
   }
 
@@ -203,8 +203,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       if (selectedFile) {
         const options = {
-          maxSizeMB: 0.1,
-          maxWidthOrHeight: 300,
+          maxSizeMB: 1,
+          maxWidthOrHeight: 800,
           useWebWorker: true
         }
         const compressedFile = await imageCompression(selectedFile, options)
@@ -231,7 +231,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       const updatedUser = { ...user, name: adminName, avatar: finalImageUrl }
       localStorage.setItem("ysg_admin_user", JSON.stringify(updatedUser))
-      
+
       setAdminProfileImage(finalImageUrl)
       setSelectedFile(null)
       toast.success(t("profileUpdated") || "Profile updated!")
@@ -249,40 +249,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex font-sans">
       <Toaster position="top-right" />
-      
+
       {/* Sidebar Overlay */}
       {isMobile && sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] transition-all"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-    <aside className={`
+      <aside className={`
       fixed lg:static inset-y-0 left-0 z-[50]
       bg-white border-r-2 border-slate-900 transition-all duration-300 ease-in-out
       flex flex-col overflow-hidden
-      ${sidebarOpen 
-        ? "w-72 translate-x-0 opacity-100" 
-        : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0"}
+      ${sidebarOpen
+          ? "w-72 translate-x-0 opacity-100"
+          : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0"}
     `}>
-      {/* Logo */}
-      <div className="h-20 flex items-center px-8 border-b-2 border-slate-900 shrink-0 bg-primary">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-slate-900 rounded-none flex items-center justify-center shadow-hard border-2 border-slate-900">
-            <span className="text-white font-bold text-xl uppercase">G</span>
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-tight uppercase">
-              {isSuperAdmin ? t("superadmin") : t("admin")} {t("panel")}
-            </h1>
-            <p className="text-xs font-bold text-slate-900 uppercase tracking-widest mt-0.5">
-              {t("managementPortal")}
-            </p>
+        {/* Logo */}
+        <div className="h-20 flex items-center px-8 border-b-2 border-slate-900 shrink-0 bg-primary">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-slate-900 rounded-none flex items-center justify-center shadow-hard border-2 border-slate-900">
+              <span className="text-white font-bold text-xl uppercase">G</span>
+            </div>
+            <div>
+              <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-tight uppercase">
+                {isSuperAdmin ? t("superadmin") : t("admin")} {t("panel")}
+              </h1>
+              <p className="text-xs font-bold text-slate-900 uppercase tracking-widest mt-0.5">
+                {t("managementPortal")}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-6 space-y-2 custom-scrollbar">
@@ -294,8 +294,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={item.href}
                 className={`
                   flex items-center gap-3 px-4 py-3 font-bold text-xs uppercase tracking-widest transition-all border-2
-                  ${isActive 
-                    ? "bg-primary text-slate-900 border-slate-900 shadow-hard" 
+                  ${isActive
+                    ? "bg-primary text-slate-900 border-slate-900 shadow-hard"
                     : "text-slate-600 border-transparent hover:text-slate-900 hover:border-slate-900"}
                 `}
               >
@@ -306,90 +306,90 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-      {/* Logout */}
-      <div className="p-6 border-t-2 border-slate-900">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-red-600 border-2 border-transparent hover:border-red-600 hover:shadow-hard-red bg-red-50 font-bold uppercase tracking-widest text-xs transition-all"
-        >
-          <LogOut className="w-5 h-5" />
-          {t("logout")}
-        </button>
-      </div>
+        {/* Logout */}
+        <div className="p-6 border-t-2 border-slate-900">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-4 py-3 text-red-600 border-2 border-transparent hover:border-red-600 hover:shadow-hard-red bg-red-50 font-bold uppercase tracking-widest text-xs transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+            {t("logout")}
+          </button>
+        </div>
       </aside>
 
-    {/* Main Content */}
-    <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-slate-50">
-      {/* Header */}
-      <header className="h-20 bg-white border-b-2 border-slate-900 px-6 lg:px-8 flex items-center justify-between shrink-0 z-[30]">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2.5 bg-slate-50 text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
-          >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-slate-50">
+        {/* Header */}
+        <header className="h-20 bg-white border-b-2 border-slate-900 px-6 lg:px-8 flex items-center justify-between shrink-0 z-[30]">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2.5 bg-slate-50 text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
             <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
             <div className={`hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
               <Link href="/admin/dashboard" className="hover:text-primary transition-colors">{t("admin")}</Link>
               <span className="text-slate-200 text-[14px] font-normal leading-none -mt-0.5">/</span>
               <span className="text-slate-900">
-                {pathname === "/admin/dashboard" ? t("dashboard") : 
-                 pathname.includes("/admin/products") ? t("products") :
-                 pathname.includes("/admin/categories") ? t("categories") :
-                 pathname.includes("/admin/inquiries") ? t("inquiries") :
-                 pathname.includes("/admin/orders") ? t("orders") :
-                 pathname.includes("/admin/users") ? t("users") :
-                 pathname.includes("/admin/activity") ? t("activity") :
-                 pathname.includes("/admin/audit-logs") ? t("auditLogs") :
-                 pathname.includes("/admin/settings") ? t("settings") :
-                 pathname.split("/").pop()?.replace("-", " ")}
+                {pathname === "/admin/dashboard" ? t("dashboard") :
+                  pathname.includes("/admin/products") ? t("products") :
+                    pathname.includes("/admin/categories") ? t("categories") :
+                      pathname.includes("/admin/inquiries") ? t("inquiries") :
+                        pathname.includes("/admin/orders") ? t("orders") :
+                          pathname.includes("/admin/users") ? t("users") :
+                            pathname.includes("/admin/activity") ? t("activity") :
+                              pathname.includes("/admin/audit-logs") ? t("auditLogs") :
+                                pathname.includes("/admin/settings") ? t("settings") :
+                                  pathname.split("/").pop()?.replace("-", " ")}
               </span>
             </div>
-            
-          {/* Global Search Bar */}
-          <div className="hidden xl:flex relative group max-w-xs w-full ml-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-            <input 
-              type="text" 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("search") + "..."}
-              className="w-full pl-11 pr-9 py-2 bg-slate-50 border-2 border-slate-900 outline-none focus:bg-white transition-all text-xs font-bold uppercase tracking-widest placeholder:text-slate-400" 
-            />
-            {search && (
-              <button 
-                onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-900 hover:text-red-600 transition-colors z-10"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+
+            {/* Global Search Bar */}
+            <div className="hidden xl:flex relative group max-w-xs w-full ml-4">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("search") + "..."}
+                className="w-full pl-11 pr-9 py-2 bg-slate-50 border-2 border-slate-900 outline-none focus:bg-white transition-all text-xs font-bold uppercase tracking-widest placeholder:text-slate-400"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-900 hover:text-red-600 transition-colors z-10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
-        <div className="flex items-center gap-4 lg:gap-6">
-          {/* Language Switcher with Flags */}
-          <div className="flex items-center bg-slate-50 border-2 border-slate-900 p-1 shadow-hard">
-            <button
-              onClick={() => setLanguage("en")}
-              className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "en" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
-              title="English"
-            >
-              <img src="/image/gb.png" alt="English" className="w-6 h-auto" />
-            </button>
-            <button
-              onClick={() => setLanguage("kh")}
-              className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "kh" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
-              title="Khmer"
-            >
-              <img src="/image/kh.png" alt="Khmer" className="w-6 h-auto" />
-            </button>
-          </div>
+          <div className="flex items-center gap-4 lg:gap-6">
+            {/* Language Switcher with Flags */}
+            <div className="flex items-center bg-slate-50 border-2 border-slate-900 p-1 shadow-hard">
+              <button
+                onClick={() => setLanguage("en")}
+                className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "en" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
+                title="English"
+              >
+                <img src="/image/gb.png" alt="English" className="w-6 h-auto" />
+              </button>
+              <button
+                onClick={() => setLanguage("kh")}
+                className={`w-10 h-8 flex items-center justify-center transition-all border-2 ${language === "kh" ? "bg-white border-slate-900" : "border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100"}`}
+                title="Khmer"
+              >
+                <img src="/image/kh.png" alt="Khmer" className="w-6 h-auto" />
+              </button>
+            </div>
 
             {/* Notifications */}
             <div className="relative" ref={notificationRef}>
-              <button 
+              <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className={`p-2 transition-all border-2 ${showNotifications ? 'bg-primary text-slate-900 border-slate-900 shadow-hard' : 'text-slate-900 border-transparent hover:border-slate-900 hover:shadow-hard'}`}
               >
@@ -432,8 +432,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       </div>
                     )}
                   </div>
-                  <Link 
-                    href="/admin/activity" 
+                  <Link
+                    href="/admin/activity"
                     onClick={() => setShowNotifications(false)}
                     className="block p-4 border-t-2 border-slate-900 bg-slate-50 text-center text-xs font-bold text-slate-900 hover:bg-slate-900 hover:text-white transition-all uppercase tracking-widest"
                   >
@@ -443,13 +443,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               )}
             </div>
 
-            <button 
+            <button
               onClick={() => setShowProfileModal(true)}
               className="flex items-center gap-3 p-1.5 pr-4 hover:bg-slate-50 transition-all border-2 border-transparent hover:border-slate-900 hover:shadow-hard group"
             >
               <div className="w-10 h-10 bg-slate-100 border-2 border-slate-900 flex items-center justify-center overflow-hidden">
                 {adminProfileImage ? (
-                  <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-primary flex items-center justify-center text-white font-bold uppercase text-lg">
                     {adminName.charAt(0)}
@@ -485,7 +485,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <h2 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">My Profile</h2>
                   <p className="text-sm text-slate-400 mt-1">{t("updatePhotoAndHistory")}</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowProfileModal(false)}
                   className="p-3 bg-white border-2 border-slate-900 text-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                 >
@@ -500,25 +500,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="relative group">
                   <div className="w-24 h-24 bg-slate-100 border-2 border-slate-900 overflow-hidden shadow-hard flex items-center justify-center">
                     {adminProfileImage ? (
-                      <img 
-                        src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/") : adminProfileImage} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                      <img
+                        src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage}
+                        alt="Profile"
+                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
                       />
                     ) : (
                       <User className="w-10 h-10 text-slate-900" />
                     )}
                   </div>
-                  <button 
+                  <button
                     onClick={() => fileInputRef.current?.click()}
                     className="absolute -bottom-3 -right-3 p-3 bg-primary text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
-                  <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
                     accept="image/*"
                     onChange={handleImageUpload}
                   />

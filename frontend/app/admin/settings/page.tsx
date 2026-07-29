@@ -42,15 +42,17 @@ export default function AdminSettings() {
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify({ table: "Setting", limit: 100 })
       })
-      const { data } = await res.json()
-      if (data && data.length > 0) {
-        const newSettings = { ...settings }
-        data.forEach((row: any) => {
-          if (newSettings.hasOwnProperty(row.key)) {
-            (newSettings as any)[row.key] = row.value
-          }
-        })
-        setSettings(newSettings)
+      if (res.ok) {
+        const { data } = await res.json()
+        if (data && data.length > 0) {
+          const newSettings = { ...settings }
+          data.forEach((row: any) => {
+            if (newSettings.hasOwnProperty(row.key)) {
+              (newSettings as any)[row.key] = row.value
+            }
+          })
+          setSettings(newSettings)
+        }
       }
     } catch (err) {
       console.error("Failed to fetch settings:", err)

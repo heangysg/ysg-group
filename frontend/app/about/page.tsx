@@ -15,8 +15,10 @@ export default function AboutPage() {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
         const res = await fetch(`${API_URL}/api/public/settings`)
-        const data = await res.json()
-        setSettings(data.data || {})
+        if (res.ok) {
+          const data = await res.json()
+          setSettings(data.data || {})
+        }
       } catch (err) {
         console.error("Failed to fetch settings:", err)
       }

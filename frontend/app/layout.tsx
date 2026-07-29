@@ -19,10 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   try {
     const res = await fetch(`${API_URL}/api/public/settings`, { next: { revalidate: 60 } })
-    const json = await res.json()
-    if (json.data) {
-      if (json.data.meta_title) meta_title = json.data.meta_title
-      if (json.data.meta_description) meta_description = json.data.meta_description
+    if (res.ok) {
+      const json = await res.json()
+      if (json.data) {
+        if (json.data.meta_title) meta_title = json.data.meta_title
+        if (json.data.meta_description) meta_description = json.data.meta_description
+      }
     }
   } catch (error) {
     console.error("Failed to fetch settings metadata", error)

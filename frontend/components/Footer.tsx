@@ -20,9 +20,11 @@ export default function Footer() {
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         const res = await fetch(`${API_URL}/api/public/settings`)
-        const { data } = await res.json()
-        if (data) {
-          setSettings((prev: any) => ({ ...prev, ...data }))
+        if (res.ok) {
+          const { data } = await res.json()
+          if (data) {
+            setSettings((prev: any) => ({ ...prev, ...data }))
+          }
         }
       } catch (err) {
         console.error("Failed to fetch settings:", err)

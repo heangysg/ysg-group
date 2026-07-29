@@ -15,10 +15,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     if (product) {
       return {
         title: `${product.name} | YSG Machinery`,
-        description: product.shortDescription,
+        description: product.description,
         openGraph: {
           title: product.name,
-          description: product.shortDescription,
+          description: product.description,
           images: product.images?.[0] ? [{ url: product.images[0] }] : [],
         },
       }
