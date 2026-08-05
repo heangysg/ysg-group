@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect, useState, useRef } from "react"
+import Link from "next/link"
 import { ArrowRight, ChevronRight, Search, TrendingUp, LayoutGrid, X } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import ProductCard from "./ProductCard"
