@@ -1,24 +1,45 @@
-import { createClient } from "../../../lib/supabase/client"
 import ProductsList from "../../../components/ProductsList"
 import type { Metadata } from "next"
 import { Suspense } from "react"
 import PublicLayout from "../../../components/PublicLayout"
+import CategorySubgrid from "../../../components/CategorySubgrid"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const supabase = createClient()
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
   
-  const { data: category } = await supabase
-    .from("Category")
-    .select("name, description")
-    .eq("slug", slug)
-    .single()
+  try {
+    const res = await fetch(`${API_URL}/api/public/categories`, { next: { revalidate: 300 } })
+    if (res.ok) {
+      const { data: categories } = await res.json()
+      const category = categories?.find((c: any) => c.slug === slug)
 
-  if (category) {
-    return {
-      title: `${category.name} | YSG Machinery`,
-      description: category.description || `Browse our collection of ${category.name}`,
+      if (category) {
+        const title = `${category.name} | YSG Machinery`
+        const description = category.description || `Browse our collection of ${category.name}`
+        const imageUrl = category.image || null
+        const images = imageUrl ? [{ url: imageUrl, width: 800, height: 600, alt: category.name }] : []
+
+        return {
+          title,
+          description,
+          openGraph: {
+            title,
+            description,
+            type: "website",
+            images,
+          },
+          twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images,
+          }
+        }
+      }
     }
+  } catch (error) {
+    console.error("Error fetching category meta", error)
   }
 
   return { title: "Category Not Found | YSG Machinery" }
@@ -26,13 +47,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const supabase = createClient()
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
   
-  const { data: category } = await supabase
-    .from("Category")
-    .select("id, name")
-    .eq("slug", slug)
-    .single()
+  let category = null
+  let subcategories: any[] = []
+  try {
+    const res = await fetch(`${API_URL}/api/public/categories`, { next: { revalidate: 300 } })
+    if (res.ok) {
+      const { data: categories } = await res.json()
+      category = categories?.find((c: any) => c.slug === slug)
+      if (category) {
+        subcategories = categories.filter((c: any) => c.parentId === category.id).sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching category", error)
+  }
 
   if (!category) {
     return (
@@ -57,7 +87,13 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
         </div>
       </PublicLayout>
     }>
-      <ProductsList initialCategory={slug} />
+      {subcategories && subcategories.length > 0 ? (
+        <PublicLayout>
+          <CategorySubgrid category={category} subcategories={subcategories} />
+        </PublicLayout>
+      ) : (
+        <ProductsList initialCategory={slug} />
+      )}
     </Suspense>
   )
 }

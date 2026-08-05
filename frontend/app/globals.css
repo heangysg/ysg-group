@@ -34,19 +34,19 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-slate-900 font-bold uppercase tracking-widest transition-all duration-300 hover:bg-primary-dark hover:shadow-hard-primary active:translate-y-1 active:shadow-none border-2 border-primary;
+    @apply bg-primary text-white font-bold rounded-2xl md:rounded-[1rem] transition-all duration-300 hover:bg-primary-dark shadow-lg shadow-primary/30 active:scale-95 flex items-center justify-center border border-primary-dark;
   }
   
   .solid-card {
-    @apply bg-white border-2 border-slate-900 shadow-hard hover:shadow-none hover:translate-y-1 hover:translate-x-1 transition-all rounded-none;
+    @apply bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-all duration-300;
   }
 
   .solid-panel {
-    @apply bg-slate-900 text-white border-2 border-primary rounded-none;
+    @apply bg-white text-slate-900 border border-slate-100 rounded-[1.5rem] md:rounded-[2rem] shadow-sm transition-all duration-300;
   }
 
   .btn-fab {
-    @apply fixed bottom-24 right-6 z-[150] w-14 h-14 bg-primary text-slate-900 rounded-none shadow-hard-primary flex items-center justify-center hover:bg-primary-dark active:translate-y-1 active:shadow-none transition-all duration-300 border-2 border-slate-900;
+    @apply fixed bottom-24 right-6 z-[150] w-14 h-14 bg-primary text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.3)] flex items-center justify-center hover:bg-primary-dark active:scale-95 transition-all duration-300 border border-white/20;
   }
 }
 

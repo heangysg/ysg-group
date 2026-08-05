@@ -65,7 +65,7 @@ export default function AdminLogin() {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-4 font-bold tracking-widest uppercase text-xs mb-6 border-2 border-red-600 shadow-hard">
+            <div className="bg-red-50 text-red-600 p-4 font-bold font-medium text-xs mb-6 border-2 border-red-600 shadow-sm">
               {error}
             </div>
           )}
@@ -73,7 +73,7 @@ export default function AdminLogin() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-base font-bold text-slate-700 uppercase tracking-widest ml-1">Email Address</label>
+                <label className="text-base font-bold text-slate-700 font-medium ml-1">Email Address</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                     <Mail className="w-5 h-5" />
@@ -81,7 +81,7 @@ export default function AdminLogin() {
                   <input
                     type="email"
                     required
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 font-medium text-[11px]"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@company.com"
@@ -90,7 +90,7 @@ export default function AdminLogin() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-base font-bold text-slate-700 uppercase tracking-widest ml-1">Password</label>
+                <label className="text-base font-bold text-slate-700 font-medium ml-1">Password</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                     <Lock className="w-5 h-5" />
@@ -98,7 +98,7 @@ export default function AdminLogin() {
                   <input
                     type="password"
                     required
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 font-medium text-[11px]"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
@@ -113,7 +113,7 @@ export default function AdminLogin() {
               className="btn-primary w-full py-4 text-[11px] flex items-center justify-center gap-3 disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" />
               ) : (
                 "LOGIN"
               )}

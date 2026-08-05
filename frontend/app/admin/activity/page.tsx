@@ -89,7 +89,7 @@ export default function ActivityPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">{t("loading")}</p>
+        <p className="text-slate-400 font-medium text-xs font-medium">{t("loading")}</p>
       </div>
     )
   }
@@ -127,7 +127,7 @@ export default function ActivityPage() {
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-3">
                     <h3 className="font-medium text-slate-900">{activity.title}</h3>
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-semibold uppercase tracking-widest rounded-md">
+                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-semibold font-medium rounded-md">
                       {t(activity.type) || activity.type}
                     </span>
                   </div>

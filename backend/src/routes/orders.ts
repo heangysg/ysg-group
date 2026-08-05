@@ -11,7 +11,7 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
 
     if (!customerName || String(customerName).length > 100) return res.status(400).json({ error: "Invalid or overly long customer name (max 100)" }) as any;
     if (!customerPhone || String(customerPhone).length > 20) return res.status(400).json({ error: "Invalid or overly long phone number (max 20)" }) as any;
-    if (!customerEmail || String(customerEmail).length > 100) return res.status(400).json({ error: "Invalid or overly long email (max 100)" }) as any;
+    if (customerEmail && String(customerEmail).length > 100) return res.status(400).json({ error: "Overly long email (max 100)" }) as any;
     if (!address || String(address).length > 500) return res.status(400).json({ error: "Invalid or overly long address (max 500)" }) as any;
     if (!paymentMethod || String(paymentMethod).length > 50) return res.status(400).json({ error: "Invalid payment method" }) as any;
 
@@ -78,15 +78,15 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
       const shortId = Array.from({ length: 10 }, () => alphabet.charAt(crypto.randomInt(0, alphabet.length))).join('');
       
       const query = `
-        INSERT INTO "Order" (id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt", "updatedAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+        INSERT INTO "Order" (id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
         RETURNING *;
       `;
       const values = [
         shortId, 
         customerName, 
         customerPhone, 
-        customerEmail, 
+        customerEmail || null, 
         address, 
         paymentMethod, 
         totalAmount, 
@@ -135,6 +135,38 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error("Fetch Order Error:", error);
     res.status(500).json({ error: "Failed to fetch order details" });
+  } finally {
+    await pgClient.release();
+  }
+});
+
+router.post('/track', async (req: Request, res: Response): Promise<void> => {
+  const { orderId, phone } = req.body;
+  
+  if (!orderId || !phone) {
+    res.status(400).json({ error: "Order ID and Phone number are required" });
+    return;
+  }
+
+  const pgClient = await getPgClient();
+  try {
+    const query = `
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      FROM "Order" 
+      WHERE id = $1 AND "customerPhone" = $2
+      LIMIT 1
+    `;
+    const { rows } = await pgClient.query(query, [orderId, phone]);
+    
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Order not found or phone number does not match." });
+      return;
+    }
+    
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Track Order Error:", error);
+    res.status(500).json({ error: "Failed to track order" });
   } finally {
     await pgClient.release();
   }

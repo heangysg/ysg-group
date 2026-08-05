@@ -12,6 +12,7 @@ export default function AdminProducts() {
   const [categories, setCategories] = useState<any[]>([])
   const [search, setSearch] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -27,12 +28,9 @@ export default function AdminProducts() {
       const token = localStorage.getItem("ysg_admin_token")
       const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
       try {
-        const [catRes, prodRes] = await Promise.all([
-          fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", order: { column: "sortOrder", ascending: true } }) }).then(r => r.json()),
-          fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Product", order: { column: "createdAt", ascending: false }, limit: 50 }) }).then(r => r.json())
-        ])
+        const catRes = await fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", order: { column: "sortOrder", ascending: true } }) }).then(r => r.json())
         setCategories(catRes.data || [])
-        setProducts(prodRes.data || [])
+        await fetchProducts(1)
       } catch (err) {
         console.error("Initial Fetch Error:", err)
       } finally {
@@ -47,7 +45,7 @@ export default function AdminProducts() {
     if (!loading) {
       fetchProducts(1)
     }
-  }, [search, selectedCategory])
+  }, [search, selectedCategory, statusFilter])
 
   useEffect(() => {
     if (!loading) {
@@ -74,9 +72,22 @@ export default function AdminProducts() {
       body.or = `name.ilike.%${search}%,nameKhmer.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`
     }
     if (selectedCategory) {
-      body.eq = { categoryId: selectedCategory }
+      body.eq = body.eq || {}
+      body.eq.categoryId = selectedCategory
     }
     
+    if (statusFilter === "published") {
+      body.eq = body.eq || {}
+      body.eq.isPublished = true
+    } else if (statusFilter === "hidden") {
+      body.eq = body.eq || {}
+      body.eq.isPublished = false
+    }
+
+    // Only fetch non-deleted products
+    body.eq = body.eq || {}
+    body.eq.isActive = true
+
     const res = await fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify(body) })
     const { data, count } = await res.json()
     setProducts(data || [])
@@ -91,15 +102,49 @@ export default function AdminProducts() {
     const res = await fetch(`${API_URL}/api/admin/crud`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-      body: JSON.stringify({ table: "Product", action: "delete", match: { id } })
+      body: JSON.stringify({ 
+        table: "Product", 
+        action: "update", 
+        match: { id },
+        data: { isActive: false }
+      })
     })
     setDeleteConfirm(null)
     if (!res.ok) {
-      toast.error("Failed to delete product")
+      toast.error("Failed to move product to trash")
     } else {
-      await logActivity({ action: "delete", entityType: "product", entityId: id, details: { name } })
-      toast.success("Product deleted successfully")
+      await logActivity({ action: "delete", entityType: "product", entityId: id, details: { name, type: "soft_delete" } })
+      toast.success("Product moved to trash")
       fetchProducts(currentPage)
+    }
+  }
+
+  async function toggleVisibility(id: string, currentStatus: boolean, name: string) {
+    const token = localStorage.getItem("ysg_admin_token")
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    const newStatus = !currentStatus
+    
+    // Optimistic update
+    setProducts(products.map(p => p.id === id ? { ...p, isPublished: newStatus } : p))
+    
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ 
+        table: "Product", 
+        action: "update", 
+        match: { id },
+        data: { isPublished: newStatus }
+      })
+    })
+
+    if (!res.ok) {
+      toast.error("Failed to update status")
+      // Revert optimistic update
+      setProducts(products.map(p => p.id === id ? { ...p, isPublished: currentStatus } : p))
+    } else {
+      await logActivity({ action: "update", entityType: "product", entityId: id, details: { name, status: newStatus ? "published" : "hidden" } })
+      toast.success(newStatus ? "Product published" : "Product hidden")
     }
   }
 
@@ -133,7 +178,7 @@ export default function AdminProducts() {
     try {
       await Promise.all(selectedProducts.map(id => {
         const payload = action === 'delete' 
-          ? { table: "Product", action: "delete", match: { id } }
+          ? { table: "Product", action: "update", match: { id }, data: { isActive: false } }
           : { table: "Product", action: "update", match: { id }, data: { isPublished: action === 'publish' } }
         
         return fetch(`${API_URL}/api/admin/crud`, {
@@ -143,7 +188,7 @@ export default function AdminProducts() {
         }).then(r => { if(r.ok) successCount++ })
       }))
 
-      toast.success(`${successCount} products ${action === 'delete' ? 'deleted' : 'updated'}`)
+      toast.success(`${successCount} products ${action === 'delete' ? 'moved to trash' : 'updated'}`)
       setSelectedProducts([])
       fetchProducts(currentPage)
     } catch (err) {
@@ -153,6 +198,10 @@ export default function AdminProducts() {
     }
   }
 
+  const selectedProductsData = products.filter(p => selectedProducts.includes(p.id))
+  const allSelectedPublished = selectedProductsData.length > 0 && selectedProductsData.every(p => p.isPublished !== false)
+  const allSelectedHidden = selectedProductsData.length > 0 && selectedProductsData.every(p => p.isPublished === false)
+
   return (
     <div className="space-y-6">
       <Toaster position="top-right" />
@@ -160,7 +209,7 @@ export default function AdminProducts() {
       {/* ─── Delete Confirmation Modal ─── */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-none p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+          <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
             {/* drag handle for mobile */}
             <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2" />
             <div className="flex items-start gap-4">
@@ -168,24 +217,24 @@ export default function AdminProducts() {
                 <Trash2 className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 uppercase tracking-tight">លុបផលិតផល</h3>
+                <h3 className="text-base font-bold text-slate-900 font-medium">លុបផលិតផល</h3>
                 <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  តើអ្នកប្រាកដថាចង់លុប <strong>"{deleteConfirm.name}"</strong> មែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។
+                  តើអ្នកប្រាកដថាចង់លុប <strong>"{deleteConfirm.name}"</strong> មែនទេ? ផលិតផលនេះនឹងត្រូវបានផ្លាស់ទីទៅធុងសំរាម។
                 </p>
               </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="w-full sm:w-auto px-6 py-3 bg-white border-2 border-slate-900 text-slate-900 text-xs font-bold uppercase tracking-widest shadow-hard hover:translate-y-0.5 hover:shadow-none transition-all"
+                className="w-full sm:w-auto px-6 py-3 bg-white border border-slate-200 text-slate-900 text-xs font-bold font-medium shadow-sm hover:translate-y-0.5 hover:shadow-none transition-all"
               >
                 បោះបង់
               </button>
               <button
                 onClick={() => deleteProduct(deleteConfirm.id, deleteConfirm.name)}
-                className="w-full sm:w-auto px-6 py-3 bg-red-600 border-2 border-red-700 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all"
+                className="w-full sm:w-auto px-6 py-3 bg-red-600 border-2 border-red-700 text-white text-xs font-bold font-medium hover:bg-red-700 transition-all"
               >
-                លុបចោល
+                លុប (ទៅធុងសំរាម)
               </button>
             </div>
           </div>
@@ -196,47 +245,60 @@ export default function AdminProducts() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("products")}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("manageProductInventory")}</p>
+          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("manageProductInventory")}</p>
         </div>
-        <Link
-          href="/admin/products/new"
-          className="btn-primary px-6 py-3 flex items-center gap-2 text-xs"
-        >
-          <Plus className="w-4 h-4" />
-          {t("addProduct")}
-        </Link>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <Link
+            href="/admin/products/trash"
+            className="w-full sm:w-auto px-4 sm:px-6 py-3 bg-white text-slate-900 border border-slate-200 shadow-sm flex items-center justify-center gap-2 text-xs font-bold font-medium hover:-translate-y-0.5 transition-all"
+          >
+            <Trash2 className="w-4 h-4" />
+            {language === "kh" ? "ធុងសំរាម" : "Trash"}
+          </Link>
+          <Link
+            href="/admin/products/new"
+            className="btn-primary w-full sm:w-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-2 text-xs"
+          >
+            <Plus className="w-4 h-4" />
+            {t("addProduct")}
+          </Link>
+        </div>
       </div>
 
       {/* Bulk Actions Bar */}
       {selectedProducts.length > 0 && (
         <div className="solid-card bg-primary p-4 flex flex-wrap items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 bg-white text-slate-900 font-bold text-sm border-2 border-slate-900 shadow-hard">
+            <span className="px-3 py-1 bg-white text-slate-900 font-bold text-sm border border-slate-200 shadow-sm">
               {selectedProducts.length}
             </span>
-            <span className="text-slate-900 font-bold uppercase tracking-widest text-sm">
+            <span className="text-slate-900 font-bold font-medium text-sm">
               {language === "kh" ? "បានជ្រើសរើស" : "Selected"}
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => handleBulkAction('publish')}
-              disabled={bulkActionLoading}
-              className="px-4 py-2 bg-white text-slate-900 font-bold text-xs border-2 border-slate-900 shadow-hard uppercase tracking-widest hover:-translate-y-0.5 transition-all disabled:opacity-50"
-            >
-              {language === "kh" ? "ផ្សព្វផ្សាយ" : "Publish"}
-            </button>
-            <button
-              onClick={() => handleBulkAction('unpublish')}
-              disabled={bulkActionLoading}
-              className="px-4 py-2 bg-slate-100 text-slate-900 font-bold text-xs border-2 border-slate-900 shadow-hard uppercase tracking-widest hover:-translate-y-0.5 transition-all disabled:opacity-50"
-            >
-              {language === "kh" ? "លាក់" : "Unpublish"}
-            </button>
+            {!allSelectedPublished && (
+              <button
+                onClick={() => handleBulkAction('publish')}
+                disabled={bulkActionLoading}
+                className="px-4 py-2 bg-white text-slate-900 font-bold text-xs border border-slate-200 shadow-sm font-medium hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              >
+                {language === "kh" ? "ផ្សព្វផ្សាយ" : "Publish"}
+              </button>
+            )}
+            {!allSelectedHidden && (
+              <button
+                onClick={() => handleBulkAction('unpublish')}
+                disabled={bulkActionLoading}
+                className="px-4 py-2 bg-slate-100 text-slate-900 font-bold text-xs border border-slate-200 shadow-sm font-medium hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              >
+                {language === "kh" ? "លាក់" : "Unpublish"}
+              </button>
+            )}
             <button
               onClick={() => handleBulkAction('delete')}
               disabled={bulkActionLoading}
-              className="px-4 py-2 bg-red-600 text-white font-bold text-xs border-2 border-red-700 shadow-hard uppercase tracking-widest hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 text-white font-bold text-xs border-2 border-red-700 shadow-sm font-medium hover:-translate-y-0.5 transition-all disabled:opacity-50"
             >
               {language === "kh" ? "លុប" : "Delete"}
             </button>
@@ -253,7 +315,7 @@ export default function AdminProducts() {
             placeholder={t("search") || "Search..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-10 py-3 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-slate-900 uppercase tracking-widest text-xs"
+            className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs"
           />
           {search && (
             <button 
@@ -265,13 +327,13 @@ export default function AdminProducts() {
           )}
         </div>
         
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative w-full md:w-64">
+        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+          <div className="relative w-full md:w-48">
             <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full pl-12 pr-10 py-3 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-slate-900 uppercase tracking-widest text-xs appearance-none"
+              className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs appearance-none"
             >
               <option value="">{t("allCategories")}</option>
               {categories.map((cat) => (
@@ -281,6 +343,18 @@ export default function AdminProducts() {
               ))}
             </select>
           </div>
+          <div className="relative w-full md:w-48">
+            <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs appearance-none"
+            >
+              <option value="all">{language === "kh" ? "ស្ថានភាពទាំងអស់" : "All Status"}</option>
+              <option value="published">{language === "kh" ? "បានផ្សព្វផ្សាយ" : "Published"}</option>
+              <option value="hidden">{language === "kh" ? "បានលាក់" : "Hidden"}</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -288,27 +362,27 @@ export default function AdminProducts() {
       <div className="solid-card bg-white overflow-hidden p-0 flex flex-col">
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center">
-            <div className="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Loading Inventory...</p>
+            <div className="w-10 h-10 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-slate-500 font-bold text-xs font-medium">Loading Inventory...</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-primary border-b-2 border-slate-900">
+                <tr className="bg-primary border-b border-slate-200">
                   <th className="px-6 py-4 w-12">
                     <input 
                       type="checkbox" 
-                      className="w-5 h-5 border-2 border-slate-900 accent-primary shadow-hard cursor-pointer"
+                      className="w-5 h-5 border border-slate-200 accent-primary shadow-sm cursor-pointer"
                       checked={products.length > 0 && selectedProducts.length === products.length}
                       onChange={toggleSelectAll}
                     />
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("productInfo")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("category")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("price")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("status")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest text-right">{t("actions")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("productInfo")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("category")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("price")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("status")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y-2 divide-slate-900">
@@ -317,14 +391,14 @@ export default function AdminProducts() {
                     <td className="px-6 py-4">
                       <input 
                         type="checkbox" 
-                        className="w-5 h-5 border-2 border-slate-900 accent-primary shadow-hard cursor-pointer"
+                        className="w-5 h-5 border border-slate-200 accent-primary shadow-sm cursor-pointer"
                         checked={selectedProducts.includes(product.id)}
                         onChange={() => toggleSelect(product.id)}
                       />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-slate-100 overflow-hidden shrink-0 border-2 border-slate-900 shadow-hard transition-transform">
+                        <div className="w-14 h-14 bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm transition-transform">
                           {product.images && product.images[0] ? (
                             <img src={product.images[0].includes('cloudinary.com') ? product.images[0].replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : product.images[0]} alt={product.name} className="w-full h-full object-cover" />
                           ) : product.thumbnail ? (
@@ -339,12 +413,12 @@ export default function AdminProducts() {
                           <h4 className="text-sm font-bold text-slate-900 uppercase">
                             {language === "kh" ? product.nameKhmer || product.name : product.name}
                           </h4>
-                          <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">#{product.id.slice(0, 8)}</p>
+                          <p className="text-xs font-bold text-slate-500 mt-1 font-medium">#{product.id.slice(0, 8)}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-xs font-bold text-slate-900 bg-white border-2 border-slate-900 px-3 py-1.5 uppercase tracking-widest shadow-hard">
+                      <span className="text-xs font-bold text-slate-900 bg-white border border-slate-200 px-3 py-1.5 font-medium shadow-sm">
                         {(() => {
                           const cat = categories.find(c => c.id === product.categoryId);
                           if (!cat) return t("general");
@@ -356,15 +430,27 @@ export default function AdminProducts() {
                       <p className="text-sm font-bold text-slate-900 tracking-wider">{formatPrice(product.price)}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 border-2 border-slate-900 bg-emerald-500 shadow-hard" />
-                          <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("inStock")}</span>
+                          <div className="w-2 h-2 border border-slate-200 bg-emerald-500 shadow-sm" />
+                          <span className="text-xs font-bold text-slate-900 font-medium">{t("inStock") || "In Stock"}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 border-2 border-slate-900 ${product.isPublished !== false ? "bg-blue-500" : "bg-slate-300"} shadow-hard`} />
-                          <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
-                            {product.isPublished !== false ? t("published") || "Published" : t("draft") || "Draft"}
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => toggleVisibility(product.id, product.isPublished !== false, product.name)}
+                            className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                              product.isPublished !== false ? 'bg-blue-600' : 'bg-slate-300'
+                            }`}
+                            title={product.isPublished !== false ? "Click to Hide" : "Click to Publish"}
+                          >
+                            <span 
+                              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                product.isPublished !== false ? 'translate-x-4' : 'translate-x-0'
+                              }`} 
+                            />
+                          </button>
+                          <span className={`text-xs font-bold font-medium ${product.isPublished !== false ? "text-blue-600" : "text-slate-500"}`}>
+                            {product.isPublished !== false ? (language === "kh" ? "បានផ្សព្វផ្សាយ" : "Published") : (language === "kh" ? "បានលាក់" : "Hidden")}
                           </span>
                         </div>
                       </div>
@@ -374,21 +460,21 @@ export default function AdminProducts() {
                         <Link
                           href={`/products/${product.slug}`}
                           target="_blank"
-                          className="p-2 bg-white text-slate-900 border-2 border-transparent hover:border-slate-900 hover:shadow-hard transition-all"
+                          className="p-2 bg-white text-slate-900 border border-transparent hover:border-slate-200 hover:shadow-sm transition-all"
                           title="View on site"
                         >
                           <Eye className="w-4 h-4" />
                         </Link>
                         <Link
                           href={`/admin/products/edit/${product.slug}`}
-                          className="p-2 bg-white text-blue-600 border-2 border-transparent hover:border-slate-900 hover:shadow-hard transition-all"
+                          className="p-2 bg-white text-blue-600 border border-transparent hover:border-slate-200 hover:shadow-sm transition-all"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => setDeleteConfirm({ id: product.id, name: product.name })}
-                          className="p-2 bg-white text-red-600 border-2 border-transparent hover:border-slate-900 hover:shadow-hard-red transition-all"
+                          className="p-2 bg-white text-red-600 border border-transparent hover:border-slate-200 hover:shadow-sm-red transition-all"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -414,21 +500,21 @@ export default function AdminProducts() {
         
         {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="p-4 border-t-2 border-slate-900 bg-slate-50 flex items-center justify-between">
+          <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
             <button 
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-white border-2 border-slate-900 font-bold text-xs uppercase tracking-widest shadow-hard hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+              className="px-4 py-2 bg-white border border-slate-200 font-bold text-xs font-medium shadow-sm hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
             >
               {t("previous") || "Previous"}
             </button>
-            <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
+            <span className="text-xs font-bold text-slate-900 font-medium">
               Page {currentPage} of {totalPages}
             </span>
             <button 
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-white border-2 border-slate-900 font-bold text-xs uppercase tracking-widest shadow-hard hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+              className="px-4 py-2 bg-white border border-slate-200 font-bold text-xs font-medium shadow-sm hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
             >
               {t("next") || "Next"}
             </button>

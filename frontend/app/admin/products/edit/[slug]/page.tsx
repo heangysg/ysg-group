@@ -263,17 +263,17 @@ export default function EditProduct() {
       <div className="mb-8 flex flex-col md:flex-row md:items-center gap-6">
         <button
           onClick={() => router.back()}
-          className="self-start p-3 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all text-slate-900"
+          className="self-start p-3 bg-white border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all text-slate-900"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-primary border-2 border-slate-900 shadow-hard">
+          <div className="p-4 bg-primary border border-slate-200 shadow-sm">
             <Package className="w-6 h-6 text-slate-900" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 uppercase tracking-tight">{t("editProduct") || "Edit Product"}</h1>
-            <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">{formData.name}</p>
+            <h1 className="text-3xl font-bold text-slate-900 font-medium">{t("editProduct") || "Edit Product"}</h1>
+            <p className="text-xs font-bold text-slate-500 mt-1 font-medium">{formData.name}</p>
           </div>
         </div>
       </div>
@@ -281,21 +281,21 @@ export default function EditProduct() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="solid-card bg-white p-0 overflow-hidden">
         {/* Basic Information */}
-        <div className="p-8 border-b-2 border-slate-900">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("basicInformation")}</h2>
+        <div className="p-8 border-b border-slate-200">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 font-medium">{t("basicInformation")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="md:col-span-2 space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("productNameKhmer")} *</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("productNameKhmer")} *</label>
               <input
                 type="text"
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
+                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide"
                 value={formData.nameKhmer}
                 onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})}
               />
             </div>
             <div className="md:col-span-2 space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <label className="text-base font-bold text-slate-900 font-medium ml-1 flex items-center gap-2">
                 {t("productNameEnglish")}
                 {isTranslatingName && <span className="text-xs text-primary font-normal normal-case tracking-normal animate-pulse">⟳ Auto-translating...</span>}
               </label>
@@ -303,7 +303,7 @@ export default function EditProduct() {
                 <Tag className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="text"
-                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-wide"
+                  className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-wide"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                 />
@@ -313,13 +313,13 @@ export default function EditProduct() {
         </div>
 
         {/* Classification */}
-        <div className="p-8 border-b-2 border-slate-900 bg-primary/5">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("classification")}</h2>
+        <div className="p-8 border-b border-slate-200 bg-primary/5">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 font-medium">{t("classification")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("mainCategory")}</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("mainCategory")}</label>
               <select
-                className="w-full px-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
+                className="w-full px-5 py-4 bg-white border border-slate-200 outline-none transition-all font-bold text-xs text-slate-900 font-medium"
                 value={formData.categoryId}
                 onChange={(e) => handleCategoryChange(e.target.value)}
               >
@@ -332,9 +332,9 @@ export default function EditProduct() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("subcategory")}</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("subcategory")}</label>
               <select
-                className="w-full px-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest disabled:opacity-50"
+                className="w-full px-5 py-4 bg-white border border-slate-200 outline-none transition-all font-bold text-xs text-slate-900 font-medium disabled:opacity-50"
                 value={formData.subcategoryId}
                 onChange={(e) => setFormData({...formData, subcategoryId: e.target.value})}
                 disabled={!formData.categoryId}
@@ -348,22 +348,22 @@ export default function EditProduct() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("brand")}</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("brand")}</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
                 <input
                   type="text"
-                  className="w-full pl-12 pr-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
+                  className="w-full pl-12 pr-5 py-4 bg-white border border-slate-200 outline-none transition-all font-bold text-xs text-slate-900 font-medium"
                   value={formData.brand}
                   onChange={(e) => setFormData({...formData, brand: e.target.value})}
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("model")}</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("model")}</label>
               <input
                 type="text"
-                className="w-full px-5 py-4 bg-white border-2 border-slate-900 outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
+                className="w-full px-5 py-4 bg-white border border-slate-200 outline-none transition-all font-bold text-xs text-slate-900 font-medium"
                 value={formData.model}
                 onChange={(e) => setFormData({...formData, model: e.target.value})}
               />
@@ -372,27 +372,27 @@ export default function EditProduct() {
         </div>
 
         {/* Pricing & Specs */}
-        <div className="p-8 border-b-2 border-slate-900">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("pricingSpecifications")}</h2>
+        <div className="p-8 border-b border-slate-200">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 font-medium">{t("pricingSpecifications")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("priceUsd")}</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("priceUsd")}</label>
               <div className="relative">
                 <DollarSign className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
-                <input type="number" className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} />
+                <input type="number" className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium" value={formData.price} onChange={(e) => setFormData({...formData, price: e.target.value})} />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("year")}</label>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("year")}</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-900" />
-                <input type="number" className="w-full pl-12 pr-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} />
+                <input type="number" className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium" value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("condition")}</label>
-              <select className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest" value={formData.condition} onChange={(e) => setFormData({...formData, condition: e.target.value})}>
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("condition")}</label>
+              <select className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium" value={formData.condition} onChange={(e) => setFormData({...formData, condition: e.target.value})}>
                 <option value="new">NEW</option>
                 <option value="used">USED</option>
                 <option value="refurbished">REFURBISHED</option>
@@ -402,18 +402,18 @@ export default function EditProduct() {
         </div>
 
         {/* Image Upload Section */}
-        <div className="p-8 border-b-2 border-slate-900 bg-primary/5">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("productImages") || "Product Images"}</h2>
+        <div className="p-8 border-b border-slate-200 bg-primary/5">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 font-medium">{t("productImages") || "Product Images"}</h2>
           <div className="space-y-6">
-            <label className="flex flex-col items-center justify-center w-full h-48 border-4 border-dashed border-slate-900 bg-white cursor-pointer hover:bg-slate-50 transition-colors shadow-hard">
+            <label className="flex flex-col items-center justify-center w-full h-48 border-4 border-dashed border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
               <div className="flex flex-col items-center justify-center gap-3 text-slate-900">
                 {uploadingImage ? (
-                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-900 border-t-transparent" />
+                  <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-transparent" />
                 ) : (
                   <>
                     <ImageIcon className="w-10 h-10" />
-                    <span className="text-sm font-bold uppercase tracking-widest">{t("clickToUpload") || "Click to upload images"}</span>
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">PNG, JPG up to 10MB each</span>
+                    <span className="text-sm font-bold font-medium">{t("clickToUpload") || "Click to upload images"}</span>
+                    <span className="text-xs font-bold text-slate-500 font-medium">PNG, JPG up to 10MB each</span>
                   </>
                 )}
               </div>
@@ -424,32 +424,32 @@ export default function EditProduct() {
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                 {/* Existing Images */}
                 {images.map((url, i) => (
-                  <div key={`existing-${i}`} className="relative group border-2 border-slate-900 shadow-hard bg-white">
+                  <div key={`existing-${i}`} className="relative group border border-slate-200 shadow-sm bg-white">
                     <img src={url} alt={`Product ${i+1}`} className="w-full h-28 object-cover" />
                     <button
                       type="button"
                       onClick={() => removeExistingImage(i)}
-                      className="absolute -top-3 -right-3 w-8 h-8 bg-white border-2 border-slate-900 text-slate-900 font-bold text-sm flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors z-10"
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-white border border-slate-200 text-slate-900 font-bold text-sm flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors z-10"
                     >
                       ✕
                     </button>
-                    {i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border-2 border-slate-900 text-slate-900 px-2 py-0.5 font-bold uppercase tracking-widest">Main</span>}
+                    {i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border border-slate-200 text-slate-900 px-2 py-0.5 font-bold font-medium">Main</span>}
                   </div>
                 ))}
                 
                 {/* Pending New Images */}
                 {previewUrls.map((url, i) => (
-                  <div key={`pending-${i}`} className="relative group border-4 border-primary bg-white shadow-hard">
+                  <div key={`pending-${i}`} className="relative group border-4 border-primary bg-white shadow-sm">
                     <img src={url} alt={`Preview ${i+1}`} className="w-full h-28 object-cover opacity-80 grayscale" />
                     <button
                       type="button"
                       onClick={() => removePendingImage(i)}
-                      className="absolute -top-3 -right-3 w-8 h-8 bg-white border-2 border-slate-900 text-slate-900 font-bold text-sm flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors z-10"
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-white border border-slate-200 text-slate-900 font-bold text-sm flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors z-10"
                     >
                       ✕
                     </button>
-                    <span className="absolute bottom-2 right-2 text-xs bg-white border-2 border-slate-900 text-slate-900 px-2 py-0.5 font-bold uppercase tracking-widest">New</span>
-                    {images.length === 0 && i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border-2 border-slate-900 text-slate-900 px-2 py-0.5 font-bold uppercase tracking-widest">Main</span>}
+                    <span className="absolute bottom-2 right-2 text-xs bg-white border border-slate-200 text-slate-900 px-2 py-0.5 font-bold font-medium">New</span>
+                    {images.length === 0 && i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border border-slate-200 text-slate-900 px-2 py-0.5 font-bold font-medium">Main</span>}
                   </div>
                 ))}
               </div>
@@ -458,16 +458,16 @@ export default function EditProduct() {
         </div>
 
         {/* Description */}
-        <div className="p-8 border-b-2 border-slate-900">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-tight">{t("description")}</h2>
+        <div className="p-8 border-b border-slate-200">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 font-medium">{t("description")}</h2>
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullDescriptionKhmer")}</label>
-              <textarea rows={4} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("fullDescriptionKhmer")}</label>
+              <textarea rows={4} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
             </div>
             <div className="space-y-2">
-              <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullDescriptionEnglish")}</label>
-              <textarea rows={6} className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+              <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("fullDescriptionEnglish")}</label>
+              <textarea rows={6} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 tracking-wide resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
             </div>
           </div>
         </div>
@@ -476,23 +476,23 @@ export default function EditProduct() {
         <div className="p-8">
           <div className="flex flex-wrap gap-10">
             <label className="flex items-center gap-4 cursor-pointer group">
-              <input type="checkbox" checked={formData.isPublished} onChange={(e) => setFormData({...formData, isPublished: e.target.checked})} className="w-6 h-6 border-2 border-slate-900 accent-primary shadow-hard cursor-pointer" />
-              <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("publishImmediately")}</span>
+              <input type="checkbox" checked={formData.isPublished} onChange={(e) => setFormData({...formData, isPublished: e.target.checked})} className="w-6 h-6 border border-slate-200 accent-primary shadow-sm cursor-pointer" />
+              <span className="text-xs font-bold text-slate-900 font-medium">{t("publishImmediately")}</span>
             </label>
             <label className="flex items-center gap-4 cursor-pointer group">
-              <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="w-6 h-6 border-2 border-slate-900 accent-primary shadow-hard cursor-pointer" />
-              <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{t("featureThisProduct")}</span>
+              <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="w-6 h-6 border border-slate-200 accent-primary shadow-sm cursor-pointer" />
+              <span className="text-xs font-bold text-slate-900 font-medium">{t("featureThisProduct")}</span>
             </label>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="p-8 bg-slate-50 border-t-2 border-slate-900 flex flex-col sm:flex-row gap-6">
-          <button type="button" onClick={() => router.back()} className="px-8 py-4 bg-white border-2 border-slate-900 text-slate-900 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 hover:shadow-hard transition-all">
+        <div className="p-8 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row gap-6">
+          <button type="button" onClick={() => router.back()} className="px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold text-xs font-medium hover:bg-slate-50 hover:shadow-sm transition-all">
             {t("cancel")}
           </button>
           <button type="submit" disabled={loading} className="flex-1 btn-primary py-4 px-8 flex items-center justify-center gap-3 text-xs">
-            {loading ? <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
+            {loading ? <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" /> : <Save className="w-5 h-5" />}
             {loading ? (t("saving") || "Saving...") : (t("saveChanges") || "Save Changes")}
           </button>
         </div>

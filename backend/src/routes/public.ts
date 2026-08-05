@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getPgClient } from '../lib/db';
 import rateLimit from 'express-rate-limit';
+import { sendTelegramNotification } from '../services/telegram';
 
 const router = Router();
 
@@ -34,6 +35,10 @@ router.post('/contact', formLimiter, async (req: Request, res: Response): Promis
       const values = [name, email, phone || null, message];
       
       const result = await pgClient.query(query, values);
+      
+      const tgMsg = `📬 *New Contact Message!*\n*Name:* ${name}\n*Email:* ${email}\n*Phone:* ${phone || 'N/A'}\n*Message:* ${message}`;
+      sendTelegramNotification(tgMsg);
+
       res.json({ success: true, id: result.rows[0].id });
     } finally {
       await pgClient.release();
@@ -68,6 +73,21 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
       const values = [customerName, customerPhone, message, productId || null];
       
       const result = await pgClient.query(query, values);
+      
+      let productName = "Unknown Product";
+      if (productId) {
+        const prodRes = await pgClient.query('SELECT name, "nameKhmer" FROM "Product" WHERE id = $1', [productId]);
+        if (prodRes.rows.length > 0) {
+          productName = prodRes.rows[0].name;
+          if (prodRes.rows[0].nameKhmer) {
+            productName += ` (${prodRes.rows[0].nameKhmer})`;
+          }
+        }
+      }
+
+      const tgMsg = `🚨 *New Product Inquiry!* 🚨\n*Product:* ${productName}\n*Customer:* ${customerName}\n*Phone:* ${customerPhone}\n*Message:* ${message}`;
+      sendTelegramNotification(tgMsg);
+
       res.json({ success: true, id: result.rows[0].id });
     } finally {
       await pgClient.release();

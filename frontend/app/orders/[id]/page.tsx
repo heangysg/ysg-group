@@ -189,14 +189,14 @@ export default function OrderDetailsPage() {
   return (
     <PublicLayout>
       <Toaster position="top-center" />
-      <div className="bg-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-6 pt-6 md:pt-8 pb-12 md:pb-24">
+      <div className="bg-slate-50 md:bg-white min-h-screen">
+        <div className="max-w-6xl mx-auto px-0 md:px-6 pt-0 md:pt-8 pb-12 md:pb-24">
           
           {/* 💎 Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-2 md:mb-12 bg-white md:bg-transparent px-4 py-4 md:px-0 md:py-0 shadow-sm md:shadow-none">
             <div className="space-y-2">
               {/* Desktop Breadcrumbs */}
-              <div className="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-500">
+              <div className="hidden md:flex items-center gap-2 text-sm font-bold font-medium text-slate-500">
                 <Link href="/" className="hover:text-slate-900 transition-colors">{t("home")}</Link>
                 <span>/</span>
                 <span className="text-slate-900">{language === "kh" ? "ព័ត៌មានលម្អិតការបញ្ជាទិញ" : "Order Detail"}</span>
@@ -204,8 +204,8 @@ export default function OrderDetailsPage() {
               
               {/* Mobile App Style Header */}
               <div className="md:hidden mb-2">
-                <Link href="/account" className="inline-flex items-center gap-3 text-slate-900 font-bold text-sm uppercase tracking-widest">
-                  <div className="w-10 h-10 flex items-center justify-center bg-slate-50 border-2 border-slate-900 shadow-[2px_2px_0px_#0f172a] active:shadow-none active:translate-y-[2px] active:translate-x-[2px] transition-all">
+                <Link href="/account" className="inline-flex items-center gap-3 text-slate-900 font-bold text-sm font-medium">
+                  <div className="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-full shadow-sm active:shadow-none active:translate-y-[2px] transition-all">
                     <ArrowLeft className="w-5 h-5" />
                   </div>
                   {language === "kh" ? "ត្រលប់ក្រោយ" : "Back"}
@@ -216,7 +216,7 @@ export default function OrderDetailsPage() {
               </h1>
             </div>
 
-            <div className={`inline-flex items-center gap-2 px-4 py-2 text-[11px] font-bold uppercase tracking-widest border-2 border-slate-900 shadow-hard ${
+            <div className={`inline-flex items-center gap-2 px-4 py-2 text-[11px] font-bold font-medium border border-slate-200 shadow-sm ${
               order.status === "paid"
                 ? "bg-emerald-400 text-slate-900"
                 : "bg-amber-400 text-slate-900"
@@ -235,18 +235,18 @@ export default function OrderDetailsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-10">
             
-            <div className="lg:col-span-8 space-y-10">
+            <div className="lg:col-span-8 space-y-2 md:space-y-10">
               
               {/* 🏗️ Status Banner */}
               {order.status === "paid" ? (
-                <div className="solid-card bg-emerald-400 p-6 md:p-12 flex flex-col md:flex-row items-start gap-6">
-                  <div className="w-12 h-12 bg-slate-900 flex items-center justify-center text-emerald-400 shrink-0 border-2 border-slate-900">
+                <div className="bg-emerald-400 p-6 md:p-12 flex flex-col md:flex-row items-start gap-4 md:gap-6 md:rounded-3xl md:solid-card">
+                  <div className="w-12 h-12 bg-slate-900 flex items-center justify-center text-emerald-400 shrink-0 border border-slate-200">
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
-                     <h2 className="text-xl md:text-2xl font-bold text-slate-900 uppercase tracking-widest leading-tight">
+                     <h2 className="text-xl md:text-2xl font-bold text-slate-900 font-medium leading-tight">
                        {language === "kh" ? "ការទូទាត់ជោគជ័យ" : "Payment Successful"}
                      </h2>
                      <p className="text-xs md:text-sm text-slate-900 font-bold">
@@ -255,10 +255,10 @@ export default function OrderDetailsPage() {
                   </div>
                 </div>
               ) : (
-                <div className="solid-card bg-primary p-6 md:p-12 text-slate-900 relative overflow-hidden group">
+                <div className="bg-primary p-6 md:p-12 text-slate-900 relative overflow-hidden group md:rounded-3xl md:solid-card">
                   <div className="relative z-10 space-y-6">
                     <div className="space-y-2">
-                      <h2 className="text-2xl font-bold tracking-widest uppercase">
+                      <h2 className="text-2xl font-bold font-medium">
                         {language === "kh" ? "តម្រូវឱ្យទូទាត់ប្រាក់" : "Payment Required"}
                       </h2>
                       <p className="text-slate-900 text-sm font-bold max-w-md">
@@ -267,7 +267,7 @@ export default function OrderDetailsPage() {
                     </div>
                     <button
                       onClick={() => setShowQR(true)}
-                      className="inline-flex items-center gap-3 bg-slate-900 text-white px-6 py-4 font-bold text-xs uppercase tracking-widest hover:-translate-y-1 hover:shadow-[4px_4px_0px_#primary] transition-all border-2 border-slate-900"
+                      className="inline-flex items-center gap-3 bg-slate-900 text-white px-6 py-4 font-bold text-xs font-medium hover:-translate-y-1 hover:shadow-lg transition-all rounded-xl"
                     >
                       <CreditCard className="w-4 h-4" />
                       {language === "kh" ? "បង្ហាញ QR កូដ" : "Show QR Code"}
@@ -277,22 +277,22 @@ export default function OrderDetailsPage() {
               )}
 
               {/* 📦 Manifest */}
-                <div className="solid-card bg-white p-6 md:p-12">
-                <h3 className="text-sm font-bold text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-3">
+              <div className="bg-white p-5 md:p-12 md:rounded-3xl md:solid-card">
+                <h3 className="text-sm font-bold text-slate-900 mb-8 font-medium flex items-center gap-3">
                   <Package className="w-4 h-4 text-primary" />
                   {language === "kh" ? "បញ្ជីគ្រឿងម៉ាស៊ីន" : "Equipment Manifest"}
                 </h3>
                 <div className="divide-y-2 divide-slate-900">
                   {order.items?.map((item: any, idx: number) => (
                     <div key={idx} className="py-4 md:py-6 flex items-start md:items-center gap-4 md:gap-6">
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 overflow-hidden shrink-0 border-2 border-slate-900 mt-1 md:mt-0">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 overflow-hidden shrink-0 border border-slate-200 mt-1 md:mt-0">
                         <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 space-y-1">
-                        <h4 className="text-sm md:text-[15px] font-bold text-slate-900 uppercase tracking-tight line-clamp-2 leading-tight">
+                        <h4 className="text-sm md:text-[15px] font-bold text-slate-900 font-medium line-clamp-2 leading-tight">
                           {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                         </h4>
-                        <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">
+                        <p className="text-[10px] md:text-xs font-bold text-slate-500 font-medium">
                           {item.brand} • {language === "kh" ? "ចំនួន" : "Qty"}: {item.quantity}
                         </p>
                       </div>
@@ -305,9 +305,9 @@ export default function OrderDetailsPage() {
                   ))}
                 </div>
 
-                <div className="mt-8 pt-8 border-t-2 border-slate-900 flex justify-between items-end">
+                <div className="mt-8 pt-8 border-t border-slate-200 flex justify-between items-end">
                   <div className="space-y-0.5">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                    <span className="text-xs font-bold text-slate-500 font-medium">
                       {language === "kh" ? "ការវិនិយោគសរុប" : "Total Investment"}
                     </span>
                   </div>
@@ -316,31 +316,31 @@ export default function OrderDetailsPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-4 space-y-8">
+            <div className="lg:col-span-4 space-y-2 md:space-y-8">
               
-              <div className="solid-card bg-slate-50 p-6 md:p-8">
-                <h3 className="text-xs font-bold text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-2">
+              <div className="bg-white md:bg-slate-50 p-5 md:p-8 md:rounded-3xl md:solid-card">
+                <h3 className="text-xs font-bold text-slate-900 mb-8 font-medium flex items-center gap-2">
                   <Truck className="w-4 h-4 text-primary" />
                   {language === "kh" ? "ការដឹកជញ្ជូន" : "Logistics"}
                 </h3>
                 <div className="space-y-6">
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{language === "kh" ? "អតិថិជន" : "Client"}</p>
+                    <p className="text-xs font-bold text-slate-500 font-medium">{language === "kh" ? "អតិថិជន" : "Client"}</p>
                     <p className="text-sm font-bold text-slate-900 uppercase">{order.customerName}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{language === "kh" ? "ទំនាក់ទំនង" : "Contact"}</p>
+                    <p className="text-xs font-bold text-slate-500 font-medium">{language === "kh" ? "ទំនាក់ទំនង" : "Contact"}</p>
                     <p className="text-sm font-bold text-slate-900">{order.customerPhone}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន" : "Site Address"}</p>
+                    <p className="text-xs font-bold text-slate-500 font-medium">{language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន" : "Site Address"}</p>
                     <p className="text-sm font-bold text-slate-900 leading-relaxed uppercase">{order.address}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="solid-card bg-white p-6 md:p-8 space-y-6">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-900">
+              <div className="bg-white p-5 md:p-8 space-y-6 md:rounded-3xl md:solid-card">
+                <h3 className="text-xs font-bold font-medium text-slate-900">
                   {language === "kh" ? "ត្រូវការជំនួយ?" : "Need Help?"}
                 </h3>
                 <p className="text-sm text-slate-500 leading-relaxed font-bold">

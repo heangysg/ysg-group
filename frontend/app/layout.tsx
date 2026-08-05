@@ -3,9 +3,11 @@ import { Inter, Outfit, Kantumruy_Pro } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "../contexts/LanguageContext"
 import { CartProvider } from "../contexts/CartContext"
+import { WishlistProvider } from "../contexts/WishlistContext"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" })
+
 const kantumruy = Kantumruy_Pro({ 
   subsets: ["khmer"], 
   variable: "--font-kantumruy",
@@ -30,9 +32,23 @@ export async function generateMetadata(): Promise<Metadata> {
     console.error("Failed to fetch settings metadata", error)
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
   return {
+    metadataBase: new URL(baseUrl),
     title: meta_title,
     description: meta_description,
+    openGraph: {
+      title: meta_title,
+      description: meta_description,
+      type: "website",
+      siteName: "YSG Machinery",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta_title,
+      description: meta_description,
+    }
   }
 }
 
@@ -58,7 +74,11 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <LanguageProvider>
           <CartProvider>
-            {children}
+            <WishlistProvider>
+              <div className="relative flex min-h-screen flex-col">
+                {children}
+              </div>
+            </WishlistProvider>
           </CartProvider>
         </LanguageProvider>
       </body>

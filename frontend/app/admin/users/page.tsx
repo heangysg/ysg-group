@@ -154,7 +154,7 @@ export default function UsersManagementPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-medium text-xs uppercase tracking-widest">Loading Personnel...</p>
+        <p className="text-slate-400 font-medium text-xs font-medium">Loading Personnel...</p>
       </div>
     )
   }
@@ -166,7 +166,7 @@ export default function UsersManagementPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("adminManagement")}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-widest">{t("createAndManageAdmins")}</p>
+          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("createAndManageAdmins")}</p>
         </div>
         <button
           onClick={openAddModal}
@@ -181,11 +181,11 @@ export default function UsersManagementPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-primary border-b-2 border-slate-900">
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("user")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("emailAddress")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest">{t("role")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 uppercase tracking-widest text-right">{t("actions")}</th>
+              <tr className="bg-primary border-b border-slate-200">
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("user")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("emailAddress")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("role")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-slate-900">
@@ -193,7 +193,7 @@ export default function UsersManagementPage() {
                 <tr key={user.id} className="group hover:bg-primary/5 transition-all">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white border-2 border-slate-900 shadow-hard flex items-center justify-center overflow-hidden">
+                      <div className="w-12 h-12 bg-white border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
                         {user.image ? (
                           <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                         ) : (
@@ -204,12 +204,12 @@ export default function UsersManagementPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">{user.email}</span>
+                    <span className="text-xs font-bold text-slate-900 font-medium">{user.email}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 border-2 border-slate-900 shadow-hard ${user.isSuperAdmin ? "bg-primary" : "bg-emerald-500"}`} />
-                      <span className="text-xs font-bold text-slate-900 uppercase tracking-widest">
+                      <div className={`w-2 h-2 border border-slate-200 shadow-sm ${user.isSuperAdmin ? "bg-primary" : "bg-emerald-500"}`} />
+                      <span className="text-xs font-bold text-slate-900 font-medium">
                         {user.isSuperAdmin ? t("superadmin") : t("admin")}
                       </span>
                     </div>
@@ -217,7 +217,7 @@ export default function UsersManagementPage() {
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => openEditModal(user)}
-                      className="p-2 bg-white text-slate-900 border-2 border-transparent hover:border-slate-900 hover:shadow-hard transition-all"
+                      className="p-2 bg-white text-slate-900 border border-transparent hover:border-slate-200 hover:shadow-sm transition-all"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -234,17 +234,17 @@ export default function UsersManagementPage() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="solid-card bg-white w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-8 border-b-2 border-slate-900 bg-primary">
+            <div className="p-8 border-b border-slate-200 bg-primary">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
-                  <p className="text-xs font-bold text-slate-900 mt-2 uppercase tracking-widest">
+                  <h2 className="text-2xl font-bold text-slate-900 font-medium">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
+                  <p className="text-xs font-bold text-slate-900 mt-2 font-medium">
                     {isEditing ? t("updateCredentialsProfile") : t("createCredentialsNewAdmin")}
                   </p>
                 </div>
                 <button 
                   onClick={() => setShowModal(false)} 
-                  className="p-3 bg-white text-slate-900 border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                  className="p-3 bg-white text-slate-900 border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -260,7 +260,7 @@ export default function UsersManagementPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${
+                      className={`flex items-center gap-2 pb-4 text-xs font-bold font-medium transition-all relative ${
                         activeTab === tab.id ? "text-slate-900" : "text-slate-900/60 hover:text-slate-900"
                       }`}
                     >
@@ -278,7 +278,7 @@ export default function UsersManagementPage() {
               {activeTab === "details" ? (
                 <form onSubmit={handleSubmit} className="space-y-8">
                   {error && (
-                    <div className="p-4 bg-red-50 border-2 border-red-900 shadow-hard flex items-center gap-3 text-red-900 text-xs font-bold uppercase tracking-widest">
+                    <div className="p-4 bg-red-50 border-2 border-red-900 shadow-sm flex items-center gap-3 text-red-900 text-xs font-bold font-medium">
                       <AlertCircle className="w-5 h-5" />
                       {error}
                     </div>
@@ -286,27 +286,27 @@ export default function UsersManagementPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("fullName")}</label>
+                      <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("fullName")}</label>
                       <input
                         type="text"
                         required
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">{t("emailAddress")}</label>
+                      <label className="text-base font-bold text-slate-900 font-medium ml-1">{t("emailAddress")}</label>
                       <input
                         type="email"
                         required
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-base font-bold text-slate-900 uppercase tracking-widest ml-1">
+                      <label className="text-base font-bold text-slate-900 font-medium ml-1">
                         {t("password")} {isEditing && <span className="text-[8px] opacity-60 italic">{t("leaveBlankToKeep")}</span>}
                       </label>
                       <input
@@ -314,16 +314,16 @@ export default function UsersManagementPage() {
                         required={!isEditing}
                         value={formData.password}
                         onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        className="w-full px-5 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 uppercase tracking-widest"
+                        className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
                       />
                     </div>
                   </div>
 
-                  <div className="pt-8 flex gap-6 border-t-2 border-slate-900">
+                  <div className="pt-8 flex gap-6 border-t border-slate-200">
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="flex-1 py-4 px-6 bg-white border-2 border-slate-900 text-slate-900 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 hover:shadow-hard transition-all"
+                      className="flex-1 py-4 px-6 bg-white border border-slate-200 text-slate-900 font-bold text-xs font-medium hover:bg-slate-50 hover:shadow-sm transition-all"
                     >
                       {t("cancel")}
                     </button>
@@ -332,7 +332,7 @@ export default function UsersManagementPage() {
                       disabled={saving}
                       className="flex-1 btn-primary py-4 px-6 flex items-center justify-center gap-3 text-xs"
                     >
-                      {saving ? <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+                      {saving ? <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                       {isEditing ? t("saveChanges") : t("addNewAdmin")}
                     </button>
                   </div>
@@ -341,32 +341,32 @@ export default function UsersManagementPage() {
                 <div className="space-y-6">
                   {historyLoading ? (
                     <div className="py-16 flex flex-col items-center justify-center">
-                      <div className="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mb-6" />
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Fetching Personnel Logs...</p>
+                      <div className="w-10 h-10 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mb-6" />
+                      <p className="text-xs font-bold text-slate-500 font-medium">Fetching Personnel Logs...</p>
                     </div>
                   ) : userHistory.length === 0 ? (
-                    <div className="solid-card bg-white p-16 text-center border-2 border-slate-900 border-dashed">
+                    <div className="solid-card bg-white p-16 text-center border border-slate-200 border-dashed">
                       <History className="w-12 h-12 text-slate-400 mx-auto mb-6" />
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{t("noActivityFound")}</p>
+                      <p className="text-xs font-bold text-slate-500 font-medium">{t("noActivityFound")}</p>
                     </div>
                   ) : (
                     <div className="space-y-6">
                       {userHistory.map((log, idx) => (
-                        <div key={idx} className="p-6 bg-white border-2 border-slate-900 shadow-hard hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all group">
+                        <div key={idx} className="p-6 bg-white border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all group">
                           <div className="flex items-center justify-between mb-4">
-                            <span className={`text-xs font-bold px-3 py-1.5 border-2 shadow-hard uppercase tracking-widest ${
+                            <span className={`text-xs font-bold px-3 py-1.5 border-2 shadow-sm font-medium ${
                               log.action === 'login' ? 'bg-blue-50 text-blue-900 border-blue-900' :
                               log.action === 'create' ? 'bg-emerald-50 text-emerald-900 border-emerald-900' :
                               log.action === 'delete' ? 'bg-red-50 text-red-900 border-red-900' : 'bg-amber-50 text-amber-900 border-amber-900'
                             }`}>
                               {log.action}
                             </span>
-                            <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">
+                            <span className="text-xs text-slate-500 font-bold font-medium">
                               {new Date(log.created_at || log.time).toLocaleString()}
                             </span>
                           </div>
-                          <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">{log.details?.name || log.entity_type || log.entityType}</p>
-                          <p className="text-xs text-slate-500 mt-2 font-bold uppercase tracking-widest">{log.details?.reason || log.details?.details || ""}</p>
+                          <p className="text-sm font-bold text-slate-900 font-medium">{log.details?.name || log.entity_type || log.entityType}</p>
+                          <p className="text-xs text-slate-500 mt-2 font-bold font-medium">{log.details?.reason || log.details?.details || ""}</p>
                         </div>
                       ))}
                     </div>

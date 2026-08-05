@@ -13,14 +13,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { data: product } = await res.json()
 
     if (product) {
+      const title = `${product.name} | YSG Machinery`
+      const description = product.shortDescription || product.description || `Buy ${product.name} at YSG Machinery`
+      const imageUrl = product.images?.[0] || product.thumbnail || null
+      const images = imageUrl ? [{ url: imageUrl, width: 800, height: 600, alt: product.name }] : []
+
       return {
-        title: `${product.name} | YSG Machinery`,
-        description: product.description,
+        title,
+        description,
         openGraph: {
-          title: product.name,
-          description: product.description,
-          images: product.images?.[0] ? [{ url: product.images[0] }] : [],
+          title,
+          description,
+          type: "article",
+          images,
         },
+        twitter: {
+          card: "summary_large_image",
+          title,
+          description,
+          images,
+        }
       }
     }
   }

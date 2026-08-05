@@ -64,7 +64,7 @@ export default function LoginPage() {
           <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-12 w-auto object-contain" />
         </Link>
 
-        <div className="solid-card bg-white p-8 sm:p-10">
+        <div className="bg-white p-8 sm:p-10 rounded-[2rem] shadow-xl border border-slate-100">
           <div className="text-center mb-10">
             <h1 className={`text-2xl font-bold text-slate-900 tracking-tight ${language === 'en' ? 'uppercase' : ''}`}>
               {t("welcomeBack") || "Welcome Back"}
@@ -77,7 +77,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-5">
               <div className="space-y-2">
-                <label className={`text-xs font-bold text-slate-700 uppercase tracking-widest ml-1 ${language === 'kh' ? 'font-khmer' : ''}`}>{t("emailAuth") || "Email"}</label>
+                <label className={`text-xs font-bold text-slate-700 font-medium ml-1 ${language === 'kh' ? 'font-khmer' : ''}`}>{t("emailAuth") || "Email"}</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                     <Mail className="w-5 h-5" />
@@ -87,7 +87,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px]"
                     placeholder="name@company.com"
                   />
                 </div>
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
-                  <label className={`text-xs font-bold text-slate-700 uppercase tracking-widest ${language === 'kh' ? 'font-khmer' : ''}`}>{t("passwordAuth") || "Password"}</label>
+                  <label className={`text-xs font-bold text-slate-700 font-medium ${language === 'kh' ? 'font-khmer' : ''}`}>{t("passwordAuth") || "Password"}</label>
                   <a href="#" className={`text-xs font-bold text-primary hover:text-primary-dark transition-colors tracking-wide ${language === 'kh' ? 'font-khmer' : ''}`}>{t("forgotPasswordAuth") || "Forgot?"}</a>
                 </div>
                 <div className="relative group">
@@ -107,7 +107,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 uppercase tracking-widest text-[11px]"
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px]"
                     placeholder="••••••••"
                   />
                 </div>
@@ -134,7 +134,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-200"></div>
             </div>
-            <div className={`relative flex justify-center text-xs uppercase tracking-widest font-bold ${language === 'kh' ? 'font-khmer' : ''}`}>
+            <div className={`relative flex justify-center text-xs font-medium font-bold ${language === 'kh' ? 'font-khmer' : ''}`}>
               <span className="px-4 bg-white text-slate-400">{t("orContinueWith") || "Or continue with"}</span>
             </div>
           </div>
@@ -142,7 +142,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="w-full bg-white text-slate-900 py-4 font-bold tracking-widest uppercase border-2 border-slate-900 shadow-hard hover:bg-slate-50 hover:translate-y-1 transition-all active:translate-y-2 active:shadow-none flex items-center justify-center gap-3 text-xs"
+            className="w-full bg-white text-slate-700 py-4 font-bold border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 hover:-translate-y-1 hover:shadow-md transition-all flex items-center justify-center gap-3 text-[13px]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />

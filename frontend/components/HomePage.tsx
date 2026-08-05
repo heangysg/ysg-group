@@ -1,60 +1,42 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
-
-import { ArrowRight, Headphones, Package, Shield, Zap } from "lucide-react"
+import { ArrowRight, ChevronRight, Search, TrendingUp, LayoutGrid, X } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import ProductCard from "./ProductCard"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([])
+  const [allProducts, setAllProducts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { t, language } = useLanguage()
   const [categories, setCategories] = useState<any[]>([])
-  const [settings, setSettings] = useState<any>({})
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter()
 
-  const stats = [
-    { label: language === "kh" ? "គ្រឿងម៉ាស៊ីនដែលលក់ចេញ" : "Equipment Sold", value: settings?.stat_machinery || "5000+" },
-    { label: language === "kh" ? "ម៉ាកផលិតផល" : "Trusted Brands", value: settings?.stat_brands || "50+" },
-    { label: language === "kh" ? "តំបន់បម្រើសេវា" : "Regions Served", value: settings?.stat_regions || "25+" },
-    { label: language === "kh" ? "ឆ្នាំនៃបទពិសោធន៍" : "Years Experience", value: settings?.stat_years || "30+" },
-  ]
-
-  const features = [
-    {
-      title: language === "kh" ? "ស្តង់ដារសកល" : "Global Standards",
-      desc: language === "kh" ? "គ្រឿងម៉ាស៊ីនដែលទទួលបានវិញ្ញាបនបត្រសុវត្ថិភាព និងប្រសិទ្ធភាពកម្រិតអន្តរជាតិ។" : "Machinery certified for international safety and performance standards.",
-      icon: Shield
-    },
-    {
-      title: language === "kh" ? "ប្រសិទ្ធភាពខ្ពស់" : "High Performance",
-      desc: language === "kh" ? "រចនាឡើងដើម្បីបង្កើនផលិតកម្ម និងកាត់បន្ថយការចំណាយសម្រាប់អាជីវកម្មរបស់អ្នក។" : "Designed to optimize your industrial production and maximize ROI.",
-      icon: Zap
-    },
-    {
-      title: language === "kh" ? "ការគាំទ្រ ២៤/៧" : "24/7 Support",
-      desc: language === "kh" ? "ក្រុមការងារបច្ចេកទេសជំនាញដែលត្រៀមខ្លួនជួយអ្នកជានិច្ច។" : "Dedicated technical assistance for all our elite industrial partners.",
-      icon: Headphones
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
     }
-  ]
+  }
 
   useEffect(() => {
     async function initialFetch() {
       setLoading(true)
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
-        const [prodRes, catRes, setRes] = await Promise.all([
-          fetch(`${API_URL}/api/public/products?featured=true&limit=6`).then(r => r.json()),
-          fetch(`${API_URL}/api/public/categories`).then(r => r.json()),
-          fetch(`${API_URL}/api/public/settings`).then(r => r.json()).catch(() => ({ data: {} }))
+        const [featRes, allRes, catRes] = await Promise.all([
+          fetch(`${API_URL}/api/public/products?featured=true&limit=8`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`${API_URL}/api/public/products?limit=16`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`${API_URL}/api/public/categories`, { cache: 'no-store' }).then(r => r.json())
         ])
 
-        setFeaturedProducts(prodRes.data || [])
+        setFeaturedProducts(featRes.data || [])
+        setAllProducts(allRes.data || [])
         setCategories(catRes.data || [])
-        setSettings(setRes.data || {})
       } catch (err) {
         console.error("Home Data Fetch Error:", err)
       } finally {
@@ -64,224 +46,216 @@ export default function HomePage() {
     initialFetch()
   }, [])
 
+  // Auto-advance banner
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const topCategories = categories.filter(c => !c.parentId).slice(0, 10)
+  const hotProducts = featuredProducts.slice(0, 8)
+  const popularProducts = allProducts.slice(0, 16)
+
+  const banners = [
+    {
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1200",
+      title: language === "kh" ? "ប្រូម៉ូសិនពិសេស" : "Super Sale",
+      subtitle: language === "kh" ? "បញ្ចុះតម្លៃរហូតដល់ ២០% លើគ្រឿងចក្រធុនធ្ងន់" : "Up to 20% Off Heavy Machinery",
+      color: "from-blue-900/90"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=1200",
+      title: language === "kh" ? "ទំនិញថ្មី" : "New Arrivals",
+      subtitle: language === "kh" ? "គ្រឿងចក្របច្ចេកវិទ្យាចុងក្រោយបង្អស់" : "Next-Generation Industrial Tech",
+      color: "from-slate-900/90"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80&w=1200",
+      title: language === "kh" ? "គុណភាពស្តង់ដារ" : "Premium Quality",
+      subtitle: language === "kh" ? "ធានាគុណភាពកម្រិតអន្តរជាតិ ISO 9001" : "ISO 9001 Certified Excellence",
+      color: "from-indigo-900/90"
+    }
+  ]
+
   return (
-    <div className="bg-slate-50 min-h-screen">
-      {/* 🚀 Dynamic Premium Hero Section */}
-      <section className="relative flex items-center justify-center pt-24 md:pt-32 pb-32 md:pb-40 overflow-hidden bg-slate-950 min-h-[85vh]">
-        <div className="absolute inset-0 bg-slate-950">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-transparent z-10" />
-        </div>
+    <div className="bg-[#F8FAFC] min-h-screen pb-24 font-sans selection:bg-primary/20">
+      
+      {/* 🔍 Native App Style Search Header */}
+      <div className="bg-gradient-to-b from-primary to-primary-dark pt-8 md:pt-12 pb-8 md:pb-24 px-4 md:px-8 relative overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-sky-400/20 rounded-full blur-[60px] translate-y-1/2 -translate-x-1/4" />
+        
+        <div className="max-w-7xl mx-auto relative z-10 mt-2 md:-mt-4">
 
-        {/* Angled Cutout at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-slate-50" style={{ clipPath: "polygon(0 100%, 100% 100%, 100% 0)" }} />
-
-        <div className="relative max-w-6xl mx-auto px-6 w-full z-10 text-center md:text-left flex flex-col md:items-start items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-3xl space-y-6 md:space-y-8 flex flex-col items-center md:items-start"
-          >
-            <div className="inline-block bg-primary text-slate-950 font-bold uppercase tracking-widest px-4 py-1 text-[10px] md:text-xs">
-              {language === "kh" ? "ក្រុមហ៊ុន យ៉ាង ស៊ី គ្រុប" : "YEUNG SHI GROUP"}
-            </div>
-
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white tracking-tighter uppercase leading-[1.1]">
-              {language === "kh" ? (
-                <>ដៃគូដ៏គួរឲ្យទុកចិត្តក្នុងវិស័យ <br /><span className="text-primary">ឧស្សាហកម្ម និងពាណិជ្ជកម្ម</span></>
-              ) : (
-                <>Your Trusted Partner in <br /><span className="text-primary">Industry & Trade</span></>
+          <div className="relative group max-w-3xl mx-auto">
+            <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/0 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+            <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 overflow-hidden">
+              <div className="pl-5">
+                <Search className="w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+              </div>
+              <input 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={language === "kh" ? "ស្វែងរកផលិតផល ឬម៉ូដែល..." : "Search for premium machinery, brands, or models..."}
+                className="w-full pl-3 pr-4 py-4 md:py-5 bg-transparent border-none text-slate-900 focus:outline-none focus:ring-0 text-[14px] font-medium placeholder:text-slate-400"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="p-2 mr-1 text-slate-400 hover:text-slate-700 transition-colors flex-shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               )}
-            </h1>
-
-            <p className="text-lg md:text-xl text-slate-400 font-medium leading-relaxed max-w-3xl">
-              {language === "kh" 
-                ? "ផ្តល់ជូននូវគ្រឿងចក្រស្តង់ដារ គ្រឿងផ្សំអាហារគុណភាពខ្ពស់ និងសេវាកម្មនាំចេញនាំចូលដ៏សម្បូរបែប ដើម្បីជួយពង្រីកអាជីវកម្មរបស់អ្នក។" 
-                : "Providing top-quality machinery, premium flavours, and comprehensive import/export solutions to scale your business."}
-            </p>
-
-            <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-8">
-              <Link href="/products" className="btn-primary px-10 py-5 text-xs">
-                {t("browseEquipment")}
-              </Link>
-              <Link href="/contact" className="solid-panel bg-transparent border-2 border-white text-white px-10 py-5 font-bold text-xs uppercase tracking-widest hover:bg-white hover:text-slate-900 transition-all duration-300">
-                {t("contactSales")}
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 📊 High-Contrast Stats Section */}
-      <section className="relative -mt-16 z-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="solid-card bg-slate-900 border-2 border-primary text-white p-8 md:p-12"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {stats.map((stat, i) => (
-                <div key={i} className="space-y-2 text-center md:text-left relative">
-                  <div className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase">{stat.value}</div>
-                  <div className="text-[10px] md:text-[11px] font-bold text-primary uppercase tracking-[0.2em]">{stat.label}</div>
-                  {i !== stats.length - 1 && (
-                    <div className="hidden md:block absolute right-[-24px] top-2 bottom-2 w-px bg-slate-800" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 🏷️ Premium Categories */}
-      <section className="py-20 md:py-32">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex justify-between items-end mb-12 md:mb-16"
-          >
-            <div className="space-y-3">
-              <span className="text-xs font-bold text-primary uppercase tracking-[0.2em]">{language === "kh" ? "ផ្នែកផលិតផល" : "Departments"}</span>
-              <h2 className="text-2xl md:text-4xl font-bold text-slate-900 tracking-tight uppercase">{t("categories")}</h2>
-            </div>
-            <Link href="/categories" className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors flex items-center gap-2 group">
-              {language === "kh" ? "មើលទាំងអស់" : "Explore All"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
-
-          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
-            {categories.filter(c => !c.parentId).map((cat, idx) => {
-              const subCats = categories.filter(sub => sub.parentId === cat.id)
-              const displaySubs = subCats.slice(0, 3)
-              const remainingSubs = subCats.length - 3
-
-              return (
-                <motion.div
-                  key={cat.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex min-w-[85vw] md:min-w-0 snap-center"
-                >
-                  <div className="solid-card p-6 md:p-8 flex flex-col w-full group">
-                    {/* Image */}
-                    <div className="relative w-full h-48 md:h-56 bg-slate-100 overflow-hidden mb-6 flex items-center justify-center border-b-4 border-slate-900">
-                      {cat.image ? (
-                        <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105" />
-                      ) : (
-                        <Package className="w-12 h-12 text-slate-300" />
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2 uppercase tracking-tight">
-                      {language === 'kh' && cat.nameKhmer ? cat.nameKhmer : cat.name}
-                    </h3>
-                    <p className="text-slate-500 text-sm mb-8 line-clamp-2">
-                      {language === 'kh' && cat.descriptionKhmer ? cat.descriptionKhmer : (cat.description || "Explore our comprehensive range of high-performance machinery, specialized equipment, and genuine spare parts.")}
-                    </p>
-
-                    {/* Subcategories */}
-                    <div className="mt-auto">
-                      <ul className="space-y-3 mb-8">
-                        {displaySubs.map(sub => (
-                          <li key={sub.id} className="flex items-center gap-3 text-sm text-slate-700 font-medium">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            {language === 'kh' && sub.nameKhmer ? sub.nameKhmer : sub.name}
-                          </li>
-                        ))}
-                        {remainingSubs > 0 && (
-                          <li className="flex items-center gap-3 text-sm text-slate-400 font-medium">
-                            <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                            +{remainingSubs}
-                          </li>
-                        )}
-                      </ul>
-
-                      <Link href={`/categories/${cat.slug}`} className="btn-primary w-full py-4 flex items-center justify-center gap-2 text-[10px]">
-                        {language === 'kh' ? "ស្វែងយល់បន្ថែម" : "View Catalog"}
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            })}
+              <div className="pr-2 hidden md:block">
+                <button type="submit" className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[13px] font-bold hover:bg-slate-800 hover:shadow-md transition-all active:scale-95">
+                  {language === "kh" ? "ស្វែងរក" : "Search"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* 🏗️ Elite Showroom Grid */}
-      <section className="py-20 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 gap-6"
-          >
-            <div className="space-y-3">
-              <span className="text-xs font-bold text-primary uppercase tracking-[0.2em]">{language === "kh" ? "ផលិតផលលេចធ្លោ" : "Elite Selection"}</span>
-              <h2 className="text-2xl md:text-4xl font-bold text-slate-900 tracking-tight uppercase">{t("featuredEquipment")}</h2>
-            </div>
-            <Link href="/products" className="btn-primary px-8 py-4 text-[12px] flex items-center justify-center gap-3">
-              {t("allProducts")}
-            </Link>
-          </motion.div>
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-4 md:-mt-16 relative z-20 space-y-8 md:space-y-12">
 
-          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-8 pb-4 -mx-4 px-4 md:mx-0 md:px-0">
-            {loading ? (
-              [1, 2, 3, 4].map((n) => <div key={n} className="aspect-[3/4] bg-slate-50 rounded-[2rem] animate-pulse border border-slate-100" />)
-            ) : (
-              featuredProducts.map((product, idx) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="min-w-[65vw] md:min-w-0 snap-center"
-                >
-                  <ProductCard product={product} />
-                </motion.div>
-              ))
-            )}
+        {/* 🎫 Animated Dynamic Banner Carousel */}
+        <section className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-900 h-[180px] md:h-[400px] shadow-[0_20px_50px_rgb(0,0,0,0.15)] group">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
+              className="absolute inset-0"
+            >
+              <img 
+                src={banners[currentSlide].image}
+                alt="Promotion"
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Carousel Indicators */}
+          <div className="absolute bottom-4 md:bottom-8 left-5 md:left-16 flex gap-1.5 md:gap-2 z-20">
+            {banners.map((_, idx) => (
+              <button 
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                className={`transition-all duration-300 rounded-full h-1.5 ${
+                  currentSlide === idx ? "w-8 bg-white" : "w-2 bg-white/40 hover:bg-white/60"
+                }`}
+              />
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 🛠️ Premium Features */}
-      <section className="py-20 md:py-32 bg-slate-900 text-white relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            {features.map((feature, i) => (
-              <motion.div
-                key={i}
+        {/* 📂 Modern Categories Pill Scroller */}
+        <section>
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <LayoutGrid className="w-5 h-5 text-slate-400" />
+              <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">{t("categories")}</h2>
+            </div>
+          </div>
+          <div className="flex overflow-x-auto no-scrollbar gap-3 md:gap-6 pb-4 snap-x">
+            {topCategories.map((cat, idx) => (
+              <motion.div 
+                key={cat.id}
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass-panel p-10 md:p-12 rounded-[2.5rem] space-y-8 hover:bg-white/5 hover:border-white/20 transition-all duration-500 hover:-translate-y-2 group"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                className="snap-start min-w-[76px] md:min-w-[120px]"
               >
-                <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 group-hover:scale-110 shadow-glow">
-                  <feature.icon className="w-8 h-8" />
-                </div>
-                <div className="space-y-4">
-                  <h3 className="text-lg md:text-xl font-bold text-white uppercase tracking-tight">{feature.title}</h3>
-                  <p className="text-slate-400 text-sm md:text-base leading-relaxed font-normal group-hover:text-slate-300 transition-colors">{feature.desc}</p>
-                </div>
+                <Link 
+                  href={`/categories/${cat.slug}`}
+                  className="flex flex-col items-center gap-2 md:gap-3 group"
+                >
+                  <div className="w-[64px] h-[64px] md:w-[110px] md:h-[110px] bg-white rounded-xl md:rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex items-center justify-center p-3 md:p-4 group-hover:border-primary/30 group-hover:shadow-[0_8px_30px_rgb(37,99,235,0.12)] transition-all duration-300 group-hover:-translate-y-1 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-300 z-0" />
+                    {cat.image ? (
+                      <img src={cat.image} alt={cat.name} className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500 drop-shadow-sm" />
+                    ) : (
+                      <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-slate-100 relative z-10" />
+                    )}
+                  </div>
+                  <span className="text-[10px] md:text-[13px] font-semibold text-slate-700 text-center leading-tight line-clamp-2 w-full group-hover:text-primary transition-colors">
+                    {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
+                  </span>
+                </Link>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+
+
+        {/* ⭐ Featured Machines (Clean Showcase) */}
+        {hotProducts.length > 0 && (
+          <section className="pt-2 md:pt-4 mb-4 md:mb-8">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
+              <div className="flex items-center gap-3">
+                <div className="h-6 md:h-8 w-1.5 md:w-2 bg-primary rounded-full"></div>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                  {language === "kh" ? "ផលិតផលពិសេសេ" : "Featured Machines"}
+                </h2>
+              </div>
+              <Link href="/products/featured" className="flex items-center gap-1 md:gap-2 text-[12px] md:text-[13px] font-bold text-slate-900 bg-slate-100 hover:bg-slate-200 px-4 py-2 md:px-5 md:py-2.5 rounded-full transition-colors">
+                {language === "kh" ? "មើលទាំងអស់" : "View All"}
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+              {loading ? (
+                [...Array(8)].map((_, n) => <div key={n} className={`aspect-[3/4] bg-white border border-slate-100 rounded-xl md:rounded-2xl animate-pulse shadow-sm ${n >= 6 ? 'hidden md:block' : ''}`} />)
+              ) : (
+                hotProducts.map((product, n) => (
+                  <div key={product.id} className={n >= 6 ? 'hidden md:block' : ''}>
+                    <ProductCard product={product} />
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* 🛍️ Just For You (Main Discovery Grid) */}
+        <section className="pt-2 md:pt-4">
+          <div className="flex items-center gap-3 mb-6 md:mb-8">
+            <div className="w-10 h-10 bg-blue-100 text-primary rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+              {language === "kh" ? "រុករកផលិតផល" : "Discover More"}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+            {loading ? (
+              [...Array(16)].map((_, n) => <div key={n} className="aspect-[3/4] bg-white border border-slate-100 rounded-xl md:rounded-2xl animate-pulse shadow-sm" />)
+            ) : (
+              popularProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            )}
+          </div>
+
+          <div className="mt-12 flex justify-center pb-8">
+            <Link href="/products" className="group bg-white border border-slate-200 text-slate-900 px-10 py-4 rounded-2xl text-[14px] font-bold hover:border-primary hover:text-primary hover:shadow-[0_8px_30px_rgb(37,99,235,0.12)] transition-all flex items-center gap-2">
+              {language === "kh" ? "មើលផលិតផលជាច្រើនទៀត" : "Load More Products"}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        </section>
+
+      </div>
     </div>
   )
 }

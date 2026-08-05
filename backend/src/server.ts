@@ -106,3 +106,37 @@ app.listen(PORT, async () => {
   await initializeDatabase();
   console.log(`🚀 Express Server running on port ${PORT}`);
 });
+
+// ─── Auto-Cleanup: Delete orders & audit logs older than 30 days ──────────────
+const runOrderCleanup = async () => {
+  try {
+    const pgClient = await getPgClient();
+    try {
+      // Delete old Orders
+      const orderResult = await pgClient.query(`
+        DELETE FROM "Order"
+        WHERE "createdAt" < NOW() - INTERVAL '30 days'
+      `);
+      const deletedOrders = orderResult.rowCount ?? 0;
+
+      // Delete old Audit Logs
+      const auditResult = await pgClient.query(`
+        DELETE FROM "audit_logs"
+        WHERE created_at < NOW() - INTERVAL '30 days'
+      `);
+      const deletedAudit = auditResult.rowCount ?? 0;
+
+      console.log(`🗑️  Auto-cleanup: Deleted ${deletedOrders} order(s) and ${deletedAudit} audit log(s) older than 30 days.`);
+    } finally {
+      await pgClient.release();
+    }
+  } catch (error) {
+    console.error('❌ Auto-cleanup failed:', error);
+  }
+};
+
+// Run once on startup, then every 24 hours
+runOrderCleanup();
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+setInterval(runOrderCleanup, TWENTY_FOUR_HOURS);
+
