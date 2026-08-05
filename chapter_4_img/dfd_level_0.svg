@@ -1,0 +1,135 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+        </marker>
+        <style>
+            .entity { fill: #fff; stroke: #000; stroke-width: 2px; }
+            .process { fill: #fff; stroke: #000; stroke-width: 2px; }
+            .datastore { fill: #fff; stroke: #000; stroke-width: 2px; }
+            .text { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 15px; fill: #000; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+            .text-small { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 13px; fill: #000; text-anchor: middle; dominant-baseline: middle; }
+            .label { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 13px; fill: #000; text-anchor: middle; }
+            .bg-rect { fill: white; }
+            .line { stroke: #000; stroke-width: 2px; fill: none; marker-end: url(#arrow); }
+            .line-no-arrow { stroke: #000; stroke-width: 2px; fill: none; }
+        </style>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="#ffffff" />
+    
+    <!-- Entities (Squares) -->
+    <!-- Customer -->
+    <rect x="20" y="220" width="100" height="60" class="entity" />
+    <text x="70" y="250" class="text">អតិថិជន</text>
+
+    <!-- Bakong -->
+    <rect x="200" y="40" width="100" height="60" class="entity" />
+    <text x="250" y="70" class="text">ប្រព័ន្ធបាគង</text>
+
+    <!-- Admin Top Right -->
+    <rect x="680" y="220" width="100" height="60" class="entity" />
+    <line x1="680" y1="240" x2="700" y2="220" stroke="#000" stroke-width="2" /> <!-- Duplicate marker -->
+    <text x="730" y="250" class="text">អ្នកគ្រប់គ្រង</text>
+
+    <!-- Admin Bottom Right -->
+    <rect x="680" y="420" width="100" height="60" class="entity" />
+    <line x1="680" y1="440" x2="700" y2="420" stroke="#000" stroke-width="2" /> <!-- Duplicate marker -->
+    <text x="730" y="450" class="text">អ្នកគ្រប់គ្រង</text>
+
+    <!-- Processes (Circles) -->
+    <!-- 1.0 Process Orders -->
+    <circle cx="250" cy="250" r="55" class="process" />
+    <line x1="198" y1="220" x2="302" y2="220" stroke="#000" stroke-width="2" />
+    <text x="250" y="210" class="text">១.០</text>
+    <text x="250" y="245" class="text-small">រៀបចំការ</text>
+    <text x="250" y="265" class="text-small">កម្មង់ទិញ</text>
+
+    <!-- 2.0 Manage Products -->
+    <circle cx="550" cy="250" r="55" class="process" />
+    <line x1="498" y1="220" x2="602" y2="220" stroke="#000" stroke-width="2" />
+    <text x="550" y="210" class="text">២.០</text>
+    <text x="550" y="245" class="text-small">គ្រប់គ្រង</text>
+    <text x="550" y="265" class="text-small">ផលិតផល</text>
+
+    <!-- 3.0 Generate Reports -->
+    <circle cx="400" cy="450" r="55" class="process" />
+    <line x1="348" y1="420" x2="452" y2="420" stroke="#000" stroke-width="2" />
+    <text x="400" y="410" class="text">៣.០</text>
+    <text x="400" y="445" class="text-small">បង្កើត</text>
+    <text x="400" y="465" class="text-small">របាយការណ៍</text>
+
+    <!-- Data Stores (Open Rectangles) -->
+    <!-- D1 Orders -->
+    <line x1="190" y1="430" x2="300" y2="430" class="line-no-arrow" />
+    <line x1="190" y1="470" x2="300" y2="470" class="line-no-arrow" />
+    <line x1="190" y1="430" x2="190" y2="470" class="line-no-arrow" />
+    <line x1="220" y1="430" x2="220" y2="470" class="line-no-arrow" />
+    <text x="205" y="450" class="text-small">D1</text>
+    <text x="260" y="450" class="text-small">ទិន្នន័យកម្មង់</text>
+
+    <!-- D2 Products -->
+    <line x1="490" y1="100" x2="600" y2="100" class="line-no-arrow" />
+    <line x1="490" y1="140" x2="600" y2="140" class="line-no-arrow" />
+    <line x1="490" y1="100" x2="490" y2="140" class="line-no-arrow" />
+    <line x1="520" y1="100" x2="520" y2="140" class="line-no-arrow" />
+    <text x="505" y="120" class="text-small">D2</text>
+    <text x="560" y="120" class="text-small">ទិន្នន័យផលិតផល</text>
+
+
+    <!-- Connections -->
+    <!-- Customer <-> 1.0 -->
+    <path d="M 120 235 L 190 235" class="line" />
+    <rect x="135" y="212" width="50" height="20" class="bg-rect" />
+    <text x="160" y="225" class="label">បញ្ជាទិញ</text>
+
+    <path d="M 190 265 L 120 265" class="line" />
+    <rect x="130" y="272" width="60" height="20" class="bg-rect" />
+    <text x="160" y="285" class="label">វិក្កយបត្រ</text>
+
+    <!-- 1.0 <-> Bakong -->
+    <path d="M 235 195 L 235 105" class="line" />
+    <rect x="195" y="140" width="40" height="20" class="bg-rect" />
+    <text x="215" y="153" class="label">ស្នើប្រាក់</text>
+
+    <path d="M 265 105 L 265 195" class="line" />
+    <rect x="265" y="140" width="75" height="20" class="bg-rect" />
+    <text x="300" y="153" class="label">បញ្ជាក់ទូទាត់</text>
+
+    <!-- 1.0 -> D1 Orders -->
+    <path d="M 250 305 L 250 425" class="line" />
+    <rect x="210" y="355" width="80" height="20" class="bg-rect" />
+    <text x="250" y="368" class="label">រក្សាទុកការកម្មង់</text>
+
+    <!-- D2 Products -> 1.0 (Check Stock/Price) -->
+    <path d="M 490 135 L 295 215" class="line" />
+    <rect x="360" y="155" width="80" height="20" class="bg-rect" />
+    <text x="400" y="168" class="label">ពិនិត្យតម្លៃ/ស្តុក</text>
+
+    <!-- Admin (Top Right) -> 2.0 -->
+    <path d="M 675 250 L 610 250" class="line" />
+    <rect x="615" y="228" width="60" height="20" class="bg-rect" />
+    <text x="645" y="240" class="label">ព័ត៌មានទំនិញ</text>
+
+    <!-- 2.0 -> D2 Products -->
+    <path d="M 550 195 L 550 145" class="line" />
+    <rect x="510" y="160" width="80" height="20" class="bg-rect" />
+    <text x="550" y="172" class="label">អាប់ដេតទិន្នន័យ</text>
+
+    <!-- D1 Orders -> 3.0 -->
+    <path d="M 300 450 L 340 450" class="line" />
+    <rect x="305" y="428" width="35" height="20" class="bg-rect" />
+    <text x="325" y="440" class="label">ទិន្នន័យ</text>
+
+    <!-- D2 Products -> 3.0 -->
+    <path d="M 545 145 L 430 405" class="line" />
+    <rect x="440" y="270" width="70" height="20" class="bg-rect" />
+    <text x="475" y="282" class="label">ទិន្នន័យស្តុក</text>
+
+    <!-- 3.0 -> Admin (Bottom Right) -->
+    <path d="M 455 450 L 675 450" class="line" />
+    <rect x="520" y="438" width="90" height="20" class="bg-rect" />
+    <text x="565" y="450" class="label">របាយការណ៍លក់</text>
+
+</svg>

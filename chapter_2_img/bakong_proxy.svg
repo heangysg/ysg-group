@@ -1,0 +1,47 @@
+<svg width="1000" height="500" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    
+  <style>
+    text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; }
+    .subtitle { font-size: 16px; fill: #333333; }
+    .box { fill: #ffffff; stroke: #333333; stroke-width: 2; rx: 6; }
+    .box-header { font-weight: bold; font-size: 18px; fill: #ffffff; }
+    .arrow { stroke: #000000; stroke-width: 3; fill: none; }
+    .arrow-head { fill: #000000; }
+    .code { font-family: 'Courier New', Courier, monospace; font-size: 14px; fill: #000000; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow-head" />
+    </marker>
+  </defs>
+
+    <rect width="1000" height="500" fill="#ffffff" />
+
+    <rect x="50" y="150" width="220" height="150" class="box" />
+    <rect x="50" y="150" width="220" height="40" fill="#000000" rx="6" />
+    <text x="160" y="177" text-anchor="middle" class="box-header">YSG Server (Vercel)</text>
+    <text x="160" y="230" text-anchor="middle" class="subtitle">Location: Abroad</text>
+    <text x="160" y="270" text-anchor="middle" class="subtitle">Domestic IP: False</text>
+
+    <path d="M 270 200 L 730 200" stroke="#000000" stroke-width="3" stroke-dasharray="10,10" />
+    <text x="500" y="180" text-anchor="middle" style="font-weight:bold; font-size: 20px;">GEO-BLOCKED</text>
+    <line x1="480" y1="180" x2="520" y2="220" stroke="#000000" stroke-width="6"/>
+    <line x1="520" y1="180" x2="480" y2="220" stroke="#000000" stroke-width="6"/>
+
+    <rect x="390" y="300" width="220" height="150" class="box" />
+    <rect x="390" y="300" width="220" height="40" fill="#666666" rx="6" />
+    <text x="500" y="327" text-anchor="middle" class="box-header">Local Proxy</text>
+    <text x="500" y="380" text-anchor="middle" class="subtitle">Location: Cambodia</text>
+    <text x="500" y="420" text-anchor="middle" class="subtitle">Domestic IP: True</text>
+
+    <path d="M 160 300 L 160 375 L 380 375" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="270" y="360" text-anchor="middle" class="code">MD5 Hash</text>
+
+    <rect x="750" y="150" width="220" height="150" class="box" />
+    <rect x="750" y="150" width="220" height="40" fill="#333333" rx="6" />
+    <text x="860" y="177" text-anchor="middle" class="box-header">NBC Bakong</text>
+    <text x="860" y="250" text-anchor="middle" class="subtitle">Payment Gateway</text>
+
+    <path d="M 610 375 L 860 375 L 860 300" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="735" y="410" text-anchor="middle" class="code">Approve Request</text>
+  </svg>

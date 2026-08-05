@@ -1,0 +1,42 @@
+<svg width="1000" height="500" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    
+  <style>
+    text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; }
+    .subtitle { font-size: 16px; fill: #333333; }
+    .box { fill: #ffffff; stroke: #333333; stroke-width: 2; rx: 6; }
+    .box-header { font-weight: bold; font-size: 18px; fill: #ffffff; }
+    .arrow { stroke: #000000; stroke-width: 3; fill: none; }
+    .arrow-head { fill: #000000; }
+    .code { font-family: 'Courier New', Courier, monospace; font-size: 14px; fill: #000000; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow-head" />
+    </marker>
+  </defs>
+
+    <rect width="1000" height="500" fill="#ffffff" />
+    
+    <rect x="50" y="150" width="200" height="150" class="box" />
+    <rect x="50" y="150" width="200" height="40" fill="#333333" rx="6" />
+    <text x="150" y="177" text-anchor="middle" class="box-header">Client (Browser)</text>
+    <text x="150" y="240" text-anchor="middle" class="subtitle">Requests Page</text>
+
+    <path d="M 250 180 L 400 180" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="325" y="165" text-anchor="middle" class="subtitle">1. Request</text>
+
+    <rect x="420" y="100" width="280" height="280" class="box" />
+    <rect x="420" y="100" width="280" height="50" fill="#000000" rx="6" />
+    <text x="560" y="132" text-anchor="middle" class="box-header">Next.js (Server-Side)</text>
+    <text x="560" y="210" text-anchor="middle" class="subtitle">2. Fetch Data (DB)</text>
+    <text x="560" y="270" text-anchor="middle" class="subtitle">3. Render HTML</text>
+
+    <path d="M 420 270 L 250 270" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="335" y="295" text-anchor="middle" class="subtitle">4. Return HTML</text>
+
+    <rect x="750" y="150" width="200" height="150" class="box" />
+    <rect x="750" y="150" width="200" height="40" fill="#666666" rx="6" />
+    <text x="850" y="177" text-anchor="middle" class="box-header" style="fill: #ffffff;">React.js</text>
+    <text x="850" y="240" text-anchor="middle" class="subtitle">5. Hydration</text>
+    <path d="M 700 225 L 750 225" class="arrow" marker-end="url(#arrowhead)" />
+  </svg>

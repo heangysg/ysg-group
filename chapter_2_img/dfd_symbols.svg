@@ -1,0 +1,84 @@
+<svg viewBox="0 0 900 600" width="900" height="600" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; font-size: 18px; text-anchor: middle; }
+        .grid-line { stroke: #000000; stroke-width: 2; fill: none; }
+        .shape { stroke: #000000; stroke-width: 3; fill: #ffffff; }
+        .shape-thin { stroke: #000000; stroke-width: 2; fill: #ffffff; }
+        .col-title { font-size: 20px; font-weight: bold; }
+        .arrow { stroke: #000000; stroke-width: 3; fill: none; }
+    </style>
+    
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#000000" />
+        </marker>
+    </defs>
+
+    <rect width="900" height="600" fill="#ffffff" />
+
+    <!-- Grid Lines -->
+    <!-- Horizontal -->
+    <line x1="0" y1="0" x2="900" y2="0" class="grid-line" />
+    <line x1="0" y1="150" x2="900" y2="150" class="grid-line" />
+    <line x1="0" y1="300" x2="900" y2="300" class="grid-line" />
+    <line x1="0" y1="450" x2="900" y2="450" class="grid-line" />
+    <line x1="0" y1="600" x2="900" y2="600" class="grid-line" />
+    <!-- Vertical -->
+    <line x1="0" y1="0" x2="0" y2="600" class="grid-line" />
+    <line x1="300" y1="0" x2="300" y2="600" class="grid-line" />
+    <line x1="600" y1="0" x2="600" y2="600" class="grid-line" />
+    <line x1="900" y1="0" x2="900" y2="600" class="grid-line" />
+
+    <!-- ROW 1: External Entity -->
+    <!-- Col 1 -->
+    <rect x="50" y="30" width="180" height="60" class="shape-thin" />
+    <rect x="60" y="40" width="180" height="60" class="shape" />
+    <text x="150" y="75" style="font-size: 16px;">Entity Name</text>
+    
+    <!-- Col 2 -->
+    <text x="450" y="85" class="col-title">External Entity</text>
+    
+    <!-- Col 3 -->
+    <rect x="660" y="40" width="180" height="60" class="shape" />
+    <text x="750" y="75" style="font-size: 16px;">Entity Name</text>
+
+    <!-- ROW 2: Data Flow -->
+    <!-- Col 1 -->
+    <path d="M 60 225 L 230 225" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="145" y="215" style="font-size: 16px;">Data Flow Name</text>
+    
+    <!-- Col 2 -->
+    <text x="450" y="235" class="col-title">Data Flow</text>
+    
+    <!-- Col 3 -->
+    <path d="M 660 225 L 830 225" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="745" y="215" style="font-size: 16px;">Data Flow Name</text>
+
+    <!-- ROW 3: Data Store -->
+    <!-- Col 1 -->
+    <rect x="60" y="340" width="180" height="60" class="shape-thin" />
+    <line x1="90" y1="340" x2="90" y2="400" class="shape-thin" />
+    <text x="165" y="375" style="font-size: 16px;">Store Name</text>
+    
+    <!-- Col 2 -->
+    <text x="450" y="385" class="col-title">Data Store</text>
+    
+    <!-- Col 3 -->
+    <line x1="660" y1="330" x2="880" y2="330" class="shape" />
+    <line x1="660" y1="390" x2="880" y2="390" class="shape" />
+    <text x="770" y="365" style="font-size: 16px;">Table Name</text>
+
+    <!-- ROW 4: Process -->
+    <!-- Col 1 -->
+    <rect x="60" y="470" width="180" height="90" rx="15" class="shape" />
+    <line x1="60" y1="500" x2="240" y2="500" class="shape" />
+    <text x="150" y="540" style="font-size: 18px;">Process</text>
+    
+    <!-- Col 2 -->
+    <text x="450" y="535" class="col-title">Process</text>
+    
+    <!-- Col 3 -->
+    <ellipse cx="770" cy="515" rx="80" ry="60" class="shape" />
+    <text x="770" y="522" style="font-size: 18px;">Process</text>
+
+</svg>

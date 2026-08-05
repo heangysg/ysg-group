@@ -38,15 +38,15 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     const tgMessage = `📬 *ការទំនាក់ទំនងថ្មី (New Contact)* 📬
 *ឈ្មោះ (Name):* ${formData.name}
 *អ៊ីមែល (Email):* ${formData.email}
 *លេខទូរស័ព្ទ (Phone):* ${formData.phone}
 *សារ (Message):* ${formData.message}`
 
-    const telegramUrl = `https://t.me/Jackie_Jr7?text=${encodeURIComponent(tgMessage)}`
-    
+    const telegramUrl = `https://t.me/Emma_Heang?text=${encodeURIComponent(tgMessage)}`
+
     // Save to DB in the background
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
     fetch(`${API_URL}/api/public/contact`, {
@@ -54,10 +54,10 @@ export default function ContactPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
     }).catch(err => console.error("Failed to save contact to DB", err))
-    
+
     // Redirect user to Telegram
     window.open(telegramUrl, '_blank')
-    
+
     toast.success(language === "kh" ? "កំពុងបើក Telegram..." : "Opening Telegram...")
     setFormData({ name: "", email: "", phone: "", message: "" })
     setLoading(false)
@@ -69,7 +69,7 @@ export default function ContactPage() {
         <Toaster position="top-center" />
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-            
+
             {/* 💎 Elite Contact Info */}
             <div className="space-y-12 animate-in fade-in slide-in-from-left duration-700">
               <div className="space-y-6">
@@ -81,8 +81,8 @@ export default function ContactPage() {
                   {t("contact")}
                 </h1>
                 <p className="text-slate-600 font-normal leading-relaxed max-w-xl">
-                  {language === "kh" 
-                    ? "ប្រសិនបើអ្នកមានចម្ងល់អំពីលក្ខណៈពិសេស ឬចាប់អារម្មណ៍លើផលិតផលពីគេហទំព័ររបស់យើង សូមកុំស្ទាក់ស្ទើរក្នុងការទាក់ទងមកយើងតាមរយៈលេខទូរស័ព្ទ ឬអ៊ីមែល។ យើងខ្ញុំសូមអរគុណយ៉ាងជ្រាលជ្រៅចំពោះការចាប់អារម្មណ៍របស់អ្នកចំពោះផលិតផលរបស់យើង។" 
+                  {language === "kh"
+                    ? "ប្រសិនបើអ្នកមានចម្ងល់អំពីលក្ខណៈពិសេស ឬចាប់អារម្មណ៍លើផលិតផលពីគេហទំព័ររបស់យើង សូមកុំស្ទាក់ស្ទើរក្នុងការទាក់ទងមកយើងតាមរយៈលេខទូរស័ព្ទ ឬអ៊ីមែល។ យើងខ្ញុំសូមអរគុណយ៉ាងជ្រាលជ្រៅចំពោះការចាប់អារម្មណ៍របស់អ្នកចំពោះផលិតផលរបស់យើង។"
                     : "If you have any feature inquiry or you are interested in products from our website, please don't hesitate to contact us through phone number or our email. We truly appreciate for your interested with our products."}
                 </p>
               </div>
@@ -113,56 +113,56 @@ export default function ContactPage() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold font-medium text-slate-900 ml-1">{t("customerName")} *</label>
-                    <input 
-                      type="text" 
-                      required 
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px]" 
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px]"
                       placeholder={language === "kh" ? "ឈ្មោះពេញរបស់អ្នក" : "Your Full Name"}
-                      value={formData.name} 
-                      onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
                   </div>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-bold font-medium text-slate-900 ml-1">{t("email")} *</label>
-                      <input 
-                        type="email" 
-                        required 
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px]" 
+                      <input
+                        type="email"
+                        required
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px]"
                         placeholder={language === "kh" ? "អាសយដ្ឋានអ៊ីមែល" : "Email Address"}
-                        value={formData.email} 
-                        onChange={(e) => setFormData({...formData, email: e.target.value})} 
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold font-medium text-slate-900 ml-1">{t("phone")}</label>
-                      <input 
-                        type="tel" 
-                        className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px]" 
+                      <input
+                        type="tel"
+                        className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px]"
                         placeholder={language === "kh" ? "លេខទូរស័ព្ទ" : "Phone Number"}
-                        value={formData.phone} 
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})} 
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold font-medium text-slate-900 ml-1">{t("message")} *</label>
-                    <textarea 
-                      rows={5} 
-                      required 
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px] resize-none" 
+                    <textarea
+                      rows={5}
+                      required
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all font-medium text-slate-900 text-[14px] resize-none"
                       placeholder={language === "kh" ? "តើអ្នកចង់ឱ្យយើងជួយអ្វីខ្លះចំពោះអាជីវកម្មរបស់អ្នក?" : "How can we help your business?"}
-                      value={formData.message} 
-                      onChange={(e) => setFormData({...formData, message: e.target.value})} 
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     />
                   </div>
                 </div>
 
-                <button 
-                  type="submit" 
-                  disabled={loading} 
+                <button
+                  type="submit"
+                  disabled={loading}
                   className="w-full bg-primary text-white py-4 rounded-xl font-bold text-xs flex items-center justify-center gap-3 disabled:opacity-50 mt-6 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1 transition-all"
                 >
                   {loading ? (

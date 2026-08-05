@@ -1,0 +1,46 @@
+<svg width="1000" height="500" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    
+  <style>
+    text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; }
+    .subtitle { font-size: 16px; fill: #333333; }
+    .box { fill: #ffffff; stroke: #333333; stroke-width: 2; rx: 6; }
+    .box-header { font-weight: bold; font-size: 18px; fill: #ffffff; }
+    .arrow { stroke: #000000; stroke-width: 3; fill: none; }
+    .arrow-head { fill: #000000; }
+    .code { font-family: 'Courier New', Courier, monospace; font-size: 14px; fill: #000000; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow-head" />
+    </marker>
+  </defs>
+
+    <rect width="1000" height="500" fill="#ffffff" />
+
+    <rect x="50" y="150" width="220" height="150" class="box" />
+    <rect x="50" y="150" width="220" height="40" fill="#333333" rx="6" />
+    <text x="160" y="177" text-anchor="middle" class="box-header">Developer</text>
+    <text x="160" y="240" text-anchor="middle" class="code">npm install qrcode</text>
+
+    <path d="M 270 225 L 390 225" class="arrow" marker-end="url(#arrowhead)" />
+
+    <rect x="410" y="80" width="260" height="320" class="box" />
+    <rect x="410" y="80" width="260" height="50" fill="#666666" rx="6" />
+    <text x="540" y="112" text-anchor="middle" class="box-header">Local Project</text>
+    
+    <rect x="440" y="150" width="200" height="60" fill="#f3f4f6" rx="4" />
+    <text x="540" y="185" text-anchor="middle" class="code">package.json</text>
+    
+    <rect x="440" y="240" width="200" height="120" fill="#f3f4f6" rx="4" />
+    <text x="540" y="275" text-anchor="middle" class="code">node_modules/</text>
+    <text x="540" y="310" text-anchor="middle" class="subtitle">/qrcode</text>
+    <text x="540" y="335" text-anchor="middle" class="subtitle">/express</text>
+
+    <path d="M 540 80 L 540 40 L 860 40 L 860 140" class="arrow" marker-end="url(#arrowhead)" />
+    <text x="700" y="30" text-anchor="middle" class="subtitle">Fetches Dependencies</text>
+
+    <rect x="750" y="150" width="220" height="150" class="box" />
+    <rect x="750" y="150" width="220" height="40" fill="#000000" rx="6" />
+    <text x="860" y="177" text-anchor="middle" class="box-header">NPM Registry</text>
+    <text x="860" y="250" text-anchor="middle" class="subtitle">Global Hub</text>
+  </svg>

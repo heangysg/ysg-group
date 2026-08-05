@@ -1,0 +1,24 @@
+<svg viewBox="0 0 700 500" width="700" height="500" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="100%" height="100%" fill="#ffffff"/>
+    <g transform="translate(50, 50)">
+        <rect x="50" y="50" width="500" height="350" fill="none" stroke="#000000" stroke-width="3"/>
+        <line x1="50" y1="120" x2="250" y2="120" stroke="#000000" stroke-width="3"/>
+        <polygon points="300,90 370,120 300,150 230,120" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+        <text x="300" y="130" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">R</text>
+        <line x1="370" y1="120" x2="550" y2="120" stroke="#000000" stroke-width="3"/>
+        <text x="150" y="110" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">1</text>
+        <text x="450" y="110" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">1</text>
+        <line x1="50" y1="220" x2="250" y2="220" stroke="#000000" stroke-width="3"/>
+        <polygon points="300,190 370,220 300,250 230,220" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+        <text x="300" y="230" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">R</text>
+        <line x1="370" y1="220" x2="550" y2="220" stroke="#000000" stroke-width="3"/>
+        <text x="150" y="210" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">1</text>
+        <text x="450" y="210" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">M</text>
+        <line x1="50" y1="320" x2="250" y2="320" stroke="#000000" stroke-width="3"/>
+        <polygon points="300,290 370,320 300,350 230,320" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+        <text x="300" y="330" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">R</text>
+        <line x1="370" y1="320" x2="550" y2="320" stroke="#000000" stroke-width="3"/>
+        <text x="150" y="310" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">M</text>
+        <text x="450" y="310" font-family="Arial" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle">N</text>
+    </g>
+</svg>

@@ -1,0 +1,67 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+        </marker>
+        <style>
+            .box { fill: #fff; stroke: #000; stroke-width: 2px; rx: 4px; }
+            .circle { fill: #fff; stroke: #000; stroke-width: 2px; }
+            .text { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 16px; fill: #000; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+            .text-small { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 14px; fill: #000; font-weight: normal; text-anchor: middle; dominant-baseline: middle; }
+            .label { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 13px; fill: #000; text-anchor: middle; }
+            .bg-rect { fill: white; }
+            .line { stroke: #000; stroke-width: 2px; fill: none; marker-end: url(#arrow); }
+        </style>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="#ffffff" />
+    
+    <!-- Process Node (Center Circle) -->
+    <circle cx="300" cy="300" r="85" class="circle" />
+    <line x1="228" y1="250" x2="372" y2="250" stroke="#000" stroke-width="2" />
+    <text x="300" y="235" class="text">០</text>
+    <text x="300" y="285" class="text">ប្រព័ន្ធគ្រប់គ្រង</text>
+    <text x="300" y="315" class="text">ការលក់ដោយដៃ</text>
+    <text x="300" y="350" class="text-small">(Old System)</text>
+
+    <!-- External Entities -->
+    <!-- Customer -->
+    <rect x="10" y="270" width="110" height="60" class="box" />
+    <text x="65" y="300" class="text">អតិថិជន</text>
+
+    <!-- Warehouse -->
+    <rect x="470" y="100" width="120" height="60" class="box" />
+    <text x="530" y="130" class="text">ឃ្លាំងផ្ទុកទំនិញ</text>
+
+    <!-- Manager -->
+    <rect x="470" y="440" width="120" height="60" class="box" />
+    <text x="530" y="470" class="text">អ្នកគ្រប់គ្រង</text>
+
+    <!-- Connections -->
+    <!-- Customer to Process -->
+    <path d="M 120 285 L 210 285" class="line" />
+    <rect x="125" y="260" width="85" height="20" class="bg-rect" />
+    <text x="165" y="275" class="label">បញ្ជាទិញ/ប្រាក់</text>
+
+    <!-- Process to Customer -->
+    <path d="M 210 315 L 120 315" class="line" />
+    <rect x="125" y="325" width="85" height="20" class="bg-rect" />
+    <text x="165" y="340" class="label">វិក្កយបត្រដៃ</text>
+
+    <!-- Process to Warehouse -->
+    <path d="M 360 230 L 465 140" class="line" />
+    <rect x="365" y="155" width="70" height="20" class="bg-rect" />
+    <text x="400" y="170" class="label">សួររកទំនិញ</text>
+
+    <!-- Warehouse to Process -->
+    <path d="M 470 160 L 375 250" class="line" />
+    <rect x="410" y="210" width="70" height="20" class="bg-rect" />
+    <text x="445" y="225" class="label">ប្រាប់ពីស្តុក</text>
+
+    <!-- Process to Manager -->
+    <path d="M 360 360 L 465 440" class="line" />
+    <rect x="390" y="375" width="90" height="20" class="bg-rect" />
+    <text x="435" y="390" class="label">របាយការណ៍លក់</text>
+
+</svg>

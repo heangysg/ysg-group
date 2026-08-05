@@ -1,0 +1,29 @@
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+    
+  <style>
+    text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; }
+    .subtitle { font-size: 16px; fill: #333333; }
+    .box { fill: #ffffff; stroke: #333333; stroke-width: 2; rx: 6; }
+    .box-header { font-weight: bold; font-size: 18px; fill: #ffffff; }
+    .arrow { stroke: #000000; stroke-width: 3; fill: none; }
+    .arrow-head { fill: #000000; }
+    .code { font-family: 'Courier New', Courier, monospace; font-size: 14px; fill: #000000; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow-head" />
+    </marker>
+  </defs>
+
+    <rect width="800" height="500" fill="#ffffff" />
+    
+    <rect x="150" y="100" width="500" height="300" class="box" />
+    <rect x="150" y="100" width="500" height="60" fill="#666666" rx="6" />
+    <text x="400" y="137" text-anchor="middle" class="box-header" style="font-size: 22px;">PostgreSQL (Supabase)</text>
+    
+    <rect x="200" y="200" width="400" height="150" fill="#f3f4f6" rx="6" />
+    <text x="400" y="235" text-anchor="middle" style="font-weight:bold; font-size:18px;">Table: machines</text>
+    <text x="250" y="275" class="code">id | name       | stock</text>
+    <text x="250" y="305" class="code">---|------------|------</text>
+    <text x="250" y="335" class="code">1  | Tractor    | 5    </text>
+  </svg>

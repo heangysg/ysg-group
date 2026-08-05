@@ -1,0 +1,63 @@
+<svg viewBox="0 0 800 800" width="800" height="800" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; font-size: 22px; text-anchor: middle; }
+        .ellipse { fill: #ffffff; stroke: #000000; stroke-width: 2; }
+        .arrow-line { fill: none; stroke: #000000; stroke-width: 4; }
+        .arrow-polygon { fill: #ffffff; stroke: #000000; stroke-width: 2; stroke-linejoin: round; }
+    </style>
+
+    <rect x="0" y="0" width="100%" height="100%" fill="#ffffff" />
+
+    <!-- ARROWS (Block arrows drawn as polygons) -->
+    <!-- 1 to 2 -->
+    <g transform="translate(480, 190) rotate(35)">
+        <polygon points="0,-10 60,-10 60,-25 95,0 60,25 60,10 0,10" class="arrow-polygon"/>
+    </g>
+
+    <!-- 2 to 3 -->
+    <g transform="translate(630, 420) rotate(105)">
+        <polygon points="0,-10 60,-10 60,-25 95,0 60,25 60,10 0,10" class="arrow-polygon"/>
+    </g>
+
+    <!-- 3 to 4 -->
+    <g transform="translate(430, 610) rotate(180)">
+        <polygon points="0,-10 60,-10 60,-25 95,0 60,25 60,10 0,10" class="arrow-polygon"/>
+    </g>
+
+    <!-- 4 to 5 -->
+    <g transform="translate(220, 510) rotate(250)">
+        <polygon points="0,-10 60,-10 60,-25 95,0 60,25 60,10 0,10" class="arrow-polygon"/>
+    </g>
+
+    <!-- 5 to 1 -->
+    <g transform="translate(210, 250) rotate(320)">
+        <polygon points="0,-10 60,-10 60,-25 95,0 60,25 60,10 0,10" class="arrow-polygon"/>
+    </g>
+
+    <!-- ELLIPSES -->
+    <!-- 1. Planning -->
+    <ellipse cx="400" cy="140" rx="130" ry="80" class="ellipse" />
+    <text x="400" y="135">1</text>
+    <text x="400" y="165">Planning</text>
+
+    <!-- 2. Analysis -->
+    <ellipse cx="660" cy="330" rx="130" ry="80" class="ellipse" />
+    <text x="660" y="325">2</text>
+    <text x="660" y="355">Analysis</text>
+
+    <!-- 3. Design -->
+    <ellipse cx="560" cy="610" rx="130" ry="80" class="ellipse" />
+    <text x="560" y="605">3</text>
+    <text x="560" y="635">Design</text>
+
+    <!-- 4. Implementation -->
+    <ellipse cx="240" cy="610" rx="130" ry="80" class="ellipse" />
+    <text x="240" y="605">4</text>
+    <text x="240" y="635">Implementation</text>
+
+    <!-- 5. Maintenance -->
+    <ellipse cx="140" cy="330" rx="130" ry="80" class="ellipse" />
+    <text x="140" y="325">5</text>
+    <text x="140" y="355">Maintenance</text>
+
+</svg>

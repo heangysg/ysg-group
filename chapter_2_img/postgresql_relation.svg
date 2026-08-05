@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="900" height="500">
+  <!-- Background -->
+  <rect width="900" height="500" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="450" y="40" font-family="Arial" font-size="24" font-weight="bold" fill="#333" text-anchor="middle">PostgreSQL Relational Database Example</text>
+  <text x="450" y="65" font-family="Arial" font-size="14" fill="#666" text-anchor="middle">(Primary Key and Foreign Key Relationships)</text>
+
+  <!-- TABLE: Users -->
+  <g transform="translate(50, 150)">
+    <!-- Table Header -->
+    <rect width="200" height="40" fill="#1976d2" stroke="#1565c0" stroke-width="2"/>
+    <text x="100" y="26" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Table: users</text>
+    
+    <!-- Table Rows -->
+    <rect y="40" width="200" height="30" fill="#ffffff" stroke="#bbdefb" stroke-width="1"/>
+    <text x="10" y="60" font-family="Courier New" font-size="14" font-weight="bold" fill="#d32f2f">id (PK)</text>
+    
+    <rect y="70" width="200" height="30" fill="#f5f5f5" stroke="#bbdefb" stroke-width="1"/>
+    <text x="10" y="90" font-family="Courier New" font-size="14" fill="#333">name</text>
+    
+    <rect y="100" width="200" height="30" fill="#ffffff" stroke="#bbdefb" stroke-width="1"/>
+    <text x="10" y="120" font-family="Courier New" font-size="14" fill="#333">email</text>
+    
+    <rect y="130" width="200" height="30" fill="#f5f5f5" stroke="#bbdefb" stroke-width="1"/>
+    <text x="10" y="150" font-family="Courier New" font-size="14" fill="#333">role (admin/staff)</text>
+    
+    <!-- Connection Point for Users PK -->
+    <circle cx="200" cy="55" r="4" fill="#d32f2f"/>
+  </g>
+
+  <!-- TABLE: Invoices (Center Table) -->
+  <g transform="translate(350, 120)">
+    <!-- Table Header -->
+    <rect width="200" height="40" fill="#388e3c" stroke="#2e7d32" stroke-width="2"/>
+    <text x="100" y="26" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Table: invoices</text>
+    
+    <!-- Table Rows -->
+    <rect y="40" width="200" height="30" fill="#ffffff" stroke="#c8e6c9" stroke-width="1"/>
+    <text x="10" y="60" font-family="Courier New" font-size="14" font-weight="bold" fill="#d32f2f">id (PK)</text>
+    
+    <rect y="70" width="200" height="30" fill="#f5f5f5" stroke="#c8e6c9" stroke-width="1"/>
+    <text x="10" y="90" font-family="Courier New" font-size="14" font-weight="bold" fill="#1976d2">user_id (FK)</text>
+    
+    <rect y="100" width="200" height="30" fill="#ffffff" stroke="#c8e6c9" stroke-width="1"/>
+    <text x="10" y="120" font-family="Courier New" font-size="14" font-weight="bold" fill="#f57c00">machine_id (FK)</text>
+    
+    <rect y="130" width="200" height="30" fill="#f5f5f5" stroke="#c8e6c9" stroke-width="1"/>
+    <text x="10" y="150" font-family="Courier New" font-size="14" fill="#333">total_amount</text>
+    
+    <rect y="160" width="200" height="30" fill="#ffffff" stroke="#c8e6c9" stroke-width="1"/>
+    <text x="10" y="180" font-family="Courier New" font-size="14" fill="#333">created_at</text>
+    
+    <!-- Connection Points -->
+    <circle cx="0" cy="85" r="4" fill="#1976d2"/>
+    <circle cx="200" cy="115" r="4" fill="#f57c00"/>
+  </g>
+
+  <!-- TABLE: Machines -->
+  <g transform="translate(650, 150)">
+    <!-- Table Header -->
+    <rect width="200" height="40" fill="#f57c00" stroke="#ef6c00" stroke-width="2"/>
+    <text x="100" y="26" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Table: machines</text>
+    
+    <!-- Table Rows -->
+    <rect y="40" width="200" height="30" fill="#ffffff" stroke="#ffe0b2" stroke-width="1"/>
+    <text x="10" y="60" font-family="Courier New" font-size="14" font-weight="bold" fill="#d32f2f">id (PK)</text>
+    
+    <rect y="70" width="200" height="30" fill="#f5f5f5" stroke="#ffe0b2" stroke-width="1"/>
+    <text x="10" y="90" font-family="Courier New" font-size="14" fill="#333">machine_name</text>
+    
+    <rect y="100" width="200" height="30" fill="#ffffff" stroke="#ffe0b2" stroke-width="1"/>
+    <text x="10" y="120" font-family="Courier New" font-size="14" fill="#333">price</text>
+    
+    <rect y="130" width="200" height="30" fill="#f5f5f5" stroke="#ffe0b2" stroke-width="1"/>
+    <text x="10" y="150" font-family="Courier New" font-size="14" fill="#333">stock_qty</text>
+
+    <!-- Connection Point for Machines PK -->
+    <circle cx="0" cy="55" r="4" fill="#d32f2f"/>
+  </g>
+
+  <!-- RELATIONSHIP LINES -->
+  
+  <!-- Line from Users to Invoices -->
+  <path d="M 250 205 L 300 205 L 300 205 L 350 205" fill="none" stroke="#1976d2" stroke-width="3" stroke-dasharray="5,5"/>
+  <polygon points="345,200 355,205 345,210" fill="#1976d2"/>
+  <text x="300" y="195" font-family="Arial" font-size="12" fill="#1976d2" text-anchor="middle">1 to Many</text>
+
+  <!-- Line from Machines to Invoices -->
+  <path d="M 650 205 L 600 205 L 600 235 L 550 235" fill="none" stroke="#f57c00" stroke-width="3" stroke-dasharray="5,5"/>
+  <polygon points="555,230 545,235 555,240" fill="#f57c00"/>
+  <text x="600" y="195" font-family="Arial" font-size="12" fill="#f57c00" text-anchor="middle">1 to Many</text>
+
+  <!-- Bottom Explanation -->
+  <rect x="150" y="400" width="600" height="60" rx="5" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/>
+  <text x="450" y="425" font-family="Arial" font-size="14" fill="#333" text-anchor="middle">Foreign Keys (FK) create a relationship between the tables.</text>
+  <text x="450" y="445" font-family="Arial" font-size="14" fill="#333" text-anchor="middle">When an invoice is created, it securely references the exact User and Machine via their ID.</text>
+
+</svg>

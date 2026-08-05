@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <!-- Background -->
+  <rect width="800" height="500" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" font-weight="bold" fill="#333" text-anchor="middle">Sales Management System Architecture</text>
+  
+  <!-- USERS SECTION -->
+  <rect x="50" y="80" width="700" height="120" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="110" font-family="Arial" font-size="18" font-weight="bold" fill="#1976d2" text-anchor="middle">Users (Front-End Access)</text>
+
+  <!-- Admin User -->
+  <circle cx="200" cy="150" r="30" fill="#4caf50" stroke="#388e3c" stroke-width="2"/>
+  <text x="200" y="155" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Admin</text>
+  <text x="200" y="195" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">Manage Roles</text>
+
+  <!-- Staff User -->
+  <circle cx="400" cy="150" r="30" fill="#ff9800" stroke="#f57c00" stroke-width="2"/>
+  <text x="400" y="155" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Staff</text>
+  <text x="400" y="195" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">Create Invoices</text>
+
+  <!-- Customer User -->
+  <circle cx="600" cy="150" r="30" fill="#9c27b0" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="600" y="155" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Customer</text>
+  <text x="600" y="195" font-family="Arial" font-size="12" fill="#333" text-anchor="middle">View Catalog</text>
+
+  <!-- Arrows from Users to System -->
+  <path d="M 200 200 L 200 240 L 380 240 L 380 260" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M 400 200 L 400 260" fill="none" stroke="#666" stroke-width="2"/>
+  <path d="M 600 200 L 600 240 L 420 240 L 420 260" fill="none" stroke="#666" stroke-width="2"/>
+
+  <!-- SYSTEM SECTION (Next.js) -->
+  <rect x="250" y="260" width="300" height="80" rx="10" fill="#ffffff" stroke="#333" stroke-width="3"/>
+  <text x="400" y="295" font-family="Arial" font-size="20" font-weight="bold" fill="#000" text-anchor="middle">Next.js Web Application</text>
+  <text x="400" y="320" font-family="Arial" font-size="14" fill="#666" text-anchor="middle">(React UI + Node.js API)</text>
+
+  <!-- Arrows from System to Database -->
+  <path d="M 400 340 L 400 380" fill="none" stroke="#2196f3" stroke-width="4"/>
+  <polygon points="395,370 405,370 400,380" fill="#2196f3"/>
+  <path d="M 410 380 L 410 340" fill="none" stroke="#4caf50" stroke-width="4"/>
+  <polygon points="405,350 415,350 410,340" fill="#4caf50"/>
+
+  <text x="350" y="365" font-family="Arial" font-size="12" fill="#2196f3" text-anchor="middle">Request</text>
+  <text x="460" y="365" font-family="Arial" font-size="12" fill="#4caf50" text-anchor="middle">Real-time Data</text>
+
+  <!-- DATABASE SECTION (Supabase) -->
+  <rect x="250" y="380" width="300" height="90" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="3"/>
+  <text x="400" y="415" font-family="Arial" font-size="18" font-weight="bold" fill="#2e7d32" text-anchor="middle">Supabase (PostgreSQL)</text>
+  
+  <!-- Database Sub-components -->
+  <rect x="270" y="430" width="80" height="30" rx="5" fill="#c8e6c9"/>
+  <text x="310" y="450" font-family="Arial" font-size="12" fill="#1b5e20" text-anchor="middle">Users DB</text>
+
+  <rect x="360" y="430" width="80" height="30" rx="5" fill="#c8e6c9"/>
+  <text x="400" y="450" font-family="Arial" font-size="12" fill="#1b5e20" text-anchor="middle">Inventory</text>
+
+  <rect x="450" y="430" width="80" height="30" rx="5" fill="#c8e6c9"/>
+  <text x="490" y="450" font-family="Arial" font-size="12" fill="#1b5e20" text-anchor="middle">Invoices</text>
+
+</svg>

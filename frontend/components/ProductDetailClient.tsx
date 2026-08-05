@@ -27,7 +27,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   const [inquiryForm, setInquiryForm] = useState({ customerName: "", customerPhone: "", message: "" })
   const [submittingInquiry, setSubmittingInquiry] = useState(false)
   const [copied, setCopied] = useState(false)
-  
+
   const inWishlist = product ? isInWishlist(product.id) : false
 
   const handleShare = async () => {
@@ -36,7 +36,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
     if (navigator.share) {
       try {
         await navigator.share({ title: productName, text: `Check out ${productName} on YSG Machinery`, url })
-      } catch {}
+      } catch { }
     } else {
       await navigator.clipboard.writeText(url)
       setCopied(true)
@@ -63,7 +63,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmittingInquiry(true)
-    
+
     const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
     const tgMessage = `🚨 *ការសាកសួរផលិតផល (Product Inquiry)* 🚨
 *ផលិតផល (Product):* ${productName}
@@ -71,8 +71,8 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 *លេខទូរស័ព្ទ (Phone):* ${inquiryForm.customerPhone}
 *សារ (Message):* ${inquiryForm.message}`
 
-    const telegramUrl = `https://t.me/Jackie_Jr7?text=${encodeURIComponent(tgMessage)}`
-    
+    const telegramUrl = `https://t.me/Emma_Heang?text=${encodeURIComponent(tgMessage)}`
+
     // Save to DB in the background
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
     fetch(`${API_URL}/api/public/inquiry`, {
@@ -80,10 +80,10 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...inquiryForm, productId: product?.id })
     }).catch(err => console.error("Failed to save inquiry to DB", err))
-    
+
     // Redirect user to Telegram
     window.open(telegramUrl, '_blank')
-    
+
     toast.success(language === "kh" ? "កំពុងបើក Telegram..." : "Opening Telegram...")
     setShowInquiry(false)
     setInquiryForm({ customerName: "", customerPhone: "", message: "" })
@@ -97,7 +97,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
         fetchRelated(initialProduct.categoryId, initialProduct.id)
         return
       }
-      
+
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
         const res = await fetch(`${API_URL}/api/public/products/${slug}`, { cache: 'no-store' })
@@ -155,7 +155,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
     <PublicLayout>
       <main className="min-h-screen bg-white md:bg-[#F8FAFC] pb-24 pt-0 md:pt-8">
         <Toaster position="top-center" reverseOrder={false} />
-        
+
         {/* Desktop Breadcrumbs */}
         <div className="hidden md:block max-w-6xl mx-auto px-4 md:px-8 mb-8">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap pb-2">
@@ -180,12 +180,12 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             <div className="space-y-4 md:space-y-6">
               <div className="bg-[#F8FAFC] md:rounded-xl aspect-square md:aspect-[4/3] relative group overflow-hidden md:border md:border-slate-100 shadow-inner">
                 {images.length > 0 && images[activeImage] ? (
-                  <Image 
-                    src={images[activeImage]} 
-                    alt={product.name} 
+                  <Image
+                    src={images[activeImage]}
+                    alt={product.name}
                     fill
                     sizes="(max-width: 1200px) 100vw, 50vw"
-                    className="object-contain transition-all duration-700 hover:scale-105" 
+                    className="object-contain transition-all duration-700 hover:scale-105"
                     priority
                   />
                 ) : (
@@ -195,16 +195,15 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                   </div>
                 )}
               </div>
-              
+
               {images.length > 1 && (
                 <div className="grid grid-cols-5 gap-3 md:gap-4 px-4 md:px-0">
                   {images.map((img: string, i: number) => (
-                    <button 
-                      key={i} 
+                    <button
+                      key={i}
                       onClick={() => setActiveImage(i)}
-                      className={`aspect-square rounded-lg overflow-hidden transition-all duration-300 border-2 ${
-                        activeImage === i ? "border-primary shadow-md shadow-primary/20 scale-105" : "border-transparent hover:border-slate-200"
-                      }`}
+                      className={`aspect-square rounded-lg overflow-hidden transition-all duration-300 border-2 ${activeImage === i ? "border-primary shadow-md shadow-primary/20 scale-105" : "border-transparent hover:border-slate-200"
+                        }`}
                     >
                       <div className="relative w-full h-full bg-[#F8FAFC]">
                         <Image src={img} alt={`${product.name} ${i}`} fill sizes="20vw" className="object-cover" />
@@ -249,14 +248,13 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                   <span className="text-3xl md:text-4xl font-black text-primary drop-shadow-sm">
                     {product.price ? `$${Number(product.price).toLocaleString()}` : "Price on Request"}
                   </span>
-                  
-                  <button 
+
+                  <button
                     onClick={handleToggleWishlist}
-                    className={`ml-auto flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all duration-300 active:scale-95 ${
-                      inWishlist 
-                        ? "bg-red-50 border-red-100 text-red-500 shadow-[0_8px_30px_rgb(239,68,68,0.2)]" 
+                    className={`ml-auto flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all duration-300 active:scale-95 ${inWishlist
+                        ? "bg-red-50 border-red-100 text-red-500 shadow-[0_8px_30px_rgb(239,68,68,0.2)]"
                         : "bg-white border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50"
-                    }`}
+                      }`}
                   >
                     <Heart className={`w-5 h-5 md:w-6 md:h-6 ${inWishlist ? "fill-red-500" : ""}`} />
                   </button>
@@ -279,7 +277,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
                   {t("contactSales")}
                 </button>
               </div>
-              
+
               {/* Share button */}
               <button
                 onClick={handleShare}
@@ -352,15 +350,15 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             <form onSubmit={handleInquirySubmit} className="space-y-4">
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("fullName") || "Full Name"}</label>
-                <input required value={inquiryForm.customerName} onChange={(e) => setInquiryForm({...inquiryForm, customerName: e.target.value})} type="text" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px]" />
+                <input required value={inquiryForm.customerName} onChange={(e) => setInquiryForm({ ...inquiryForm, customerName: e.target.value })} type="text" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px]" />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("phone") || "Phone Number"}</label>
-                <input required value={inquiryForm.customerPhone} onChange={(e) => setInquiryForm({...inquiryForm, customerPhone: e.target.value})} type="tel" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px]" />
+                <input required value={inquiryForm.customerPhone} onChange={(e) => setInquiryForm({ ...inquiryForm, customerPhone: e.target.value })} type="tel" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px]" />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("message") || "Message"}</label>
-                <textarea required value={inquiryForm.message} onChange={(e) => setInquiryForm({...inquiryForm, message: e.target.value})} rows={4} className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px] resize-none"></textarea>
+                <textarea required value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} rows={4} className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px] resize-none"></textarea>
               </div>
               <button disabled={submittingInquiry} type="submit" className="w-full bg-primary text-white rounded-xl py-4 font-bold text-[13px] mt-6 flex items-center justify-center gap-2 hover:bg-primary-dark transition-all active:scale-95 shadow-lg shadow-primary/30">
                 {submittingInquiry ? t("loading") || "Sending..." : t("send") || "Send Message"}

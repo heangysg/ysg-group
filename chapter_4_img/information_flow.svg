@@ -1,0 +1,88 @@
+<svg width="650" height="750" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#000" />
+        </marker>
+        <style>
+            .shape { fill: #fff; stroke: #000; stroke-width: 2px; }
+            .text { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 15px; fill: #000; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+            .text-small { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 13px; fill: #000; text-anchor: middle; dominant-baseline: middle; }
+            .label { font-family: 'Khmer OS Siemreap', sans-serif; font-size: 14px; fill: #000; background: white; }
+            .line { stroke: #000; stroke-width: 2px; fill: none; marker-end: url(#arrow); }
+            .line-no-arrow { stroke: #000; stroke-width: 2px; fill: none; }
+        </style>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="#ffffff" />
+    
+    <!-- 1. Start (Oval) -->
+    <ellipse cx="300" cy="60" rx="70" ry="25" class="shape" />
+    <text x="300" y="60" class="text">ចាប់ផ្តើម</text>
+    
+    <path d="M 300 85 L 300 115" class="line" />
+
+    <!-- 2. Process 1: Customer Orders (Rect) -->
+    <rect x="200" y="120" width="200" height="50" class="shape" rx="4" />
+    <text x="300" y="145" class="text">អតិថិជនបញ្ជាទិញទំនិញ</text>
+    
+    <!-- Document 1: Invoice -->
+    <path d="M 400 145 L 450 145" class="line" />
+    <path d="M 460 120 L 560 120 L 560 160 Q 535 170 510 160 Q 485 150 460 160 Z" class="shape" />
+    <text x="510" y="140" class="text-small">វិក្កយបត្រ</text>
+
+    <path d="M 300 170 L 300 205" class="line" />
+
+    <!-- 3. Decision: Payment (Diamond) -->
+    <polygon points="300,210 380,260 300,310 220,260" class="shape" />
+    <text x="300" y="260" class="text">ទូទាត់ជោគជ័យ?</text>
+
+    <!-- No Arrow to Cancel -->
+    <path d="M 380 260 L 445 260" class="line" />
+    <rect x="395" y="235" width="30" height="20" fill="white" />
+    <text x="410" y="247" class="label" text-anchor="middle">ទេ</text>
+    
+    <!-- Cancel (Oval) -->
+    <ellipse cx="510" cy="260" rx="50" ry="20" class="shape" />
+    <text x="510" y="260" class="text-small">បោះបង់</text>
+
+    <!-- Yes Arrow Down -->
+    <path d="M 300 310 L 300 355" class="line" />
+    <rect x="310" y="320" width="50" height="20" fill="white" />
+    <text x="335" y="332" class="label" text-anchor="middle">បាទ/ចាស</text>
+
+    <!-- 4. Process 2: System Cuts Stock -->
+    <rect x="200" y="360" width="200" height="50" class="shape" rx="4" />
+    <text x="300" y="385" class="text">ប្រព័ន្ធកាត់ស្តុកស្វ័យប្រវត្តិ</text>
+    
+    <!-- DB: Database -->
+    <path d="M 400 385 L 450 385" class="line" />
+    <!-- Cylinder -->
+    <ellipse cx="505" cy="365" rx="45" ry="12" class="shape" />
+    <path d="M 460 365 L 460 395 A 45 12 0 0 0 550 395 L 550 365" class="shape" />
+    <text x="505" y="385" class="text-small">ទិន្នន័យ</text>
+
+    <path d="M 300 410 L 300 455" class="line" />
+
+    <!-- 5. Process 3: Delivery -->
+    <rect x="200" y="460" width="200" height="50" class="shape" rx="4" />
+    <text x="300" y="485" class="text">រៀបចំ និងដឹកជញ្ជូន</text>
+
+    <path d="M 300 510 L 300 555" class="line" />
+
+    <!-- 6. Process 4: Report -->
+    <rect x="200" y="560" width="200" height="50" class="shape" rx="4" />
+    <text x="300" y="585" class="text">បង្កើតរបាយការណ៍</text>
+
+    <!-- Document 2: Report -->
+    <path d="M 400 585 L 450 585" class="line" />
+    <path d="M 460 560 L 560 560 L 560 600 Q 535 610 510 600 Q 485 590 460 600 Z" class="shape" />
+    <text x="510" y="580" class="text-small">របាយការណ៍</text>
+
+    <path d="M 300 610 L 300 655" class="line" />
+
+    <!-- 7. End (Oval) -->
+    <ellipse cx="300" cy="685" rx="70" ry="25" class="shape" />
+    <text x="300" y="685" class="text">បញ្ចប់</text>
+
+</svg>

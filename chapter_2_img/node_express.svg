@@ -1,0 +1,44 @@
+<svg width="1000" height="500" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+    
+  <style>
+    text { font-family: 'Khmer OS Siemreap', Arial, sans-serif; fill: #000000; }
+    .subtitle { font-size: 16px; fill: #333333; }
+    .box { fill: #ffffff; stroke: #333333; stroke-width: 2; rx: 6; }
+    .box-header { font-weight: bold; font-size: 18px; fill: #ffffff; }
+    .arrow { stroke: #000000; stroke-width: 3; fill: none; }
+    .arrow-head { fill: #000000; }
+    .code { font-family: 'Courier New', Courier, monospace; font-size: 14px; fill: #000000; }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" class="arrow-head" />
+    </marker>
+  </defs>
+
+    <rect width="1000" height="500" fill="#ffffff" />
+    
+    <rect x="50" y="150" width="180" height="150" class="box" />
+    <rect x="50" y="150" width="180" height="40" fill="#666666" rx="6" />
+    <text x="140" y="177" text-anchor="middle" class="box-header">Client</text>
+    <text x="140" y="235" text-anchor="middle" class="subtitle">API Request</text>
+
+    <path d="M 230 225 L 320 225" class="arrow" marker-end="url(#arrowhead)" />
+    
+    <rect x="340" y="80" width="380" height="320" class="box" />
+    <rect x="340" y="80" width="380" height="50" fill="#333333" rx="6" />
+    <text x="530" y="112" text-anchor="middle" class="box-header">Express.js (Node.js)</text>
+    
+    <rect x="380" y="160" width="150" height="70" fill="#f3f4f6" stroke="#cccccc" stroke-width="2" rx="6" />
+    <text x="455" y="200" text-anchor="middle" class="subtitle">Router (/api)</text>
+
+    <rect x="550" y="160" width="150" height="70" fill="#f3f4f6" stroke="#cccccc" stroke-width="2" rx="6" />
+    <text x="625" y="200" text-anchor="middle" class="subtitle">Middleware</text>
+    
+    <rect x="465" y="280" width="150" height="70" fill="#f3f4f6" stroke="#cccccc" stroke-width="2" rx="6" />
+    <text x="540" y="320" text-anchor="middle" class="subtitle">Controller</text>
+
+    <path d="M 720 225 L 810 225" class="arrow" marker-end="url(#arrowhead)" />
+    
+    <ellipse cx="880" cy="225" rx="60" ry="70" class="box" />
+    <text x="880" y="232" text-anchor="middle" style="font-weight:bold; font-size:22px;">DB</text>
+  </svg>

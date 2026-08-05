@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Khmer OS Battambang', Arial, sans-serif; line-height: 1.6; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <p>ជំពូក ៤
+ការវិភាគ ការគ្រោង និងការអនុវត្ត (Analysis, Planning and Implementation)</p>
+<p>៤.១ ការវិភាគ និងការសិក្សាលើប្រព័ន្ធ (Study And Analysis the System)
+បន្ទាប់ពីក្រុមសិក្សាស្រាវជ្រាវបានចុះសិក្សាផ្ទាល់ និងទទួលយកព័ត៌មានពីក្រុមហ៊ុន Yeung Shi Group រួមជាមួយការសម្ភាសន៍ជាមួយម្ចាស់ក្រុមហ៊ុន បានឃើញថា ប្រព័ន្ធគ្រប់គ្រងបច្ចុប្បន្ននៅមានលក្ខណៈសាមញ្ញ និងបច្ចេកទេសមិនទាន់គ្រប់គ្រាន់។ ការលក់ ការគ្រប់គ្រងស្តុកទំនិញ (ដូចជា គ្រឿងម៉ាស៊ីន គ្រឿងផ្សំអាហារ និងផលិតផលនាំចេញ-នាំចូល) និងការកត់ត្រាអតិថិជន ត្រូវបានកត់ត្រាលើសៀវភៅ និង Microsoft Excel ដែលពិបាកផ្ទុកទិន្នន័យ អាចធ្វើឲ្យទិន្នន័យមិនមានសុវត្ថិភាព ហើយងាយនឹងបាត់បង់ទិន្នន័យរបស់អាជីវកម្ម។ រូបរាងនៃឯកសារមិនមានភាពទាក់ទាញនិងមិនងាយស្រួលប្រើប្រាស់ ចំណាយពេលយូរក្នុងការស្វែងរកទិន្នន័យដូចជាឈ្មោះអតិថិជន និងប្រវត្តិទិញ។ វាក៏មានការលំបាកក្នុងការថែទាំទិន្នន័យ ដែលធ្វើឲ្យការគ្រប់គ្រងអាជីវកម្មជួបប្រទះភាពយឺតយ៉ាវ និងមិនអាចឆ្លើយតបតម្រូវការទាន់ពេល។</p>
+<p>៤.២ ការវិភាគលើប្រព័ន្ធបច្ចុប្បន្ន(ចាស់) (Analysis The Current System)
+ក្រុមហ៊ុន Yeung Shi Group ជាក្រុមហ៊ុននាំចេញ-នាំចូល និងចែកចាយទំនិញជាច្រើនប្រភេទដូចជា គ្រឿងម៉ាស៊ីន (ម៉ាស៊ីនចំណីអាហារ និងម៉ាស៊ីនកសិកម្ម) សម្ភារៈអាំងនិងក្លាសេ គ្រឿងផ្សំ គ្រឿងផ្សំរសជាតិអាហារនិងភេសជ្ជៈ និងសំបកវេចខ្ចប់ ដែលមានសកម្មភាពលក់ និងគ្រប់គ្រងស្តុកដោយពឹងផ្អែកលើការកត់ត្រាដោយបុគ្គលិកផ្ទាល់។ </p>
+<p>៤.២.១ ការសង្កេតលើប្រព័ន្ធបច្ចុប្បន្ន
+តាមការសង្កេតរបស់ក្រុមសិក្សាស្រាវជ្រាវបានដឹងថា រាល់សកម្មភាពគឺមានភាពយឺត និងលក្ខណៈសាមញ្ញ។</p>
+<p>[សូមបញ្ចូលរូបភាពដ្យាក្រាមនៅទីនេះ]
+<em>រូបភាព ៤.១ រចនាសម្ព័ន្ធការងារចាស់</em></p>
+<p>[សូមបញ្ចូលរូបភាពដ្យាក្រាមនៅទីនេះ]
+<em>រូបភាព ៤.២ ដ្យាក្រាមបិទនៃប្រព័ន្ធចាស់</em></p>
+<p>៤.៣ ការវិភាគលើប្រព័ន្ធនៃការសិក្សា(Proposed System)
+បន្ទាប់ពីបានការសិក្សា និងវិភាគលើប្រព័ន្ធបច្ចុប្បន្នក្រុមសិក្សាស្រាវជ្រាវយើងខ្ញុំបានបង្កើតនូវប្រព័ន្ធលក់ និងគ្រប់គ្រងស្តុកអនឡាញ (E-Commerce and Inventory System) មួយដែលអាចឆ្លើយតបទៅនឹងតម្រូវការរបស់ក្រុមហ៊ុន Yeung Shi Group បានយ៉ាងល្អ។</p>
+<p>ប្រព័ន្ធនេះផ្ដល់នូវមុខងារសំខាន់ៗដូចខាងក្រោម៖
+* ប្រព័ន្ធចាប់ផ្ដើមពីជំហាន ចូលប្រើប្រាស់ (Login) ដោយ អតិថិជន និង អ្នកគ្រប់គ្រង។ 
+* អតិថិជនអាចស្វែងរក មើលព័ត៌មានទំនិញ (គ្រឿងម៉ាស៊ីន និងគ្រឿងផ្សំ) និងអាចបញ្ជាទិញទំនិញបានយ៉ាងងាយស្រួលពីចម្ងាយ។
+* អតិថិជនអាចធ្វើការទូទាត់ប្រាក់យ៉ាងរហ័សតាមរយៈប្រព័ន្ធ Bakong Payment។
+* អ្នកគ្រប់គ្រងអាចបញ្ចូលទិន្នន័យទំនិញថ្មី កែប្រែព័ត៌មាន និងតាមដានចំនួនស្តុកដែលនៅសល់ក្នុងឃ្លាំងបានយ៉ាងងាយស្រួល។
+* ប្រព័ន្ធនឹងធ្វើការកាត់ស្តុកដោយស្វ័យប្រវត្តិរាល់ពេលមានការបញ្ជាទិញទំនិញជោគជ័យ ដែលជួយកាត់បន្ថយភាពខុសឆ្គងក្នុងការកត់ត្រាដោយដៃ។
+* អ្នកគ្រប់គ្រងអាចតាមដានស្ថានភាពនៃការកម្មង់ និងអាចចេញវិក្កយបត្រឌីជីថល (Digital Invoice) ជូនអតិថិជនបានភ្លាមៗ។
+* ប្រព័ន្ធអនុញ្ញាតឲ្យអ្នកគ្រប់គ្រងទាញយករបាយការណ៍លក់ និងរបាយការណ៍ស្តុក ដើម្បីងាយស្រួលក្នុងការសម្រេចចិត្តបញ្ជាទិញទំនិញចូលឃ្លាំងបន្ថែមឲ្យបានទាន់ពេលវេលា។</p>
+<p>[សូមបញ្ចូលរូបភាព new_system_structure នៅទីនេះ]
+<em>រូបភាព ៤.៣០ រចនាសម្ព័ន្ធនៃប្រព័ន្ធថ្មី</em></p>
+<ul>
+<li>Administrator (អ្នកគ្រប់គ្រងប្រព័ន្ធមេ) ៖ មានតួនាទីកំណត់សិទ្ធិអ្នកប្រើប្រាស់ គ្រប់គ្រងប្រព័ន្ធទូទៅ មើលរបាយការណ៍ចំណូលប្រចាំខែ/ឆ្នាំ និងត្រួតពិនិត្យរាល់ទិន្នន័យទាំងអស់នៅក្នុងប្រព័ន្ធដើម្បីធានាដំណើរការអាជីវកម្ម។</li>
+<li>Staff / Inventory Manager (បុគ្គលិកគ្រប់គ្រងស្តុក) ៖ សិទ្ធិចូលប្រើប្រាស់ផ្តោតទៅលើការបញ្ចូលទំនិញថ្មី កែប្រែព័ត៌មានទំនិញ ត្រួតពិនិត្យចំនួនស្តុក និងរៀបចំទំនិញចេញតាមការបញ្ជាទិញរបស់អតិថិជន។ ទោះជាយ៉ាងណា ពួកគេមិនអាចផ្លាស់ប្តូរសិទ្ធិអ្នកប្រើប្រាស់ផ្សេងទៀតបានឡើយ។</li>
+<li>Customer (អតិថិជន) ៖ អាចចូលប្រើប្រាស់ប្រព័ន្ធដើម្បីស្វែងរកទំនិញ មើលកាតាឡុក បញ្ជាទិញទំនិញ និងទូទាត់ប្រាក់តាមរយៈ Bakong។ អតិថិជនអាចមើលបានតែព័ត៌មានប្រវត្តិទិញទំនិញ និងវិក្កយបត្រផ្ទាល់ខ្លួនរបស់ពួកគេប៉ុណ្ណោះ។</li>
+</ul>
+<p>៤.៣.១ លំហូរនៃឯកសារ ឬព័ត៌មាន (Document/Information Flow)
+ដើម្បីបង្ហាញពីលំហូរព័ត៌មាននៅក្នុងប្រព័ន្ធលក់ និងគ្រប់គ្រងស្តុកថ្មីនេះ ក្រុមយើងខ្ញុំបានប្រើប្រាស់ដ្យាក្រាមបរិបទ (Context Diagram) និងដ្យាក្រាមកម្រិតសូន្យ (DFD Level 0)។ ដ្យាក្រាមទាំងនេះជួយបង្ហាញយ៉ាងច្បាស់ពីដំណើរការនៃការផ្ទេរព័ត៌មានរវាងអ្នកប្រើប្រាស់ (អតិថិជន និងអ្នកគ្រប់គ្រង) ទៅកាន់ប្រព័ន្ធ ព្រមទាំងបង្ហាញពីរបៀបដែលទិន្នន័យបញ្ជាទិញ និងទិន្នន័យស្តុកត្រូវបានរក្សាទុកយ៉ាងមានសុវត្ថិភាព។ ការបង្ហាញជាទម្រង់ដ្យាក្រាមនេះ ធ្វើឲ្យការត្រួតពិនិត្យ និងការអភិវឌ្ឍប្រព័ន្ធកាន់តែមានភាពងាយស្រួលនិងច្បាស់លាស់។ </p>
+<p>[សូមបញ្ចូលរូបភាព E-Commerce Information នៅទីនេះ]
+<em>រូបភាព ៤.៣១ E-Commerce Information (ព័ត៌មានប្រព័ន្ធ)</em></p>
+<p>[សូមបញ្ចូលរូបភាព Information Flow នៅទីនេះ]
+<em>រូបភាព ៤.៣២ Information Flow (លំហូរព័ត៌មាន)</em></p>
+<p>ក. លំហូរនៃទិន្នន័យ Context ដ្យាក្រាម</p>
+<p>[សូមបញ្ចូលរូបភាព new_system_context នៅទីនេះ]
+<em>រូបភាព ៤.៣៣ Context ដ្យាក្រាម នៃប្រព័ន្ធថ្មី</em></p>
+<p>ខ. ដ្យាក្រាម ០</p>
+<p>[សូមបញ្ចូលរូបភាព new_system_dfd_level0 នៅទីនេះ]
+<em>រូបភាព ៤.៣៤ ដ្យាក្រាម ០ នៃប្រព័ន្ធថ្មី</em></p>
+<p>គ. លំហូរដំណើរការ
+ដំណើរការរបស់ប្រព័ន្ធចាប់ផ្ដើមពីការចូលប្រើប្រាស់របស់អ្នកប្រើប្រាស់ (អតិថិជន ឬ អ្នកគ្រប់គ្រង) ដើម្បីធ្វើសកម្មភាពផ្សេងៗដូចជា៖
+* ការស្វែងរក និងបញ្ជាទិញទំនិញពីសំណាក់អតិថិជន
+* ការទូទាត់ប្រាក់យ៉ាងរហ័សតាមរយៈប្រព័ន្ធ Bakong
+* ការបញ្ចូលទិន្នន័យទំនិញថ្មី និងគ្រប់គ្រងស្តុកពីសំណាក់អ្នកគ្រប់គ្រង
+* ប្រសិនបើប្រតិបត្តិការត្រឹមត្រូវ និងមានគ្រប់លក្ខខណ្ឌ ប្រព័ន្ធនឹងធ្វើការកាត់ស្តុកដោយស្វ័យប្រវត្តិ ហើយបញ្ជូនព័ត៌មានទៅកាន់អ្នកគ្រប់គ្រងដើម្បីរៀបចំទំនិញ
+* បន្ទាប់ពីការកម្មង់ត្រូវបានទូទាត់ជោគជ័យ ប្រព័ន្ធនឹងចេញវិក្កយបត្រឌីជីថលជូនអតិថិជន។</p>
+<p>៤.៣.២ វចនានុក្រមទិន្នន័យ (Data Dictionary)
+Data Dictionary ត្រូវបានគេបង្កើតបន្ទាប់ពី លំហូរទិន្នន័យវចនានុក្រម។ វចនានុក្រមទិន្នន័យមានបញ្ជីរបស់ Field ទាំងអស់ និងមានឈ្មោះប្រភេទនៃ Field នីមួយៗ។ វចនានុក្រមទិន្នន័យជាឯកសារដែលមានតួនាទីសំខាន់ក្នុងការធ្វើឲ្យទិន្នន័យមានគំរូនិងទម្រង់ច្បាស់លាស់ ជៀសវាងការផ្ទុកទិន្នន័យស្ទួននៅកន្លែងផ្សេង។ ហើយ Data Dictionary មានធាតុសំខាន់ៗដូចជា:
+១. ដំណើរការ: មានតួនាទីទទួលទិន្នន័យចូល និងបង្កើតទិន្នន័យចេញ។ ព្រមទាំងអាចមាននាទីបំប្លែងទិន្នន័យ ឲ្យទៅជាលទ្ធផលដែលត្រូវការ។ 
+២. លំហូរទិន្នន័យ: ជាលំហូរទិន្នន័យដែលផ្លាស់ប្តូរពីផ្នែកមួយទៅផ្នែកមួយផ្សេងទៀតក្នុងប្រព័ន្ធ ដែលបង្ហាញទិសដៅនៃទិន្នន័យក្នុងប្រព័ន្ធ។ 
+៣. ការផ្ទុកទិន្នន័យ: គឺជាកន្លែងសម្រាប់រក្សាទុករាល់ទិន្នន័យដែលអាចប្រើប្រាស់នៅពេលក្រោយ។ វាផ្ទុកនូវព័ត៌មានសំខាន់ៗដូចជា ព័ត៌មានអតិថិជន ព័ត៌មានទំនិញ/គ្រឿងម៉ាស៊ីន ចំនួនស្តុកសល់ក្នុងឃ្លាំង និងកំណត់ត្រាបញ្ជាទិញផ្សេងៗ។ 
+៤. អង្គភាពខាងក្រៅ: ជាភាគីខាងក្រៅប្រព័ន្ធដែលអាចជាមនុស្ស ឬ អង្គភាពណាដែលមានទំនាក់ទំនងជាប់ពាក់ព័ន្ធជាមួយការប្រើប្រាស់ទិន្នន័យក្នុងប្រព័ន្ធ។ ឧទាហរណ៍៖ អតិថិជន អ្នកគ្រប់គ្រង ឬ ប្រព័ន្ធធនាគារ (Bakong)។</p>
+<p>វចនានុក្រមទិន្នន័យ ត្រូវបានប្រើប្រាស់ដូចខាងក្រោម៖
+* ជួយផ្ទៀងផ្ទាត់ភាពត្រឹមត្រូវនៃទិន្នន័យនៅក្នុងប្រព័ន្ធ
+* ជាមូលដ្ឋានសម្រាប់ការរចនាប្រព័ន្ធ និងបង្កើតរបាយការណ៍លក់/ស្តុក
+* ទុកព័ត៌មានសំខាន់ៗសម្រាប់ការរៀបចំគម្រោងពេលវេលា និងដោះស្រាយបញ្ហាផ្សេងៗ។</p>
+<p>ខាងក្រោមនេះគឺជាតារាងទិន្នន័យ (Tables) សំខាន់ៗនៃប្រព័ន្ធថ្មី៖</p>
+<p>តារាង ៤.១ Users (អ្នកប្រើប្រាស់)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+name | Name | text
+email | Email Address | text
+password | Password | text
+phone | Phone Number | text
+avatar | Profile Image | text
+status | Status | text
+roleId | Foreign Key | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp
+isSuperAdmin | Is Super Admin | boolean
+lastLogin | Last Login | timestamp
+isActive | Active Status | boolean</p>
+<p>តារាង ៤.២ Role (តួនាទី)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+name | Role Name | text
+description | Description | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.៣ Category (ប្រភេទពាណិជ្ជកម្ម)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+name | Category Name | text
+slug | URL Slug | text
+description | Description | text
+image | Image URL | text
+isFeatured | Is Featured | boolean
+sortOrder | Sort Order | int
+parentId | Foreign Key | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp
+nameKhmer | Khmer Name | text
+descriptionKhmer | Khmer Description | text
+isActive | Active Status | boolean</p>
+<p>តារាង ៤.៤ Subcategory (អនុប្រភេទ)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+categoryId | Foreign Key | text
+name | Subcategory Name | text
+slug | URL Slug | text
+description | Description | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.៥ Product (ទំនិញ និងគ្រឿងម៉ាស៊ីន)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+categoryId | Foreign Key | text
+subcategoryId | Foreign Key | text
+name | Product Name | text
+slug | URL Slug | text
+model | Model Number | text
+brand | Brand | text
+sku | Stock Keeping Unit | text
+price | Price | numeric
+currency | Currency | text
+stock | Stock Quantity | int
+status | Product Status | text
+isFeatured | Is Featured | boolean
+isPublished | Is Published | boolean
+thumbnail | Thumbnail URL | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp
+titleKhmer | Khmer Title | text
+description | Description | text
+descriptionKhmer | Khmer Description | text
+isActive | Active Status | boolean</p>
+<p>តារាង ៤.៦ ProductImage (រូបភាពទំនិញ)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+productId | Foreign Key | text
+imageUrl | Image URL | text
+altText | Alt Text | text
+isPrimary | Is Primary Image | boolean
+sortOrder | Sort Order | int
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp
+url | URL | text</p>
+<p>តារាង ៤.៧ ProductDetail (លម្អិតទំនិញ)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+productId | Foreign Key | text
+label | Label | text
+value | Value | text
+groupName | Group Name | text
+sortOrder | Sort Order | int
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.៨ Order (ការបញ្ជាទិញ)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+createdAt | Order Date | timestamp
+customerName | Customer Name | text
+customerPhone | Phone Number | text
+customerEmail | Email Address | text
+address | Delivery Address | text
+paymentMethod | Payment Method | text
+totalAmount | Total Amount | numeric
+items | JSON Items | jsonb
+status | Order Status | text
+bakongMd5 | Bakong MD5 Hash | text</p>
+<p>តារាង ៤.៩ Inquiry (ការសាកសួរព័ត៌មាន)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+productId | Foreign Key | text
+userId | Foreign Key | text
+customerName | Customer Name | text
+companyName | Company Name | text
+email | Email | text
+phone | Phone | text
+country | Country | text
+message | Inquiry Message | text
+quantity | Quantity | int
+status | Inquiry Status | text
+source | Source | text
+notes | Notes | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.១០ ContactMessage (សារទាក់ទង)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+name | Sender Name | text
+email | Email | text
+phone | Phone | text
+subject | Subject | text
+message | Message Content | text
+status | Status | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.១១ Page (ទំព័រព័ត៌មានអនឡាញ)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+title | Page Title | text
+slug | URL Slug | text
+content | JSON Content | jsonb
+excerpt | Excerpt | text
+metaTitle | Meta Title | text
+metaDescription | Meta Description | text
+status | Page Status | text
+createdById | Foreign Key | text
+updatedById | Foreign Key | text
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.១២ Setting (ការកំណត់ប្រព័ន្ធ)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | text
+key | Setting Key | text
+value | JSON Value | jsonb
+createdAt | Created Date | timestamp
+updatedAt | Updated Date | timestamp</p>
+<p>តារាង ៤.១៣ AuditLog (កំណត់ត្រាសកម្មភាព)
+Field | Description | Data Type
+---|---|---
+id | Primary Key | uuid
+userId | User ID | int
+userName | User Name | text
+userEmail | User Email | text
+action | Action Performed | text
+entity | Entity Name | text
+entityid | Entity ID | text
+details | JSON Details | jsonb
+ipAddress | IP Address | text
+userAgent | User Agent | text
+status | Status | text
+createdAt | Created Date | timestamp</p>
+<p>៤.៤ ការគ្រោង
+៤.៤.១ ការបង្កើតតារាងនៅក្នុង SQL
+• Users: (id, name, email, password, phone, avatar, status, roleId, createdAt, updatedAt, isSuperAdmin, lastLogin, isActive) ប្រើសម្រាប់ផ្ទុកទិន្នន័យដែលអ្នកប្រើក្នុងដំណើរការចូលមកកាន់ប្រព័ន្ធ។
+រូបភាព ៤.៣៥ Users ប្រើសម្រាប់ផ្ទុកទិន្នន័យព័ត៌មានអ្នកប្រើប្រាស់ពេលចូលប្រព័ន្ធ</p>
+<p>• Role: (id, name, description, createdAt, updatedAt) ប្រើសម្រាប់កំណត់សិទ្ធិចូលប្រើប្រាស់ជាមួយលក្ខណៈនៃអ្នកប្រើប្រាស់។
+រូបភាព ៤.៣៦ Role សម្រាប់កំណត់សិទ្ធិចូលប្រើប្រាស់ជាមួយលក្ខណៈនៃអ្នកប្រើប្រាស់</p>
+<p>• Category: (id, name, slug, description, image, isFeatured, sortOrder, parentId, createdAt, updatedAt, nameKhmer, descriptionKhmer, isActive) ប្រើសម្រាប់ផ្ទុកទិន្នន័យចំណាត់ថ្នាក់ក្រុមទំនិញ និងម៉ាស៊ីន។
+រូបភាព ៤.៣៧ Category ប្រើសម្រាប់ផ្ទុកទិន្នន័យចំណាត់ថ្នាក់ក្រុមទំនិញ</p>
+<p>• Subcategory: (id, categoryId, name, slug, description, createdAt, updatedAt) ប្រើសម្រាប់ផ្ទុកទិន្នន័យអនុប្រភេទនៃទំនិញ។
+រូបភាព ៤.៣៨ Subcategory ប្រើសម្រាប់ផ្ទុកទិន្នន័យអនុប្រភេទនៃទំនិញ</p>
+<p>• Product: (id, categoryId, subcategoryId, name, slug, model, brand, sku, price, currency, stock, status, isFeatured, isPublished, thumbnail, createdAt, updatedAt, titleKhmer, description, descriptionKhmer, isActive) ប្រើសម្រាប់ផ្ទុកទិន្នន័យទំនិញ និងគ្រឿងម៉ាស៊ីននីមួយៗ។
+រូបភាព ៤.៣៩ Product ប្រើសម្រាប់ផ្ទុកទិន្នន័យទំនិញ និងគ្រឿងម៉ាស៊ីន</p>
+<p>• ProductImage: (id, productId, imageUrl, altText, isPrimary, sortOrder, createdAt, updatedAt, url) ប្រើសម្រាប់ផ្ទុកទិន្នន័យរូបភាពទំនិញ។
+រូបភាព ៤.៤០ ProductImage ប្រើសម្រាប់ផ្ទុកទិន្នន័យរូបភាពទំនិញ</p>
+<p>• ProductDetail: (id, productId, label, value, groupName, sortOrder, createdAt, updatedAt) ប្រើសម្រាប់ផ្ទុកទិន្នន័យលម្អិតគ្រឿងម៉ាស៊ីន។
+រូបភាព ៤.៤១ ProductDetail ប្រើសម្រាប់ផ្ទុកទិន្នន័យលម្អិតគ្រឿងម៉ាស៊ីន</p>
+<p>• Order: (id, createdAt, customerName, customerPhone, customerEmail, address, paymentMethod, totalAmount, items, status, bakongMd5) ប្រើសម្រាប់កត់ត្រាការបញ្ជាទិញរបស់អតិថិជន និងការទូទាត់ប្រាក់។
+រូបភាព ៤.៤២ Order ប្រើសម្រាប់កត់ត្រាការបញ្ជាទិញរបស់អតិថិជន</p>
+<p>• Inquiry: (id, productId, userId, customerName, companyName, email, phone, country, message, quantity, status, source, notes, createdAt, updatedAt) ប្រើសម្រាប់កត់ត្រាសារសាកសួររបស់អតិថិជន។
+រូបភាព ៤.៤៣ Inquiry ប្រើសម្រាប់កត់ត្រាសារសាកសួររបស់អតិថិជន</p>
+<p>• ContactMessage: (id, name, email, phone, subject, message, status, createdAt, updatedAt) ប្រើសម្រាប់កត់ត្រាសារទាក់ទងរបស់អតិថិជន។
+រូបភាព ៤.៤៤ ContactMessage ប្រើសម្រាប់កត់ត្រាសារទាក់ទងរបស់អតិថិជន</p>
+<p>• Page: (id, title, slug, content, excerpt, metaTitle, metaDescription, status, createdById, updatedById, createdAt, updatedAt) ប្រើសម្រាប់គ្រប់គ្រងមាតិកាគេហទំព័រអនឡាញ។
+រូបភាព ៤.៤៥ Page ប្រើសម្រាប់គ្រប់គ្រងមាតិកាគេហទំព័រ</p>
+<p>• Setting: (id, key, value, createdAt, updatedAt) ប្រើសម្រាប់ផ្ទុកទិន្នន័យការកំណត់ប្រព័ន្ធទូទៅ។
+រូបភាព ៤.៤៦ Setting ប្រើសម្រាប់ផ្ទុកទិន្នន័យការកំណត់ប្រព័ន្ធទូទៅ</p>
+<p>• AuditLog: (id, userId, userName, userEmail, action, entity, entityid, details, ipAddress, userAgent, status, createdAt) ប្រើសម្រាប់កត់ត្រារាល់សកម្មភាពរបស់អ្នកប្រើប្រាស់ក្នុងប្រព័ន្ធ។
+រូបភាព ៤.៤៧ AuditLog ប្រើសម្រាប់កត់ត្រារាល់សកម្មភាពរបស់អ្នកប្រើប្រាស់ក្នុងប្រព័ន្ធ</p>
+<p>៤.៤.២ Entity Relationship ដ្យាក្រាម (ERD)
+• Entity Relationship ដ្យាក្រាម គំនូសតាងនៃបង្គុំប្រព័ន្ធទិន្នន័យ(Database)ទាំងមូលដែលជាទំនាក់ទំនងគ្នារវាង Entity មួយទៅ Entity មួយ ឬច្រើនផ្សេងទៀតដែលមាននៅក្នុង មូលទិន្នន័យ(Database)។  ដូច្នេះមុននិងបង្កើតប្រព័ន្ធទិន្នន័យ Database នៅក្នុង DBMS ការសិក្សាស្រាវជ្រាវសុំលើកយក ER-ដ្យាក្រាម មកធ្វើជាគំរូរក្នុងការបង្កើតជាប្រព័ន្ធទិន្នន័យជាមុនសិនដើម្បីឲ្យភាពងាយស្រួលក្នុងការកែប្រែនៅពេលមានបញ្ហាអ្វីមួយកើតឡើង ឬការមិនពេញចិត្ត ពីអ្នកស្នើប្រព័ន្ធក្នុង ER-ដ្យាក្រាម នេះ Entity ដែលបានចូលរួមមានដូចជា៖ Users, Role, Category, Subcategory, Product, ProductImage, ProductDetail, Order, Inquiry, ContactMessage, Page, Setting និង AuditLog។</p>
+<p>[សូមបញ្ចូលរូបភាពដ្យាក្រាមនៅទីនេះ]
+<em>រូបភាព ៤.៤៨ ERD នៃប្រព័ន្ធគ្រប់គ្រងការលក់អនឡាញ Yeung Shi Group</em></p>
+<p>៤.៤.៣ ការរចនា Table និង Relationship</p>
+<p>[សូមបញ្ចូលរូបភាព table_relationship_design នៅទីនេះ]
+<em>រូបភាព ៤.៦៦ ការរចនាTable និង Relationship</em></p>
+<p>៤.៤.៤ ការគ្រោង (Design)
+ដោយយោងទៅតាមវិធីសាស្រ្តក្នុងការសិក្សាកន្លងមកឃើញថារាល់ការបង្កើតកម្មវិធីមួយ ត្រូវតែមានការវិភាគឲ្យបានច្បាស់លាស់។ ដូច្នេះហើយឈានទៅដល់ការបង្កើតនូវកម្មវិធីមួយ យើងត្រូវស្វែងរកពីលក្ខណៈសម្បត្តិរបស់កម្មវិធីជាមុនសិន។ ខាងក្រោមនេះគឺជា User Interface ដែលបង្កើតឡើងសម្រាប់ប្រព័ន្ធគ្រប់គ្រងការលក់នៃក្រុមហ៊ុនយ៉ាងស៊ឺគ្រុប ៖</p>
+<p>• ទំព័រដើម (Home Page) ៖ គឺជាទំព័រចម្បងសម្រាប់អតិថិជនចូលមើលព័ត៌មានទូទៅ ផលិតផលលេចធ្លោ ម៉ាកយីហោ និងប្រភេទគ្រឿងម៉ាស៊ីនផ្សេងៗ។ វាផ្តល់នូវចំណុចទាក់ទាញដំបូងយ៉ាងងាយស្រួល។
+[ដាក់រូបភាព ទំព័រដើម នៅទីនេះ]
+<em>រូបភាព ៤.៦៧ ទំព័រដើម</em></p>
+<p>• ទំព័រផលិតផល (Products Page) ៖ ជាទំព័រដែលបង្ហាញបញ្ជីគ្រឿងម៉ាស៊ីនទាំងអស់ អនុញ្ញាតឱ្យអតិថិជនស្វែងរក និងចម្រោះ (Filter) តាមប្រភេទ ម៉ាក ឬតម្លៃ។
+[ដាក់រូបភាព ទំព័រផលិតផល នៅទីនេះ]
+<em>រូបភាព ៤.៦៨ ទំព័រផលិតផល</em></p>
+<p>• ទំព័រលម្អិតផលិតផល (Product Detail Page) ៖ គឺជាកន្លែងសម្រាប់មើលលម្អិតនៃគ្រឿងម៉ាស៊ីននីមួយៗ រួមមានរូបភាព លក្ខណៈបច្ចេកទេស (Specifications) ម៉ូដែល ឆ្នាំផលិត និងការពិពណ៌នាលម្អិតផ្សេងៗ។
+[ដាក់រូបភាព ទំព័រលម្អិតផលិតផល នៅទីនេះ]
+<em>រូបភាព ៤.៦៩ ទំព័រលម្អិតផលិតផល</em></p>
+<p>• ទំព័រស្នើសុំព័ត៌មាន (Inquiry Page) ៖ ជាទំព័រដែលអនុញ្ញាតឱ្យអតិថិជនបំពេញទម្រង់បែបបទដើម្បីស្នើសុំសម្រង់តម្លៃ (Quote) ឬសាកសួរព័ត៌មានបន្ថែមអំពីគ្រឿងម៉ាស៊ីនណាមួយដែលពួកគេចាប់អារម្មណ៍។
+[ដាក់រូបភាព ទំព័រស្នើសុំព័ត៌មាន នៅទីនេះ]
+<em>រូបភាព ៤.៧០ ទំព័រស្នើសុំព័ត៌មាន</em></p>
+<p>• ទំព័រចូលគណនីអតិថិជន (Customer Login &amp; Register) ៖ ជាទំព័រសម្រាប់អតិថិជនបង្កើតគណនីថ្មី ឬចូលប្រើប្រាស់ប្រព័ន្ធ ដើម្បីរក្សាទុកប្រវត្តិបញ្ជាទិញ និងងាយស្រួលក្នុងការកម្មង់ទំនិញ។
+[ដាក់រូបភាព ទំព័រចូលគណនីអតិថិជន នៅទីនេះ]
+<em>រូបភាព ៤.៧១ ទំព័រចូលគណនីអតិថិជន</em></p>
+<p>• ទំព័រកន្ត្រកទំនិញ (Shopping Cart) ៖ ជាទំព័រដែលបង្ហាញពីគ្រឿងម៉ាស៊ីនដែលអតិថិជនបានជ្រើសរើស អនុញ្ញាតឲ្យពួកគេកែប្រែចំនួន ឬលុបចេញមុនពេលបន្តទៅការទូទាត់។
+[ដាក់រូបភាព ទំព័រកន្ត្រកទំនិញ នៅទីនេះ]
+<em>រូបភាព ៤.៧២ ទំព័រកន្ត្រកទំនិញ</em></p>
+<p>• ទំព័រទូទាត់ប្រាក់ (Checkout &amp; Payment) ៖ ជាកន្លែងដែលអតិថិជនត្រូវបំពេញព័ត៌មានដឹកជញ្ជូន និងធ្វើការទូទាត់ប្រាក់តាមរយៈប្រព័ន្ធ Bakong។
+[ដាក់រូបភាព ទំព័រទូទាត់ប្រាក់ នៅទីនេះ]
+<em>រូបភាព ៤.៧៣ ទំព័រទូទាត់ប្រាក់</em></p>
+<p>• ទំព័រប្រវត្តិបញ្ជាទិញ (Customer Profile &amp; Order History) ៖ ជាទំព័រផ្ទាល់ខ្លួនរបស់អតិថិជន សម្រាប់តាមដានស្ថានភាពនៃការដឹកជញ្ជូន និងមើលប្រវត្តិវិក្កយបត្រចាស់ៗ។
+[ដាក់រូបភាព ទំព័រប្រវត្តិបញ្ជាទិញ នៅទីនេះ]
+<em>រូបភាព ៤.៧៤ ទំព័រប្រវត្តិបញ្ជាទិញអតិថិជន</em></p>
+<p>• ទំព័រទំនាក់ទំនង (Contact Us) ៖ ជាទំព័រដែលមានព័ត៌មានទីតាំង លេខទូរស័ព្ទ និងទម្រង់សម្រាប់អតិថិជនផ្ញើសារសាកសួរព័ត៌មានទូទៅមកកាន់ក្រុមហ៊ុន។
+[ដាក់រូបភាព ទំព័រទំនាក់ទំនង នៅទីនេះ]
+<em>រូបភាព ៤.៧៥ ទំព័រទំនាក់ទំនង</em></p>
+<p>• ទំព័រចូលប្រព័ន្ធ (Admin Login Page) ៖ ជាទំព័រដែលអនុញ្ញាតឱ្យ អ្នកគ្រប់គ្រង (Administrator) ចូលប្រើប្រព័ន្ធគ្រប់គ្រងក្រោយហាង (Back-office) ដោយប្រើអ៊ីមែល (Email) និងពាក្យសម្ងាត់ (Password) ដើម្បីធានានូវសុវត្ថិភាព។
+[ដាក់រូបភាព ទំព័រចូល នៅទីនេះ]
+<em>រូបភាព ៤.៧៦ ទំព័រចូលប្រព័ន្ធ</em></p>
+<p>• ទំព័រ Dashboard (Admin Dashboard) ៖ គឺជាទំព័រសម្រាប់ឲ្យអ្នកគ្រប់គ្រងចូលមើលទិន្នន័យសរុបប្រចាំថ្ងៃ ដូចជាចំនួនផលិតផលសរុប ចំនួនការបញ្ជាទិញ និងសំណើសុំតម្លៃរបស់អតិថិជន។
+[ដាក់រូបភាព ទំព័រ Dashboard នៅទីនេះ]
+<em>រូបភាព ៤.៧៧ ទំព័រ Dashboard</em></p>
+<p>• ទំព័រគ្រប់គ្រងផលិតផល (Product Management) ៖ គឺជាកន្លែងសម្រាប់ផ្ទុកនូវព័ត៌មានគ្រឿងម៉ាស៊ីន ហើយក្នុងនាមជា Admin យើងមានសិទ្ធិ Create, Update, View detail និង Delete។
+[ដាក់រូបភាព ទំព័រគ្រប់គ្រងផលិតផល នៅទីនេះ]
+<em>រូបភាព ៤.៧៨ ទំព័រគ្រប់គ្រងផលិតផល</em></p>
+<p>• ទំព័រគ្រប់គ្រងប្រភេទផលិតផល (Category Management) ៖ គឺជាកន្លែងសម្រាប់បង្កើត កែប្រែ និងគ្រប់គ្រងប្រភេទ (Categories) និងអនុប្រភេទ (Subcategories) នៃគ្រឿងម៉ាស៊ីនទាំងអស់ក្នុងប្រព័ន្ធ។
+[ដាក់រូបភាព ទំព័រគ្រប់គ្រងប្រភេទផលិតផល នៅទីនេះ]
+<em>រូបភាព ៤.៧៩ ទំព័រគ្រប់គ្រងប្រភេទផលិតផល</em></p>
+<p>• ទំព័រគ្រប់គ្រងទំនាក់ទំនង (Contact Management) ៖ ជាទំព័រសម្រាប់អ្នកគ្រប់គ្រងពិនិត្យមើល និងឆ្លើយតបទៅនឹងសារសាកសួរព័ត៌មាន ឬបញ្ហាផ្សេងៗដែលអតិថិជនបានផ្ញើមកកាន់ក្រុមហ៊ុន។
+[ដាក់រូបភាព ទំព័រគ្រប់គ្រងទំនាក់ទំនង នៅទីនេះ]
+<em>រូបភាព ៤.៨០ ទំព័រគ្រប់គ្រងទំនាក់ទំនង</em></p>
+<p>• ទំព័រគ្រប់គ្រងការបញ្ជាទិញ (Order Management) ៖ ជាកន្លែងសម្រាប់គ្រប់គ្រងរាល់ការបញ្ជាទិញរបស់អតិថិជន ពិនិត្យមើលការទូទាត់ប្រាក់ និងស្ថានភាពនៃការបញ្ជូនទំនិញ។
+[ដាក់រូបភាព ទំព័រគ្រប់គ្រងការបញ្ជាទិញ នៅទីនេះ]
+<em>រូបភាព ៤.៨១ ទំព័រគ្រប់គ្រងការបញ្ជាទិញ</em></p>
+<p>• ទំព័រអ្នកប្រើប្រាស់ (Users Page) ៖ គឺជាកន្លែងសម្រាប់បង្កើតគណនីអ្នកប្រើប្រាស់ថ្មី (បុគ្គលិក) និងកំណត់តួនាទីសិទ្ធិប្រើប្រាស់ប្រព័ន្ធ។
+[ដាក់រូបភាព ទំព័រអ្នកប្រើប្រាស់ នៅទីនេះ]
+<em>រូបភាព ៤.៨២ ទំព័រអ្នកប្រើប្រាស់</em></p>
+<p>• ទំព័រកំណត់ត្រាសកម្មភាព (Audit Log) ៖ ជាទំព័រសម្រាប់ត្រួតពិនិត្យ និងតាមដានរាល់សកម្មភាពរបស់អ្នកប្រើប្រាស់ (Admin &amp; Staff) ដែលបានធ្វើប្រតិបត្តិការនៅក្នុងប្រព័ន្ធ។
+[ដាក់រូបភាព ទំព័រកំណត់ត្រាសកម្មភាព នៅទីនេះ]
+<em>រូបភាព ៤.៨៣ ទំព័រកំណត់ត្រាសកម្មភាព</em></p>
+<p>• ទំព័រការកំណត់ (System Settings) ៖ ជាកន្លែងសម្រាប់រៀបចំ និងកែប្រែការកំណត់ទូទៅរបស់ប្រព័ន្ធទាំងមូល ដូចជាឈ្មោះគេហទំព័រ អ៊ីមែល លេខទូរស័ព្ទ និងអាសយដ្ឋាន។
+[ដាក់រូបភាព ទំព័រការកំណត់ នៅទីនេះ]
+<em>រូបភាព ៤.៨៤ ទំព័រការកំណត់</em></p>
+<p>៤.៥ ការអនុវត្តន៍
+បន្ទាប់ពីបានឆ្លងកាត់ការវិភាគ និងដំណាក់កាលផ្សេងៗដែលបានរៀបរាប់រួចនៅដំណាក់កាលនេះជាដំណាក់កាលនៃការអនុវត្ត។ ការសិក្សាបែងចែកដំណាក់កាលនេះជា ៤ ជំហានមានដូចជាការដំឡើងកម្មវិធីចាំបាច់សម្រាប់បង្កើតប្រព័ន្ធ រចនារូបរាង ការសរសេរកូដ និងការអនុវត្តសាកល្បង។ </p>
+<p>[ដាក់រូបភាព ការអនុវត្ដន៍ នៅទីនេះ]
+<em>រូបភាព ៤.៨៥ ការអនុវត្ដន៍</em></p>
+<p>៤.៥.១ ការដំឡើងកម្មវិធីចាំបាច់សម្រាប់បង្កើតប្រព័ន្ធ
+ក្រុមសិក្សាស្រាវជ្រាវយើងបានប្រើប្រាស់ប្រព័ន្ធមូលដ្ឋានទិន្នន័យ PostgreSQL (Supabase) ដើម្បីរក្សាទុកទិន្នន័យឬព័ត៌មានរបស់ប្រព័ន្ធ ថែមទាំងមានបច្ចេកវិទ្យាទំនើបមួយចំនួនទៀតដូចជា៖</p>
+<ul>
+<li>
+<p>ផ្នែកបច្ចេកវិទ្យា (Technologies):
+• Next.js / React – សម្រាប់បង្កើត Frontend Framework ទាំងវេបសាយអតិថិជន និងផ្ទាំងគ្រប់គ្រង Admin
+• Tailwind CSS – UI Framework សម្រាប់រចនាផ្ទាំងឱ្យមានភាពស្រស់ស្អាតនិងទាក់ទាញ
+• Node.js / Express.js – សម្រាប់បង្កើត Server-Side Backend API
+• Prisma (ORM) – សម្រាប់ភ្ជាប់និងគ្រប់គ្រងទិន្នន័យពី Database
+• PostgreSQL (Supabase) – សម្រាប់ផ្ទុកទិន្នន័យ (Database) ដែលមានសុវត្ថិភាពខ្ពស់
+• NPM – សម្រាប់គ្រប់គ្រងកញ្ចប់ (Package) របស់ Node.js</p>
+</li>
+<li>
+<p>ឧបករណ៍ជំនួយ (Tools):
+• Git / GitHub – Version Control សម្រាប់ការងារជាក្រុម
+• VS Code – Code Editor សម្រាប់ការសរសេរកូដ
+• Figma – សម្រាប់រចនា UI/UX Design
+• Mermaid / SVG Generator – សម្រាប់បង្កើតដ្យាក្រាមរចនាសម្ព័ន្ធទិន្នន័យ</p>
+</li>
+</ul>
+<p>៤.៥.២ ការរចនា អន្តរមុខ (Interface)
+UI មានតួនាទីសំខាន់ក្នុងការធ្វើឲ្យប្រព័ន្ធមានភាពងាយស្រួលប្រើ។ ក្រុមបានប្រើ Figma ដើម្បីបង្កើត UI Mockups សម្រាប់ទំព័រដូចជា ទំព័រដើម ទំព័រលម្អិតគ្រឿងម៉ាស៊ីន ផ្ទាំងគ្រប់គ្រង និងប្រព័ន្ធបញ្ជាទិញ។ ការរចនាផ្អែកលើលក្ខណៈប្រើប្រាស់ងាយស្រួល ទំនើប និងផ្តល់បទពិសោធន៍ល្អដល់អតិថិជន។</p>
+<p>៤.៥.៣ ការសរសេរកូដ
+បន្ទាប់ពីបានរចនារូបរាងថ្មី និងគ្រប់ផ្នែកនៃប្រព័ន្ធរួចមក ការសរសេរកូដគឺជាជំហានសំខាន់ក្នុងការអភិវឌ្ឍប្រព័ន្ធ។ ការសរសេរកូដបានធ្វើឡើងដោយប្រើប្រាស់ទាំង Front-end និង Back-end ដូចជា៖
+• Front-end: ប្រើប្រាស់ Next.js, React, និង Tailwind CSS ដើម្បីបង្កើតចំណុចប្រទាក់អ្នកប្រើប្រាស់ (UI) ឱ្យដំណើរការលឿន និងទាក់ទាញ។
+• Back-end: ប្រើប្រាស់ Node.js, Express.js, និង Prisma ORM ភ្ជាប់ទៅកាន់ PostgreSQL សម្រាប់ដំណើរការទិន្នន័យ រក្សាសុវត្ថិភាពខ្ពស់ និងធ្វើសម្របសម្រួលអំពី សំណើ/ការឆ្លើយតប API។
+កូដត្រូវបានអភិវឌ្ឍន៍ទៅតាមគោលការណ៍ដែលមានរបៀបរៀបរយ ដើម្បីជួយឲ្យសមាសធាតុកម្មវិធីមានភាពងាយស្រួលក្នុងការថែទាំ។ ក្រុមការងារក៏បានប្រើកម្មវិធី VS Code សម្រាប់ការសរសេរកូដ និងប្រើ Git ដើម្បីគ្រប់គ្រងកំណែនៃប្រភពកូដ។</p>
+<p>៤.៥.៤ សាកល្បង និង កែប្រែកំហុស
+មុនពេលដាក់ប្រព័ន្ធគ្រប់គ្រងការលក់នៃក្រុមហ៊ុនយ៉ាងស៊ឺគ្រុប ឲ្យប្រើប្រាស់ ក្រុមការងារត្រូវអនុវត្តការតេស្តសាកល្បងប្រព័ន្ធជាមុនសិន ដើម្បីស្វែងរកកំហុសដែលអាចកើតមាន។ យើងបានធ្វើតេស្តលើមុខងារបញ្ចូលផលិតផល ការបង្កើតការបញ្ជាទិញ និងការបញ្ជូនទម្រង់ស្នើសុំ (Inquiry)។ ការកែប្រែកំហុសប្រព័ន្ធ ជាដំណើរការកែសម្រួលកំហុសដែលបានរកឃើញក្នុងអំឡុងពេលសាកល្បង។ ដោយការជ្រើសយកវិធីសាស្រ្តនៃ SDLC (វដ្តជីវិតនៃការអភិវឌ្ឍន៍ប្រព័ន្ធ) ក្រុមសិក្សាស្រាវជ្រាវអាចដោះស្រាយកំហុសបានយ៉ាងមានប្រសិទ្ធភាព និងធានាថាប្រព័ន្ធមានសុវត្ថិភាពខ្ពស់ ដំណើរការរលូន។</p>
+</body>
+</html>
