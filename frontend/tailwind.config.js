@@ -19,9 +19,10 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-kantumruy)', 'var(--font-oswald)', 'var(--font-inter)', 'sans-serif'],
         khmer: ['var(--font-kantumruy)', 'sans-serif'],
-        heading: ['var(--font-outfit)', 'var(--font-inter)', 'sans-serif'],
+        heading: ['var(--font-oswald)', 'var(--font-kantumruy)', 'sans-serif'],
+        condensed: ['var(--font-oswald)', 'var(--font-kantumruy)', 'sans-serif'],
       },
       boxShadow: {
         'lux': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
