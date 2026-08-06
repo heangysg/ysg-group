@@ -8,19 +8,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#2563EB',
-        'primary-dark': '#1D4ED8',
-        'primary-light': '#3B82F6',
-        slate: {
-          850: '#151e2e',
-          900: '#0F172A',
-          950: '#020617',
+        primary: '#18181B',
+        'primary-dark': '#09090B',
+        'primary-light': '#27272A',
+        accent: '#4338CA',
+        zinc: {
+          850: '#18181b',
+          900: '#09090b',
+          950: '#030712',
         }
       },
       fontFamily: {
-        sans: ['var(--font-kantumruy)', 'var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
         khmer: ['var(--font-kantumruy)', 'sans-serif'],
-        heading: ['var(--font-kantumruy)', 'var(--font-outfit)', 'sans-serif'],
+        heading: ['var(--font-outfit)', 'var(--font-inter)', 'sans-serif'],
       },
       boxShadow: {
         'lux': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
