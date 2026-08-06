@@ -157,24 +157,24 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
         <Toaster position="top-center" reverseOrder={false} />
 
         {/* Desktop Breadcrumbs */}
-        <div className="hidden md:block max-w-6xl mx-auto px-4 md:px-8 mb-8">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap pb-2">
+        <div className="hidden md:block max-w-7xl mx-auto px-4 md:px-8 mb-6">
+          <div className="flex items-center gap-2 text-xs font-medium text-slate-500 overflow-x-auto whitespace-nowrap">
             <Link href="/" className="hover:text-primary transition-colors">{t("home")}</Link>
-            <ChevronRight className="w-4 h-4" />
+            <span>/</span>
             <Link href="/products" className="hover:text-primary transition-colors">{t("products")}</Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-slate-900">{language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}</span>
+            <span>/</span>
+            <span className="text-slate-900 font-bold">{language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}</span>
           </div>
         </div>
 
         {/* Mobile App Style Header */}
         <div className="md:hidden absolute top-4 left-4 z-50">
-          <Link href="/products" className="flex items-center justify-center w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-sm text-slate-900 border border-slate-200/50">
-            <ArrowLeft className="w-5 h-5" />
+          <Link href="/products" className="flex items-center justify-center w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full shadow-xs text-slate-900 border border-slate-200">
+            <ArrowLeft className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="max-w-6xl mx-auto px-0 md:px-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="bg-white md:rounded-2xl p-0 md:p-8 lg:p-12 md:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:border md:border-slate-100 grid lg:grid-cols-2 gap-0 md:gap-12 lg:gap-16">
             {/* Image Gallery */}
             <div className="space-y-4 md:space-y-6">

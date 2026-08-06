@@ -97,16 +97,31 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-8 md:pt-12 px-2.5 sm:px-4 md:px-8 bg-[#F8FAFC] min-h-screen">
+      <main className="pb-24 pt-4 md:pt-6 px-4 md:px-8 bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 md:mb-10 gap-3 md:gap-6 md:bg-white md:p-8 md:rounded-2xl md:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:border md:border-slate-100 mx-0">
-            <div className="max-w-2xl w-full">
-              <div className="hidden md:flex items-center gap-3 mb-3">
-                <div className="h-1 w-8 bg-primary rounded-full" />
-                <span className="text-[11px] font-bold text-primary uppercase tracking-widest">{t("ourCollection")}</span>
-              </div>
-              <h1 className="text-xl md:text-5xl font-black text-slate-900 mb-0 md:mb-3 tracking-tight leading-tight">
+          
+          {/* 🍞 Breadcrumbs (Matching Image 1 & 2) */}
+          <div className="flex items-center gap-2 text-[11px] md:text-[12px] text-slate-500 font-medium mb-4">
+            <Link href="/" className="hover:text-primary transition-colors">{t("home")}</Link>
+            <span>/</span>
+            <Link href="/products" className="hover:text-primary transition-colors">{t("allProducts")}</Link>
+            {selectedCategory !== "all" && (
+              <>
+                <span>/</span>
+                <span className="text-slate-900 font-bold">
+                  {(() => {
+                    const cat = categories.find(c => c.slug === selectedCategory)
+                    return cat ? (language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name) : selectedCategory
+                  })()}
+                </span>
+              </>
+            )}
+          </div>
+
+          {/* Header Bar: Category Title + Count + Sort */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 mb-6 border-b border-slate-200 gap-4">
+            <div>
+              <h1 className="text-xl md:text-3xl font-bold text-slate-900 tracking-tight">
                 {(() => {
                   if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
                   if (isFeatured) return language === "kh" ? "ផលិតផលពិសេសេ" : "Featured Machines"
@@ -116,94 +131,89 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   return language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name
                 })()}
               </h1>
-              <p className="hidden md:block text-slate-500 font-medium text-sm md:text-base">{t("discoverPopular")}</p>
             </div>
-            
-            <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input 
-                  type="text" 
-                  placeholder={t("searchProducts")}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-8 py-2.5 md:py-3.5 bg-white md:bg-slate-50 border border-slate-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[12px] md:text-[13px] shadow-sm"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery("")
-                      router.push("/products")
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-full flex items-center justify-center transition-colors"
-                    title="Clear search"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
+
+            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto text-[12px] font-medium text-slate-600">
+              <span>
+                {language === "kh" ? `បង្ហាញ ${filteredProducts.length} លទ្ធផល` : `Showing ${filteredProducts.length} results`}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline font-semibold">{t("sortBy") || "Sort by"}:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="py-1.5 px-3 bg-slate-100 border border-slate-200 rounded-md outline-none text-[12px] font-semibold text-slate-800 cursor-pointer focus:border-[#004691]"
+                >
+                  <option value="newest">{language === "kh" ? "ថ្មីបំផុត" : "Newest"}</option>
+                  <option value="price_asc">{language === "kh" ? "តម្លៃ (ទាប ទៅ ខ្ពស់)" : "Price (Low to High)"}</option>
+                  <option value="price_desc">{language === "kh" ? "តម្លៃ (ខ្ពស់ ទៅ ទាប)" : "Price (High to Low)"}</option>
+                  <option value="name_az">{language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z"}</option>
+                </select>
+                <button 
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`p-2 lg:hidden rounded-md border text-xs font-bold ${showFilters ? 'bg-[#004691] text-white border-[#004691]' : 'bg-slate-100 border-slate-200 text-slate-700'}`}
+                >
+                  <Filter className="w-4 h-4" />
+                </button>
               </div>
-              {/* Sort Dropdown */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="py-2.5 md:py-3.5 px-2 md:px-4 bg-white border border-slate-200 rounded-xl outline-none font-bold text-[11px] md:text-[12px] text-slate-700 cursor-pointer flex-shrink-0 shadow-sm focus:border-primary transition-all max-w-[90px] md:max-w-none truncate"
-              >
-                <option value="newest">{language === "kh" ? "ថ្មីបំផុត" : "Newest"}</option>
-                <option value="price_asc">{language === "kh" ? "តម្លៃ (ទាប ទៅ ខ្ពស់)" : "Price (Low to High)"}</option>
-                <option value="price_desc">{language === "kh" ? "តម្លៃ (ខ្ពស់ ទៅ ទាប)" : "Price (High to Low)"}</option>
-                <option value="name_az">{language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z"}</option>
-              </select>
-              <button 
-                onClick={() => setShowFilters(!showFilters)}
-                className={`p-2.5 md:p-3.5 transition-all md:hidden shrink-0 rounded-xl border shadow-sm ${showFilters ? 'bg-primary text-white border-primary' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
-              >
-                <Filter className="w-4 h-4 md:w-5 md:h-5" />
-              </button>
             </div>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar Filters - Clean Professional */}
-            <aside className={`lg:w-72 shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
-              <div className="bg-white rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 sticky top-28 mx-1.5 md:mx-0 max-h-[calc(100vh-120px)] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-6 px-2">{t("categories")}</h3>
-                <div className="flex flex-col gap-1.5">
+            {/* Sidebar Accordion Filters (Matching Image 2) */}
+            <aside className={`lg:w-64 shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
+              <div className="bg-white rounded-lg border border-slate-200 p-4 sticky top-28">
+                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">
+                  {t("categories")}
+                </h3>
+                <div className="flex flex-col gap-1">
                   <button
                     onClick={() => handleCategorySelect("all")}
-                    className={`flex items-center justify-between px-4 py-3 text-[13px] font-bold transition-all duration-300 rounded-xl ${
-                      selectedCategory === "all" ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                    className={`flex items-center justify-between px-3 py-2 text-[12px] font-bold rounded-md transition-all ${
+                      selectedCategory === "all" ? "bg-[#004691] text-white" : "text-slate-700 hover:bg-slate-100"
                     }`}
                   >
                     <span>{t("allProducts")}</span>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${selectedCategory === "all" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}`}>{products.length}</span>
+                    <span className="text-[10px] opacity-80">({products.length})</span>
                   </button>
-                  {categories.filter(c => !c.parentId).map(cat => (
-                    <div key={cat.id} className="space-y-1">
-                      <button
-                        onClick={() => handleCategorySelect(cat.slug)}
-                        className={`w-full flex items-center justify-between px-4 py-3 text-[13px] font-bold transition-all duration-300 rounded-xl ${
-                          selectedCategory === cat.slug ? "bg-primary text-white shadow-md shadow-primary/20" : "text-slate-600 hover:bg-slate-50 hover:text-primary"
-                        }`}
-                      >
-                        <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
-                      </button>
-                      {/* Subcategories */}
-                      <div className="pl-3 space-y-1 mt-1">
-                        {categories.filter(sub => sub.parentId === cat.id).map(sub => (
-                          <button
-                            key={sub.id}
-                            onClick={() => handleCategorySelect(sub.slug)}
-                            className={`w-full text-left px-4 py-2 text-[12px] font-medium transition-all rounded-lg flex items-center gap-2 ${
-                              selectedCategory === sub.slug ? "text-primary bg-primary/5 font-bold" : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
-                            }`}
-                          >
-                            <div className={`w-1.5 h-1.5 rounded-full ${selectedCategory === sub.slug ? "bg-primary" : "bg-slate-300"}`} />
-                            {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
-                          </button>
-                        ))}
+                  
+                  {categories.filter(c => !c.parentId).map(cat => {
+                    const isSelected = selectedCategory === cat.slug
+                    const subCats = categories.filter(sub => sub.parentId === cat.id)
+                    const hasSubs = subCats.length > 0
+
+                    return (
+                      <div key={cat.id} className="flex flex-col">
+                        <button
+                          onClick={() => handleCategorySelect(cat.slug)}
+                          className={`flex items-center justify-between px-3 py-2 text-[12px] font-semibold rounded-md transition-all ${
+                            isSelected ? "bg-slate-100 text-[#004691] font-bold" : "text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
+                          {hasSubs && <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />}
+                        </button>
+
+                        {/* Nested Subcategories */}
+                        {hasSubs && (isSelected || subCats.some(s => s.slug === selectedCategory)) && (
+                          <div className="ml-3 pl-3 border-l border-slate-200 flex flex-col gap-1 my-1">
+                            {subCats.map(sub => (
+                              <button
+                                key={sub.id}
+                                onClick={() => handleCategorySelect(sub.slug)}
+                                className={`text-left px-2 py-1.5 text-[11px] rounded-md transition-all ${
+                                  selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900"
+                                }`}
+                              >
+                                {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </aside>

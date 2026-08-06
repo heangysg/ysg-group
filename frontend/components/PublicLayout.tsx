@@ -185,105 +185,102 @@ export default function PublicLayout({
         )}
       </AnimatePresence>
 
-      {/* 🚀 Sleek Professional Header */}
+      {/* 🚀 Gyeon Cambodia Style Header */}
       {!hideNav && (
-        <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 ${
-          scrolled ? "bg-white/95 backdrop-blur-md h-14 md:h-16 shadow-xs border-b border-slate-200" : "bg-white h-16 md:h-18 border-b border-slate-200/80"
-        }`}>
-          <div className="max-w-7xl mx-auto px-4 md:px-8 h-full">
-            <div className="flex justify-between items-center h-full">
+        <header className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-slate-200 shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
+            
+            {/* Top Bar: Logo + Pill Search + Language + Actions */}
+            <div className="flex items-center justify-between h-16 md:h-18 gap-4 border-b border-slate-100">
               
-              <Link href="/" className="flex items-center group">
-                <div className="relative flex items-center justify-center">
-                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 md:h-11 w-auto object-contain" />
-                </div>
+              {/* Logo */}
+              <Link href="/" className="flex items-center shrink-0">
+                <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 md:h-11 w-auto object-contain" />
               </Link>
 
-              <nav className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`text-[13px] font-bold tracking-wide transition-colors duration-150 py-1 border-b-2 ${
-                        isActive 
-                          ? "text-primary border-primary" 
-                          : "text-slate-700 border-transparent hover:text-primary hover:border-slate-300"
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </nav>
-
-              <div className="hidden lg:flex items-center gap-3">
-                <button
-                  onClick={() => setLanguage(language === "en" ? "kh" : "en")}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-md transition-all text-slate-800 text-[11px] font-bold border border-slate-200/60"
+              {/* Desktop Pill Search Input */}
+              <div className="hidden md:flex flex-1 max-w-md mx-6">
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const input = form.elements.namedItem('search') as HTMLInputElement;
+                    if (input?.value.trim()) {
+                      router.push(`/products?search=${encodeURIComponent(input.value.trim())}`);
+                    }
+                  }} 
+                  className="w-full flex items-center bg-slate-100/80 hover:bg-slate-100 rounded-full px-4 py-2 text-xs border border-transparent focus-within:border-primary/40 focus-within:bg-white transition-all"
                 >
-                  <div className="w-4 h-3 rounded-xs overflow-hidden shadow-2xs">
-                    <img 
-                      src={language === "en" ? "/image/kh.png" : "/image/gb.png"} 
-                      alt={language}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span>{language === "en" ? "KH" : "EN"}</span>
-                </button>
-
-                <div className="flex items-center gap-1.5">
-                  {user ? (
-                    <Link href="/account" className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-800 transition-all text-[12px] font-bold">
-                      {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
-                        <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <UserIcon className="w-4 h-4 text-slate-600" />
-                      )}
-                      <span>{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
-                    </Link>
-                  ) : (
-                    <Link href="/login" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-800 transition-all text-[12px] font-bold">
-                      <UserIcon className="w-4 h-4 text-slate-600" />
-                      <span>{t("login")}</span>
-                    </Link>
-                  )}
-
-                  <Link href="/wishlist" className="relative p-2 text-slate-700 hover:text-red-500 rounded-md hover:bg-slate-100 transition-all">
-                    <Heart className="w-4 h-4" />
-                    {wishlistItems && wishlistItems.length > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
-                        {wishlistItems.length}
-                      </span>
-                    )}
-                  </Link>
-
-                  <Link href="/checkout" className="relative p-2 text-slate-700 hover:text-primary rounded-md hover:bg-slate-100 transition-all">
-                    <ShoppingCart className="w-4 h-4" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Link>
-                </div>
+                  <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                  <input 
+                    name="search"
+                    type="text" 
+                    placeholder={language === "kh" ? "តើអ្នកកំពុងស្វែងរកអ្វី?" : "What are you looking for?"}
+                    className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-[12px] font-medium"
+                  />
+                </form>
               </div>
 
-              <div className="flex lg:hidden items-center gap-2">
-                <Link href="/checkout" className="relative p-2 bg-slate-50 text-slate-700 rounded-full hover:bg-primary hover:text-white transition-all duration-300">
+              {/* Top Right Utilities */}
+              <div className="flex items-center gap-3 md:gap-4 shrink-0">
+                
+                {/* Language Switcher Pill */}
+                <div className="hidden sm:flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-[11px] font-bold">
+                  <button 
+                    onClick={() => setLanguage("en")}
+                    className={`px-3 py-1 rounded-full transition-all flex items-center gap-1 ${language === "en" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
+                  >
+                    <span>English</span>
+                  </button>
+                  <button 
+                    onClick={() => setLanguage("kh")}
+                    className={`px-3 py-1 rounded-full transition-all flex items-center gap-1 ${language === "kh" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
+                  >
+                    <span>ភាសាខ្មែរ</span>
+                  </button>
+                </div>
+
+                {/* Account Link */}
+                {user ? (
+                  <Link href="/account" className="p-2 text-slate-700 hover:text-[#004691] transition-colors" title={t("account")}>
+                    {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
+                      <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      <UserIcon className="w-5 h-5" />
+                    )}
+                  </Link>
+                ) : (
+                  <Link href="/login" className="p-2 text-slate-700 hover:text-[#004691] transition-colors" title={t("login")}>
+                    <UserIcon className="w-5 h-5" />
+                  </Link>
+                )}
+
+                {/* Wishlist Icon */}
+                <Link href="/wishlist" className="relative p-2 text-slate-700 hover:text-red-500 transition-colors" title={t("wishlist")}>
+                  <Heart className="w-5 h-5" />
+                  {wishlistItems && wishlistItems.length > 0 && (
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-[16px] flex items-center justify-center rounded-full">
+                      {wishlistItems.length}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Cart Icon */}
+                <Link href="/checkout" className="relative p-2 text-slate-700 hover:text-[#004691] transition-colors" title={t("cart")}>
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-[16px] flex items-center justify-center rounded-full border-2 border-white">
+                    <span className="absolute top-0 right-0 bg-[#004691] text-white text-[9px] font-bold min-w-[16px] h-[16px] flex items-center justify-center rounded-full">
                       {cartCount}
                     </span>
                   )}
                 </Link>
-                <button
+
+                {/* Mobile Menu Button */}
+                <button 
                   onClick={() => setMobileMenuOpen(true)}
-                  className="p-2 bg-slate-50 text-slate-700 rounded-full hover:bg-slate-100 transition-all duration-300 border border-slate-100"
+                  className="lg:hidden p-2 text-slate-700 hover:text-slate-900"
                 >
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-6 h-6" />
                 </button>
               </div>
             </div>
@@ -291,7 +288,7 @@ export default function PublicLayout({
         </header>
       )}
 
-      <main className={`transition-all ${!hideNav ? "pt-16 md:pt-[88px] pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
+      <main className={`transition-all ${!hideNav ? "pt-20 md:pt-28 pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
         <Toaster position="top-center" />
         {children}
       </main>
