@@ -8,10 +8,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#18181B',
-        'primary-dark': '#09090B',
-        'primary-light': '#27272A',
-        accent: '#4338CA',
+        primary: '#004691',
+        'primary-dark': '#003366',
+        'primary-light': '#005BB5',
+        accent: '#004691',
         zinc: {
           850: '#18181b',
           900: '#09090b',
