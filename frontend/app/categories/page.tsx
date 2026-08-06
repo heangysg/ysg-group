@@ -31,7 +31,7 @@ export default function CategoriesPage() {
   return (
     <PublicLayout>
       <main className="pb-24 pt-6 md:pt-8 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Hero Header */}
           <div className="mb-4 md:mb-24 text-left md:text-center max-w-2xl mx-auto">
             <div className="hidden md:inline-flex items-center gap-3 mb-6">

@@ -98,7 +98,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
   return (
     <PublicLayout>
       <main className="pb-24 pt-8 md:pt-12 px-2.5 sm:px-4 md:px-8 bg-[#F8FAFC] min-h-screen">
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 md:mb-10 gap-3 md:gap-6 md:bg-white md:p-8 md:rounded-2xl md:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:border md:border-slate-100 mx-0">
             <div className="max-w-2xl w-full">

@@ -151,7 +151,7 @@ export default function AccountPage() {
           <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:20px_20px]" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent to-transparent" />
           
-          <div className="relative max-w-6xl mx-auto px-4 md:px-6">
+          <div className="relative max-w-7xl mx-auto px-4 md:px-8">
             <div className="flex items-center gap-3 md:gap-5">
               <div className="relative group shrink-0">
                 <div className="w-14 h-14 md:w-20 md:h-20 bg-slate-100 border-2 md:border-3 border-white shadow-sm rounded-full overflow-hidden transition-all duration-300">
@@ -200,7 +200,7 @@ export default function AccountPage() {
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">
+        <section className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-8 items-start">
             
             {/* Mobile Horizontal Navigation Tabs & Desktop Sidebar */}

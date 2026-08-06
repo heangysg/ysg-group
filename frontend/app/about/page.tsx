@@ -61,8 +61,8 @@ export default function AboutPage() {
       <main className="min-h-screen bg-white pb-24 pt-6 md:pt-8">
 
         {/* 🏆 Hero Section */}
-        <section className="pt-6 md:pt-10 pb-20 px-6">
-          <div className="max-w-6xl mx-auto">
+        <section className="pt-6 md:pt-10 pb-20">
+          <div className="max-w-7xl mx-auto px-4 md:px-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-px w-8 bg-primary" />
               <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">{language === "kh" ? "ប្រវត្តិក្រុមហ៊ុន YSG Group" : "YSG Group Legacy"}</span>
