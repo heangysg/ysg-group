@@ -205,29 +205,53 @@ export default function AccountPage() {
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <section className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-start">
             
-            <div className="lg:col-span-3 lg:sticky lg:top-24 mb-4 md:mb-0">
-              <nav className="flex flex-col gap-0 md:gap-2 -mx-4 md:mx-0 bg-white md:bg-transparent border-y border-slate-100 md:border-none">
-                {menuItems.map((item, index) => {
+            {/* Mobile Horizontal Navigation Tabs & Desktop Sidebar */}
+            <div className="lg:col-span-3 lg:sticky lg:top-24 mb-2 lg:mb-0">
+              {/* Mobile Horizontal Tabs */}
+              <nav className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4 border-b border-slate-100">
+                {menuItems.map((item) => {
                   const isActive = activeTab === item.id
                   const Icon = item.icon
                   return (
                     <button 
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`flex items-center justify-between px-6 py-4 md:px-5 md:py-3.5 md:rounded-xl text-[14px] md:text-[12px] font-medium transition-all duration-300 ${index !== menuItems.length - 1 ? 'border-b border-slate-100 md:border-none' : ''} ${
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-bold shrink-0 transition-all ${
                         isActive 
-                          ? "bg-slate-50 md:bg-primary text-primary md:text-white md:shadow-md md:shadow-primary/20" 
-                          : "bg-white md:bg-transparent text-slate-700 hover:bg-slate-50"
+                          ? "bg-primary text-white shadow-md shadow-primary/20" 
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
+                    </button>
+                  )
+                })}
+              </nav>
+
+              {/* Desktop Vertical Sidebar */}
+              <nav className="hidden lg:flex flex-col gap-2">
+                {menuItems.map((item) => {
+                  const isActive = activeTab === item.id
+                  const Icon = item.icon
+                  return (
+                    <button 
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center justify-between px-5 py-3.5 rounded-xl text-[12px] font-medium transition-all duration-300 ${
+                        isActive 
+                          ? "bg-primary text-white shadow-md shadow-primary/20" 
+                          : "bg-transparent text-slate-700 hover:bg-slate-50"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-5 h-5 md:w-4 md:h-4 ${isActive ? "text-primary md:text-white" : "text-slate-400"}`} />
+                        <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
                         <span className={isActive ? "font-bold" : ""}>{item.label}</span>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-300 md:hidden" />
+                      <ChevronRight className="w-4 h-4 text-slate-300" />
                     </button>
                   )
                 })}
@@ -236,65 +260,65 @@ export default function AccountPage() {
 
             <div className="lg:col-span-9">
               {activeTab === "overview" && (
-                <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="space-y-6 md:space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                   
-                  <div className="flex overflow-x-auto no-scrollbar gap-3 pb-4 -mx-4 px-4 md:grid md:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 snap-x">
+                  {/* 📊 Responsive Stats Grid (3 Columns on Mobile & Desktop) */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
                     {[
-                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0).toLocaleString()}`, icon: CreditCard, color: "bg-blue-600" },
-                      { label: t("totalOrders"), value: orders.length, icon: Package, color: "bg-blue-600" },
-                      { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield, color: "bg-blue-600" }
+                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0).toLocaleString()}`, icon: CreditCard },
+                      { label: t("totalOrders"), value: orders.length, icon: Package },
+                      { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield }
                     ].map((stat, i) => (
-                      <div key={i} className="min-w-[160px] md:min-w-0 flex-shrink-0 snap-center solid-card bg-white p-4 md:p-8 hover:-translate-y-1 transition-all duration-300 group rounded-xl md:rounded-2xl border border-slate-100 shadow-sm">
-                        <div className="relative z-10 flex flex-col gap-4">
-                          <div className={`w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center`}>
-                            <stat.icon className="w-4 h-4 md:w-5 md:h-5" />
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-[10px] font-bold text-slate-500 font-medium">{stat.label}</p>
-                            <p className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
-                          </div>
+                      <div key={i} className="bg-white p-3 sm:p-4 md:p-6 rounded-xl md:rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                        <div className="w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-lg md:rounded-xl flex items-center justify-center mb-2">
+                          <stat.icon className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] sm:text-[11px] font-bold text-slate-500 truncate">{stat.label}</p>
+                          <p className="text-sm sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight truncate">{stat.value}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="space-y-6">
+                  {/* 🛍️ Recent Orders List */}
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight">
+                      <h3 className="text-base md:text-xl font-bold text-slate-900 tracking-tight">
                         {language === "kh" ? "សកម្មភាពថ្មីៗ" : "Recent Orders"}
                       </h3>
-                      <button onClick={() => setActiveTab("orders")} className="text-[13px] font-medium text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 transition-all">
-                        {language === "kh" ? "មើលទាំងអស់" : "View All"} <ChevronRight className="w-4 h-4" />
+                      <button onClick={() => setActiveTab("orders")} className="text-[12px] md:text-[13px] font-bold text-primary hover:underline flex items-center gap-1">
+                        {language === "kh" ? "មើលទាំងអស់" : "View All"} <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     
                     {orders.length > 0 ? (
-                      <div className="grid grid-cols-1 gap-3 md:gap-4">
+                      <div className="grid grid-cols-1 gap-2.5 sm:gap-4">
                         {orders.slice(0, 4).map((order) => (
                           <Link 
                             key={order.id} 
                             href={`/orders/${order.id}`}
-                            className="bg-white border border-slate-100 rounded-2xl p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
+                            className="bg-white border border-slate-100 rounded-xl md:rounded-2xl p-3 md:p-5 flex items-center justify-between gap-3 group hover:border-primary/30 transition-all shadow-sm"
                           >
-                            <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
-                              <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 transition-colors flex-shrink-0">
-                                <Package className="w-5 h-5 md:w-6 md:h-6 text-slate-300 group-hover:text-primary transition-colors" />
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-9 h-9 md:w-12 md:h-12 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 shrink-0 group-hover:bg-primary/5 transition-colors">
+                                <Package className="w-4 h-4 md:w-6 md:h-6 text-slate-400 group-hover:text-primary transition-colors" />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[13px] md:text-[14px] font-bold text-slate-900 uppercase truncate">#{order.id.slice(0, 8)}</p>
-                                <p className="text-[10px] font-bold text-slate-500 font-medium truncate">{new Date(order.createdAt).toLocaleDateString()}</p>
+                              <div className="min-w-0">
+                                <p className="text-[12px] md:text-[14px] font-bold text-slate-900 uppercase truncate">#{order.id.slice(0, 8)}</p>
+                                <p className="text-[10px] md:text-[11px] text-slate-500 font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
                               </div>
                             </div>
-                            <div className={`px-4 py-1.5 text-[10px] font-bold font-medium rounded-full ${getStatusColor(order.status)} shrink-0 self-start sm:self-auto`}>
+                            <div className={`px-2.5 py-1 md:px-4 md:py-1.5 text-[9px] md:text-[10px] font-bold rounded-full border ${getStatusColor(order.status)} shrink-0`}>
                               {getStatusLabel(order.status)}
                             </div>
                           </Link>
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-slate-50 p-16 text-center rounded-2xl border-2 border-dashed border-slate-200">
-                        <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                        <p className="text-[11px] font-bold text-slate-500 font-medium">{t("noRecentActivity")}</p>
+                      <div className="bg-slate-50 p-12 text-center rounded-2xl border-2 border-dashed border-slate-200">
+                        <Package className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                        <p className="text-[12px] font-bold text-slate-500">{t("noRecentActivity")}</p>
                       </div>
                     )}
                   </div>
