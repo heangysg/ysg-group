@@ -234,7 +234,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             {/* Product Grid */}
             <div className="flex-1">
               {loading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                     <div key={n} className="aspect-[4/5] bg-white rounded-3xl border border-slate-100 animate-pulse shadow-sm" />
                   ))}
@@ -248,7 +248,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   <p className="text-slate-400 text-sm max-w-sm">{t("noProductsDescription")}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                   {filteredProducts.map(product => (
                     <ProductCard key={product.id} product={product} />
                   ))}
