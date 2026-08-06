@@ -74,13 +74,25 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
     fetchData()
   }, [selectedCategory])
 
-  const handleCategorySelect = (slug: string) => {
-    setShowFilters(false)
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([])
+
+  const handleCategorySelect = (slug: string, hasSubcategories = false) => {
     if (slug === "all") {
-      router.push("/products")
-    } else {
-      router.push(`/categories/${slug}`)
+      setSelectedCategory("all")
+      router.push("/products", { scroll: false })
+      return
     }
+
+    // Toggle expansion if it has subcategories
+    if (hasSubcategories) {
+      setExpandedCategories(prev => 
+        prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
+      )
+    }
+
+    setSelectedCategory(slug)
+    router.push(`/products?category=${slug}`, { scroll: false })
   }
 
   const filteredProducts = products
@@ -183,26 +195,27 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                     const isSelected = selectedCategory === cat.slug
                     const subCats = categories.filter(sub => sub.parentId === cat.id)
                     const hasSubs = subCats.length > 0
+                    const isExpanded = expandedCategories.includes(cat.slug) || isSelected || subCats.some(s => s.slug === selectedCategory)
 
                     return (
                       <div key={cat.id} className="flex flex-col">
                         <button
-                          onClick={() => handleCategorySelect(cat.slug)}
+                          onClick={() => handleCategorySelect(cat.slug, hasSubs)}
                           className={`flex items-center justify-between px-3 py-2 text-[12px] font-semibold rounded-md transition-all ${
                             isSelected ? "bg-slate-100 text-[#004691] font-bold" : "text-slate-700 hover:bg-slate-50"
                           }`}
                         >
                           <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
-                          {hasSubs && <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />}
+                          {hasSubs && <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />}
                         </button>
 
-                        {/* Nested Subcategories */}
-                        {hasSubs && (isSelected || subCats.some(s => s.slug === selectedCategory)) && (
+                        {/* Nested Subcategories Dropdown */}
+                        {hasSubs && isExpanded && (
                           <div className="ml-3 pl-3 border-l border-slate-200 flex flex-col gap-1 my-1">
                             {subCats.map(sub => (
                               <button
                                 key={sub.id}
-                                onClick={() => handleCategorySelect(sub.slug)}
+                                onClick={() => handleCategorySelect(sub.slug, false)}
                                 className={`text-left px-2 py-1.5 text-[11px] rounded-md transition-all ${
                                   selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900"
                                 }`}
