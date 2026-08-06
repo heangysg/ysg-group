@@ -30,9 +30,9 @@ export default function HomePage() {
           fetch(`${API_URL}/api/public/banners`, { cache: 'no-store' })
         ])
 
-        const catData = await catRes.json()
-        const prodData = await prodRes.json()
-        const bannerData = await bannerRes.json()
+        const catData = catRes.ok ? await catRes.json() : { data: [] }
+        const prodData = prodRes.ok ? await prodRes.json() : { data: [] }
+        const bannerData = bannerRes.ok ? await bannerRes.json() : { data: [] }
 
         if (catData.data) {
           const mainCats = catData.data.filter((c: any) => !c.parentId)
@@ -49,7 +49,7 @@ export default function HomePage() {
           setBanners(bannerData.data)
         } else {
           setBanners([
-            { id: 1, image: "/image/cover.png", title: "Premium Industrial Machinery" }
+            { id: 1, image: "", title: "YSG Machinery - Quality Equipment" }
           ])
         }
       } catch (err) {
@@ -86,11 +86,20 @@ export default function HomePage() {
               transition={{ duration: 0.7, ease: "easeInOut" }}
               className="absolute inset-0"
             >
-              <img 
-                src={banners[currentSlide]?.image || "/image/cover.png"}
-                alt="Promotion"
-                className="w-full h-full object-cover"
-              />
+              {banners[currentSlide]?.image ? (
+                <img 
+                  src={banners[currentSlide].image}
+                  alt="Promotion"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-[#004691] flex flex-col items-center justify-center p-6 text-white text-center">
+                  <img src="/logo/ysg-logo.png" alt="YSG Logo" className="h-12 md:h-16 w-auto object-contain mb-3 brightness-0 invert" />
+                  <h2 className="text-lg md:text-2xl font-bold tracking-wide">
+                    {banners[currentSlide]?.title || "YSG Machinery - Quality Equipment"}
+                  </h2>
+                </div>
+              )}
             </motion.div>
           </AnimatePresence>
 
