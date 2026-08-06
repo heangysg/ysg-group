@@ -185,21 +185,16 @@ export default function PublicLayout({
         )}
       </AnimatePresence>
 
-      {/* 🚀 Gyeon Cambodia Style Header */}
+      {/* 🚀 Gyeon Cambodia Dual-Row Header */}
       {!hideNav && (
-        <header className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-slate-200 shadow-xs">
+        <header className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-slate-200 shadow-2xs">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
             
-            {/* Top Bar: Logo + Pill Search + Language + Actions */}
-            <div className="flex items-center justify-between h-16 md:h-18 gap-4 border-b border-slate-100">
+            {/* Row 1 (Top Utility Bar): Pill Search + Language Switcher + Icons */}
+            <div className="flex items-center justify-between h-12 md:h-14 gap-4 border-b border-slate-100 py-2">
               
-              {/* Logo */}
-              <Link href="/" className="flex items-center shrink-0">
-                <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 md:h-11 w-auto object-contain" />
-              </Link>
-
               {/* Desktop Pill Search Input */}
-              <div className="hidden md:flex flex-1 max-w-md mx-6">
+              <div className="flex flex-1 max-w-md">
                 <form 
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -209,9 +204,9 @@ export default function PublicLayout({
                       router.push(`/products?search=${encodeURIComponent(input.value.trim())}`);
                     }
                   }} 
-                  className="w-full flex items-center bg-slate-100/80 hover:bg-slate-100 rounded-full px-4 py-2 text-xs border border-transparent focus-within:border-primary/40 focus-within:bg-white transition-all"
+                  className="w-full flex items-center bg-slate-100 hover:bg-slate-200/80 rounded-full px-4 py-1.5 text-xs border border-transparent focus-within:border-[#004691] focus-within:bg-white transition-all"
                 >
-                  <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
                   <input 
                     name="search"
                     type="text" 
@@ -222,10 +217,10 @@ export default function PublicLayout({
               </div>
 
               {/* Top Right Utilities */}
-              <div className="flex items-center gap-3 md:gap-4 shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
                 
                 {/* Language Switcher Pill */}
-                <div className="hidden sm:flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-[11px] font-bold">
+                <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-[11px] font-bold">
                   <button 
                     onClick={() => setLanguage("en")}
                     className={`px-3 py-1 rounded-full transition-all flex items-center gap-1 ${language === "en" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
@@ -242,34 +237,34 @@ export default function PublicLayout({
 
                 {/* Account Link */}
                 {user ? (
-                  <Link href="/account" className="p-2 text-slate-700 hover:text-[#004691] transition-colors" title={t("account")}>
+                  <Link href="/account" className="p-1.5 text-slate-700 hover:text-[#004691] transition-colors" title={t("account")}>
                     {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
                       <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      <UserIcon className="w-5 h-5" />
+                      <UserIcon className="w-4 h-4" />
                     )}
                   </Link>
                 ) : (
-                  <Link href="/login" className="p-2 text-slate-700 hover:text-[#004691] transition-colors" title={t("login")}>
-                    <UserIcon className="w-5 h-5" />
+                  <Link href="/login" className="p-1.5 text-slate-700 hover:text-[#004691] transition-colors" title={t("login")}>
+                    <UserIcon className="w-4 h-4" />
                   </Link>
                 )}
 
                 {/* Wishlist Icon */}
-                <Link href="/wishlist" className="relative p-2 text-slate-700 hover:text-red-500 transition-colors" title={t("wishlist")}>
-                  <Heart className="w-5 h-5" />
+                <Link href="/wishlist" className="relative p-1.5 text-slate-700 hover:text-red-500 transition-colors" title={t("wishlist")}>
+                  <Heart className="w-4 h-4" />
                   {wishlistItems && wishlistItems.length > 0 && (
-                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] font-bold min-w-[16px] h-[16px] flex items-center justify-center rounded-full">
+                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
                       {wishlistItems.length}
                     </span>
                   )}
                 </Link>
 
                 {/* Cart Icon */}
-                <Link href="/checkout" className="relative p-2 text-slate-700 hover:text-[#004691] transition-colors" title={t("cart")}>
-                  <ShoppingCart className="w-5 h-5" />
+                <Link href="/checkout" className="relative p-1.5 text-slate-700 hover:text-[#004691] transition-colors" title={t("cart")}>
+                  <ShoppingCart className="w-4 h-4" />
                   {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 bg-[#004691] text-white text-[9px] font-bold min-w-[16px] h-[16px] flex items-center justify-center rounded-full">
+                    <span className="absolute top-0 right-0 bg-[#004691] text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
                       {cartCount}
                     </span>
                   )}
@@ -278,17 +273,53 @@ export default function PublicLayout({
                 {/* Mobile Menu Button */}
                 <button 
                   onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden p-2 text-slate-700 hover:text-slate-900"
+                  className="lg:hidden p-1.5 text-slate-700 hover:text-slate-900"
                 >
-                  <Menu className="w-6 h-6" />
+                  <Menu className="w-5 h-5" />
                 </button>
               </div>
             </div>
+
+            {/* Row 2 (Main Navigation Bar - Gyeon Clone): Logo + Category Menu */}
+            <div className="flex items-center justify-between h-14 md:h-16">
+              
+              {/* Logo on Row 2 Left */}
+              <Link href="/" className="flex items-center shrink-0">
+                <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-8 md:h-10 w-auto object-contain" />
+              </Link>
+
+              {/* Center Category Navigation Menu */}
+              <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-[12px] font-bold tracking-wider uppercase">
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`transition-colors duration-150 py-1 border-b-2 ${
+                        isActive 
+                          ? "text-[#004691] border-[#004691]" 
+                          : "text-slate-700 border-transparent hover:text-[#004691] hover:border-slate-300"
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </nav>
+
+              {/* Right empty spacer or contact phone */}
+              <div className="hidden lg:flex items-center text-[12px] font-semibold text-slate-500">
+                <span>012 345 678</span>
+              </div>
+
+            </div>
+
           </div>
         </header>
       )}
 
-      <main className={`transition-all ${!hideNav ? "pt-20 md:pt-28 pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
+      <main className={`transition-all ${!hideNav ? "pt-24 md:pt-[124px] pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
         <Toaster position="top-center" />
         {children}
       </main>

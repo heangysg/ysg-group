@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react"
 
+import Link from "next/link"
 import PublicLayout from "./PublicLayout"
 import ProductCard from "./ProductCard"
 import { useLanguage } from "../contexts/LanguageContext"
-import { Search, SlidersHorizontal, X, Filter, Package } from "lucide-react"
+import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight } from "lucide-react"
 import { useRouter, useParams, useSearchParams } from "next/navigation"
 
 export default function ProductsList({ initialCategory = "all", initialFeatured = false }: { initialCategory?: string, initialFeatured?: boolean }) {
