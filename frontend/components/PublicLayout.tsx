@@ -38,6 +38,16 @@ export default function PublicLayout({
     { name: t("about"), href: "/about", icon: Info },
   ]
 
+  const [categories, setCategories] = useState<any[]>([])
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([])
+
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    fetch(`${API_URL}/api/public/categories`).then(r => r.json()).then(res => {
+      if (res.data) setCategories(res.data)
+    }).catch(err => console.error("Failed to fetch categories for menu", err))
+  }, [])
+
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -93,91 +103,121 @@ export default function PublicLayout({
             />
             
             <motion.div 
-              initial={{ x: "100%" }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="absolute top-0 right-0 bottom-0 w-[280px] bg-slate-50 border-l border-slate-100 flex flex-col shadow-[-10px_0_30px_rgb(0,0,0,0.1)] rounded-l-3xl"
+              className="absolute top-0 left-0 bottom-0 w-[300px] bg-white border-r border-slate-200 flex flex-col shadow-2xl z-[210]"
             >
-              <div className="p-6 flex items-center justify-between border-b border-slate-200 bg-white">
+              {/* Drawer Header */}
+              <div className="p-4 flex items-center justify-between border-b border-slate-200 bg-white">
                 <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-10 w-auto object-contain" />
+                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-8 w-auto object-contain" />
                 </Link>
-                <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full transition-all">
-                  <X className="w-6 h-6" />
+                <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-slate-500 hover:text-slate-900 rounded-full">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-4 py-8 no-scrollbar">
-                <nav className="flex flex-col gap-2">
-                  {navItems.map((item, i) => {
-                    const isActive = pathname === item.href
-                    const Icon = item.icon
+              {/* Drawer Content */}
+              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+                
+                {/* Search inside drawer */}
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const input = form.elements.namedItem('search') as HTMLInputElement;
+                    if (input?.value.trim()) {
+                      router.push(`/products?search=${encodeURIComponent(input.value.trim())}`);
+                      setMobileMenuOpen(false);
+                    }
+                  }}
+                  className="w-full flex items-center bg-slate-100 rounded-full px-3 py-2 text-xs border border-slate-200"
+                >
+                  <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                  <input 
+                    name="search"
+                    type="text" 
+                    placeholder={language === "kh" ? "តើអ្នកកំពុងស្វែងរកអ្វី?" : "What are you looking for?"}
+                    className="w-full bg-transparent border-none outline-none text-slate-800 text-[11px]"
+                  />
+                </form>
+
+                {/* Navigation Links */}
+                <nav className="flex flex-col gap-1">
+                  <Link
+                    href="/products"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2.5 text-[13px] font-bold text-slate-900 uppercase hover:bg-slate-100 rounded-md"
+                  >
+                    {t("allProducts")}
+                  </Link>
+
+                  {/* Category Tree Accordions */}
+                  {categories.filter(c => !c.parentId).map(cat => {
+                    const subCats = categories.filter(sub => sub.parentId === cat.id)
+                    const hasSubs = subCats.length > 0
+                    const isExpanded = expandedCategories.includes(cat.slug)
+
                     return (
-                      <motion.div 
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + i * 0.05 }}
-                        key={item.href}
-                      >
-                        <Link
-                          href={item.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-4 px-5 py-3.5 text-[13px] font-bold transition-all duration-300 rounded-xl ${
-                            isActive 
-                              ? "bg-primary/10 text-primary" 
-                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                          }`}
-                        >
-                          <Icon className={`w-5 h-5 ${isActive ? "text-slate-900" : "text-slate-400"}`} />
-                          {item.name}
-                        </Link>
-                      </motion.div>
+                      <div key={cat.id} className="flex flex-col">
+                        <div className="flex items-center justify-between px-3 py-2.5 text-[12px] font-semibold text-slate-800 hover:bg-slate-50 rounded-md">
+                          <Link 
+                            href={`/products?category=${cat.slug}`}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="flex-1 text-left"
+                          >
+                            {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
+                          </Link>
+                          {hasSubs && (
+                            <button
+                              onClick={() => {
+                                setExpandedCategories(prev => 
+                                  prev.includes(cat.slug) ? prev.filter(s => s !== cat.slug) : [...prev, cat.slug]
+                                )
+                              }}
+                              className="p-1 text-slate-400 hover:text-slate-900"
+                            >
+                              <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90 text-[#004691]' : ''}`} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Nested Subcategories */}
+                        {hasSubs && isExpanded && (
+                          <div className="ml-4 pl-3 border-l border-slate-200 flex flex-col gap-1 my-1">
+                            {subCats.map(sub => (
+                              <Link
+                                key={sub.id}
+                                href={`/products?category=${sub.slug}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="px-2 py-1.5 text-[11px] text-slate-600 hover:text-[#004691] rounded-md"
+                              >
+                                {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )
                   })}
                 </nav>
               </div>
 
-              <div className="p-6 border-t border-slate-200 space-y-4 bg-slate-100">
-                {user ? (
-                  <div className="flex items-center gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                    <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center overflow-hidden border border-slate-100">
-                      {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
-                        <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      ) : (
-                        <UserIcon className="w-5 h-5 text-slate-400" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-slate-900 truncate">{user.user_metadata?.full_name || user.email?.split('@')[0]}</p>
-                      <button onClick={handleLogout} className="text-[10px] font-bold text-primary uppercase hover:underline">Sign Out</button>
-                    </div>
-                  </div>
-                ) : (
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="btn-primary w-full flex items-center justify-center py-4 text-[11px]"
-                  >
-                    Sign In
-                  </Link>
-                )}
-
+              {/* Drawer Footer */}
+              <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
                 <button
                   onClick={() => {
                     setLanguage(language === "en" ? "kh" : "en")
                     setMobileMenuOpen(false)
                   }}
-                  className="w-full flex items-center gap-3 px-5 py-4 bg-white border border-slate-100 rounded-xl text-[13px] font-bold text-slate-700 hover:shadow-sm hover:text-primary transition-all duration-300 mt-2"
+                  className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-slate-200 rounded-md text-[12px] font-bold text-slate-800"
                 >
-                  <div className="w-6 h-4 rounded-sm overflow-hidden shadow-sm">
-                    <img 
-                      src={language === "en" ? "/image/kh.png" : "/image/gb.png"} 
-                      alt="flag"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="flex-1 text-left">{language === "en" ? "ភាសាខ្មែរ" : "English"}</span>
+                  <span>{language === "en" ? "Switch to ភាសាខ្មែរ" : "Switch to English"}</span>
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-[#004691] text-white rounded-xs">
+                    {language === "en" ? "KH" : "EN"}
+                  </span>
                 </button>
               </div>
             </motion.div>
