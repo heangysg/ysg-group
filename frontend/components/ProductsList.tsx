@@ -74,7 +74,6 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
     fetchData()
   }, [selectedCategory])
 
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
 
   const handleCategorySelect = (slug: string, hasSubcategories = false) => {
