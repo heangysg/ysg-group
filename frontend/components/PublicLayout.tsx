@@ -185,34 +185,34 @@ export default function PublicLayout({
         )}
       </AnimatePresence>
 
-      {/* 🚀 Premium E-Commerce Header */}
+      {/* 🚀 Sleek Professional Header */}
       {!hideNav && (
-        <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
-          scrolled ? "bg-white/90 backdrop-blur-md h-14 md:h-[72px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-b border-slate-100" : "bg-white h-16 md:h-[88px] border-b border-slate-100"
+        <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-200 ${
+          scrolled ? "bg-white/95 backdrop-blur-md h-14 md:h-16 shadow-xs border-b border-slate-200" : "bg-white h-16 md:h-18 border-b border-slate-200/80"
         }`}>
           <div className="max-w-7xl mx-auto px-4 md:px-8 h-full">
             <div className="flex justify-between items-center h-full">
               
               <Link href="/" className="flex items-center group">
-                <div className="relative flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-10 md:h-12 w-auto object-contain" />
+                <div className="relative flex items-center justify-center">
+                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 md:h-11 w-auto object-contain" />
                 </div>
               </Link>
 
-              <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2">
+              <nav className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`relative px-4 py-2 text-[13px] font-bold transition-all duration-300 rounded-full ${
+                      className={`text-[13px] font-bold tracking-wide transition-colors duration-150 py-1 border-b-2 ${
                         isActive 
-                          ? "text-primary bg-primary/5" 
-                          : "text-slate-600 hover:text-primary hover:bg-slate-50"
+                          ? "text-primary border-primary" 
+                          : "text-slate-700 border-transparent hover:text-primary hover:border-slate-300"
                       }`}
                     >
-                      <span className="relative z-10">{item.name}</span>
+                      {item.name}
                     </Link>
                   )
                 })}
@@ -221,50 +221,48 @@ export default function PublicLayout({
               <div className="hidden lg:flex items-center gap-3">
                 <button
                   onClick={() => setLanguage(language === "en" ? "kh" : "en")}
-                  className="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-full transition-all duration-300 border border-slate-100"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-md transition-all text-slate-800 text-[11px] font-bold border border-slate-200/60"
                 >
-                  <div className="w-4 h-4 rounded-full overflow-hidden shadow-sm">
+                  <div className="w-4 h-3 rounded-xs overflow-hidden shadow-2xs">
                     <img 
                       src={language === "en" ? "/image/kh.png" : "/image/gb.png"} 
                       alt={language}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-700">
-                    {language === "en" ? "KH" : "EN"}
-                  </span>
+                  <span>{language === "en" ? "KH" : "EN"}</span>
                 </button>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   {user ? (
-                    <Link href="/account" className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-slate-50 text-slate-700 hover:text-primary transition-all duration-300 text-[13px] font-bold border border-transparent hover:border-slate-100">
+                    <Link href="/account" className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-800 transition-all text-[12px] font-bold">
                       {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
                         <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
                       ) : (
-                        <UserIcon className="w-4 h-4" />
+                        <UserIcon className="w-4 h-4 text-slate-600" />
                       )}
                       <span>{user.user_metadata?.full_name?.split(' ')[0] || t("account")}</span>
                     </Link>
                   ) : (
-                    <Link href="/login" className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-slate-50 text-slate-700 hover:text-primary transition-all duration-300 text-[13px] font-bold border border-transparent hover:border-slate-100">
-                      <UserIcon className="w-4 h-4" />
+                    <Link href="/login" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-100 text-slate-800 transition-all text-[12px] font-bold">
+                      <UserIcon className="w-4 h-4 text-slate-600" />
                       <span>{t("login")}</span>
                     </Link>
                   )}
 
-                  <Link href="/wishlist" className="relative p-2.5 bg-slate-50 text-slate-700 rounded-full hover:bg-red-50 hover:text-red-500 transition-all duration-300 group shadow-sm border border-slate-100">
-                    <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <Link href="/wishlist" className="relative p-2 text-slate-700 hover:text-red-500 rounded-md hover:bg-slate-100 transition-all">
+                    <Heart className="w-4 h-4" />
                     {wishlistItems && wishlistItems.length > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow-sm border-2 border-white">
+                      <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
                         {wishlistItems.length}
                       </span>
                     )}
                   </Link>
 
-                  <Link href="/checkout" className="relative p-2.5 bg-slate-50 text-slate-700 rounded-full hover:bg-primary hover:text-white transition-all duration-300 group shadow-sm border border-slate-100">
-                    <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <Link href="/checkout" className="relative p-2 text-slate-700 hover:text-primary rounded-md hover:bg-slate-100 transition-all">
+                    <ShoppingCart className="w-4 h-4" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full shadow-sm border-2 border-white">
+                      <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
                         {cartCount}
                       </span>
                     )}

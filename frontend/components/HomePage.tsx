@@ -84,26 +84,21 @@ export default function HomePage() {
   return (
     <div className="bg-[#F8FAFC] min-h-screen pb-24 font-sans selection:bg-primary/20">
       
-      {/* 🔍 Native App Style Search Header */}
-      <div className="bg-gradient-to-b from-primary to-primary-dark pt-8 md:pt-12 pb-8 md:pb-24 px-4 md:px-8 relative overflow-hidden">
-        {/* Abstract Background Elements */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-sky-400/20 rounded-full blur-[60px] translate-y-1/2 -translate-x-1/4" />
-        
-        <div className="max-w-7xl mx-auto relative z-10 mt-2 md:-mt-4">
+      {/* 🔍 Professional Minimalist Search Header */}
+      <div className="bg-slate-900 pt-6 md:pt-10 pb-8 md:pb-16 px-4 md:px-8 border-b border-slate-800 relative">
+        <div className="max-w-7xl mx-auto relative z-10">
 
-          <div className="relative group max-w-3xl mx-auto">
-            <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/0 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
-            <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/50 overflow-hidden">
-              <div className="pl-5">
-                <Search className="w-5 h-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+          <div className="relative max-w-3xl mx-auto">
+            <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-lg shadow-sm border border-slate-300 overflow-hidden">
+              <div className="pl-4">
+                <Search className="w-4 h-4 text-slate-400" />
               </div>
               <input 
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={language === "kh" ? "ស្វែងរកផលិតផល ឬម៉ូដែល..." : "Search for premium machinery, brands, or models..."}
-                className="w-full pl-3 pr-4 py-4 md:py-5 bg-transparent border-none text-slate-900 focus:outline-none focus:ring-0 text-[14px] font-medium placeholder:text-slate-400"
+                className="w-full pl-3 pr-4 py-3 md:py-3.5 bg-transparent border-none text-slate-900 focus:outline-none focus:ring-0 text-[13px] font-medium placeholder:text-slate-400"
               />
               {searchQuery && (
                 <button
@@ -114,8 +109,8 @@ export default function HomePage() {
                   <X className="w-4 h-4" />
                 </button>
               )}
-              <div className="pr-2 hidden md:block">
-                <button type="submit" className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[13px] font-bold hover:bg-slate-800 hover:shadow-md transition-all active:scale-95">
+              <div className="pr-1.5 hidden md:block">
+                <button type="submit" className="bg-slate-900 hover:bg-primary text-white px-6 py-2 rounded-md text-[12px] font-bold transition-all active:scale-95">
                   {language === "kh" ? "ស្វែងរក" : "Search"}
                 </button>
               </div>
@@ -124,10 +119,10 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-4 md:-mt-16 relative z-20 space-y-8 md:space-y-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-6 md:mt-8 relative z-20 space-y-6 md:space-y-10">
 
-        {/* 🎫 Animated Dynamic Banner Carousel */}
-        <section className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-900 h-[180px] md:h-[400px] shadow-[0_20px_50px_rgb(0,0,0,0.15)] group">
+        {/* 🎫 Banner Showcase */}
+        <section className="relative rounded-lg md:rounded-xl overflow-hidden bg-slate-900 h-[180px] md:h-[380px] shadow-sm group border border-slate-200">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
