@@ -214,67 +214,64 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
               )}
             </div>
 
-            {/* Product Info */}
-            <div className="flex flex-col px-5 py-6 md:p-0">
-              <div className="flex flex-col mb-4 md:mb-6">
-                <div className="flex flex-col gap-1 md:gap-1.5 mb-2 md:mb-3">
-                  <span className="text-[12px] font-black text-primary uppercase tracking-widest">
-                    {product.brand}
-                  </span>
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-[1.1]">
+            {/* Product Info (Matching Gyeon Image 1) */}
+            <div className="flex flex-col px-4 py-4 md:p-0">
+              
+              {/* Header: Title + Category + Wishlist/Share */}
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1">
                     {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
                   </h1>
+                  <p className="text-[12px] font-semibold text-slate-500 tracking-wider uppercase">
+                    {language === "kh" ? "ប្រភេទ: " : "Category: "}{product.brand || "ACCESSORIES"}
+                  </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <div className="flex items-center gap-4 text-slate-500 font-semibold text-sm bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
-                    <span>Model: {product.model || "Standard"}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-3 py-2 rounded-lg text-[11px] font-bold border border-emerald-100">
-                    <ShieldCheck className="w-4 h-4" />
-                    {t("qualityAssured")}
-                  </div>
-                  {product.isFeatured && (
-                    <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-2 rounded-lg text-[11px] font-bold border border-primary/20">
-                      <Star className="w-4 h-4 fill-primary" />
-                      {t("featured")}
-                    </div>
-                  )}
-                </div>
-
-                <div className="h-px w-full bg-slate-100 mb-3" />
-
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl md:text-4xl font-black text-primary drop-shadow-sm">
-                    {product.price ? `$${Number(product.price).toLocaleString()}` : "Price on Request"}
-                  </span>
-
-                  <button
+                <div className="flex items-center gap-2">
+                  <button 
                     onClick={handleToggleWishlist}
-                    className={`ml-auto flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all duration-300 active:scale-95 ${inWishlist
-                        ? "bg-red-50 border-red-100 text-red-500 shadow-[0_8px_30px_rgb(239,68,68,0.2)]"
-                        : "bg-white border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50"
-                      }`}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
+                      inWishlist ? "text-red-500 border-red-200 bg-red-50" : "text-slate-400 border-slate-200 hover:text-red-500"
+                    }`}
                   >
-                    <Heart className={`w-5 h-5 md:w-6 md:h-6 ${inWishlist ? "fill-red-500" : ""}`} />
+                    <Heart className={`w-4 h-4 ${inWishlist ? "fill-red-500" : ""}`} />
+                  </button>
+                  <button 
+                    onClick={handleShare}
+                    className="w-9 h-9 rounded-full flex items-center justify-center border border-slate-200 text-slate-600 hover:text-primary transition-all"
+                  >
+                    <Share2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              <div className="hidden md:grid grid-cols-2 gap-4 mb-6">
+              {/* Big Price Tag (Image 1 Style) */}
+              <div className="my-4">
+                <span className="text-3xl md:text-4xl font-extrabold text-[#004691]">
+                  {product.price ? `$${Number(product.price).toLocaleString()}` : "Price on Request"}
+                </span>
+              </div>
+
+              {/* Quantity Counter + Pill Add to Cart CTA (Image 1 Style) */}
+              <div className="flex flex-wrap items-center gap-4 my-6">
+                
+                {/* Add to Cart Pill Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="bg-slate-900 text-white py-4 px-8 rounded-xl font-bold hover:bg-primary transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm shadow-sm"
+                  className="flex-1 min-w-[200px] h-12 bg-[#004691] hover:bg-[#003366] text-white rounded-full font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  {t("placeOrder")}
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>{language === "kh" ? "ដាក់ចូលកន្ត្រកទំនិញ" : "Add to Cart"}</span>
                 </button>
+
+                {/* Inquiry Telegram Pill Button */}
                 <button
                   onClick={() => setShowInquiry(true)}
-                  className="bg-white text-slate-900 border-2 border-slate-200 py-4 px-8 rounded-xl font-bold hover:border-slate-900 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm"
+                  className="h-12 px-6 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all"
                 >
-                  <Send className="w-5 h-5" />
-                  {t("contactSales")}
+                  <Send className="w-3.5 h-3.5 text-[#004691]" />
+                  <span>{language === "kh" ? "សាកសួរព័ត៌មាន" : "Inquire"}</span>
                 </button>
               </div>
 

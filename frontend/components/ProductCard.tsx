@@ -62,33 +62,31 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="group flex flex-col h-full relative bg-white rounded-lg border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all duration-300">
+    <div className="group flex flex-col h-full relative bg-white transition-all duration-300 p-2 md:p-3 rounded-lg hover:shadow-xs">
       <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0" aria-label={`View ${product.name}`} />
       
-      {/* 🖼️ Clean Image Container */}
-      <div className="relative aspect-square w-full bg-[#FAFBFD] border-b border-slate-100 overflow-hidden p-4 flex items-center justify-center">
+      {/* 🖼️ Floating Clean Image Container */}
+      <div className="relative aspect-square w-full bg-white overflow-hidden p-4 flex items-center justify-center mb-3">
         {imageUrl && imageUrl !== "" ? (
           <Image 
             src={imageUrl} 
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-contain p-3 transition-transform duration-500 group-hover:scale-105"
+            className="object-contain transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+          <div className="w-full h-full flex items-center justify-center bg-slate-50 rounded-md">
             <Package className="w-10 h-10 text-slate-300 group-hover:text-slate-600 transition-colors" />
           </div>
         )}
         
-        {/* Wishlist Button */}
-        <div className="absolute top-2.5 right-2.5 z-20">
+        {/* Wishlist Icon on Hover/Top Right */}
+        <div className="absolute top-1 right-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button 
             onClick={handleToggleWishlist}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 border shadow-2xs ${
-              inWishlist 
-                ? "text-red-500 border-red-200 bg-red-50" 
-                : "text-slate-400 border-slate-200/80 bg-white/90 hover:text-red-500 hover:border-red-200 hover:bg-white"
+            className={`w-7 h-7 rounded-full flex items-center justify-center border bg-white shadow-2xs ${
+              inWishlist ? "text-red-500 border-red-200" : "text-slate-400 border-slate-200 hover:text-red-500"
             }`}
           >
             <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500" : ""}`} />
@@ -96,38 +94,22 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* 📝 Clean Product Info */}
-      <div className="p-3.5 md:p-4 flex flex-col flex-1 relative z-10 pointer-events-none">
-        <div className="space-y-1 mb-3 flex-1">
-          <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
-            {product.brand || "YSG Group"}
+      {/* 📝 Centered Title & Price (Matching Gyeon Image 2) */}
+      <div className="flex flex-col items-center text-center flex-1 z-10 pointer-events-none">
+        <h3 className="text-[13px] md:text-[14px] font-medium text-slate-900 leading-snug line-clamp-2 min-h-[38px] group-hover:text-[#004691] transition-colors duration-200 mb-1">
+          {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
+        </h3>
+        
+        <div className="mt-auto pt-1 flex items-center justify-center gap-2 pointer-events-auto">
+          <span className="text-base md:text-lg font-extrabold text-[#004691] tracking-tight">
+            ${formatPrice(product.price)}
           </span>
-          <h3 className="text-[13px] md:text-[14px] font-semibold text-slate-900 leading-snug line-clamp-2 min-h-[38px] group-hover:text-primary transition-colors duration-200">
-            {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
-          </h3>
-          {product.model && (
-            <p className="text-[11px] text-slate-400 font-normal">
-              {product.model}
-            </p>
-          )}
-        </div>
-
-        {/* Price & Action */}
-        <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between pointer-events-auto">
-          <div className="flex flex-col">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t("price") || "Price"}</span>
-            <span className="text-base md:text-lg font-bold text-slate-900 tracking-tight">
-              ${formatPrice(product.price)}
-            </span>
-          </div>
-          
           <button 
             onClick={handleAddToCart}
-            className="h-8 md:h-9 px-3 bg-slate-900 hover:bg-primary text-white rounded-md flex items-center gap-1.5 text-[11px] font-semibold transition-all duration-200 shadow-2xs active:scale-95"
-            aria-label="Add to cart"
+            className="w-7 h-7 bg-slate-900 hover:bg-[#004691] text-white rounded-full flex items-center justify-center transition-colors shadow-2xs active:scale-95 ml-1"
+            title={language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
           >
             <ShoppingCart className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{language === "kh" ? "ទិញ" : "Add"}</span>
           </button>
         </div>
       </div>
