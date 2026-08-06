@@ -18,9 +18,9 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-kantumruy)', 'var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
         khmer: ['var(--font-kantumruy)', 'sans-serif'],
-        nunito: ['var(--font-nunito)', 'Nunito Sans', 'sans-serif'],
+        heading: ['var(--font-kantumruy)', 'var(--font-outfit)', 'sans-serif'],
       },
       boxShadow: {
         'lux': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
