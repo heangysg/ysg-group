@@ -75,47 +75,12 @@ export default function HomePage() {
     },
     {
       image: "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?auto=format&fit=crop&q=80&w=1200",
-      title: language === "kh" ? "គុណភាពស្តង់ដារ" : "Premium Quality",
-      subtitle: language === "kh" ? "ធានាគុណភាពកម្រិតអន្តរជាតិ ISO 9001" : "ISO 9001 Certified Excellence",
-      color: "from-indigo-900/90"
-    }
-  ]
-
-  return (
-    <div className="bg-[#F8FAFC] min-h-screen pb-24 font-sans selection:bg-primary/20">
+      title: language === "kh" ? "គ�    <div className="bg-[#FAFBFD] min-h-screen pb-24 font-sans selection:bg-primary/20">
       
-      {/* 🔍 Professional Minimalist Search Header */}
-      <div className="bg-slate-900 pt-6 md:pt-10 pb-8 md:pb-16 px-4 md:px-8 border-b border-slate-800 relative">
-        <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 md:pt-6 relative z-20 space-y-6 md:space-y-10">
 
-          <div className="relative max-w-3xl mx-auto">
-            <form onSubmit={handleSearch} className="relative flex items-center bg-white rounded-lg shadow-sm border border-slate-300 overflow-hidden">
-              <div className="pl-4">
-                <Search className="w-4 h-4 text-slate-400" />
-              </div>
-              <input 
-                type="text" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={language === "kh" ? "ស្វែងរកផលិតផល ឬម៉ូដែល..." : "Search for premium machinery, brands, or models..."}
-                className="w-full pl-3 pr-4 py-3 md:py-3.5 bg-transparent border-none text-slate-900 focus:outline-none focus:ring-0 text-[13px] font-medium placeholder:text-slate-400"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="p-2 mr-1 text-slate-400 hover:text-slate-700 transition-colors flex-shrink-0"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-              <div className="pr-1.5 hidden md:block">
-                <button type="submit" className="bg-slate-900 hover:bg-primary text-white px-6 py-2 rounded-md text-[12px] font-bold transition-all active:scale-95">
-                  {language === "kh" ? "ស្វែងរក" : "Search"}
-                </button>
-              </div>
-            </form>
-          </div>
+        {/* 🎫 Hero Banner Showcase */}
+        <section className="relative rounded-lg md:rounded-xl overflow-hidden bg-slate-900 h-[180px] sm:h-[240px] md:h-[380px] shadow-2xs group border border-slate-200">/div>
         </div>
       </div>
 

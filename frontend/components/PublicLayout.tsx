@@ -185,16 +185,19 @@ export default function PublicLayout({
         )}
       </AnimatePresence>
 
-      {/* 🚀 Gyeon Cambodia Dual-Row Header */}
+      {/* 🚀 Sleek Header (Optimized for Mobile & Laptop) */}
       {!hideNav && (
         <header className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-slate-200 shadow-2xs">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
             
-            {/* Row 1 (Top Utility Bar): Pill Search + Language Switcher + Icons */}
-            <div className="flex items-center justify-between h-12 md:h-14 gap-4 border-b border-slate-100 py-2">
-              
-              {/* Desktop Pill Search Input */}
-              <div className="flex flex-1 max-w-md">
+            {/* 📱 Mobile Single Header Bar (< lg) */}
+            <div className="flex lg:hidden items-center justify-between h-14 gap-2">
+              <Link href="/" className="flex items-center shrink-0">
+                <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-7 w-auto object-contain" />
+              </Link>
+
+              {/* Mobile Pill Search Input */}
+              <div className="flex-1 mx-2">
                 <form 
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -204,122 +207,152 @@ export default function PublicLayout({
                       router.push(`/products?search=${encodeURIComponent(input.value.trim())}`);
                     }
                   }} 
-                  className="w-full flex items-center bg-slate-100 hover:bg-slate-200/80 rounded-full px-4 py-1.5 text-xs border border-transparent focus-within:border-[#004691] focus-within:bg-white transition-all"
+                  className="w-full flex items-center bg-slate-100 rounded-full px-3 py-1 text-xs border border-transparent focus-within:border-[#004691] focus-within:bg-white"
                 >
-                  <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" />
                   <input 
                     name="search"
                     type="text" 
-                    placeholder={language === "kh" ? "តើអ្នកកំពុងស្វែងរកអ្វី?" : "What are you looking for?"}
-                    className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-[12px] font-medium"
+                    placeholder={language === "kh" ? "ស្វែងរក..." : "Search..."}
+                    className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-[11px] font-medium"
                   />
                 </form>
               </div>
 
-              {/* Top Right Utilities */}
-              <div className="flex items-center gap-3 shrink-0">
-                
-                {/* Language Switcher Pill */}
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-[11px] font-bold">
-                  <button 
-                    onClick={() => setLanguage("en")}
-                    className={`px-3 py-1 rounded-full transition-all flex items-center gap-1 ${language === "en" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
-                  >
-                    <span>English</span>
-                  </button>
-                  <button 
-                    onClick={() => setLanguage("kh")}
-                    className={`px-3 py-1 rounded-full transition-all flex items-center gap-1 ${language === "kh" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
-                  >
-                    <span>ភាសាខ្មែរ</span>
-                  </button>
-                </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button 
+                  onClick={() => setLanguage(language === "en" ? "kh" : "en")}
+                  className="px-2 py-1 bg-slate-100 rounded-full text-[10px] font-bold text-slate-800"
+                >
+                  {language === "en" ? "KH" : "EN"}
+                </button>
 
-                {/* Account Link */}
-                {user ? (
-                  <Link href="/account" className="p-1.5 text-slate-700 hover:text-[#004691] transition-colors" title={t("account")}>
-                    {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
-                      <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <UserIcon className="w-4 h-4" />
-                    )}
-                  </Link>
-                ) : (
-                  <Link href="/login" className="p-1.5 text-slate-700 hover:text-[#004691] transition-colors" title={t("login")}>
-                    <UserIcon className="w-4 h-4" />
-                  </Link>
-                )}
-
-                {/* Wishlist Icon */}
-                <Link href="/wishlist" className="relative p-1.5 text-slate-700 hover:text-red-500 transition-colors" title={t("wishlist")}>
-                  <Heart className="w-4 h-4" />
-                  {wishlistItems && wishlistItems.length > 0 && (
-                    <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
-                      {wishlistItems.length}
-                    </span>
-                  )}
-                </Link>
-
-                {/* Cart Icon */}
-                <Link href="/checkout" className="relative p-1.5 text-slate-700 hover:text-[#004691] transition-colors" title={t("cart")}>
+                <Link href="/checkout" className="relative p-1.5 text-slate-700">
                   <ShoppingCart className="w-4 h-4" />
                   {cartCount > 0 && (
-                    <span className="absolute top-0 right-0 bg-[#004691] text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
+                    <span className="absolute top-0 right-0 bg-[#004691] text-white text-[8px] font-bold min-w-[14px] h-[14px] flex items-center justify-center rounded-full">
                       {cartCount}
                     </span>
                   )}
                 </Link>
 
-                {/* Mobile Menu Button */}
                 <button 
                   onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden p-1.5 text-slate-700 hover:text-slate-900"
+                  className="p-1.5 text-slate-700"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Row 2 (Main Navigation Bar - Gyeon Clone): Logo + Category Menu */}
-            <div className="flex items-center justify-between h-14 md:h-16">
-              
-              {/* Logo on Row 2 Left */}
-              <Link href="/" className="flex items-center shrink-0">
-                <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-8 md:h-10 w-auto object-contain" />
-              </Link>
+            {/* 💻 Desktop Dual-Row Header (>= lg) */}
+            <div className="hidden lg:block">
+              {/* Row 1: Search + Language + Actions */}
+              <div className="flex items-center justify-between h-12 border-b border-slate-100 py-2">
+                <div className="flex flex-1 max-w-md">
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const input = form.elements.namedItem('search') as HTMLInputElement;
+                      if (input?.value.trim()) {
+                        router.push(`/products?search=${encodeURIComponent(input.value.trim())}`);
+                      }
+                    }} 
+                    className="w-full flex items-center bg-slate-100 hover:bg-slate-200/80 rounded-full px-4 py-1.5 text-xs border border-transparent focus-within:border-[#004691] focus-within:bg-white transition-all"
+                  >
+                    <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                    <input 
+                      name="search"
+                      type="text" 
+                      placeholder={language === "kh" ? "តើអ្នកកំពុងស្វែងរកអ្វី?" : "What are you looking for?"}
+                      className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-[12px] font-medium"
+                    />
+                  </form>
+                </div>
 
-              {/* Center Category Navigation Menu */}
-              <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-[12px] font-bold tracking-wider uppercase">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`transition-colors duration-150 py-1 border-b-2 ${
-                        isActive 
-                          ? "text-[#004691] border-[#004691]" 
-                          : "text-slate-700 border-transparent hover:text-[#004691] hover:border-slate-300"
-                      }`}
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center bg-slate-100 p-0.5 rounded-full border border-slate-200 text-[11px] font-bold">
+                    <button 
+                      onClick={() => setLanguage("en")}
+                      className={`px-3 py-1 rounded-full transition-all ${language === "en" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
                     >
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </nav>
+                      English
+                    </button>
+                    <button 
+                      onClick={() => setLanguage("kh")}
+                      className={`px-3 py-1 rounded-full transition-all ${language === "kh" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-600 hover:text-slate-900"}`}
+                    >
+                      ភាសាខ្មែរ
+                    </button>
+                  </div>
 
-              {/* Right empty spacer or contact phone */}
-              <div className="hidden lg:flex items-center text-[12px] font-semibold text-slate-500">
-                <span>012 345 678</span>
+                  {user ? (
+                    <Link href="/account" className="p-1.5 text-slate-700 hover:text-[#004691]">
+                      {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
+                        <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        <UserIcon className="w-4 h-4" />
+                      )}
+                    </Link>
+                  ) : (
+                    <Link href="/login" className="p-1.5 text-slate-700 hover:text-[#004691]">
+                      <UserIcon className="w-4 h-4" />
+                    </Link>
+                  )}
+
+                  <Link href="/wishlist" className="relative p-1.5 text-slate-700 hover:text-red-500">
+                    <Heart className="w-4 h-4" />
+                    {wishlistItems && wishlistItems.length > 0 && (
+                      <span className="absolute top-0 right-0 bg-red-500 text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
+                        {wishlistItems.length}
+                      </span>
+                    )}
+                  </Link>
+
+                  <Link href="/checkout" className="relative p-1.5 text-slate-700 hover:text-[#004691]">
+                    <ShoppingCart className="w-4 h-4" />
+                    {cartCount > 0 && (
+                      <span className="absolute top-0 right-0 bg-[#004691] text-white text-[9px] font-bold min-w-[15px] h-[15px] flex items-center justify-center rounded-full">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
               </div>
 
+              {/* Row 2: Logo + Category Navigation */}
+              <div className="flex items-center justify-between h-14">
+                <Link href="/" className="flex items-center shrink-0">
+                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-8 w-auto object-contain" />
+                </Link>
+
+                <nav className="flex items-center gap-8 text-[12px] font-bold tracking-wider uppercase">
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.href
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`transition-colors py-1 border-b-2 ${
+                          isActive 
+                            ? "text-[#004691] border-[#004691]" 
+                            : "text-slate-700 border-transparent hover:text-[#004691]"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    )
+                  })}
+                </nav>
+              </div>
             </div>
 
           </div>
         </header>
       )}
 
-      <main className={`transition-all ${!hideNav ? "pt-24 md:pt-[124px] pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
+      <main className={`transition-all ${!hideNav ? "pt-16 lg:pt-[116px] pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
         <Toaster position="top-center" />
         {children}
       </main>
