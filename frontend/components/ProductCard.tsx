@@ -41,9 +41,21 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.preventDefault()
     e.stopPropagation()
     addToCart(product)
-    const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
-    const message = language === "kh" ? `បានបន្ថែម ${productName} ទៅកន្ត្រក!` : `${productName} added to cart!`
-    toast.success(message)
+    const message = language === "kh" ? "បានបន្ថែមទៅកន្ត្រកទំនិញ" : "Added to cart"
+    toast.success(message, {
+      style: {
+        background: '#16a34a',
+        color: '#ffffff',
+        padding: '8px 16px',
+        borderRadius: '9999px',
+        fontWeight: '600',
+        fontSize: '11px'
+      },
+      iconTheme: {
+        primary: '#ffffff',
+        secondary: '#16a34a'
+      }
+    })
   }
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -81,15 +93,15 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         
-        {/* Wishlist Icon on Hover/Top Right */}
-        <div className="absolute top-1 right-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/* Wishlist Icon (Always Visible) */}
+        <div className="absolute top-1 right-1 z-20 transition-opacity duration-200">
           <button 
             onClick={handleToggleWishlist}
-            className={`w-7 h-7 rounded-full flex items-center justify-center border bg-white shadow-2xs ${
-              inWishlist ? "text-red-500 border-red-200" : "text-slate-400 border-slate-200 hover:text-red-500"
+            className={`w-7 h-7 rounded-md flex items-center justify-center border bg-white shadow-2xs ${
+              inWishlist ? "text-[#004691] border-[#004691] bg-blue-50" : "text-slate-400 border-slate-200 hover:text-[#004691]"
             }`}
           >
-            <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-red-500" : ""}`} />
+            <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-[#004691]" : ""}`} />
           </button>
         </div>
       </div>

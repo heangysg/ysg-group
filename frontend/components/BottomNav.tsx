@@ -10,13 +10,13 @@ import { useCart } from "../contexts/CartContext"
 export default function BottomNav() {
   const pathname = usePathname()
   const { t, language } = useLanguage()
-  const { cartCount } = useCart()
+  const { cartCount, openCart } = useCart()
 
   const navItems = [
     { name: t("home") || "Home", href: "/", icon: Home },
     { name: t("allProducts") || "Products", href: "/products", icon: Package },
     { name: t("categories") || "Categories", href: "/categories", icon: FolderOpen },
-    { name: t("cart") || "Cart", href: "/checkout", icon: ShoppingCart, badge: cartCount },
+    { name: t("cart") || "Cart", href: "#", icon: ShoppingCart, badge: cartCount, isCart: true },
     { name: t("account") || "Account", href: "/account", icon: User },
   ]
 
@@ -24,15 +24,41 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-white border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] safe-pb">
       <div className="flex items-center justify-around h-[72px] px-2 max-w-md mx-auto">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+          const isActive = item.href !== "#" && (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href)))
           const Icon = item.icon
           
+          if (item.isCart) {
+            return (
+              <button
+                key={item.name}
+                onClick={openCart}
+                className="flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 relative text-slate-500 hover:text-slate-900"
+              >
+                <div className="flex flex-col items-center gap-1.5 relative">
+                  <div>
+                    <Icon className="w-5 h-5 stroke-[2]" />
+                  </div>
+                  
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="absolute -top-2 -right-3 bg-[#004691] text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center border-2 border-white px-1 shadow-sm">
+                      {item.badge}
+                    </span>
+                  )}
+                  
+                  <span className="text-[10px] font-medium opacity-70">
+                    {item.name}
+                  </span>
+                </div>
+              </button>
+            )
+          }
+
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center justify-center flex-1 h-full transition-all duration-300 relative ${
-                isActive ? "text-primary" : "text-slate-500 hover:text-slate-900"
+                isActive ? "text-[#004691]" : "text-slate-500 hover:text-slate-900"
               }`}
             >
               <div className="flex flex-col items-center gap-1.5 relative">
@@ -41,13 +67,13 @@ export default function BottomNav() {
                 </div>
                 
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center border-2 border-white px-1 shadow-sm">
+                  <span className="absolute -top-2 -right-3 bg-[#004691] text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center border-2 border-white px-1 shadow-sm">
                     {item.badge}
                   </span>
                 )}
                 
                 <span className={`text-[10px] font-medium transition-all ${
-                  isActive ? "opacity-100" : "opacity-70"
+                  isActive ? "opacity-100 font-bold" : "opacity-70"
                 }`}>
                   {item.name}
                 </span>

@@ -59,12 +59,23 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       return [...prev, product]
     })
 
-    // React batches state updates. We use a microtask or just wait a tick to show the toast
-    // But since it's just a local variable flag, we can just do:
     setTimeout(() => {
       if (added) {
-        const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
-        toast.success(language === "kh" ? `បានបន្ថែម ${productName} ទៅបញ្ជីចំណូលចិត្ត!` : `${productName} added to wishlist!`)
+        const message = language === "kh" ? "បានបន្ថែមទៅបញ្ជីបំណង" : "Added to wishlist"
+        toast.success(message, {
+          style: {
+            background: '#16a34a',
+            color: '#ffffff',
+            padding: '8px 16px',
+            borderRadius: '9999px',
+            fontWeight: '600',
+            fontSize: '11px'
+          },
+          iconTheme: {
+            primary: '#ffffff',
+            secondary: '#16a34a'
+          }
+        })
       }
     }, 0)
   }

@@ -24,6 +24,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   const { t, language } = useLanguage()
   const { addToCart } = useCart()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
+  const [quantity, setQuantity] = useState(1)
   const [inquiryForm, setInquiryForm] = useState({ customerName: "", customerPhone: "", message: "" })
   const [submittingInquiry, setSubmittingInquiry] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -46,10 +47,24 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   }
 
   const handleAddToCart = () => {
-    addToCart(product)
-    const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
-    const message = language === "kh" ? `បានបន្ថែម ${productName} ទៅកន្ត្រក!` : `${productName} added to cart!`
-    toast.success(message)
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product)
+    }
+    const message = language === "kh" ? "បានបន្ថែមទៅកន្ត្រកទំនិញ" : "Added to cart"
+    toast.success(message, {
+      style: {
+        background: '#16a34a',
+        color: '#ffffff',
+        padding: '8px 16px',
+        borderRadius: '9999px',
+        fontWeight: '600',
+        fontSize: '11px'
+      },
+      iconTheme: {
+        primary: '#ffffff',
+        secondary: '#16a34a'
+      }
+    })
   }
 
   const handleToggleWishlist = () => {
@@ -90,46 +105,70 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
     setSubmittingInquiry(false)
   }
 
+  const [categoryObj, setCategoryObj] = useState<any>(null)
+
+  const fetchCategoryDetails = async (catId: string) => {
+    if (!catId) return
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    try {
+      const res = await fetch(`${API_URL}/api/public/categories`)
+      if (res.ok) {
+        const { data } = await res.json()
+        if (data) {
+          const matched = data.find((c: any) => c.id === catId || c.slug === catId)
+          if (matched) setCategoryObj(matched)
+        }
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   useEffect(() => {
     async function fetchProduct() {
       if (initialProduct) {
         setLoading(false)
         fetchRelated(initialProduct.categoryId, initialProduct.id)
+        fetchCategoryDetails(initialProduct.categoryId)
         return
       }
 
+      setLoading(true)
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
-        const res = await fetch(`${API_URL}/api/public/products/${slug}`, { cache: 'no-store' })
-        if (!res.ok) throw new Error("Product not found")
-        const { data } = await res.json()
-        setProduct(data)
-        fetchRelated(data.categoryId, data.id)
-      } catch (error) {
-        toast.error("Product not found")
+        const res = await fetch(`${API_URL}/api/public/products/${slug}`)
+        if (res.ok) {
+          const { data } = await res.json()
+          setProduct(data)
+          if (data) {
+            fetchRelated(data.categoryId, data.id)
+            fetchCategoryDetails(data.categoryId)
+          }
+        }
+      } catch (err) {
+        console.error("Fetch Product Error:", err)
       } finally {
         setLoading(false)
       }
     }
 
-    async function fetchRelated(categoryId: string, currentId: string) {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-      try {
-        const res = await fetch(`${API_URL}/api/public/products`, { cache: 'no-store' })
-        if (res.ok) {
-          const { data } = await res.json()
-          const related = data
-            .filter((p: any) => p.categoryId === categoryId && p.id !== currentId)
-            .slice(0, 4)
-          setRelatedProducts(related)
-        }
-      } catch (error) {
-        console.error("Failed to fetch related products")
-      }
-    }
-
     fetchProduct()
   }, [slug, initialProduct])
+
+  const fetchRelated = async (catId: string, currentId: string) => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+    try {
+      const res = await fetch(`${API_URL}/api/public/products`)
+      if (res.ok) {
+        const { data } = await res.json()
+        if (data) {
+          setRelatedProducts(data.filter((p: any) => p.categoryId === catId && p.id !== currentId).slice(0, 4))
+        }
+      }
+    } catch (err) {
+      console.error("Fetch Related Error:", err)
+    }
+  }
 
   if (loading) {
     return (
@@ -153,175 +192,172 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
   return (
     <PublicLayout>
-      <main className="min-h-screen bg-white md:bg-[#F8FAFC] pb-24 pt-0 md:pt-8">
-        <Toaster position="top-center" reverseOrder={false} />
-
-        {/* Desktop Breadcrumbs */}
-        <div className="hidden md:block max-w-7xl mx-auto px-4 md:px-8 mb-6">
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500 overflow-x-auto whitespace-nowrap">
-            <Link href="/" className="hover:text-primary transition-colors">{t("home")}</Link>
-            <span>/</span>
-            <Link href="/products" className="hover:text-primary transition-colors">{t("products")}</Link>
-            <span>/</span>
-            <span className="text-slate-900 font-bold">{language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}</span>
-          </div>
-        </div>
-
-        {/* Mobile App Style Header */}
-        <div className="md:hidden absolute top-4 left-4 z-50">
-          <Link href="/products" className="flex items-center justify-center w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full shadow-xs text-slate-900 border border-slate-200">
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-        </div>
-
+      <main className="min-h-screen bg-white pb-24 pt-4 md:pt-6 font-sans">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="bg-white md:rounded-2xl p-0 md:p-8 lg:p-12 md:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:border md:border-slate-100 grid lg:grid-cols-2 gap-0 md:gap-12 lg:gap-16">
-            {/* Image Gallery */}
-            <div className="space-y-4 md:space-y-6">
-              <div className="bg-[#F8FAFC] md:rounded-xl aspect-square md:aspect-[4/3] relative group overflow-hidden md:border md:border-slate-100 shadow-inner">
+          
+          {/* 📍 Mobile Responsive Breadcrumbs (Increased font size) */}
+          <div className="mb-4 md:mb-6 flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-600 overflow-hidden whitespace-nowrap">
+            <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">
+              {language === "kh" ? "ទំព័រដើម" : "Home"}
+            </Link>
+            <span className="shrink-0 text-slate-400">/</span>
+            <Link href={`/products/category/${categoryObj?.slug || 'all'}`} className="hover:text-[#004691] shrink-0 transition-colors">
+              {categoryObj 
+                ? (language === "kh" && categoryObj.nameKhmer ? categoryObj.nameKhmer : categoryObj.name)
+                : (language === "kh" ? "ផលិតផល" : "Products")}
+            </Link>
+            <span className="shrink-0 text-slate-400">/</span>
+            <span className="text-slate-800 font-bold truncate min-w-0">
+              {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
+            </span>
+          </div>
+
+          {/* 🛍️ Main Product Detail Grid */}
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start mb-12">
+            
+            {/* Left: Image Showcase & Thumbnails */}
+            <div className="space-y-4">
+              <div className="bg-white rounded-2xl aspect-square relative overflow-hidden flex items-center justify-center p-6 shadow-2xs border border-slate-100">
                 {images.length > 0 && images[activeImage] ? (
                   <Image
                     src={images[activeImage]}
                     alt={product.name}
                     fill
                     sizes="(max-width: 1200px) 100vw, 50vw"
-                    className="object-contain transition-all duration-700 hover:scale-105"
+                    className="object-contain p-4"
                     priority
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-4">
-                    <Package className="w-20 h-20" />
-                    <span className="font-medium text-xs">No Image Available</span>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-300 gap-3">
+                    <Package className="w-16 h-16" />
+                    <span className="text-xs font-medium">No Image Available</span>
                   </div>
                 )}
               </div>
 
+              {/* Thumbnails row */}
               {images.length > 1 && (
-                <div className="grid grid-cols-5 gap-3 md:gap-4 px-4 md:px-0">
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
                   {images.map((img: string, i: number) => (
                     <button
                       key={i}
                       onClick={() => setActiveImage(i)}
-                      className={`aspect-square rounded-lg overflow-hidden transition-all duration-300 border-2 ${activeImage === i ? "border-primary shadow-md shadow-primary/20 scale-105" : "border-transparent hover:border-slate-200"
-                        }`}
+                      className={`w-20 h-20 bg-white rounded-xl overflow-hidden shrink-0 border-2 transition-all p-1 ${
+                        activeImage === i ? "border-[#004691] shadow-xs" : "border-slate-200 opacity-70 hover:opacity-100"
+                      }`}
                     >
-                      <div className="relative w-full h-full bg-[#F8FAFC]">
-                        <Image src={img} alt={`${product.name} ${i}`} fill sizes="20vw" className="object-cover" />
-                      </div>
+                      <img src={img} alt={`${product.name} ${i}`} className="w-full h-full object-contain" />
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Product Info (Matching Gyeon Image 1) */}
-            <div className="flex flex-col px-4 py-4 md:p-0">
+            {/* Right: Product Info & Actions (100% Gyeon Cambodia Clone) */}
+            <div className="flex flex-col space-y-4 pt-2">
               
-              {/* Header: Title + Category + Wishlist/Share */}
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1">
-                    {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
-                  </h1>
-                  <p className="text-[12px] font-semibold text-slate-500 tracking-wider uppercase">
-                    {language === "kh" ? "ប្រភេទ: " : "Category: "}{product.brand || "ACCESSORIES"}
-                  </p>
-                </div>
+              {/* Title & Favorite / Share Buttons */}
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">
+                  {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
+                </h1>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <button 
                     onClick={handleToggleWishlist}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
-                      inWishlist ? "text-red-500 border-red-200 bg-red-50" : "text-slate-400 border-slate-200 hover:text-red-500"
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all ${
+                      inWishlist ? "text-[#004691] border-[#004691] bg-blue-50" : "text-slate-400 border-slate-200 hover:text-[#004691] bg-white"
                     }`}
                   >
-                    <Heart className={`w-4 h-4 ${inWishlist ? "fill-red-500" : ""}`} />
+                    <Heart className={`w-4.5 h-4.5 ${inWishlist ? "fill-[#004691]" : ""}`} />
                   </button>
+
                   <button 
                     onClick={handleShare}
-                    className="w-9 h-9 rounded-full flex items-center justify-center border border-slate-200 text-slate-600 hover:text-primary transition-all"
+                    className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#1E3A5F] text-white hover:bg-[#004691] transition-all shadow-2xs"
                   >
                     <Share2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Big Price Tag (Image 1 Style) */}
-              <div className="my-4">
-                <span className="text-3xl md:text-4xl font-extrabold text-[#004691]">
-                  {product.price ? `$${Number(product.price).toLocaleString()}` : "Price on Request"}
+              {/* Category */}
+              <div className="text-xs font-semibold text-slate-500">
+                <span>{language === "kh" ? "ប្រភេទ: " : "Category: "}</span>
+                <Link href={`/products/category/${categoryObj?.slug || product.category?.slug || product.categorySlug || 'all'}`} className="text-slate-800 hover:text-[#004691] font-bold">
+                  {(() => {
+                    if (categoryObj) {
+                      return language === "kh" && categoryObj.nameKhmer ? categoryObj.nameKhmer : categoryObj.name
+                    }
+                    if (product.category) {
+                      return language === "kh" && product.category.nameKhmer ? product.category.nameKhmer : product.category.name
+                    }
+                    return product.brand || (language === "kh" ? "ម៉ាស៊ីន និង ឧបករណ៍" : "Machinery & Equipment")
+                  })()}
+                </Link>
+              </div>
+
+              {/* Price Tag */}
+              <div className="pt-2">
+                <span className="text-3xl md:text-4xl font-extrabold text-[#004691] font-sans">
+                  ${product.price ? Number(product.price).toLocaleString() : "0.00"}
                 </span>
               </div>
 
-              {/* Quantity Counter + Pill Add to Cart CTA (Image 1 Style) */}
-              <div className="flex flex-wrap items-center gap-4 my-6">
-                
-                {/* Add to Cart Pill Button */}
+              {/* Quantity Selector + Add to Cart Button Row */}
+              <div className="flex flex-wrap items-center gap-4 pt-4 pb-2">
+                {/* Quantity Controls */}
+                <div className="flex items-center bg-slate-100 rounded-lg border border-slate-200 px-3 py-1.5">
+                  <button 
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="text-slate-600 hover:text-slate-900 font-extrabold text-lg px-2"
+                  >
+                    -
+                  </button>
+                  <span className="w-10 text-center font-extrabold text-sm text-slate-900 font-sans">
+                    {quantity}
+                  </span>
+                  <button 
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="text-slate-600 hover:text-slate-900 font-extrabold text-lg px-2"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Add to Cart CTA */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 min-w-[200px] h-12 bg-[#004691] hover:bg-[#003366] text-white rounded-full font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+                  className="flex-1 min-w-[200px] py-3 px-6 bg-[#1E3A5F] hover:bg-[#004691] text-white rounded-lg font-extrabold text-xs md:text-sm flex items-center justify-center gap-2.5 shadow-xs transition-all active:scale-95 uppercase tracking-wider"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <span>{language === "kh" ? "ដាក់ចូលកន្ត្រកទំនិញ" : "Add to Cart"}</span>
                 </button>
-
-                {/* Inquiry Telegram Pill Button */}
-                <button
-                  onClick={() => setShowInquiry(true)}
-                  className="h-12 px-6 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-full font-bold text-xs flex items-center justify-center gap-2 transition-all"
-                >
-                  <Send className="w-3.5 h-3.5 text-[#004691]" />
-                  <span>{language === "kh" ? "សាកសួរព័ត៌មាន" : "Inquire"}</span>
-                </button>
               </div>
 
-              {/* Share button */}
-              <button
-                onClick={handleShare}
-                className="flex items-center justify-center gap-2 mb-4 md:mb-6 text-xs font-bold text-slate-600 hover:text-primary bg-slate-50 hover:bg-slate-100 py-3 rounded-2xl transition-all w-full border border-slate-100"
-              >
-                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
-                {copied ? (language === "kh" ? "ចម្លងហើយ!" : "Copied!") : (language === "kh" ? "ចែករំលែក​ផលិតផល" : "Share Product")}
-              </button>
-
-              {/* Mobile Sticky Actions */}
-              <div className="md:hidden fixed bottom-[72px] left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 p-4 z-[90] flex gap-3 shadow-[0_-8px_30px_rgb(0,0,0,0.08)] rounded-t-3xl">
-                <button
-                  onClick={handleAddToCart}
-                  className="bg-primary text-white rounded-2xl flex-[1.5] py-3.5 flex items-center justify-center gap-2 text-[12px] font-bold shadow-lg shadow-primary/30"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  {t("placeOrder")}
-                </button>
-                <button
-                  onClick={() => setShowInquiry(true)}
-                  className="flex-1 bg-white text-slate-900 border border-slate-200 rounded-2xl py-3.5 font-bold text-[12px] hover:bg-slate-50 transition-all shadow-sm flex items-center justify-center gap-2"
-                >
-                  <Send className="w-4 h-4 text-primary" />
-                  {t("contactSales")}
-                </button>
-              </div>
-
-              {/* Description */}
-              <div className="flex flex-col gap-2 pt-4 md:pt-6 border-t border-slate-100">
-                <h3 className="text-slate-900 font-black text-lg md:text-xl">{t("description")}</h3>
-                <div className="text-slate-500 text-[15px] leading-relaxed whitespace-pre-line font-medium bg-slate-50 p-6 rounded-xl border border-slate-100">
+              {/* Description Details */}
+              <div className="pt-4 border-t border-slate-200/80 space-y-3">
+                <p className="text-xs md:text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-line">
                   {language === "kh" && product.descriptionKhmer ? product.descriptionKhmer.trim() : product.description?.trim()}
-                </div>
+                </p>
               </div>
+
             </div>
           </div>
 
-          {/* Related Products */}
+          {/* 🌟 Related Products Section (Gyeon Style: ផលិតផលដែលអ្នកអាចនឹងចូលចិត្ត) */}
           {relatedProducts.length > 0 && (
-            <div className="mt-8 md:mt-12 px-4 md:px-0">
-              <div className="flex items-center justify-between mb-6 md:mb-8">
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t("relatedProducts")}</h2>
-                <Link href="/products" className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-100 text-slate-600 font-bold text-xs hover:text-primary hover:border-primary transition-all group">
-                  View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <div className="pt-8 border-t border-slate-200">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl md:text-2xl font-bold text-[#004691] tracking-tight">
+                  {language === "kh" ? "ផលិតផលស្រដៀង" : "Similar Products"}
+                </h2>
+                <Link href="/products" className="text-xs font-bold text-[#004691] hover:underline">
+                  {language === "kh" ? "មើលទាំងអស់" : "View All"}
                 </Link>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 md:gap-8">
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                 {relatedProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}

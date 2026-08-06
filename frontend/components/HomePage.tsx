@@ -71,7 +71,7 @@ export default function HomePage() {
   }, [banners.length])
 
   return (
-    <div className="bg-[#FAFBFD] min-h-screen pb-24 font-sans selection:bg-primary/20">
+    <div className="bg-white min-h-screen pb-24 font-sans selection:bg-primary/20">
       
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 md:pt-6 relative z-20 space-y-6 md:space-y-10">
 
@@ -137,7 +137,7 @@ export default function HomePage() {
                 className="snap-start min-w-[76px] md:min-w-[120px]"
               >
                 <Link 
-                  href={`/products?category=${cat.slug}`}
+                  href={`/products/category/${cat.slug}`}
                   className="flex flex-col items-center gap-2 md:gap-3 group"
                 >
                   <div className="w-[64px] h-[64px] md:w-[110px] md:h-[110px] bg-white rounded-xl md:rounded-2xl shadow-xs border border-slate-100 flex items-center justify-center p-3 md:p-4 group-hover:border-[#004691] transition-all duration-300 overflow-hidden relative">
