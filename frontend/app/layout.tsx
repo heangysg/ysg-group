@@ -43,11 +43,20 @@ export async function generateMetadata(): Promise<Metadata> {
       description: meta_description,
       type: "website",
       siteName: "YSG Machinery",
+      images: [
+        {
+          url: "/logo/ysg-logo.png",
+          width: 1200,
+          height: 630,
+          alt: "YSG Machinery - Yeung Shi Group",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: meta_title,
       description: meta_description,
+      images: ["/logo/ysg-logo.png"],
     }
   }
 }
