@@ -93,7 +93,10 @@ const initializeDatabase = async () => {
           "updatedAt" TIMESTAMP DEFAULT NOW()
         )
       `);
-      console.log('✅ Database tables verified.');
+      await pgClient.query(`
+        ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "bakongMd5" TEXT;
+      `);
+      console.log('✅ Database tables and schema verified.');
     } finally {
       await pgClient.release();
     }
