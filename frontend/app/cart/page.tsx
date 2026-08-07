@@ -16,11 +16,11 @@ export default function CartPage() {
 
   return (
     <PublicLayout>
-      <main className="min-h-screen bg-white pb-36 md:pb-24 pt-16 sm:pt-20 md:pt-6 font-sans">
+      <main className="min-h-screen bg-white pb-24 pt-4 md:pt-6 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
-          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base text-slate-600 font-medium mb-3 sm:mb-4 overflow-hidden whitespace-nowrap">
+          <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
             <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">{t("home")}</Link>
             <span className="shrink-0 text-slate-400">/</span>
             <span className="text-slate-900 font-bold truncate min-w-0">{language === "kh" ? "កន្ត្រកទំនិញ" : "Shopping Cart"}</span>

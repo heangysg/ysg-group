@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next"
+﻿import type { Metadata, Viewport } from "next"
 import { Inter, Outfit, Kantumruy_Pro, Oswald } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "../contexts/LanguageContext"
@@ -39,6 +39,22 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(baseUrl),
     title: meta_title,
     description: meta_description,
+    manifest: "/manifest.json",
+    icons: {
+      icon: [
+        { url: "/logo.png", type: "image/png" },
+      ],
+      apple: [
+        { url: "/logo.png", sizes: "180x180", type: "image/png" },
+      ],
+      shortcut: "/logo.png",
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "Yeung Shi Group",
+      startupImage: "/logo.png",
+    },
     openGraph: {
       title: meta_title,
       description: meta_description,
@@ -80,6 +96,17 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Yeung Shi Group" />
+        <meta name="theme-color" content="#004691" />
+        <meta name="msapplication-TileColor" content="#004691" />
+        <meta name="msapplication-TileImage" content="/logo.png" />
       </head>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <LanguageProvider>

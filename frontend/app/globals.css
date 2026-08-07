@@ -76,10 +76,7 @@ html.khmer-mode body {
   font-size: 104%;
 }
 
-/* 🎨 Main Brand Color for All Headings across English & Khmer Modes */
-h1, h2, h3, h4, h5, h6 {
-  color: #004691 !important;
-}
+
 
 html.khmer-mode h1,
 html.khmer-mode h2,

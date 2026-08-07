@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const category = categories?.find((c: any) => c.slug === slug)
 
       if (category) {
-        const title = `${category.name} | YSG Machinery`
+        const title = `${category.name} | Yeung Shi Group`
         const description = category.description || `Browse our collection of ${category.name}`
         const imageUrl = category.image || null
         const images = imageUrl ? [{ url: imageUrl, width: 800, height: 600, alt: category.name }] : []
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     console.error(e)
   }
 
-  return { title: "Products Category | YSG Machinery" }
+  return { title: "Products Category | Yeung Shi Group" }
 }
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {

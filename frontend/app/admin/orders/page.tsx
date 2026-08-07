@@ -128,13 +128,12 @@ export default function AdminOrders() {
   }
 
   return (
-    <div className="space-y-6">
-      <Toaster position="top-right" />
+    <div className="space-y-6 animate-in fade-in duration-500">
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("orders")}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("manageOrders")}</p>
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("orders")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("manageOrders")}</p>
         </div>
         <div className="relative w-full md:w-80">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -160,13 +159,13 @@ export default function AdminOrders() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-primary border-b border-slate-200">
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("orderId")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("customer")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("date")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("amount")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("status")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("actions")}</th>
+              <tr className="bg-primary text-white border-b border-slate-200">
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("orderId")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("customer")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("date")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("amount")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("status")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-slate-900">
@@ -296,9 +295,9 @@ export default function AdminOrders() {
                       <span className="text-sm font-bold text-slate-900 tracking-wider">{formatPrice(item.price * item.quantity)}</span>
                     </div>
                   ))}
-                  <div className="mt-8 flex justify-between items-center p-6 bg-primary border border-slate-200 shadow-sm">
-                    <span className="text-sm font-bold text-slate-900 font-medium">{t("totalAmount")}</span>
-                    <span className="text-2xl font-bold text-slate-900 tracking-tight">{formatPrice(selectedOrder.totalAmount)}</span>
+                  <div className="mt-8 flex justify-between items-center p-6 bg-primary text-white border border-slate-200 shadow-sm">
+                    <span className="text-sm font-bold text-white font-medium">{t("totalAmount")}</span>
+                    <span className="text-2xl font-bold text-white tracking-tight">{formatPrice(selectedOrder.totalAmount)}</span>
                   </div>
                 </div>
               </div>
@@ -340,6 +339,8 @@ export default function AdminOrders() {
           </div>
         </div>
       )}
+    
+      <Toaster position="top-right" />
     </div>
   )
 }

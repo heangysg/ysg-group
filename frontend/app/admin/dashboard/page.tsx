@@ -56,77 +56,34 @@ export default function AdminDashboard() {
       const token = localStorage.getItem("ysg_admin_token")
       const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
       
-      const [
-        productsRes,
-        categoriesRes,
-        inquiriesRes,
-        ordersRes,
-        recentRes
-      ] = await Promise.all([
-        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Product", countExact: true, limit: 0 }) }).then(r => r.json()),
-        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Category", countExact: true, limit: 0 }) }).then(r => r.json()),
-        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", countExact: true, limit: 0 }) }).then(r => r.json()),
-        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", countExact: true }) }).then(r => r.json()),
-        fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json())
-      ])
+      const res = await fetch(`${API_URL}/api/admin/stats`, { method: "POST", headers })
+      const data = await res.json()
+
+      if (data.error) {
+        console.error("Dashboard Fetch Error:", data.error)
+        return
+      }
+
+      setStats(data.stats)
+      setRecentOrders(data.recentOrders || [])
+      setRevenueData(data.revenueData || [])
+
+      const statusColors: Record<string, string> = {
+        'pending': '#f59e0b',
+        'paid': '#10b981',
+        'completed': '#3b82f6',
+        'cancelled': '#ef4444'
+      }
       
-      const productsCount = productsRes.count
-      const categoriesCount = categoriesRes.count
-      const inquiriesCount = inquiriesRes.count
-      const ordersCount = ordersRes.count
-      const ordersData = ordersRes.data || []
-      const recent = recentRes.data || []
-
-      if (ordersRes.error) console.error("Orders fetching error:", ordersRes.error)
-
-      const validOrders = ordersData.filter((o: any) => o.status !== 'cancelled' && o.status !== 'failed')
-      const totalRevenue = validOrders.reduce((acc: number, curr: any) => acc + parseFloat(curr.totalAmount || 0), 0) || 0
-      
-      setStats({
-        products: productsCount || 0,
-        categories: categoriesCount || 0,
-        inquiries: inquiriesCount || 0,
-        orders: ordersCount || 0,
-        revenue: totalRevenue
-      })
-      setRecentOrders(recent || [])
-
-      if (ordersData) {
-        const statMap: Record<string, number> = {}
-
-        ordersData.forEach((o: any) => {
-          const status = o.status?.toLowerCase() || 'pending'
-          statMap[status] = (statMap[status] || 0) + 1
-        })
-
-        const sortedOrders = [...ordersData].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-        const sortedRevMap: Record<string, number> = {}
-        sortedOrders.forEach((o: any) => {
-          const dateStr = new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-          sortedRevMap[dateStr] = (sortedRevMap[dateStr] || 0) + parseFloat(o.totalAmount || 0)
-        })
-
-        const revChartData = Object.keys(sortedRevMap).map(key => ({
-          date: key,
-          revenue: sortedRevMap[key]
+      if (data.statusData) {
+        const statChartData = data.statusData.map((item: any) => ({
+          name: item.status.toUpperCase(),
+          value: item.count,
+          color: statusColors[item.status.toLowerCase()] || '#64748b'
         }))
-
-        const statusColors: Record<string, string> = {
-          'pending': '#f59e0b',
-          'paid': '#10b981',
-          'completed': '#3b82f6',
-          'cancelled': '#ef4444'
-        }
-        
-        const statChartData = Object.keys(statMap).map(key => ({
-          name: key.toUpperCase(),
-          value: statMap[key],
-          color: statusColors[key] || '#64748b'
-        }))
-
-        setRevenueData(revChartData)
         setStatusData(statChartData)
       }
+
     } catch (err) {
       console.error("Dashboard Fetch Error:", err)
     } finally {
@@ -184,7 +141,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 font-medium">

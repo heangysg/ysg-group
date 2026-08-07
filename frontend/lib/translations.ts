@@ -1,4 +1,4 @@
-export const translations = {
+﻿export const translations = {
   en: {
     activity: "Activity",
     dashboard: "Dashboard",
@@ -251,14 +251,14 @@ export const translations = {
     productsSubtitle: "Premium machinery and heavy equipment for your business",
     adjustFilters: "Try adjusting your search or category filters",
     createAccount: "Create Account",
-    joinYsg: "Join YSG Machinery to manage your orders",
+    joinYsg: "Join Yeung Shi Group to manage your orders",
     registerNow: "Register Now",
     alreadyHaveAccount: "Already have an account?",
     signIn: "Sign In",
     logInToAccount: "Log in to your account",
     continueWithGoogle: "Continue with Google",
     orContinueWithEmail: "Or continue with email",
-    newToYsg: "New to YSG Machinery?",
+    newToYsg: "New to Yeung Shi Group?",
     forgot: "Forgot?",
     management: "Management System",
     myAccount: "My Account",

@@ -160,13 +160,12 @@ export default function UsersManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Toaster position="top-right" />
+    <div className="space-y-6 animate-in fade-in duration-500">
       
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("adminManagement")}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("createAndManageAdmins")}</p>
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("adminManagement")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("createAndManageAdmins")}</p>
         </div>
         <button
           onClick={openAddModal}
@@ -181,11 +180,11 @@ export default function UsersManagementPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-primary border-b border-slate-200">
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("user")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("emailAddress")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("role")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("actions")}</th>
+              <tr className="bg-primary text-white border-b border-slate-200">
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("user")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("emailAddress")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("role")}</th>
+                <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y-2 divide-slate-900">
@@ -234,11 +233,11 @@ export default function UsersManagementPage() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="solid-card bg-white w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="p-8 border-b border-slate-200 bg-primary">
+            <div className="p-8 border-b border-slate-200 bg-primary text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 font-medium">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
-                  <p className="text-xs font-bold text-slate-900 mt-2 font-medium">
+                  <h2 className="text-2xl font-bold text-white font-medium">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
+                  <p className="text-xs font-bold text-white mt-2 font-medium">
                     {isEditing ? t("updateCredentialsProfile") : t("createCredentialsNewAdmin")}
                   </p>
                 </div>
@@ -338,7 +337,7 @@ export default function UsersManagementPage() {
                   </div>
                 </form>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-in fade-in duration-500">
                   {historyLoading ? (
                     <div className="py-16 flex flex-col items-center justify-center">
                       <div className="w-10 h-10 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mb-6" />
@@ -377,6 +376,8 @@ export default function UsersManagementPage() {
           </div>
         </div>
       )}
+    
+      <Toaster position="top-right" />
     </div>
   )
 }

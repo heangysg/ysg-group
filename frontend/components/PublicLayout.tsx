@@ -12,6 +12,9 @@ import BottomNav from "./BottomNav"
 import Footer from "./Footer"
 import CartDrawer from "./CartDrawer"
 import { motion, AnimatePresence } from "framer-motion"
+
+let _searchCache: any[] | null = null
+let _isFetchingSearch = false
 import { Toaster } from "react-hot-toast"
 import { getValidImages, getOptimizedImageUrl } from "../lib/imageUtils"
 
@@ -48,26 +51,33 @@ export default function PublicLayout({
     const timer = setTimeout(async () => {
       setIsSearching(true)
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-        const res = await fetch(`${API_URL}/api/public/products`)
-        if (res.ok) {
-          const { data } = await res.json()
-          if (data) {
-            const q = searchQuery.toLowerCase().trim()
-            const filtered = data.filter((p: any) => 
-              (p.name && p.name.toLowerCase().includes(q)) ||
-              (p.nameKhmer && p.nameKhmer.toLowerCase().includes(q)) ||
-              (p.category?.name && p.category.name.toLowerCase().includes(q))
-            )
-            setSearchResults(filtered.slice(0, 5))
+        if (!_searchCache && !_isFetchingSearch) {
+          _isFetchingSearch = true
+          const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+          const res = await fetch(`${API_URL}/api/public/products`)
+          if (res.ok) {
+            const { data } = await res.json()
+            if (data) _searchCache = data
           }
+          _isFetchingSearch = false
+        }
+        
+        if (_searchCache) {
+          const q = searchQuery.toLowerCase().trim()
+          const filtered = _searchCache.filter((p: any) => 
+            (p.name && p.name.toLowerCase().includes(q)) ||
+            (p.nameKhmer && p.nameKhmer.toLowerCase().includes(q)) ||
+            (p.category?.name && p.category.name.toLowerCase().includes(q))
+          )
+          setSearchResults(filtered.slice(0, 5))
         }
       } catch (err) {
         console.error("Live search error:", err)
+        _isFetchingSearch = false
       } finally {
         setIsSearching(false)
       }
-    }, 200)
+    }, 150) // Reduced delay for snappier feel
 
     return () => clearTimeout(timer)
   }, [searchQuery])

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
@@ -93,7 +93,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-medium mb-4">YSG Machinery</h3>
+              <h3 className="text-xl font-medium mb-4">Yeung Shi Group</h3>
               <p className="text-gray-400 text-sm">Premium heavy equipment solutions since 2010</p>
             </div>
             <div>
@@ -122,7 +122,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 YSG Machinery. All rights reserved.</p>
+            <p>&copy; 2024 Yeung Shi Group. All rights reserved.</p>
           </div>
         </div>
       </footer>

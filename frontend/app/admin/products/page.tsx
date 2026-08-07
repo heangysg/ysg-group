@@ -203,49 +203,12 @@ export default function AdminProducts() {
   const allSelectedHidden = selectedProductsData.length > 0 && selectedProductsData.every(p => p.isPublished === false)
 
   return (
-    <div className="space-y-6">
-      <Toaster position="top-right" />
-
-      {/* ─── Delete Confirmation Modal ─── */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
-            {/* drag handle for mobile */}
-            <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2" />
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-red-50 border-2 border-red-500 shrink-0">
-                <Trash2 className="w-5 h-5 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900 font-medium">លុបផលិតផល</h3>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  តើអ្នកប្រាកដថាចង់លុប <strong>"{deleteConfirm.name}"</strong> មែនទេ? ផលិតផលនេះនឹងត្រូវបានផ្លាស់ទីទៅធុងសំរាម។
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-              <button
-                onClick={() => setDeleteConfirm(null)}
-                className="w-full sm:w-auto px-6 py-3 bg-white border border-slate-200 text-slate-900 text-xs font-bold font-medium shadow-sm hover:translate-y-0.5 hover:shadow-none transition-all"
-              >
-                បោះបង់
-              </button>
-              <button
-                onClick={() => deleteProduct(deleteConfirm.id, deleteConfirm.name)}
-                className="w-full sm:w-auto px-6 py-3 bg-red-600 border-2 border-red-700 text-white text-xs font-bold font-medium hover:bg-red-700 transition-all"
-              >
-                លុប (ទៅធុងសំរាម)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="space-y-6 animate-in fade-in duration-500 w-full">
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("products")}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("manageProductInventory")}</p>
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("products")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("manageProductInventory")}</p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           <Link
@@ -521,6 +484,42 @@ export default function AdminProducts() {
           </div>
         )}
       </div>
+      
+      {/* ─── Delete Confirmation Modal ─── */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-xl p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+            {/* drag handle for mobile */}
+            <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2" />
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-red-50 border-2 border-red-500 shrink-0">
+                <Trash2 className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 font-medium">លុបផលិតផល</h3>
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                  តើអ្នកប្រាកដថាចង់លុប <strong>"{deleteConfirm.name}"</strong> មែនទេ? ផលិតផលនេះនឹងត្រូវបានផ្លាស់ទីទៅធុងសំរាម។
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="w-full sm:w-auto px-6 py-3 bg-white border border-slate-200 text-slate-900 text-xs font-bold font-medium shadow-sm hover:translate-y-0.5 hover:shadow-none transition-all"
+              >
+                បោះបង់
+              </button>
+              <button
+                onClick={() => deleteProduct(deleteConfirm.id, deleteConfirm.name)}
+                className="w-full sm:w-auto px-6 py-3 bg-red-600 border-2 border-red-700 text-white text-xs font-bold font-medium hover:bg-red-700 transition-all"
+              >
+                លុប (ទៅធុងសំរាម)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <Toaster position="top-right" />
     </div>
   )
 }

@@ -5,9 +5,13 @@ import Link from "next/link"
 import PublicLayout from "./PublicLayout"
 import ProductCard from "./ProductCard"
 import { useLanguage } from "../contexts/LanguageContext"
-import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDown, Check } from "lucide-react"
+import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDown, Check, ArrowRight } from "lucide-react"
 import { useRouter, useParams, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+
+// Module-level cache — survives across route changes (component remounts)
+let _cachedProducts: any[] = []
+let _cachedCategories: any[] = []
 
 export default function ProductsList({ initialCategory = "all", initialFeatured = false, initialSearch = "" }: { initialCategory?: string, initialFeatured?: boolean, initialSearch?: string }) {
   const { t, language } = useLanguage()
@@ -29,6 +33,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
   const [sortBy, setSortBy] = useState("newest")
   const [sortOpen, setSortOpen] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<string[]>([])
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (urlCategory) {
@@ -38,18 +43,29 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
   useEffect(() => {
     async function fetchData() {
-      setLoading(true)
+      // Only show loading skeleton if we have no cached data yet
+      if (_cachedProducts.length === 0) setLoading(true)
+      else {
+        // Show cached data immediately while refreshing in background
+        setAllProducts(_cachedProducts)
+        setCategories(_cachedCategories)
+        setLoading(false)
+      }
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
         const [catRes, prodRes] = await Promise.all([
           fetch(`${API_URL}/api/public/categories`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`${API_URL}/api/public/products${isFeatured ? '?featured=true' : ''}`, { cache: 'no-store' }).then(r => r.json())
         ])
-        
-        setCategories(catRes.data || [])
-        setAllProducts(prodRes.data || [])
+        const cats = catRes.data || []
+        const prods = prodRes.data || []
+        _cachedProducts = prods
+        _cachedCategories = cats
+        setCategories(cats)
+        setAllProducts(prods)
       } catch (e) {
         console.error("Failed to fetch products page data", e)
+        // On error, keep cached data visible
       } finally {
         setLoading(false)
       }
@@ -72,9 +88,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
     }
 
     const targetUrl = slug === "all" ? "/products" : `/products/category/${slug}`
-    if (typeof window !== "undefined") {
-      window.history.pushState(null, "", targetUrl)
-    }
+    startTransition(() => {
+      router.push(targetUrl, { scroll: false })
+    })
   }
 
   // ⚡ Instant Client-Side Category & Search Filtering (Zero Flash / Glitch)
@@ -303,6 +319,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             </div>
           </div>
 
+
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Desktop Sidebar Accordion Filters */}
             <aside className="hidden lg:block lg:w-64 shrink-0">
@@ -376,13 +393,164 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{t("noProductsFound")}</h3>
                   <p className="text-slate-400 text-sm max-w-sm">{t("noProductsDescription")}</p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
-                  {filteredProducts.map(product => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              )}
+              ) : (() => {
+                // Determine if we should group by subcategory
+                // Group when: "all" or a specific parent category is selected (not a leaf subcategory)
+                const selectedCatObj = categories.find(c => c.slug === selectedCategory)
+                const isParentSelected = selectedCategory === "all" || (selectedCatObj && !selectedCatObj.parentId)
+                const subCatsOfSelected = selectedCatObj
+                  ? categories.filter(c => c.parentId === selectedCatObj.id)
+                  : []
+                const shouldGroup = isParentSelected && (selectedCategory === "all" || subCatsOfSelected.length > 0)
+
+                if (!shouldGroup) {
+                  // Flat grid for a specific subcategory
+                  return (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                      {filteredProducts.map(product => (
+                        <ProductCard key={product.id} product={product} />
+                      ))}
+                    </div>
+                  )
+                }
+
+                // Build groups: each parent category that has products under it
+                const mainCats = categories.filter(c => !c.parentId)
+
+                // Figure out which cats to group under
+                const groupCats = selectedCategory === "all"
+                  ? mainCats
+                  : [selectedCatObj!]
+
+                const groups: { cat: any; subLabel: string; products: any[] }[] = []
+
+                groupCats.forEach(parentCat => {
+                  const subs = categories.filter(c => c.parentId === parentCat.id)
+
+                  if (subs.length === 0) {
+                    // No subcategories — put all products under parent
+                    const prods = filteredProducts.filter(p =>
+                      p.categoryId === parentCat.id ||
+                      p.categorySlug === parentCat.slug ||
+                      p.category?.slug === parentCat.slug
+                    )
+                    if (prods.length > 0) {
+                      groups.push({ cat: parentCat, subLabel: language === "kh" && parentCat.nameKhmer ? parentCat.nameKhmer : parentCat.name, products: prods })
+                    }
+                  } else {
+                    // Group by each subcategory
+                    subs.forEach(sub => {
+                      const prods = filteredProducts.filter(p =>
+                        p.categoryId === sub.id ||
+                        p.categorySlug === sub.slug ||
+                        p.category?.slug === sub.slug
+                      )
+                      if (prods.length > 0) {
+                        groups.push({ cat: sub, subLabel: language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name, products: prods })
+                      }
+                    })
+
+                    // Products directly under the parent (not in any sub)
+                    const subIds = subs.map(s => s.id)
+                    const subSlugs = subs.map(s => s.slug)
+                    const directProds = filteredProducts.filter(p =>
+                      (p.categoryId === parentCat.id || p.categorySlug === parentCat.slug || p.category?.slug === parentCat.slug) &&
+                      !subIds.includes(p.categoryId) &&
+                      !subSlugs.includes(p.categorySlug) &&
+                      !subSlugs.includes(p.category?.slug)
+                    )
+                    if (directProds.length > 0) {
+                      groups.push({ cat: parentCat, subLabel: language === "kh" && parentCat.nameKhmer ? parentCat.nameKhmer : parentCat.name, products: directProds })
+                    }
+                  }
+                })
+
+                // Fallback: if grouping left out some products, add them at end
+                const groupedIds = new Set(groups.flatMap(g => g.products.map((p: any) => p.id)))
+                const ungrouped = filteredProducts.filter(p => !groupedIds.has(p.id))
+
+                const PREVIEW_COUNT = 4 // products shown before "See all"
+
+                return (
+                  <div className="flex flex-col gap-10">
+                    {groups.map((group, idx) => {
+                      const groupKey = group.cat.id + idx
+                      const isExpanded = expandedGroups.has(groupKey)
+                      const displayProducts = isExpanded ? group.products : group.products.slice(0, PREVIEW_COUNT)
+                      const hasMore = group.products.length > PREVIEW_COUNT
+
+                      return (
+                        <div key={groupKey}>
+                          {/* ── Subcategory Divider Label ── */}
+                          <div className="flex items-center gap-3 mb-5">
+                            <div className="h-0.5 flex-1 bg-slate-200" />
+                            <button
+                              onClick={() => handleCategorySelect(group.cat.slug)}
+                              className="flex items-center gap-2 shrink-0 group"
+                            >
+                              <span className="text-base sm:text-lg md:text-xl font-black text-slate-700 group-hover:text-[#004691] transition-colors whitespace-nowrap tracking-tight">
+                                {group.subLabel}
+                              </span>
+                              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#004691] transition-colors" />
+                            </button>
+                            <div className="h-0.5 flex-1 bg-slate-200" />
+                          </div>
+
+                          {/* Product grid for this group */}
+                          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                            {displayProducts.map(product => (
+                              <ProductCard key={product.id} product={product} />
+                            ))}
+                          </div>
+
+                          {/* See all / Collapse button */}
+                          {hasMore && (
+                            <div className="mt-4 flex items-center justify-center gap-3">
+                              <div className="h-px flex-1 bg-slate-100" />
+                              <button
+                                onClick={() => {
+                                  setExpandedGroups(prev => {
+                                    const next = new Set(prev)
+                                    if (next.has(groupKey)) next.delete(groupKey)
+                                    else next.add(groupKey)
+                                    return next
+                                  })
+                                }}
+                                className="shrink-0 flex items-center gap-2 px-5 py-2 rounded-full border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-600 hover:border-[#004691] hover:text-[#004691] transition-all shadow-2xs"
+                              >
+                                {isExpanded ? (
+                                  <>{language === "kh" ? "បង្ហាញតិច" : "Show less"}</>
+                                ) : (
+                                  <>{language === "kh" ? `មើលទាំងអស់ (${group.products.length})` : `See all ${group.products.length}`} <ChevronRight className="w-3.5 h-3.5" /></>
+                                )}
+                              </button>
+                              <div className="h-px flex-1 bg-slate-100" />
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+
+                    {/* Ungrouped fallback */}
+                    {ungrouped.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="h-0.5 flex-1 bg-slate-200" />
+                          <span className="text-base sm:text-lg font-black text-slate-700 whitespace-nowrap tracking-tight">
+                            {language === "kh" ? "ផ្សេងទៀត" : "Others"}
+                          </span>
+                          <div className="h-0.5 flex-1 bg-slate-200" />
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                          {ungrouped.map(product => (
+                            <ProductCard key={product.id} product={product} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           </div>
         </div>

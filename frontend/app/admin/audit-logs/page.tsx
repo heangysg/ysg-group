@@ -94,9 +94,11 @@ export default function AuditLogsPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("auditLogs")}</h1>
-        <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("trackActivities")}</p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("auditLogs")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("trackActivities")}</p>
+        </div>
       </div>
 
       {/* Filters */}
@@ -105,7 +107,7 @@ export default function AuditLogsPage() {
         <button
           onClick={() => setFilter("all")}
           className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
-            filter === "all" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+            filter === "all" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           {t("allActivities")}
@@ -113,7 +115,7 @@ export default function AuditLogsPage() {
         <button
           onClick={() => setFilter("product")}
           className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
-            filter === "product" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+            filter === "product" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           <Package className="w-4 h-4" />
@@ -122,7 +124,7 @@ export default function AuditLogsPage() {
         <button
           onClick={() => setFilter("category")}
           className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
-            filter === "category" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+            filter === "category" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           <FolderOpen className="w-4 h-4" />
@@ -131,7 +133,7 @@ export default function AuditLogsPage() {
         <button
           onClick={() => setFilter("inquiry")}
           className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
-            filter === "inquiry" ? "bg-primary text-slate-900 translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+            filter === "inquiry" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
           }`}
         >
           <Mail className="w-4 h-4" />

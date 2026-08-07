@@ -268,12 +268,12 @@ export default function EditProduct() {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-primary border border-slate-200 shadow-sm">
-            <Package className="w-6 h-6 text-slate-900" />
+          <div className="p-4 bg-primary text-white border border-slate-200 shadow-sm">
+            <Package className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 font-medium">{t("editProduct") || "Edit Product"}</h1>
-            <p className="text-xs font-bold text-slate-500 mt-1 font-medium">{formData.name}</p>
+            <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("editProduct") || "Edit Product"}</h2>
+            <p className="text-sm font-medium text-slate-500 mt-2">{t("modifyProductInfo") || "Modify product details and specifications"}</p>
           </div>
         </div>
       </div>
@@ -433,7 +433,7 @@ export default function EditProduct() {
                     >
                       ✕
                     </button>
-                    {i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border border-slate-200 text-slate-900 px-2 py-0.5 font-bold font-medium">Main</span>}
+                    {i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border border-slate-200 text-white px-2 py-0.5 font-bold font-medium">Main</span>}
                   </div>
                 ))}
                 
@@ -449,7 +449,7 @@ export default function EditProduct() {
                       ✕
                     </button>
                     <span className="absolute bottom-2 right-2 text-xs bg-white border border-slate-200 text-slate-900 px-2 py-0.5 font-bold font-medium">New</span>
-                    {images.length === 0 && i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border border-slate-200 text-slate-900 px-2 py-0.5 font-bold font-medium">Main</span>}
+                    {images.length === 0 && i === 0 && <span className="absolute bottom-2 left-2 text-xs bg-primary border border-slate-200 text-white px-2 py-0.5 font-bold font-medium">Main</span>}
                   </div>
                 ))}
               </div>

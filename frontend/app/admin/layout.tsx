@@ -274,10 +274,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="text-white font-bold text-xl uppercase">G</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-slate-900 tracking-tight leading-tight uppercase">
+              <h1 className="text-sm font-bold text-white tracking-tight leading-tight uppercase">
                 {isSuperAdmin ? t("superadmin") : t("admin")} {t("panel")}
               </h1>
-              <p className="text-xs font-bold text-slate-900 font-medium mt-0.5">
+              <p className="text-xs font-bold text-blue-100 font-medium mt-0.5">
                 {t("managementPortal")}
               </p>
             </div>
@@ -296,11 +296,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className={`
                   flex items-center gap-3 px-4 py-3 font-bold text-xs font-medium transition-all border-2
                   ${isActive
-                    ? "bg-primary text-slate-900 border-slate-200 shadow-sm"
-                    : "text-slate-600 border-transparent hover:text-slate-900 hover:border-slate-200"}
+                    ? "bg-primary text-white border-transparent mx-2 rounded-lg"
+                    : "text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50 mx-2 rounded-lg"}
                 `}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? "text-slate-900" : "text-slate-500"}`} />
+                <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-500"}`} />
                 {item.name}
               </Link>
             )
@@ -403,9 +403,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {/* Notification Dropdown */}
               {showNotifications && (
                 <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-4 lg:w-80 bg-white border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
-                  <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-primary">
-                    <h3 className="font-bold text-slate-900 font-medium text-xs">{t("notifications")}</h3>
-                    <button className="text-xs font-bold text-slate-900 hover:text-white transition-colors font-medium">{t("markAllRead")}</button>
+                  <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-primary text-white">
+                    <h3 className="font-bold text-white font-medium text-xs">{t("notifications")}</h3>
+                    <button className="text-xs font-bold text-blue-200 hover:text-white transition-colors font-medium">{t("markAllRead")}</button>
                   </div>
                   <div className="max-h-[350px] overflow-y-auto">
                     {notifications.length > 0 ? (
@@ -480,11 +480,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {showProfileModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
           <div className="solid-card bg-white w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-8 border-b border-slate-200 bg-primary">
+            <div className="p-8 border-b border-slate-200 bg-primary text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight uppercase">My Profile</h2>
-                  <p className="text-sm text-slate-400 mt-1">{t("updatePhotoAndHistory")}</p>
+                  <h2 className="text-2xl font-bold tracking-tight uppercase text-white">My Profile</h2>
+                  <p className="text-sm font-medium text-blue-100 mt-2">{t("updatePhotoAndHistory")}</p>
                 </div>
                 <button
                   onClick={() => setShowProfileModal(false)}

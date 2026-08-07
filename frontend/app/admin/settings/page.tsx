@@ -101,9 +101,11 @@ export default function AdminSettings() {
     <div>
       <Toaster position="top-right" />
       
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("settings")}</h1>
-        <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("websiteConfiguration")}</p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("settings")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("websiteConfiguration")}</p>
+        </div>
       </div>
 
       <div className="max-w-2xl">

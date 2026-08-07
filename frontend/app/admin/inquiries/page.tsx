@@ -73,8 +73,7 @@ export default function AdminInquiries() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <Toaster position="top-right" />
+    <div className="space-y-6 animate-in fade-in duration-500">
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
@@ -85,8 +84,8 @@ export default function AdminInquiries() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{t("customerInquiries")}</h1>
-            <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("manageInquiriesDesc") || "Respond to customer questions and machinery requests"}</p>
+            <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("customerInquiries")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("manageInquiriesDesc") || "Respond to customer questions and machinery requests"}</p>
           </div>
         </div>
       </div>
@@ -94,17 +93,17 @@ export default function AdminInquiries() {
       <div className="grid grid-cols-1 gap-8">
         {inquiries.map((inquiry: any) => (
           <div key={inquiry.id} className="solid-card bg-white p-0 flex flex-col">
-            <div className="p-8 border-b border-slate-200 bg-primary">
+            <div className="p-8 border-b border-slate-200 bg-primary text-white">
               <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-white border border-slate-200 shadow-sm text-slate-900 flex items-center justify-center">
                     <Mail className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-900 text-xl uppercase tracking-wider">{inquiry.name || inquiry.customerName || t("walkInCustomer")}</h3>
-                    <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-slate-900 font-bold font-medium">
+                    <h3 className="font-bold text-white text-xl uppercase tracking-wider">{inquiry.name || inquiry.customerName || t("walkInCustomer")}</h3>
+                    <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-blue-100 font-bold font-medium">
                       <span>{inquiry.email}</span>
-                      <span className="text-slate-900">|</span>
+                      <span className="text-white">|</span>
                       <span>{inquiry.phone || t("noPhoneProvided") || "No phone"}</span>
                     </div>
                   </div>
@@ -161,7 +160,8 @@ export default function AdminInquiries() {
           </div>
         )}
       </div>
+    
+      <Toaster position="top-right" />
     </div>
   )
 }
-

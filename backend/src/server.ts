@@ -15,6 +15,7 @@ import ordersRoutes from './routes/orders';
 import crudRoutes from './routes/crud';
 import publicRoutes from './routes/public';
 import readRoutes from './routes/read';
+import statsRoutes from './routes/stats';
 
 dotenv.config();
 
@@ -80,6 +81,7 @@ app.use('/api/public/inquiry', formLimiter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/crud', crudRoutes);
 app.use('/api/admin/read', readRoutes);
+app.use('/api/admin/stats', statsRoutes);
 app.use('/api/bakong', bakongRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/public', publicRoutes);

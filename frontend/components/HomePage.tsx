@@ -15,6 +15,7 @@ export default function HomePage() {
   const [popularProducts, setPopularProducts] = useState<any[]>([])
   const [banners, setBanners] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isReady, setIsReady] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [displayLimit, setDisplayLimit] = useState(12)
 
@@ -57,10 +58,14 @@ export default function HomePage() {
         console.error("Home Data Fetch Error:", err)
       } finally {
         setLoading(false)
+        setIsReady(true)
       }
     }
 
     fetchHomeData()
+    // Small delay to prevent flash/stuck on very first paint
+    const readyTimer = setTimeout(() => setIsReady(true), 50)
+    return () => clearTimeout(readyTimer)
   }, [])
 
   useEffect(() => {
@@ -70,6 +75,32 @@ export default function HomePage() {
     }, 5000)
     return () => clearInterval(timer)
   }, [banners.length])
+
+  if (!isReady) {
+    return (
+      <div className="bg-white min-h-screen pb-24 font-sans">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 md:pt-6 space-y-6 md:space-y-10">
+          {/* Hero skeleton */}
+          <div className="rounded-lg md:rounded-xl bg-slate-100 animate-pulse h-[180px] sm:h-[240px] md:h-[380px]" />
+          {/* Category row skeleton */}
+          <div className="flex overflow-x-auto gap-3 pb-4">
+            {[1,2,3,4,5,6].map(n => (
+              <div key={n} className="min-w-[96px] flex flex-col items-center gap-2">
+                <div className="w-[80px] h-[80px] rounded-xl bg-slate-100 animate-pulse" />
+                <div className="w-16 h-3 rounded bg-slate-100 animate-pulse" />
+              </div>
+            ))}
+          </div>
+          {/* Product grid skeleton */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[1,2,3,4,5,6,7,8].map(n => (
+              <div key={n} className="rounded-xl bg-slate-100 animate-pulse aspect-square" />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-white min-h-screen pb-24 font-sans selection:bg-[#004691]/20">
@@ -128,37 +159,37 @@ export default function HomePage() {
               <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">{t("categories")}</h2>
             </div>
           </div>
-          <div className="flex overflow-x-auto no-scrollbar gap-3 md:gap-6 pb-4 snap-x">
+          <div className="flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-6 pb-4 snap-x">
             {loading ? (
               [1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="snap-start min-w-[88px] sm:min-w-[110px] md:min-w-[130px] flex flex-col items-center gap-2">
-                  <div className="w-[76px] h-[76px] sm:w-[90px] sm:h-[90px] md:w-[120px] md:h-[120px] bg-slate-100 rounded-xl md:rounded-2xl animate-pulse" />
-                  <div className="w-16 h-3 bg-slate-100 rounded animate-pulse" />
+                <div key={n} className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px] flex flex-col items-center gap-2">
+                  <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-slate-100 rounded-xl md:rounded-2xl animate-pulse" />
+                  <div className="w-14 sm:w-16 h-3 bg-slate-100 rounded animate-pulse" />
                 </div>
               ))
             ) : (
               topCategories.map((cat, idx) => (
                 <motion.div 
                   key={cat.id}
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.04 }}
-                  className="snap-start min-w-[88px] sm:min-w-[110px] md:min-w-[130px]"
+                  className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px]"
                 >
                   <Link 
                     href={`/products/category/${cat.slug}`}
-                    className="flex flex-col items-center gap-2 md:gap-3 group"
+                    className="flex flex-col items-center gap-1.5 sm:gap-2 md:gap-3 group"
                   >
-                    <div className="w-[76px] h-[76px] sm:w-[90px] sm:h-[90px] md:w-[120px] md:h-[120px] bg-white rounded-xl md:rounded-2xl shadow-2xs border border-slate-200 flex items-center justify-center p-3 md:p-4 group-hover:border-[#004691] transition-all duration-300 overflow-hidden relative">
+                    <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-white rounded-xl md:rounded-2xl shadow-2xs border border-slate-200 flex items-center justify-center p-2 sm:p-3 md:p-4 group-hover:border-[#004691] transition-all duration-300 overflow-hidden relative">
                       {cat.image ? (
                         <img src={cat.image} alt={cat.name} className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500" />
                       ) : (
-                        <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-slate-100 relative z-10 flex items-center justify-center text-slate-300 font-bold">
-                          {cat.name ? cat.name[0] : "C"}
+                        <div className="w-full h-full rounded-lg bg-gradient-to-br from-slate-100 to-slate-50 relative z-10 flex items-center justify-center">
+                          <LayoutGrid className="w-7 h-7 sm:w-8 sm:h-8 text-slate-400" />
                         </div>
                       )}
                     </div>
-                    <span className="text-xs sm:text-sm md:text-base font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full group-hover:text-[#004691] transition-colors">
+                    <span className="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
                       {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
                     </span>
                   </Link>

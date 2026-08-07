@@ -239,8 +239,8 @@ export default function AdminTrashProducts() {
       {/* Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight uppercase">{language === "kh" ? "ធុងសំរាម" : "Trash"}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{language === "kh" ? "គ្រប់គ្រងផលិតផលដែលបានលុប" : "Manage deleted products"}</p>
+            <h1 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{language === "kh" ? "ធុងសំរាម" : "Trash"}</h1>
+            <p className="text-sm font-medium text-slate-500 mt-2">{language === "kh" ? "ទំនិញដែលបានលុប" : "Deleted products"}</p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full md:w-auto">
           <Link
@@ -347,7 +347,7 @@ export default function AdminTrashProducts() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-primary border-b border-slate-200">
+                <tr className="bg-primary text-white border-b border-slate-200">
                   <th className="px-6 py-4 w-12">
                     <input 
                       type="checkbox" 
@@ -356,11 +356,11 @@ export default function AdminTrashProducts() {
                       onChange={toggleSelectAll}
                     />
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("productInfo")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("category")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("price")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("status")}</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("actions")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("productInfo")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("category")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("price")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("status")}</th>
+                  <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y-2 divide-slate-900">

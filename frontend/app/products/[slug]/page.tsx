@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { data: product } = await res.json()
 
     if (product) {
-      const title = `${product.name} | YSG Machinery`
-      const description = product.shortDescription || product.description || `Buy ${product.name} at YSG Machinery`
+      const title = `${product.name} | Yeung Shi Group`
+      const description = product.shortDescription || product.description || `Buy ${product.name} at Yeung Shi Group`
       const imageUrl = product.images?.[0] || product.thumbnail || null
       const images = imageUrl ? [{ url: imageUrl, width: 800, height: 600, alt: product.name }] : []
 
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  return { title: "Product Not Found | YSG Machinery" }
+  return { title: "Product Not Found | Yeung Shi Group" }
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {

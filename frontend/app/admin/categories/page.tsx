@@ -272,10 +272,10 @@ export default function AdminCategories() {
     <div>
       <Toaster position="top-right" />
       
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 font-medium">{t("categories")}</h1>
-          <p className="text-sm font-bold text-slate-500 mt-1 font-medium">{t("manageMainCategories")}</p>
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-slate-900">{t("categories")}</h2>
+          <p className="text-sm font-medium text-slate-500 mt-2">{t("manageMainCategories")}</p>
         </div>
         <button
           onClick={openAddMainModal}
@@ -287,9 +287,9 @@ export default function AdminCategories() {
       </div>
 
       <div className="solid-card bg-white overflow-hidden p-0">
-        <div className="p-6 border-b border-slate-200 bg-primary">
-          <h2 className="font-bold text-slate-900 font-medium text-lg">{t("categoryStructure")}</h2>
-          <p className="text-xs font-bold text-slate-900 mt-1 font-medium">{t("cannotDeleteCategories")}</p>
+        <div className="p-6 border-b border-slate-200 bg-primary text-white">
+          <h2 className="text-2xl font-bold tracking-tight uppercase text-white">{t("categoryStructure")}</h2>
+          <p className="text-sm font-medium text-blue-100 mt-2">{t("cannotDeleteCategories")}</p>
         </div>
         <div className="divide-y-2 divide-slate-900">
           {categories.map((cat: any) => {
@@ -371,10 +371,13 @@ export default function AdminCategories() {
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" onClick={() => setShowAddModal(false)}>
           <div className="solid-card bg-white max-w-lg w-full max-h-[90vh] overflow-y-auto p-0 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-primary border-b border-slate-200 px-8 py-6 z-10 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-slate-900 font-medium">
-                {editingItem ? t("edit") : t("addNew")} {modalType === "main" ? t("categoryName") : t("subcategory")}
-              </h3>
+            <div className="sticky top-0 bg-primary text-white border-b border-slate-200 px-8 py-6 z-10 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight uppercase text-white">{editingItem ? t("editCategory") : t("addMainCategory")}</h2>
+                  <p className="text-sm font-medium text-blue-100 mt-2">
+                  {editingItem ? t("modifyCategoryInfo") : t("createNewTopLevel")}
+                </p>
+              </div>
               <button 
                 onClick={() => setShowAddModal(false)}
                 className="p-2 bg-white border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"

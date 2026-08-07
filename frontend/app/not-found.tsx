@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
 import { useLanguage } from "../contexts/LanguageContext"
@@ -54,7 +54,7 @@ export default function NotFound() {
       {/* YSG Brand */}
       <div className="mt-16 text-center">
         <p className="text-xs font-bold text-slate-400 font-medium">
-          YSG Machinery — {language === "kh" ? "ក្រុមហ៊ុន យ៉ឺង ស៊ី" : "Yeung Shi Group"}
+          Yeung Shi Group — {language === "kh" ? "ក្រុមហ៊ុន យ៉ឺង ស៊ី" : "Yeung Shi Group"}
         </p>
       </div>
     </div>

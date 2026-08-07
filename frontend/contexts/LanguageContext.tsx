@@ -14,17 +14,29 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  // Start with 'kh' consistently on both Server and Client initial render to prevent SSR Hydration Mismatch
-  const [language, setLanguage] = useState<Language>("kh")
-
-  // Sync saved user preference from localStorage after initial hydration
-  useEffect(() => {
+  // Read from localStorage synchronously before first render to avoid flash
+  const getInitialLanguage = (): Language => {
     if (typeof window !== "undefined") {
-      const savedLang = (localStorage.getItem("adminLanguage") || localStorage.getItem("appLanguage")) as Language
-      if (savedLang === "en" || savedLang === "kh") {
-        setLanguage(savedLang)
-      }
+      const saved = localStorage.getItem("appLanguage") || localStorage.getItem("adminLanguage")
+      if (saved === "en" || saved === "kh") return saved
     }
+    return "kh" // default to Khmer
+  }
+
+  const [language, setLanguage] = useState<Language>("kh")
+  const [isReady, setIsReady] = useState(false)
+
+  // Apply correct language after hydration — runs once, immediately
+  useEffect(() => {
+    const lang = getInitialLanguage()
+    setLanguage(lang)
+    // Apply khmer-mode class right away
+    if (lang === "kh") {
+      document.documentElement.classList.add("khmer-mode")
+    } else {
+      document.documentElement.classList.remove("khmer-mode")
+    }
+    setIsReady(true)
   }, [])
 
   useEffect(() => {
@@ -54,7 +66,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: setLanguageWrapper, t }}>
-      {children}
+      {!isReady ? (
+        // Render invisible children during hydration to prevent layout shift,
+        // but don't block the DOM tree — just hide text content briefly
+        <div style={{ visibility: "hidden" }}>{children}</div>
+      ) : (
+        children
+      )}
     </LanguageContext.Provider>
   )
 }
