@@ -122,6 +122,36 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+router.get('/user/find', async (req: Request, res: Response): Promise<void> => {
+  const email = (req.query.email as string || '').trim();
+  const phone = (req.query.phone as string || '').trim();
+  const userId = (req.query.userId as string || '').trim();
+
+  if (!email && !phone && !userId) {
+    res.json({ data: [] });
+    return;
+  }
+
+  const pgClient = await getPgClient();
+  try {
+    const query = `
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      FROM "Order" 
+      WHERE ($1 <> '' AND "customerEmail" ILIKE $1)
+         OR ($2 <> '' AND "customerPhone" = $2)
+         OR ($3 <> '' AND id = $3)
+      ORDER BY "createdAt" DESC
+    `;
+    const { rows } = await pgClient.query(query, [email, phone, userId]);
+    res.json({ data: rows });
+  } catch (error) {
+    console.error("Fetch User Orders Error:", error);
+    res.status(500).json({ error: "Failed to fetch user orders" });
+  } finally {
+    await pgClient.release();
+  }
+});
+
 router.get('/user/:identifier', async (req: Request, res: Response): Promise<void> => {
   const { identifier } = req.params;
   

@@ -6,6 +6,7 @@ export type CartItem = {
   id: string
   name: string
   nameKhmer?: string
+  slug?: string
   price: number
   image: string
   quantity: number
@@ -84,6 +85,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         id: product.id,
         name: product.name,
         nameKhmer: product.nameKhmer,
+        slug: product.slug || product.id,
         price: product.price,
         image: selectedImage,
         brand: product.brand,

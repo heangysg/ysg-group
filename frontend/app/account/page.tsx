@@ -70,8 +70,11 @@ export default function AccountPage() {
         // Fetch user orders
         setFetchingOrders(true)
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-        const identifier = session.user.email || session.user.user_metadata?.phone || session.user.id
-        const res = await fetch(`${API_URL}/api/orders/user/${encodeURIComponent(identifier)}`)
+        const email = session.user.email || ""
+        const phone = session.user.user_metadata?.phone || ""
+        const userId = session.user.id || ""
+
+        const res = await fetch(`${API_URL}/api/orders/user/find?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&userId=${encodeURIComponent(userId)}`)
         if (res.ok) {
           const data = await res.json()
           setOrders(data.data || [])

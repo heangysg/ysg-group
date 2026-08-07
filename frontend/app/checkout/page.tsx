@@ -7,15 +7,15 @@ import { useLanguage } from "../../contexts/LanguageContext"
 import PublicLayout from "../../components/PublicLayout"
 import { createClient } from "../../lib/supabase/client"
 import toast, { Toaster } from "react-hot-toast"
-import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, CreditCard, Truck, User, Phone, MapPin, Package, Check } from "lucide-react"
+import { ShoppingBag, ArrowLeft, Trash2, Plus, Minus, CreditCard, Truck, User, Phone, MapPin, Package, Check, ArrowRight, ShieldCheck } from "lucide-react"
 import Link from "next/link"
+import { getValidImages, getOptimizedImageUrl } from "../../lib/imageUtils"
 
 export default function CheckoutPage() {
   const { items, cartTotal, removeFromCart, updateQuantity, clearCart, isLoaded } = useCart()
   const { t, language } = useLanguage()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [step, setStep] = useState<1 | 2>(1)
   const [formData, setFormData] = useState({
     customerName: "",
     customerPhone: "",
@@ -31,94 +31,82 @@ export default function CheckoutPage() {
       if (user) {
         setFormData(prev => ({
           ...prev,
-          customerName: user.user_metadata?.full_name || "",
-          customerEmail: user.email || ""
+          customerName: user.user_metadata?.full_name || prev.customerName,
+          customerPhone: user.user_metadata?.phone || prev.customerPhone,
+          customerEmail: user.email || prev.customerEmail
         }))
       }
     }
     fetchUser()
   }, [])
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price)
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleNextStep = (e: React.FormEvent) => {
-    e.preventDefault()
-    setStep(2)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (items.length === 0) return
+    if (!formData.customerName || !formData.customerPhone || !formData.address) {
+      toast.error(language === "kh" ? "សូមបំពេញព័ត៌មានដែលបានតម្រូវ" : "Please fill in all required fields")
+      return
+    }
 
     setLoading(true)
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const response = await fetch(`${API_URL}/api/orders/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerName: formData.customerName,
-          customerPhone: formData.customerPhone,
-          customerEmail: formData.customerEmail,
-          address: formData.address,
-          paymentMethod: formData.paymentMethod,
-          items: items
+          ...formData,
+          items: items.map(item => ({
+            id: item.id,
+            slug: item.slug,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
         })
       })
 
       const data = await response.json()
 
-      if (!response.ok) throw new Error(data.error || "Failed to checkout")
-
-      toast.success("Order placed successfully!", { duration: 3000 })
-      clearCart()
-      router.push(`/orders/${data.order.id}`)
-    } catch (error: any) {
-      console.error("Error placing order:", error)
-      toast.error("Failed to place order. Please try again.")
+      if (response.ok && data.order) {
+        clearCart()
+        toast.success(language === "kh" ? "ការបញ្ជាទិញបានជោគជ័យ!" : "Order placed successfully!")
+        router.push(`/orders/${data.order.id}`)
+      } else {
+        toast.error(data.error || (language === "kh" ? "មានបញ្ហាក្នុងការបញ្ជាទិញ" : "Failed to place order"))
+      }
+    } catch (err: any) {
+      console.error("Checkout Error:", err)
+      toast.error(language === "kh" ? "មានបញ្ហាក្នុងការបញ្ជាទិញ" : "Failed to process checkout")
     } finally {
       setLoading(false)
     }
   }
 
-  if (!isLoaded) {
+  if (isLoaded && items.length === 0) {
     return (
       <PublicLayout>
-        <div className="min-h-[70vh] flex items-center justify-center bg-white">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary" />
-        </div>
-      </PublicLayout>
-    )
-  }
-
-  if (items.length === 0) {
-    return (
-      <PublicLayout>
-        <div className="min-h-[70vh] flex items-center justify-center px-4 bg-white">
-          <div className="text-center max-w-sm space-y-6">
-            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto text-slate-300">
-              <ShoppingBag className="w-8 h-8" />
+        <div className="bg-white min-h-screen pt-16 sm:pt-20 md:pt-12 pb-32 font-sans">
+          <div className="max-w-2xl mx-auto px-4 text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-2xs">
+              <ShoppingBag className="w-8 h-8 sm:w-10 sm:h-10 text-slate-300" />
             </div>
-            <div className="space-y-2">
-              <h2 className="text-xl font-medium text-slate-900 tracking-tight">{t("emptyCart")}</h2>
-              <p className="text-[14px] text-slate-500 font-medium">{t("emptyCartDesc")}</p>
-            </div>
-            <Link href="/products" className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 py-3.5 rounded-xl font-medium text-[12px] font-medium transition-all hover:bg-primary shadow-lg">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 mb-2">
+              {language === "kh" ? "កន្ត្រកទំនិញរបស់អ្នកទទេ" : "Your cart is empty"}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mb-6">
+              {language === "kh" ? "សូមជ្រើសរើសផលិតផល និងបន្ថែមទៅកន្ត្រកដើម្បីបន្តទូទាត់" : "Browse our inventory and add items to your cart before checking out."}
+            </p>
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-[#004691] hover:bg-[#003366] text-white font-bold rounded-full text-xs sm:text-sm transition-all shadow-2xs active:scale-95"
+            >
               <ArrowLeft className="w-4 h-4" />
-              {t("browseEquipment")}
+              <span>{language === "kh" ? "រុករកផលិតផល" : "Browse Products"}</span>
             </Link>
           </div>
         </div>
@@ -128,246 +116,277 @@ export default function CheckoutPage() {
 
   return (
     <PublicLayout>
-      <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
-      <div className="bg-white md:bg-[#F8FAFC] min-h-screen">
-        <div className="max-w-6xl mx-auto px-0 md:px-6 pt-4 md:pt-8 pb-32 md:pb-24">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-20 items-start">
+      <Toaster position="top-center" />
+      <div className="bg-white min-h-screen pb-36 md:pb-24 pt-16 sm:pt-20 md:pt-6 font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+
+          {/* 🍞 Mobile Responsive Breadcrumbs */}
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-base text-slate-600 font-medium mb-3 sm:mb-4 overflow-hidden whitespace-nowrap">
+            <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">{t("home")}</Link>
+            <span className="shrink-0 text-slate-400">/</span>
+            <Link href="/cart" className="hover:text-[#004691] shrink-0 transition-colors">{language === "kh" ? "កន្ត្រកទំនិញ" : "Cart"}</Link>
+            <span className="shrink-0 text-slate-400">/</span>
+            <span className="text-slate-900 font-bold truncate min-w-0">{language === "kh" ? "ការទូទាត់ប្រាក់" : "Checkout"}</span>
+          </div>
+
+          {/* Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 pb-3 sm:pb-4 mb-4 sm:mb-6 border-b border-slate-200">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
+              {language === "kh" ? "ការទូទាត់ប្រាក់" : "Checkout"}
+            </h1>
+            <span className="text-xs sm:text-sm font-semibold text-slate-500">
+              {items.length} {language === "kh" ? "មុខទំនិញ" : "items in cart"}
+            </span>
+          </div>
+
+          {/* Checkout Main Form Grid */}
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
-            {/* 🛒 Shopping Cart Section */}
-            <div className="w-full lg:flex-1 space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 md:px-0">
-              <div className="flex items-center justify-between">
-                <h1 className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tight uppercase">{t("shoppingCart")}</h1>
-                <span className="px-3 py-1 bg-slate-50 rounded-lg text-[9px] font-medium text-slate-400 font-medium border border-slate-100">
-                  {items.length} {items.length === 1 ? 'UNIT' : 'UNITS'}
-                </span>
-              </div>
-
-              <div className="space-y-3 md:space-y-4">
-                {items.map((item) => (
-                  <div key={item.id} className="solid-card bg-white border border-slate-100 md:border-slate-200 p-3 md:p-6 flex items-center gap-3 md:gap-6 group rounded-2xl md:rounded-3xl">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
-                      {item.image ? (
-                        <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <Package className="w-8 h-8 text-slate-300" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-0.5">
-                      <p className="text-[8px] font-medium font-medium text-primary">{item.brand}</p>
-                      <h3 className="text-[14px] md:text-[16px] font-medium text-slate-900 font-medium truncate">
-                        {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
-                      </h3>
-                      <p className="text-[9px] font-medium text-slate-400 font-medium">{item.model}</p>
-                    </div>
-                    
-                    <div className="flex flex-col items-end gap-2 md:gap-3">
-                      <button onClick={() => removeFromCart(item.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                      <div className="flex items-center gap-2 bg-slate-50 p-1 px-2 border border-slate-200">
-                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-0.5 text-slate-900 hover:bg-slate-200">
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className="w-6 text-center font-bold text-[13px] text-slate-900">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-0.5 text-slate-900 hover:bg-slate-200">
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
+            {/* Left: Customer Information & Payment Method (7 cols) */}
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+              
+              {/* Customer Info Box */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 space-y-4 sm:space-y-5 shadow-2xs">
+                <div className="flex items-center gap-3 border-b border-slate-200 pb-3 sm:pb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 text-[#004691] rounded-xl flex items-center justify-center font-bold shrink-0">
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                ))}
-              </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+                      {language === "kh" ? "ព័ត៌មានអតិថិជន និងការដឹកជញ្ជូន" : "Customer & Delivery Details"}
+                    </h2>
+                    <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                      {language === "kh" ? "សូមបញ្ចូលព័ត៌មានទំនាក់ទំនងរបស់អ្នកសម្រាប់ការដឹកជញ្ជូន" : "Enter your contact info for order delivery"}
+                    </p>
+                  </div>
+                </div>
 
-              <div className="mb-8 mt-6">
-                <Link href="/products" className="inline-flex items-center gap-2 text-slate-500 font-bold text-sm font-medium hover:text-slate-900 transition-colors">
-                  <ArrowLeft className="w-4 h-4" /> {language === "kh" ? "ត្រលប់ទៅកាន់ផលិតផល" : "Back to Products"}
-                </Link>
-              </div>
-            </div>
-
-            {/* 🏗️ Checkout Details Section */}
-            <div className="w-full lg:w-[420px] animate-in fade-in slide-in-from-bottom-8 duration-1000 px-4 md:px-0">
-              <div className="solid-card bg-white p-0 md:p-10 md:sticky md:top-24 md:border md:border-slate-100 md:rounded-3xl md:shadow-sm">
-                <h2 className="hidden md:block text-xl md:text-2xl font-bold text-slate-900 mb-8 font-medium">
-                  {step === 1 ? t("checkoutDetails") : (language === "kh" ? "ពិនិត្យឡើងវិញនូវការបញ្ជាទិញ" : "Review Your Order")}
-                </h2>
-                
-                <form onSubmit={step === 1 ? handleNextStep : handleSubmit} className="space-y-6 md:space-y-8">
-                  {step === 1 ? (
-                    <>
-                      <div className="space-y-3">
-                    <div className="relative group">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input 
-                        type="text" 
+                <div className="space-y-3 sm:space-y-4 pt-1">
+                  {/* Full Name */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-700 block">
+                      {language === "kh" ? "ឈ្មោះពេញ *" : "Full Name *"}
+                    </label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
                         name="customerName"
-                        placeholder={t("fullName")}
                         required
                         value={formData.customerName}
                         onChange={handleInputChange}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px] font-medium"
-                      />
-                    </div>
-                    <div className="relative group">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input 
-                        type="tel" 
-                        name="customerPhone"
-                        placeholder={t("phone")}
-                        required
-                        value={formData.customerPhone}
-                        onChange={handleInputChange}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px] font-medium"
-                      />
-                    </div>
-                    <div className="relative group">
-                      <MapPin className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
-                      <textarea 
-                        name="address"
-                        placeholder={t("address")}
-                        required
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        rows={3}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:border-primary outline-none transition-all font-bold text-slate-900 placeholder:text-slate-400 text-[13px] resize-none font-medium"
+                        placeholder={language === "kh" ? "បញ្ចូលឈ្មោះរបស់អ្នក" : "e.g. Sok Dara"}
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="flex flex-col ml-1">
-                      <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-slate-400 mb-0.5">
-                        {language === "kh" ? "វិធីសាស្ត្រទូទាត់" : "Payment Method"}
-                      </p>
-                      <p className="text-[11px] font-medium text-slate-300 italic">
-                        {language === "kh" ? "វិធីសាស្ត្រដែលត្រូវបានទទួលយក" : "Accepted method"}
-                      </p>
-                    </div>
-
-                    <div className="w-full p-4 md:p-5 border-2 border-[#E1232E] bg-[#E1232E]/5 flex items-center gap-3 md:gap-4 group relative rounded-2xl transition-all">
-                      <div className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 flex flex-shrink-0 items-center justify-center border-[#E1232E]">
-                        <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full bg-[#E1232E]" />
-                      </div>
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-[#E1232E] rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-                        <img 
-                          src="/logo/KHQR Logo.png" 
-                          alt="KHQR" 
-                          className="w-8 h-8 object-contain" 
+                  {/* Phone & Email Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        {language === "kh" ? "លេខទូរស័ព្ទ *" : "Phone Number *"}
+                      </label>
+                      <div className="relative">
+                        <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="tel"
+                          name="customerPhone"
+                          required
+                          value={formData.customerPhone}
+                          onChange={handleInputChange}
+                          placeholder="e.g. 012 345 678"
+                          className="w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all"
                         />
                       </div>
-                      <div className="flex-1 min-w-0 space-y-0.5">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold text-[#E1232E] font-medium">KHQR</span>
-                          <div className="w-1 h-1 bg-slate-300 rounded-xl" />
-                          <span className="text-[13px] md:text-[14px] font-bold text-slate-900 font-medium truncate">Bakong KHQR</span>
-                        </div>
-                        <p className="text-[11px] font-medium text-slate-500 truncate">
-                          {language === "kh" ? "ការទូទាត់តាម Bakong" : "Cambodia's Bakong Payment"}
-                        </p>
-                      </div>
-                      <div className="w-6 h-6 bg-[#E1232E] rounded-full flex items-center justify-center text-white shrink-0">
-                        <Check className="w-4 h-4" />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        {language === "kh" ? "អ៊ីមែល (មិនបាច់បំពេញក៏បាន)" : "Email Address (Optional)"}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          name="customerEmail"
+                          value={formData.customerEmail}
+                          onChange={handleInputChange}
+                          placeholder="e.g. client@example.com"
+                          className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all"
+                        />
                       </div>
                     </div>
                   </div>
-                    </>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="bg-slate-50 p-6 border border-slate-200 shadow-sm">
-                        <h3 className="font-bold text-slate-900 font-medium text-sm mb-4">
-                          {language === "kh" ? "ព័ត៌មានលម្អិត" : "Customer Details"}
-                        </h3>
-                        <div className="space-y-3 text-sm text-slate-900">
-                          <p><strong className="font-medium text-xs w-24 inline-block">{t("fullName")}:</strong> {formData.customerName}</p>
-                          <p><strong className="font-medium text-xs w-24 inline-block">{t("phone")}:</strong> {formData.customerPhone}</p>
-                          <p><strong className="font-medium text-xs w-24 inline-block">{t("email")}:</strong> <span className="break-all">{formData.customerEmail || "N/A"}</span></p>
-                          <p className="flex items-start"><strong className="font-medium text-xs w-24 shrink-0 inline-block">{t("address")}:</strong> <span className="flex-1">{formData.address}</span></p>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="flex flex-col ml-1">
-                          <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-slate-400 mb-0.5">
-                            {language === "kh" ? "វិធីសាស្ត្រទូទាត់" : "Payment Method"}
-                          </p>
-                          <p className="text-[11px] font-medium text-slate-300 italic">
-                            {language === "kh" ? "វិធីសាស្ត្រដែលត្រូវបានទទួលយក" : "Accepted method"}
-                          </p>
-                        </div>
-                        <div className="w-full p-4 md:p-5 border-2 border-[#E1232E] bg-[#E1232E]/5 rounded-2xl flex items-center gap-3 md:gap-4">
-                          <div className="w-12 h-12 bg-[#E1232E] rounded-xl shadow-sm flex items-center justify-center flex-shrink-0">
-                            <img src="/logo/KHQR Logo.png" alt="KHQR" className="w-8 h-8 object-contain" />
-                          </div>
-                          <div className="flex-1 min-w-0 space-y-0.5">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[10px] font-bold text-[#E1232E] font-medium">KHQR</span>
-                              <div className="w-1 h-1 bg-slate-300 rounded-xl" />
-                              <span className="text-[13px] md:text-[14px] font-bold text-slate-900 font-medium truncate">Bakong KHQR</span>
-                            </div>
-                            <p className="text-[11px] font-medium text-slate-500 truncate">
-                              {language === "kh" ? "ការទូទាត់តាម Bakong" : "Cambodia's Bakong Payment"}
-                            </p>
-                          </div>
-                          <div className="w-6 h-6 bg-[#E1232E] rounded-full flex items-center justify-center text-white shrink-0">
-                            <Check className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
 
-                      <button type="button" onClick={() => setStep(1)} className="w-full py-4 bg-white text-slate-900 border border-slate-200 shadow-sm font-bold text-xs font-medium hover:-translate-y-0.5 hover:shadow-sm-lg transition-all">
-                        {language === "kh" ? "កែប្រែព័ត៌មាន" : "Edit Details"}
-                      </button>
+                  {/* Delivery Address */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-700 block">
+                      {language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន *" : "Delivery Address *"}
+                    </label>
+                    <div className="relative">
+                      <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                      <textarea
+                        name="address"
+                        required
+                        rows={3}
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        placeholder={language === "kh" ? "ផ្ទះលេខ ផ្លូវ សង្កាត់ ខណ្ឌ រាជធានី/ខេត្ត" : "House/Street, Sangkat, Khan, City/Province"}
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all resize-none"
+                      />
                     </div>
-                  )}
-
-                  <div className="fixed md:static bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-auto left-0 right-0 bg-white p-4 md:p-0 border-t border-slate-100 md:border-none shadow-[0_-8px_30px_rgb(0,0,0,0.06)] md:shadow-none z-40">
-                    <div className="hidden md:block pt-6 border-t border-slate-200 space-y-2.5">
-                      <div className="flex justify-between text-slate-400 font-medium text-[10px]">
-                        <span>{t("subtotal")}</span>
-                        <span>{formatPrice(cartTotal)}</span>
-                      </div>
-                      <div className="flex justify-between text-slate-400 font-medium text-[10px]">
-                        <span>{t("shipping")}</span>
-                        <span className="text-emerald-500 font-medium">{language === "kh" ? "ឥតគិតថ្លៃ" : "FREE"}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between md:pt-3 md:pb-6 tracking-tighter uppercase">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-slate-500 font-bold md:hidden">{t("total")}</span>
-                        <span className="hidden md:inline text-[13px] font-bold text-slate-900">{t("total")}</span>
-                        <span className="text-xl md:text-2xl font-black text-primary leading-none mt-0.5">{formatPrice(cartTotal)}</span>
-                      </div>
-                      <div className="md:hidden">
-                        <button 
-                          type="submit"
-                          disabled={loading}
-                          className="btn-primary px-8 py-3.5 text-[12px] flex items-center justify-center gap-2 rounded-xl"
-                        >
-                          {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : (step === 1 ? (language === "kh" ? "បន្ត" : "Continue") : t("placeOrder"))}
-                        </button>
-                      </div>
-                    </div>
-
-                    <button 
-                      type="submit"
-                      disabled={loading}
-                      className="hidden md:flex btn-primary w-full py-5 text-[12px] items-center justify-center gap-3"
-                    >
-                      {loading ? (
-                        <div className="w-5 h-5 border border-slate-200/20 border-t-slate-900 rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <CreditCard className="w-5 h-5" />
-                          {step === 1 ? (language === "kh" ? "ពិនិត្យការបញ្ជាទិញ" : "Review Order") : (language === "kh" ? "បញ្ជាក់ការបញ្ជាទិញ" : t("placeOrder"))}
-                        </>
-                      )}
-                    </button>
                   </div>
-                </form>
+                </div>
+              </div>
+
+              {/* Payment Method Selection */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 space-y-4 shadow-2xs">
+                <div className="flex items-center gap-3 border-b border-slate-200 pb-3 sm:pb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-rose-50 text-[#E1232E] rounded-xl flex items-center justify-center font-bold shrink-0">
+                    <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+                      {language === "kh" ? "វិធីសាស្ត្រទូទាត់ប្រាក់" : "Payment Method"}
+                    </h2>
+                    <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                      {language === "kh" ? "ជ្រើសរើសវិធីសាស្ត្រទូទាត់ប្រាក់ដែលអ្នកពេញចិត្ត" : "Select your preferred payment method"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Bakong KHQR Option */}
+                  <label
+                    onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "Bakong" }))}
+                    className={`flex items-center gap-3 p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.paymentMethod === "Bakong"
+                        ? "bg-[#E1232E]/5 border-[#E1232E] shadow-2xs"
+                        : "bg-white border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#E1232E] rounded-xl flex items-center justify-center shrink-0">
+                      <img src="/logo/KHQR Logo.png" alt="KHQR" className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-extrabold text-slate-900 block">
+                        {language === "kh" ? "បាគង KHQR" : "Bakong KHQR"}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-semibold block">
+                        {language === "kh" ? "ស្កេនទូទាត់ជាមួយកម្មវិធីធនាគារ" : "Scan with any KHQR App"}
+                      </span>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                      formData.paymentMethod === "Bakong" ? "border-[#E1232E] bg-[#E1232E]" : "border-slate-300"
+                    }`}>
+                      {formData.paymentMethod === "Bakong" && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                    </div>
+                  </label>
+
+                  {/* Cash / Direct Option */}
+                  <label
+                    onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "Cash" }))}
+                    className={`flex items-center gap-3 p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      formData.paymentMethod === "Cash"
+                        ? "bg-blue-50/70 border-[#004691] shadow-2xs"
+                        : "bg-white border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 text-[#004691] rounded-xl flex items-center justify-center shrink-0 font-bold">
+                      <Truck className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-extrabold text-slate-900 block">
+                        {language === "kh" ? "ទូទាត់ពេលប្រគល់" : "Cash / Transfer"}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-semibold block">
+                        {language === "kh" ? "ទូទាត់ប្រាក់ពេលទទួលបានទំនិញ" : "Pay upon order confirmation"}
+                      </span>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                      formData.paymentMethod === "Cash" ? "border-[#004691] bg-[#004691]" : "border-slate-300"
+                    }`}>
+                      {formData.paymentMethod === "Cash" && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Right: Order Items Summary & Final CTA (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-8 space-y-5 sm:space-y-6 shadow-2xs lg:sticky lg:top-24">
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900 border-b border-slate-100 pb-3">
+                  {language === "kh" ? "សេចក្តីសង្ខេបការបញ្ជាទិញ" : "Order Summary"}
+                </h2>
+
+                {/* Items List */}
+                <div className="divide-y divide-slate-100 max-h-64 sm:max-h-72 overflow-y-auto pr-1">
+                  {items.map((item) => (
+                    <div key={item.id} className="py-2.5 sm:py-3 flex items-center gap-3">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 border border-slate-200 rounded-lg p-1 shrink-0 flex items-center justify-center overflow-hidden">
+                        {getValidImages(item)[0] ? (
+                          <img src={getOptimizedImageUrl(getValidImages(item)[0], 'thumb')} alt={item.name} className="w-full h-full object-contain" />
+                        ) : (
+                          <Package className="w-4 h-4 text-slate-400" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-slate-900 truncate">
+                          {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
+                        </p>
+                        <span className="text-[11px] text-slate-500 font-semibold block">
+                          ${item.price?.toLocaleString()} × {item.quantity}
+                        </span>
+                      </div>
+                      <span className="text-xs font-black text-[#004691] shrink-0">
+                        ${(item.price * item.quantity).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Total Summary Breakdown */}
+                <div className="border-t border-slate-100 pt-3.5 space-y-2 text-xs sm:text-sm font-semibold text-slate-600">
+                  <div className="flex justify-between">
+                    <span>{language === "kh" ? "សរុបរង (Subtotal):" : "Subtotal:"}</span>
+                    <span className="font-bold text-slate-900">${cartTotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{language === "kh" ? "ថ្លៃដឹកជញ្ជូន:" : "Shipping:"}</span>
+                    <span className="text-emerald-600 font-bold">{language === "kh" ? "ឥតគិតថ្លៃ / ពិភាក្សា" : "Free / Discussed"}</span>
+                  </div>
+                  <div className="border-t border-slate-100 pt-3 flex justify-between items-center text-base sm:text-lg">
+                    <span className="font-extrabold text-slate-900">{language === "kh" ? "សរុបចុងក្រោយ:" : "Total:"}</span>
+                    <span className="font-black text-[#004691] text-xl sm:text-2xl">${cartTotal.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Submit Order Action Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 sm:py-4 bg-[#004691] hover:bg-[#003366] text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>{language === "kh" ? "បញ្ជាក់ការបញ្ជាទិញ" : "Place Order Now"}</span>
+                      <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+                    </>
+                  )}
+                </button>
+
+                <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-slate-400 pt-0.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{language === "kh" ? "ការទូទាត់ប្រកបដោយសុវត្ថិភាព ១០០%" : "100% Encrypted & Secure Checkout"}</span>
+                </div>
+              </div>
+            </div>
+
+          </form>
+
         </div>
       </div>
     </PublicLayout>
