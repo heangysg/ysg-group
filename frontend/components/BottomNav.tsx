@@ -45,7 +45,7 @@ export default function BottomNav() {
                     </span>
                   )}
                   
-                  <span className="text-[10px] font-medium opacity-70">
+                  <span className="text-[10px] sm:text-[11px] font-semibold opacity-90 tracking-tight">
                     {item.name}
                   </span>
                 </div>
@@ -72,8 +72,8 @@ export default function BottomNav() {
                   </span>
                 )}
                 
-                <span className={`text-[10px] font-medium transition-all ${
-                  isActive ? "opacity-100 font-bold" : "opacity-70"
+                <span className={`text-[10px] sm:text-[11px] tracking-tight transition-all ${
+                  isActive ? "opacity-100 font-bold" : "opacity-90 font-semibold"
                 }`}>
                   {item.name}
                 </span>

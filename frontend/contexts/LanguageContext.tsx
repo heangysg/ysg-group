@@ -14,12 +14,16 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>("en")
+  // Start with 'kh' consistently on both Server and Client initial render to prevent SSR Hydration Mismatch
+  const [language, setLanguage] = useState<Language>("kh")
 
+  // Sync saved user preference from localStorage after initial hydration
   useEffect(() => {
-    const savedLang = localStorage.getItem("adminLanguage") as Language
-    if (savedLang && (savedLang === "en" || savedLang === "kh")) {
-      setLanguage(savedLang)
+    if (typeof window !== "undefined") {
+      const savedLang = (localStorage.getItem("adminLanguage") || localStorage.getItem("appLanguage")) as Language
+      if (savedLang === "en" || savedLang === "kh") {
+        setLanguage(savedLang)
+      }
     }
   }, [])
 
@@ -33,7 +37,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguageWrapper = (lang: Language) => {
     setLanguage(lang)
-    localStorage.setItem("adminLanguage", lang)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adminLanguage", lang)
+      localStorage.setItem("appLanguage", lang)
+    }
+    if (lang === "kh") {
+      document.documentElement.classList.add("khmer-mode")
+    } else {
+      document.documentElement.classList.remove("khmer-mode")
+    }
   }
 
   const t = (key: string): string => {

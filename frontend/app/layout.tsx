@@ -17,7 +17,7 @@ const kantumruy = Kantumruy_Pro({
 
 export async function generateMetadata(): Promise<Metadata> {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-  let meta_title = "YSG Machinery - Premium Heavy Equipment Solutions"
+  let meta_title = "Yeung Shi Group - Premium Heavy Equipment Solutions"
   let meta_description = "Quality heavy machinery for construction, mining, and industrial applications"
 
   try {
@@ -43,13 +43,13 @@ export async function generateMetadata(): Promise<Metadata> {
       title: meta_title,
       description: meta_description,
       type: "website",
-      siteName: "YSG Machinery",
+      siteName: "Yeung Shi Group",
       images: [
         {
           url: "/logo/ysg-logo.png",
           width: 1200,
           height: 630,
-          alt: "YSG Machinery - Yeung Shi Group",
+          alt: "Yeung Shi Group",
         },
       ],
     },

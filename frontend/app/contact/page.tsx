@@ -65,22 +65,30 @@ export default function ContactPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-32 pt-6 md:pt-8 px-6 bg-white min-h-screen">
+      <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
         <Toaster position="top-center" />
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          
+          {/* 🍞 Mobile Responsive Breadcrumbs */}
+          <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
+            <a href="/" className="hover:text-[#004691] shrink-0 transition-colors">{t("home")}</a>
+            <span className="shrink-0 text-slate-400">/</span>
+            <span className="text-slate-900 font-bold truncate min-w-0">{t("contact")}</span>
+          </div>
+
+          {/* Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-200">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
+              {t("contact")}
+            </h1>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
 
             {/* 💎 Elite Contact Info */}
-            <div className="space-y-12 animate-in fade-in slide-in-from-left duration-700">
-              <div className="space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-px w-8 bg-primary" />
-                  <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">{t("contactUs") || "Contact Us"}</span>
-                </div>
-                <h1 className="text-2xl md:text-4xl font-medium text-slate-900 tracking-tight uppercase leading-tight">
-                  {t("contact")}
-                </h1>
-                <p className="text-slate-600 font-normal leading-relaxed max-w-xl">
+            <div className="space-y-8 animate-in fade-in slide-in-from-left duration-700">
+              <div className="space-y-4">
+                <p className="text-slate-600 font-medium text-sm sm:text-base leading-relaxed">
                   {language === "kh"
                     ? "ប្រសិនបើអ្នកមានចម្ងល់អំពីលក្ខណៈពិសេស ឬចាប់អារម្មណ៍លើផលិតផលពីគេហទំព័ររបស់យើង សូមកុំស្ទាក់ស្ទើរក្នុងការទាក់ទងមកយើងតាមរយៈលេខទូរស័ព្ទ ឬអ៊ីមែល។ យើងខ្ញុំសូមអរគុណយ៉ាងជ្រាលជ្រៅចំពោះការចាប់អារម្មណ៍របស់អ្នកចំពោះផលិតផលរបស់យើង។"
                     : "If you have any feature inquiry or you are interested in products from our website, please don't hesitate to contact us through phone number or our email. We truly appreciate for your interested with our products."}

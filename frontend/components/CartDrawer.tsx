@@ -105,11 +105,11 @@ export default function CartDrawer() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-slate-900 truncate mb-1">
+                    <h4 className="text-sm font-bold text-slate-900 truncate mb-1">
                       {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                     </h4>
 
-                    <div className="text-xs font-black text-[#004691] mb-1">
+                    <div className="text-sm font-black text-[#004691] mb-1">
                       ${item.price.toLocaleString()}
                     </div>
 
@@ -151,7 +151,7 @@ export default function CartDrawer() {
             <div className="p-4 border-t border-slate-100 bg-white">
               <button
                 onClick={handleCheckout}
-                className="w-full py-3.5 bg-[#004691] hover:bg-[#003366] text-white rounded-lg font-extrabold text-sm flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 uppercase tracking-wider"
+                className="w-full py-4 bg-[#004691] hover:bg-[#003366] text-white rounded-lg font-extrabold text-sm sm:text-base flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 uppercase tracking-wider"
               >
                 <span>{language === "kh" ? "ទូទាត់" : "Checkout"}</span>
                 <ArrowRight className="w-4 h-4" />

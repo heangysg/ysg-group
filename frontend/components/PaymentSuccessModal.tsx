@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle2, Package, Home, ArrowRight } from "lucide-react"
+import { Check, CheckCircle2, Package, Home, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useLanguage } from "../contexts/LanguageContext"
 
@@ -119,7 +119,7 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount, 
         {/* Bottom Bar */}
         <div className="bg-slate-900 py-3 text-center shrink-0">
           <p className="text-[10px] font-bold text-slate-50 uppercase tracking-[0.2em]">
-            YSG Machinery • Industrial Solutions
+            Yeung Shi Group • Industrial Solutions
           </p>
         </div>
       </div>

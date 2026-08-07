@@ -124,11 +124,11 @@ export default function CartPage() {
 
               {/* Summary Card */}
               <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs h-fit space-y-4">
-                <h2 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3">
+                <h2 className="text-base sm:text-lg font-extrabold text-slate-900 border-b border-slate-100 pb-3">
                   {language === "kh" ? "សេចក្តីសង្ខេប (Summary)" : "Order Summary"}
                 </h2>
 
-                <div className="space-y-2 text-xs font-semibold text-slate-600">
+                <div className="space-y-2.5 text-xs sm:text-sm font-semibold text-slate-600">
                   <div className="flex justify-between">
                     <span>{language === "kh" ? "សរុប (Subtotal):" : "Subtotal:"}</span>
                     <span className="font-bold text-slate-900">${cartTotal.toLocaleString()}</span>
@@ -140,13 +140,13 @@ export default function CartPage() {
                 </div>
 
                 <div className="border-t border-slate-100 pt-3 flex justify-between items-center">
-                  <span className="font-extrabold text-slate-900 text-sm">{language === "kh" ? "សរុបចុងក្រោយ:" : "Total:"}</span>
-                  <span className="text-xl font-black text-[#004691]">${cartTotal.toLocaleString()}</span>
+                  <span className="font-extrabold text-slate-900 text-sm sm:text-base">{language === "kh" ? "សរុបចុងក្រោយ:" : "Total:"}</span>
+                  <span className="text-xl sm:text-2xl font-black text-[#004691]">${cartTotal.toLocaleString()}</span>
                 </div>
 
                 <button
                   onClick={() => router.push("/checkout")}
-                  className="w-full py-3.5 bg-[#004691] hover:bg-[#003366] text-white rounded-full font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+                  className="w-full py-4 bg-[#004691] hover:bg-[#003366] text-white rounded-lg font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
                 >
                   <span>{language === "kh" ? "ទៅកាន់ការទូទាត់ប្រាក់" : "Proceed to Checkout"}</span>
                   <ArrowRight className="w-4 h-4" />

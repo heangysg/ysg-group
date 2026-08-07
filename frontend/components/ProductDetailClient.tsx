@@ -13,6 +13,7 @@ import { useWishlist } from "../contexts/WishlistContext"
 import { ArrowLeft, MapPin, Calendar, Clock, CheckCircle2, ChevronRight, Send, X, Package, ShieldCheck, Star, ArrowRight, ShoppingCart, Share2, Copy, Check, Heart } from "lucide-react"
 import ProductCard from "./ProductCard"
 import ProductNotFound from "./ProductNotFound"
+import { getValidImages } from "../lib/imageUtils"
 
 export default function ProductDetailClient({ initialProduct }: { initialProduct: any }) {
   const { slug } = useParams()
@@ -36,7 +37,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
     const productName = language === "kh" && product.nameKhmer ? product.nameKhmer : product.name
     if (navigator.share) {
       try {
-        await navigator.share({ title: productName, text: `Check out ${productName} on YSG Machinery`, url })
+        await navigator.share({ title: productName, text: `Check out ${productName} on Yeung Shi Group`, url })
       } catch { }
     } else {
       await navigator.clipboard.writeText(url)
@@ -188,7 +189,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
     )
   }
 
-  const images = product.images || (product.thumbnail ? [product.thumbnail] : [])
+  const images = getValidImages(product)
 
   return (
     <PublicLayout>
@@ -196,7 +197,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           
           {/* 📍 Mobile Responsive Breadcrumbs (Increased font size) */}
-          <div className="mb-4 md:mb-6 flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-600 overflow-hidden whitespace-nowrap">
+          <div className="mb-4 md:mb-6 flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-600 overflow-hidden whitespace-nowrap">
             <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">
               {language === "kh" ? "ទំព័រដើម" : "Home"}
             </Link>
@@ -382,18 +383,18 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             <p className="text-sm text-slate-500 mb-8 font-medium">Get a quote for <span className="text-primary font-bold">{product.name}</span></p>
             <form onSubmit={handleInquirySubmit} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("fullName") || "Full Name"}</label>
-                <input required value={inquiryForm.customerName} onChange={(e) => setInquiryForm({ ...inquiryForm, customerName: e.target.value })} type="text" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px]" />
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("fullName") || "Full Name"}</label>
+                <input required value={inquiryForm.customerName} onChange={(e) => setInquiryForm({ ...inquiryForm, customerName: e.target.value })} type="text" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-sm sm:text-base" />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("phone") || "Phone Number"}</label>
-                <input required value={inquiryForm.customerPhone} onChange={(e) => setInquiryForm({ ...inquiryForm, customerPhone: e.target.value })} type="tel" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px]" />
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("phone") || "Phone Number"}</label>
+                <input required value={inquiryForm.customerPhone} onChange={(e) => setInquiryForm({ ...inquiryForm, customerPhone: e.target.value })} type="tel" className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-sm sm:text-base" />
               </div>
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("message") || "Message"}</label>
-                <textarea required value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} rows={4} className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-[13px] resize-none"></textarea>
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">{t("message") || "Message"}</label>
+                <textarea required value={inquiryForm.message} onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })} rows={4} className="w-full px-5 py-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-slate-900 text-sm sm:text-base resize-none"></textarea>
               </div>
-              <button disabled={submittingInquiry} type="submit" className="w-full bg-primary text-white rounded-xl py-4 font-bold text-[13px] mt-6 flex items-center justify-center gap-2 hover:bg-primary-dark transition-all active:scale-95 shadow-lg shadow-primary/30">
+              <button disabled={submittingInquiry} type="submit" className="w-full bg-primary text-white rounded-xl py-4 font-bold text-sm sm:text-base mt-6 flex items-center justify-center gap-2 hover:bg-primary-dark transition-all active:scale-95 shadow-lg shadow-primary/30">
                 {submittingInquiry ? t("loading") || "Sending..." : t("send") || "Send Message"}
               </button>
             </form>

@@ -7,6 +7,7 @@ import { useLanguage } from "../contexts/LanguageContext"
 import { useCart } from "../contexts/CartContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import toast from "react-hot-toast"
+import { getValidImages, getOptimizedImageUrl } from "../lib/imageUtils"
 
 type ProductCardProps = {
   product: {
@@ -68,10 +69,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   }
 
-  let imageUrl = product.images && product.images[0] ? product.images[0] : product.thumbnail
-  if (imageUrl && imageUrl.includes("cloudinary.com")) {
-    imageUrl = imageUrl.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/")
-  }
+  const images = getValidImages(product)
+  let imageUrl = getOptimizedImageUrl(images[0] || "", 'card')
 
   return (
     <div className="group flex flex-col h-full relative bg-white transition-all duration-300 p-2 md:p-3 rounded-lg hover:shadow-xs">
@@ -108,12 +107,12 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* 📝 Centered Title & Price (Matching Gyeon Image 2) */}
       <div className="flex flex-col items-center text-center flex-1 z-10 pointer-events-none">
-        <h3 className="text-[13px] md:text-[14px] font-medium text-slate-900 leading-snug line-clamp-2 min-h-[38px] group-hover:text-[#004691] transition-colors duration-200 mb-1">
+        <h3 className="text-sm md:text-base font-medium text-slate-900 leading-snug line-clamp-2 min-h-[42px] group-hover:text-[#004691] transition-colors duration-200 mb-1">
           {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
         </h3>
         
         <div className="mt-auto pt-1 flex items-center justify-center gap-2 pointer-events-auto">
-          <span className="text-base md:text-lg font-extrabold text-[#004691] tracking-tight">
+          <span className="text-base md:text-xl font-extrabold text-[#004691] tracking-tight">
             ${formatPrice(product.price)}
           </span>
           <button 

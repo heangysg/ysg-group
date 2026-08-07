@@ -97,6 +97,20 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
       const result = await pgClient.query(query, values);
       const newOrder = result.rows[0];
       
+      // Dispatch Telegram Sales Notification Alert (Background)
+      const botToken = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
+      if (botToken && chatId) {
+        const itemsText = validatedItems.map(i => `- ${i.name} (x${i.quantity}) - $${(i.price * i.quantity).toFixed(2)}`).join('\n');
+        const tgText = `🛍️ *ការបញ្ជាទិញថ្មី (NEW ORDER)* 🛍️\n\n*Order ID:* \`${newOrder.id}\`\n*Customer:* ${customerName}\n*Phone:* ${customerPhone}\n*Payment:* ${paymentMethod}\n*Total:* $${totalAmount.toFixed(2)}\n\n*Items:*\n${itemsText}`;
+        
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, text: tgText, parse_mode: 'Markdown' })
+        }).catch(err => console.error("Telegram Order Alert Error:", err));
+      }
+
       res.json({ order: newOrder });
     } finally {
       await pgClient.release();
@@ -105,6 +119,33 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
   } catch (err: any) {
     console.error("Checkout Error:", err);
     res.status(500).json({ error: "Failed to process checkout" });
+  }
+});
+
+router.get('/user/:identifier', async (req: Request, res: Response): Promise<void> => {
+  const { identifier } = req.params;
+  
+  if (!identifier || typeof identifier !== 'string') {
+    res.status(400).json({ error: "Invalid user identifier" });
+    return;
+  }
+
+  const pgClient = await getPgClient();
+  try {
+    const query = `
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      FROM "Order" 
+      WHERE "customerEmail" ILIKE $1 OR "customerPhone" = $1 OR id = $1
+      ORDER BY "createdAt" DESC
+    `;
+    const { rows } = await pgClient.query(query, [identifier]);
+    
+    res.json({ data: rows });
+  } catch (error) {
+    console.error("Fetch User Orders Error:", error);
+    res.status(500).json({ error: "Failed to fetch user orders" });
+  } finally {
+    await pgClient.release();
   }
 });
 

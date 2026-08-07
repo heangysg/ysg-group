@@ -68,6 +68,15 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Strict Rate Limiting for Public Form Submissions to prevent Spam & Bot Injections
+const formLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // max 15 submissions per 15 mins per IP
+  message: { error: "Too many form submissions, please try again in a few minutes." }
+});
+app.use('/api/public/contact', formLimiter);
+app.use('/api/public/inquiry', formLimiter);
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/crud', crudRoutes);
 app.use('/api/admin/read', readRoutes);

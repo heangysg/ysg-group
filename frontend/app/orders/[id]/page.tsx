@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import PublicLayout from '../../../components/PublicLayout'
-import { CheckCircle2, Clock, MapPin, Phone, User, Package, ArrowRight, ArrowLeft, CreditCard, Loader2, Receipt, Truck } from 'lucide-react'
+import { CheckCircle2, Clock, MapPin, Phone, User, Package, ArrowRight, ArrowLeft, CreditCard, Loader2, Receipt, Truck, XCircle, Printer } from 'lucide-react'
 import { useLanguage } from '../../../contexts/LanguageContext'
 import { generateBakongQR } from '../../../lib/bakong'
 import BakongQRModal from '../../../components/BakongQRModal'
@@ -142,7 +142,7 @@ export default function OrderDetailsPage() {
     return (
       <PublicLayout>
         <div className="min-h-[70vh] flex items-center justify-center bg-white">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#004691] animate-spin" />
         </div>
       </PublicLayout>
     )
@@ -151,11 +151,13 @@ export default function OrderDetailsPage() {
   if (!order) {
     return (
       <PublicLayout>
-        <div className="min-h-[70vh] flex items-center justify-center bg-white">
+        <div className="min-h-[70vh] flex items-center justify-center bg-white px-4">
           <div className="text-center space-y-4">
-            <h2 className="text-xl font-medium tracking-tight">Order Not Found</h2>
-            <Link href="/products" className="inline-flex items-center gap-2 text-primary text-[13px] font-medium hover:underline">
-              Back to Products <ArrowRight className="w-4 h-4" />
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+              {language === "kh" ? "រកមិនឃើញការបញ្ជាទិញទេ" : "Order Not Found"}
+            </h2>
+            <Link href="/products" className="inline-flex items-center gap-2 text-[#004691] text-sm font-bold hover:underline">
+              {language === "kh" ? "ត្រឡប់ទៅផលិតផល" : "Back to Products"} <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -186,172 +188,213 @@ export default function OrderDetailsPage() {
     }
   }
 
+  const getStatusText = (status: string) => {
+    const s = status?.toLowerCase()
+    if (s === "paid" || s === "completed") {
+      return language === "kh" ? "បានទូទាត់ប្រាក់" : "Paid"
+    }
+    if (s === "pending") {
+      return language === "kh" ? "កំពុងរង់ចាំ" : "Pending"
+    }
+    if (s === "cancelled") {
+      return language === "kh" ? "បានបោះបង់" : "Cancelled"
+    }
+    return status
+  }
+
+  const isPaid = order.status?.toLowerCase() === "paid" || order.status?.toLowerCase() === "completed"
+  const isCancelled = order.status?.toLowerCase() === "cancelled"
+
   return (
     <PublicLayout>
       <Toaster position="top-center" />
-      <div className="bg-slate-50 md:bg-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-0 md:px-6 pt-0 md:pt-8 pb-12 md:pb-24">
+      <div className="bg-white min-h-screen pb-24 pt-4 md:pt-8 font-sans">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 space-y-6">
           
-          {/* 💎 Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-2 md:mb-12 bg-white md:bg-transparent px-4 py-4 md:px-0 md:py-0 shadow-sm md:shadow-none">
-            <div className="space-y-2">
-              {/* Desktop Breadcrumbs */}
-              <div className="hidden md:flex items-center gap-2 text-sm font-bold font-medium text-slate-500">
-                <Link href="/" className="hover:text-slate-900 transition-colors">{t("home")}</Link>
+          {/* Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-500 mb-1">
+                <Link href="/" className="hover:text-[#004691] transition-colors">{t("home")}</Link>
                 <span>/</span>
-                <span className="text-slate-900">{language === "kh" ? "ព័ត៌មានលម្អិតការបញ្ជាទិញ" : "Order Detail"}</span>
+                <Link href="/account" className="hover:text-[#004691] transition-colors">{language === "kh" ? "គណនី" : "Account"}</Link>
+                <span>/</span>
+                <span className="text-slate-900 font-bold">{language === "kh" ? "ព័ត៌មានលម្អិត" : "Order Details"}</span>
               </div>
-              
-              {/* Mobile App Style Header */}
-              <div className="md:hidden mb-2">
-                <Link href="/account" className="inline-flex items-center gap-3 text-slate-900 font-bold text-sm font-medium">
-                  <div className="w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-100 rounded-full shadow-sm active:shadow-none active:translate-y-[2px] transition-all">
-                    <ArrowLeft className="w-5 h-5" />
-                  </div>
-                  {language === "kh" ? "ត្រលប់ក្រោយ" : "Back"}
-                </Link>
-              </div>
-              <h1 className="text-2xl md:text-3xl font-medium text-slate-900 tracking-tight uppercase">
-                {language === "kh" ? "ការបញ្ជាទិញ" : "Order"} <span className="text-primary">#{order.id}</span>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                {language === "kh" ? "ការបញ្ជាទិញ" : "Order"} <span className="text-[#004691]">#{order.id}</span>
               </h1>
+              <p className="text-xs sm:text-sm font-medium text-slate-500">
+                {language === "kh" ? "កាលបរិច្ឆេទ:" : "Date:"} <span className="font-bold text-slate-800">{new Date(order.createdAt).toLocaleDateString()}</span>
+              </p>
             </div>
 
-            <div className={`inline-flex items-center gap-2 px-4 py-2 text-[11px] font-bold font-medium border border-slate-200 shadow-sm ${
-              order.status === "paid"
-                ? "bg-emerald-400 text-slate-900"
-                : "bg-amber-400 text-slate-900"
-            }`}>
-              {order.status === "paid" ? (
-                <>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  {language === "kh" ? "បានបង់ប្រាក់" : "Paid"}
-                </>
-              ) : (
-                <>
-                  <Clock className="w-3.5 h-3.5" />
-                  {language === "kh" ? "កំពុងរង់ចាំ" : "Pending"}
-                </>
-              )}
+            {/* Status Badge & Print Invoice Action */}
+            <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
+              <button
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95 print:hidden"
+              >
+                <Printer className="w-4 h-4 text-slate-600" />
+                <span>{language === "kh" ? "បោះពុម្ពវិក្កយបត្រ" : "Print Invoice"}</span>
+              </button>
+
+              <div className={`inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-xl border shadow-2xs ${
+                isPaid
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : isCancelled
+                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                  : "bg-amber-50 text-amber-700 border-amber-200"
+              }`}>
+                {isPaid ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>{getStatusText(order.status)}</span>
+                  </>
+                ) : isCancelled ? (
+                  <>
+                    <XCircle className="w-4 h-4 text-rose-600" />
+                    <span>{getStatusText(order.status)}</span>
+                  </>
+                ) : (
+                  <>
+                    <Clock className="w-4 h-4 text-amber-600 animate-spin" />
+                    <span>{getStatusText(order.status)}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             
-            <div className="lg:col-span-8 space-y-2 md:space-y-10">
+            {/* Left Content Area */}
+            <div className="lg:col-span-8 space-y-6">
               
-              {/* 🏗️ Status Banner */}
-              {order.status === "paid" ? (
-                <div className="bg-emerald-400 p-6 md:p-12 flex flex-col md:flex-row items-start gap-4 md:gap-6 md:rounded-3xl md:solid-card">
-                  <div className="w-12 h-12 bg-slate-900 flex items-center justify-center text-emerald-400 shrink-0 border border-slate-200">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
+              {/* Payment Action Callout if Pending */}
+              {!isPaid && !isCancelled && (
+                <div className="bg-blue-50 border border-blue-200 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="space-y-1">
-                     <h2 className="text-xl md:text-2xl font-bold text-slate-900 font-medium leading-tight">
-                       {language === "kh" ? "ការទូទាត់ជោគជ័យ" : "Payment Successful"}
-                     </h2>
-                     <p className="text-xs md:text-sm text-slate-900 font-bold">
-                       {language === "kh" ? "សូមអរគុណសម្រាប់ការវិនិយោគរបស់អ្នក។ គ្រឿងម៉ាស៊ីនឧស្សាហកម្មរបស់អ្នកឥឡូវនេះកំពុងត្រូវបានរៀបចំសម្រាប់ដឹកជញ្ជូន។" : "Thank you for your investment. Your industrial machinery is now being prepared for logistics."}
-                     </p>
+                    <h3 className="text-base font-bold text-slate-900">
+                      {language === "kh" ? "តម្រូវឱ្យទូទាត់ប្រាក់" : "Payment Required"}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-md">
+                      {language === "kh" ? "សូមបញ្ចប់ការទូទាត់របស់អ្នកតាមរយៈ Bakong KHQR ដើម្បីបញ្ចប់ការបញ្ជាទិញរបស់អ្នក។" : "Please complete your payment via Bakong KHQR to finalize your order."}
+                    </p>
                   </div>
-                </div>
-              ) : (
-                <div className="bg-primary p-6 md:p-12 text-slate-900 relative overflow-hidden group md:rounded-3xl md:solid-card">
-                  <div className="relative z-10 space-y-6">
-                    <div className="space-y-2">
-                      <h2 className="text-2xl font-bold font-medium">
-                        {language === "kh" ? "តម្រូវឱ្យទូទាត់ប្រាក់" : "Payment Required"}
-                      </h2>
-                      <p className="text-slate-900 text-sm font-bold max-w-md">
-                        {language === "kh" ? "សូមបញ្ចប់ការទូទាត់របស់អ្នកតាមរយៈ Bakong KHQR ដើម្បីបញ្ចប់ការបញ្ជាទិញរបស់អ្នក។" : "Please complete your payment via Bakong KHQR to finalize your order."}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setShowQR(true)}
-                      className="inline-flex items-center gap-3 bg-slate-900 text-white px-6 py-4 font-bold text-xs font-medium hover:-translate-y-1 hover:shadow-lg transition-all rounded-xl"
-                    >
-                      <CreditCard className="w-4 h-4" />
-                      {language === "kh" ? "បង្ហាញ QR កូដ" : "Show QR Code"}
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setShowQR(true)}
+                    className="px-6 py-3 bg-[#004691] hover:bg-[#003366] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all shrink-0 flex items-center gap-2 active:scale-95"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>{language === "kh" ? "បង្ហាញ QR កូដ" : "Show QR Code"}</span>
+                  </button>
                 </div>
               )}
 
-              {/* 📦 Manifest */}
-              <div className="bg-white p-5 md:p-12 md:rounded-3xl md:solid-card">
-                <h3 className="text-sm font-bold text-slate-900 mb-8 font-medium flex items-center gap-3">
-                  <Package className="w-4 h-4 text-primary" />
-                  {language === "kh" ? "បញ្ជីគ្រឿងម៉ាស៊ីន" : "Equipment Manifest"}
+              {/* Items Card */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-2xs space-y-4">
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                  <Package className="w-5 h-5 text-[#004691]" />
+                  <span>{language === "kh" ? "ការបញ្ជាទិញរបស់អ្នក" : "Your Order"}</span>
                 </h3>
-                <div className="divide-y-2 divide-slate-900">
+
+                <div className="divide-y divide-slate-100">
                   {order.items?.map((item: any, idx: number) => (
-                    <div key={idx} className="py-4 md:py-6 flex items-start md:items-center gap-4 md:gap-6">
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 overflow-hidden shrink-0 border border-slate-200 mt-1 md:mt-0">
-                        <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div key={idx} className="py-4 flex items-center gap-4">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-xl border border-slate-100 overflow-hidden shrink-0 p-1 flex items-center justify-center">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                        ) : (
+                          <div className="w-full h-full bg-slate-100 rounded-md" />
+                        )}
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <h4 className="text-sm md:text-[15px] font-bold text-slate-900 font-medium line-clamp-2 leading-tight">
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate mb-1">
                           {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                         </h4>
-                        <p className="text-[10px] md:text-xs font-bold text-slate-500 font-medium">
-                          {item.brand} • {language === "kh" ? "ចំនួន" : "Qty"}: {item.quantity}
+                        <p className="text-xs sm:text-sm font-semibold text-slate-500">
+                          {language === "kh" ? "តម្លៃ:" : "Price:"} <span className="text-slate-900">${item.price.toLocaleString()}</span> • {language === "kh" ? "ចំនួន:" : "Qty:"} <span className="text-slate-900 font-bold">{item.quantity}</span>
                         </p>
                       </div>
-                      <div className="text-right shrink-0 mt-1 md:mt-0">
-                        <p className="text-sm md:text-[15px] font-bold text-slate-900">
-                          {formatPrice(item.price * item.quantity)}
+
+                      <div className="text-right shrink-0">
+                        <p className="text-sm sm:text-base font-extrabold text-slate-900">
+                          ${(item.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-slate-200 flex justify-between items-end">
-                  <div className="space-y-0.5">
-                    <span className="text-xs font-bold text-slate-500 font-medium">
-                      {language === "kh" ? "ការវិនិយោគសរុប" : "Total Investment"}
-                    </span>
-                  </div>
-                  <span className="text-3xl font-bold text-slate-900 tracking-tighter">{formatPrice(order.totalAmount)}</span>
+                {/* Subtotal & Total */}
+                <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
+                  <span className="text-sm sm:text-base font-bold text-slate-700">
+                    {language === "kh" ? "សរុបចុងក្រោយ:" : "Total Amount:"}
+                  </span>
+                  <span className="text-xl sm:text-2xl font-black text-[#004691]">
+                    {formatPrice(order.totalAmount)}
+                  </span>
                 </div>
               </div>
+
             </div>
 
-            <div className="lg:col-span-4 space-y-2 md:space-y-8">
+            {/* Right Sidebar */}
+            <div className="lg:col-span-4 space-y-6">
               
-              <div className="bg-white md:bg-slate-50 p-5 md:p-8 md:rounded-3xl md:solid-card">
-                <h3 className="text-xs font-bold text-slate-900 mb-8 font-medium flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-primary" />
-                  {language === "kh" ? "ការដឹកជញ្ជូន" : "Logistics"}
+              {/* Delivery / Shipping Info Card */}
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 md:p-6 shadow-2xs space-y-4">
+                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                  <Truck className="w-5 h-5 text-[#004691]" />
+                  <span>{language === "kh" ? "ព័ត៌មានដឹកជញ្ជូន" : "Delivery Details"}</span>
                 </h3>
-                <div className="space-y-6">
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-500 font-medium">{language === "kh" ? "អតិថិជន" : "Client"}</p>
-                    <p className="text-sm font-bold text-slate-900 uppercase">{order.customerName}</p>
+
+                <div className="space-y-3.5 text-xs sm:text-sm">
+                  <div>
+                    <p className="font-bold text-slate-400 uppercase text-[11px] tracking-wider mb-0.5">{language === "kh" ? "ឈ្មោះអតិថិជន" : "Customer Name"}</p>
+                    <p className="font-bold text-slate-900 text-sm sm:text-base">{order.customerName}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-500 font-medium">{language === "kh" ? "ទំនាក់ទំនង" : "Contact"}</p>
-                    <p className="text-sm font-bold text-slate-900">{order.customerPhone}</p>
+
+                  <div>
+                    <p className="font-bold text-slate-400 uppercase text-[11px] tracking-wider mb-0.5">{language === "kh" ? "លេខទូរស័ព្ទ" : "Phone Number"}</p>
+                    <p className="font-bold text-slate-900 text-sm sm:text-base">{order.customerPhone}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-500 font-medium">{language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន" : "Site Address"}</p>
-                    <p className="text-sm font-bold text-slate-900 leading-relaxed uppercase">{order.address}</p>
+
+                  {order.customerEmail && (
+                    <div>
+                      <p className="font-bold text-slate-400 uppercase text-[11px] tracking-wider mb-0.5">{language === "kh" ? "អ៊ីមែល" : "Email Address"}</p>
+                      <p className="font-bold text-slate-900 text-xs sm:text-sm truncate">{order.customerEmail}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <p className="font-bold text-slate-400 uppercase text-[11px] tracking-wider mb-0.5">{language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន" : "Delivery Address"}</p>
+                    <p className="font-semibold text-slate-800 text-xs sm:text-sm leading-relaxed">{order.address}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white p-5 md:p-8 space-y-6 md:rounded-3xl md:solid-card">
-                <h3 className="text-xs font-bold font-medium text-slate-900">
+              {/* Need Help Box */}
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 space-y-3">
+                <h4 className="text-sm font-bold text-slate-900">
                   {language === "kh" ? "ត្រូវការជំនួយ?" : "Need Help?"}
-                </h3>
-                <p className="text-sm text-slate-500 leading-relaxed font-bold">
-                  {language === "kh" ? "ផ្នែកគាំទ្ររបស់យើងគឺសកម្ម ២៤/៧ សម្រាប់ការសាកសួរបច្ចេកទេស។" : "Our support is active 24/7 for technical queries."}
+                </h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  {language === "kh" ? "ផ្នែកគាំទ្ររបស់យើងគឺសកម្ម ២៤/៧ សម្រាប់ការសាកសួរបច្ចេកទេស។" : "Our support team is active 24/7 for order questions."}
                 </p>
-                <a href="tel:+85512345678" className="btn-primary w-full py-4 text-xs flex items-center justify-center">
-                   {language === "kh" ? "ទាក់ទងអ្នកជំនាញ" : "Contact Specialist"}
+                <a 
+                  href="tel:+85512345678" 
+                  className="w-full py-3 bg-white border border-slate-200 text-[#004691] hover:bg-blue-50 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-2xs"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>{language === "kh" ? "ទាក់ទងអ្នកជំនាញ" : "Contact Support"}</span>
                 </a>
               </div>
 
             </div>
+
           </div>
         </div>
       </div>

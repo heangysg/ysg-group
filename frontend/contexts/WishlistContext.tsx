@@ -18,6 +18,7 @@ export type Product = {
 
 type WishlistContextType = {
   wishlistItems: Product[]
+  items: Product[]
   addToWishlist: (product: Product) => void
   removeFromWishlist: (productId: string) => void
   isInWishlist: (productId: string) => boolean
@@ -93,7 +94,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <WishlistContext.Provider value={{ wishlistItems, addToWishlist, removeFromWishlist, isInWishlist, clearWishlist, isLoaded }}>
+    <WishlistContext.Provider value={{ wishlistItems, items: wishlistItems, addToWishlist, removeFromWishlist, isInWishlist, clearWishlist, isLoaded }}>
       {children}
     </WishlistContext.Provider>
   )

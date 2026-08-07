@@ -8,7 +8,7 @@ import { useLanguage } from "../contexts/LanguageContext"
 import { useEffect, useState } from "react"
 
 export default function Footer() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const currentYear = new Date().getFullYear()
   const [settings, setSettings] = useState<any>({
     address: "Building 230, St. 271, Yothapol Khemarak Phoumin Boulevard, Phnom Penh.",
@@ -36,23 +36,22 @@ export default function Footer() {
 
   const sections = [
     {
-      title: t("quickLinks") || "Quick Links",
+      title: language === "kh" ? "លីងរហ័ស" : "Quick Links",
       links: [
-        { name: t("home") || "Home", href: "/" },
-        { name: t("allProducts") || "Products", href: "/products" },
-        { name: t("categories") || "Categories", href: "/categories" },
-        { name: t("about") || "About Us", href: "/about" },
-        { name: t("contact") || "Contact", href: "/contact" },
+        { name: language === "kh" ? "ទំព័រដើម" : "Home", href: "/" },
+        { name: language === "kh" ? "ផលិតផលទាំងអស់" : "Products", href: "/products" },
+        { name: language === "kh" ? "ប្រភេទផលិតផល" : "Categories", href: "/categories" },
+        { name: language === "kh" ? "អំពីយើង" : "About Us", href: "/about" },
+        { name: language === "kh" ? "ទំនាក់ទំនង" : "Contact", href: "/contact" },
       ]
     },
     {
-      title: t("support") || "Support",
+      title: language === "kh" ? "ផ្នែកជំនួយ" : "Support",
       links: [
-        { name: t("trackOrder") || "Track Order", href: "/track-order" },
-        { name: t("helpCenter") || "Help Center", href: "/help" },
-        { name: t("privacyPolicy") || "Privacy Policy", href: "/privacy" },
-        { name: t("termsOfService") || "Terms of Service", href: "/terms" },
-        { name: t("shippingInfo") || "Shipping", href: "/shipping" },
+        { name: language === "kh" ? "តាមដានការបញ្ជាទិញ" : "Track Order", href: "/orders" },
+        { name: language === "kh" ? "មជ្ឈមណ្ឌលជំនួយ" : "Help Center", href: "/help" },
+        { name: language === "kh" ? "គោលការណ៍ឯកជនភាព" : "Privacy Policy", href: "/help" },
+        { name: language === "kh" ? "លក្ខខណ្ឌសេវាកម្ម" : "Terms of Service", href: "/help" },
       ]
     }
   ]
@@ -100,14 +99,14 @@ export default function Footer() {
           ))}
 
           <div className="space-y-6">
-            <h3 className="text-slate-900 font-bold text-sm mb-6">{t("contactUs") || "Contact Specialist"}</h3>
+            <h3 className="text-slate-900 font-bold text-sm mb-6">{language === "kh" ? "ទំនាក់ទំនងយើងខ្ញុំ" : "Contact Us"}</h3>
             <div className="space-y-5">
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
                   <MapPin className="w-4.5 h-4.5 text-primary" />
                 </div>
                 <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">Headquarters</p>
+                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "ការិយាល័យកណ្តាល" : "Headquarters"}</p>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
                     target="_blank"
@@ -123,8 +122,8 @@ export default function Footer() {
                   <Clock className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">Working Hours</p>
-                  <p className="font-medium text-slate-500">8:00 am – 5:30 pm (Mon – Sat)</p>
+                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours"}</p>
+                  <p className="font-medium text-slate-500">{language === "kh" ? "៨:០០ ព្រឹក – ៥:៣០ ល្ងាច (ចន្ទ – សៅរ៍)" : "8:00 am – 5:30 pm (Mon – Sat)"}</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -132,7 +131,7 @@ export default function Footer() {
                   <Phone className="w-4.5 h-4.5 text-primary" />
                 </div>
                 <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">Phone</p>
+                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "លេខទូរស័ព្ទ" : "Phone"}</p>
                   <a
                     href={`tel:${settings.contact_phone?.replace(/\s/g, "")}`}
                     className="text-sm font-medium text-slate-500 hover:text-primary transition-colors"
@@ -146,7 +145,7 @@ export default function Footer() {
                   <Mail className="w-4.5 h-4.5 text-primary" />
                 </div>
                 <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">Email</p>
+                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "អ៊ីមែល" : "Email"}</p>
                   <a
                     href={`mailto:${settings.contact_email}`}
                     className="text-sm font-medium text-slate-500 hover:text-primary transition-colors"

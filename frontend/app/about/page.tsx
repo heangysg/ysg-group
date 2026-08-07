@@ -58,21 +58,31 @@ export default function AboutPage() {
 
   return (
     <PublicLayout>
-      <main className="min-h-screen bg-white pb-24 pt-6 md:pt-8">
+      <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          
+          {/* 🍞 Mobile Responsive Breadcrumbs */}
+          <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
+            <a href="/" className="hover:text-[#004691] shrink-0 transition-colors">{t("home")}</a>
+            <span className="shrink-0 text-slate-400">/</span>
+            <span className="text-slate-900 font-bold truncate min-w-0">{t("about")}</span>
+          </div>
 
-        {/* 🏆 Hero Section */}
-        <section className="pt-6 md:pt-10 pb-20">
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-px w-8 bg-primary" />
-              <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">{language === "kh" ? "ប្រវត្តិក្រុមហ៊ុន YSG Group" : "YSG Group Legacy"}</span>
-            </div>
-            <h1 className="text-2xl md:text-4xl font-medium text-slate-900 tracking-tight uppercase leading-[1.1] mb-8 max-w-4xl">
+          {/* Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-200">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
+              {t("about")}
+            </h1>
+          </div>
+
+          {/* 🏆 Hero Section */}
+          <section className="pb-16">
+            <h2 className="text-xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-[1.2] mb-4 max-w-4xl">
               {language === "kh"
                 ? "ប្រវត្តិនៃការបង្កើតក្រុមហ៊ុន YSG Group"
                 : "The Heritage of YSG Group (Yeung Shi Group)"}
-            </h1>
-            <p className="text-slate-600 font-normal text-lg md:text-xl leading-relaxed max-w-3xl mb-12">
+            </h2>
+            <p className="text-slate-600 font-medium text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mb-10">
               {language === "kh"
                 ? "ក្រុមហ៊ុន YSG Group ត្រូវបានបង្កើតឡើងដំបូងនៅប្រទេសចិន ក្នុងទីក្រុងក្វាងចូវ ចាប់តាំងពីទសវត្សរ៍ឆ្នាំ 1990 ហើយយើងបានចាប់ផ្តើមដំណើរការក្រុមហ៊ុននៅប្រទេសកម្ពុជាក្នុងឆ្នាំ 2005 ដោយក្តីស្រមៃរបស់យើងគឺស្វែងរកទីផ្សារគោលដៅក្នុងប្រទេសកម្ពុជា។"
                 : "Yeung Shi Group company was establish in china at GuangZhou city since 1990s, and we started to process the company in Cambodia in 2005, our passion is trying to figure out a target market in Cambodia."}
@@ -86,8 +96,7 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
 
         {/* 🏔️ Story Section */}
         <section className="py-20 bg-slate-50 px-6">
@@ -209,6 +218,7 @@ export default function AboutPage() {
           </div>
         </section>
 
+        </div>
       </main>
     </PublicLayout>
   )

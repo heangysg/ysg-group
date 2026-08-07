@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useTransition } from "react"
 import Link from "next/link"
 import PublicLayout from "./PublicLayout"
 import ProductCard from "./ProductCard"
@@ -9,17 +9,18 @@ import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDow
 import { useRouter, useParams, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
-export default function ProductsList({ initialCategory = "all", initialFeatured = false }: { initialCategory?: string, initialFeatured?: boolean }) {
+export default function ProductsList({ initialCategory = "all", initialFeatured = false, initialSearch = "" }: { initialCategory?: string, initialFeatured?: boolean, initialSearch?: string }) {
   const { t, language } = useLanguage()
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
+  const [isPending, startTransition] = useTransition()
   
   const urlCategory = (params?.slug as string) || searchParams.get("category") || initialCategory
   const isFeatured = initialFeatured || searchParams.get("featured") === "true"
-  const urlSearch = searchParams.get("search") || ""
+  const urlSearch = (params?.query as string) || searchParams.get("search") || initialSearch
 
-  const [products, setProducts] = useState<any[]>([])
+  const [allProducts, setAllProducts] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState(urlSearch)
@@ -45,23 +46,8 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           fetch(`${API_URL}/api/public/products${isFeatured ? '?featured=true' : ''}`, { cache: 'no-store' }).then(r => r.json())
         ])
         
-        const catData = catRes.data || []
-        let prodData = prodRes.data || []
-
-        setCategories(catData)
-
-        if (urlCategory && urlCategory !== "all") {
-          const mainCat = catData.find((c: any) => c.slug === urlCategory)
-          if (mainCat) {
-            const childCategoryIds = catData.filter((c: any) => c.parentId === mainCat.id).map((c: any) => c.id)
-            const targetIds = [mainCat.id, ...childCategoryIds]
-            prodData = prodData.filter((p: any) => targetIds.includes(p.categoryId))
-          } else {
-            prodData = prodData.filter((p: any) => p.categorySlug === urlCategory || p.category?.slug === urlCategory)
-          }
-        }
-
-        setProducts(prodData)
+        setCategories(catRes.data || [])
+        setAllProducts(prodRes.data || [])
       } catch (e) {
         console.error("Failed to fetch products page data", e)
       } finally {
@@ -69,33 +55,58 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
       }
     }
     fetchData()
-  }, [urlCategory, isFeatured])
+  }, [isFeatured])
 
-  const handleCategorySelect = (slug: string, hasSubs: boolean = false) => {
-    if (hasSubs) {
-      setExpandedCategories(prev => 
-        prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
-      )
-    }
-    
+  const toggleCategoryExpand = (slug: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    setExpandedCategories(prev => 
+      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
+    )
+  }
+
+  const handleCategorySelect = (slug: string, isMobile: boolean = false) => {
     setSelectedCategory(slug)
-    setShowFilters(false)
-    if (slug === "all") {
-      router.push("/products")
-    } else {
-      router.push(`/products/category/${slug}`)
+    if (isMobile) {
+      setShowFilters(false)
+    }
+
+    const targetUrl = slug === "all" ? "/products" : `/products/category/${slug}`
+    if (typeof window !== "undefined") {
+      window.history.pushState(null, "", targetUrl)
     }
   }
 
-  let filteredProducts = products.filter(p => {
-    if (!searchQuery) return true
-    const q = searchQuery.toLowerCase()
-    return p.name.toLowerCase().includes(q) || 
-           (p.nameKhmer && p.nameKhmer.toLowerCase().includes(q)) ||
-           (p.description && p.description.toLowerCase().includes(q)) ||
-           (p.descriptionKhmer && p.descriptionKhmer.toLowerCase().includes(q))
+  // ⚡ Instant Client-Side Category & Search Filtering (Zero Flash / Glitch)
+  let filteredProducts = allProducts.filter(p => {
+    // 1. Category Filter
+    if (selectedCategory !== "all") {
+      const mainCat = categories.find((c: any) => c.slug === selectedCategory)
+      if (mainCat) {
+        const childCategoryIds = categories.filter((c: any) => c.parentId === mainCat.id).map((c: any) => c.id)
+        const targetIds = [mainCat.id, ...childCategoryIds]
+        if (!targetIds.includes(p.categoryId) && p.categorySlug !== selectedCategory && p.category?.slug !== selectedCategory) {
+          return false
+        }
+      } else {
+        if (p.categorySlug !== selectedCategory && p.category?.slug !== selectedCategory) {
+          return false
+        }
+      }
+    }
+
+    // 2. Search Query Filter
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      const matchName = p.name.toLowerCase().includes(q) || (p.nameKhmer && p.nameKhmer.toLowerCase().includes(q))
+      const matchDesc = (p.description && p.description.toLowerCase().includes(q)) || (p.descriptionKhmer && p.descriptionKhmer.toLowerCase().includes(q))
+      if (!matchName && !matchDesc) return false
+    }
+
+    return true
   })
 
+  // Sort Filter
   filteredProducts.sort((a, b) => {
     if (sortBy === "price_asc") return a.price - b.price
     if (sortBy === "price_desc") return b.price - a.price
@@ -106,13 +117,13 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
   const renderCategoryFilters = (isMobile: boolean = false) => (
     <div className="flex flex-col gap-1">
       <button
-        onClick={() => handleCategorySelect("all")}
-        className={`flex items-center justify-between px-3 py-2.5 text-[12px] font-bold rounded-lg transition-all ${
-          selectedCategory === "all" ? "bg-[#004691] text-white" : "text-slate-700 hover:bg-slate-100"
+        onClick={() => handleCategorySelect("all", isMobile)}
+        className={`flex items-center justify-between px-3.5 py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all ${
+          selectedCategory === "all" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-700 hover:bg-slate-100"
         }`}
       >
         <span>{t("allProducts")}</span>
-        <span className="text-[10px] opacity-80">({products.length})</span>
+        <span className="text-xs opacity-80">({allProducts.length})</span>
       </button>
       
       {categories.filter(c => !c.parentId).map(cat => {
@@ -123,32 +134,60 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
         return (
           <div key={cat.id} className="flex flex-col">
-            <button
-              onClick={() => handleCategorySelect(cat.slug, hasSubs)}
-              className={`flex items-center justify-between px-3 py-2.5 text-[12px] font-semibold rounded-lg transition-all ${
-                isSelected ? "bg-[#004691]/10 text-[#004691] font-bold" : "text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
-              {hasSubs && <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />}
-            </button>
+            <div className={`flex items-center justify-between rounded-lg transition-all ${
+              isSelected ? "bg-[#004691]/10 text-[#004691]" : "text-slate-800 hover:bg-slate-50"
+            }`}>
+              <button
+                onClick={(e) => {
+                  if (hasSubs) {
+                    toggleCategoryExpand(cat.slug, e)
+                  } else {
+                    handleCategorySelect(cat.slug, isMobile)
+                  }
+                }}
+                className="flex-1 text-left px-3.5 py-2.5 text-sm md:text-base font-bold flex items-center justify-between"
+              >
+                <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
+                {hasSubs && (
+                  <ChevronRight className={`w-4 h-4 transition-transform duration-200 shrink-0 ${isExpanded ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />
+                )}
+              </button>
+            </div>
 
-            {/* Nested Subcategories */}
-            {hasSubs && isExpanded && (
-              <div className="ml-3 pl-3 border-l border-slate-200 flex flex-col gap-1 my-1">
-                {subCats.map(sub => (
+            {/* Smooth Animated Accordion for Nested Subcategories */}
+            <AnimatePresence initial={false}>
+              {hasSubs && isExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="overflow-hidden ml-3 pl-3 border-l-2 border-[#004691]/20 flex flex-col gap-1 my-1"
+                >
+                  {/* Option to view all products under this main category */}
                   <button
-                    key={sub.id}
-                    onClick={() => handleCategorySelect(sub.slug, false)}
-                    className={`text-left px-2.5 py-2 text-[11px] rounded-md transition-all ${
-                      selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    onClick={() => handleCategorySelect(cat.slug, isMobile)}
+                    className={`text-left px-2.5 py-2 text-xs md:text-sm font-bold rounded-md transition-all ${
+                      selectedCategory === cat.slug ? "text-[#004691] bg-blue-50" : "text-slate-500 hover:text-[#004691] hover:bg-slate-50"
                     }`}
                   >
-                    {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                    {language === "kh" ? `ទំនិញទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
                   </button>
-                ))}
-              </div>
-            )}
+
+                  {subCats.map(sub => (
+                    <button
+                      key={sub.id}
+                      onClick={() => handleCategorySelect(sub.slug, isMobile)}
+                      className={`text-left px-2.5 py-2 text-xs md:text-sm rounded-md transition-all ${
+                        selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                      }`}
+                    >
+                      {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )
       })}
@@ -157,14 +196,14 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-4 md:pt-6 px-4 md:px-8 bg-white min-h-screen">
+      <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs md:text-sm text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
-            <Link href="/" className="hover:text-primary shrink-0 transition-colors">{t("home")}</Link>
+          <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
+            <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">{t("home")}</Link>
             <span className="shrink-0 text-slate-400">/</span>
-            <Link href="/products" className="hover:text-primary shrink-0 transition-colors">{t("allProducts")}</Link>
+            <Link href="/products" className="hover:text-[#004691] shrink-0 transition-colors">{t("allProducts")}</Link>
             {selectedCategory !== "all" && (
               <>
                 <span className="shrink-0 text-slate-400">/</span>
@@ -181,7 +220,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           {/* Header Bar: Category Title + Count + Custom Sort & Filter */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 mb-6 border-b border-slate-200 gap-4">
             <div>
-              <h1 className="text-xl md:text-3xl font-bold text-[#004691] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
                 {(() => {
                   if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
                   if (isFeatured) return language === "kh" ? "ផលិតផលពិសេស" : "Featured Machines"
@@ -193,19 +232,19 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               </h1>
             </div>
 
-            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto text-xs font-medium text-slate-600">
-              <span className="text-slate-500">
+            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto text-sm font-semibold text-slate-700">
+              <span className="text-slate-600 font-semibold text-sm sm:text-base">
                 {language === "kh" ? `បង្ហាញ ${filteredProducts.length} លទ្ធផល` : `Showing ${filteredProducts.length} results`}
               </span>
 
               <div className="flex items-center gap-2">
-                <span className="hidden sm:inline font-semibold">{t("sortBy") || "Sort by"}:</span>
+                <span className="hidden sm:inline font-bold text-sm sm:text-base text-slate-800">{t("sortBy") || "Sort by"}:</span>
                 
                 {/* 🤍 Custom White Dropdown Popover */}
                 <div className="relative">
                   <button
                     onClick={() => setSortOpen(!sortOpen)}
-                    className="flex items-center gap-2 py-2 px-3.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition-all"
+                    className="flex items-center gap-2 py-2 px-4 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition-all"
                   >
                     <span>
                       {sortBy === "newest" && (language === "kh" ? "ថ្មីបំផុត" : "Newest")}
@@ -213,7 +252,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                       {sortBy === "price_desc" && (language === "kh" ? "តម្លៃ (ខ្ពស់ ទៅ ទាប)" : "Price (High to Low)")}
                       {sortBy === "name_az" && (language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z")}
                     </span>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${sortOpen ? "rotate-180 text-[#004691]" : ""}`} />
+                    <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${sortOpen ? "rotate-180 text-[#004691]" : ""}`} />
                   </button>
 
                   <AnimatePresence>
@@ -224,7 +263,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 6 }}
-                          className="absolute right-0 top-full mt-1.5 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-40 py-1.5 overflow-hidden"
+                          className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-slate-200 rounded-xl shadow-xl z-40 py-1.5 overflow-hidden"
                         >
                           {[
                             { value: "newest", label: language === "kh" ? "ថ្មីបំផុត" : "Newest" },
@@ -238,12 +277,12 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                                 setSortBy(option.value)
                                 setSortOpen(false)
                               }}
-                              className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left font-medium transition-colors ${
+                              className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left font-semibold transition-colors ${
                                 sortBy === option.value ? "bg-blue-50 text-[#004691] font-bold" : "text-slate-700 hover:bg-slate-50"
                               }`}
                             >
                               <span>{option.label}</span>
-                              {sortBy === option.value && <Check className="w-3.5 h-3.5 text-[#004691]" />}
+                              {sortBy === option.value && <Check className="w-4 h-4 text-[#004691]" />}
                             </button>
                           ))}
                         </motion.div>
@@ -255,7 +294,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                 {/* Mobile Filter Button */}
                 <button 
                   onClick={() => setShowFilters(true)}
-                  className="p-2 lg:hidden rounded-lg border bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200 transition-all flex items-center gap-1.5 text-xs font-bold"
+                  className="p-2 lg:hidden rounded-lg border bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200 transition-all flex items-center gap-1.5 text-xs sm:text-sm font-bold"
                 >
                   <Filter className="w-4 h-4 text-[#004691]" />
                   <span className="hidden xs:inline">{t("filter") || "Filter"}</span>
@@ -268,7 +307,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             {/* Desktop Sidebar Accordion Filters */}
             <aside className="hidden lg:block lg:w-64 shrink-0">
               <div className="bg-white rounded-xl border border-slate-200 p-4 sticky top-28 shadow-2xs">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">
+                <h3 className="text-sm font-bold text-[#004691] uppercase tracking-wider mb-3 px-2">
                   {t("categories")}
                 </h3>
                 {renderCategoryFilters(false)}

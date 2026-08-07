@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { createClient } from "../../lib/supabase/client"
 import PublicLayout from "../../components/PublicLayout"
 import { useLanguage } from "../../contexts/LanguageContext"
-import { ChevronRight, Package, ArrowRight } from "lucide-react"
+import { ChevronRight, Package, ArrowRight, LayoutGrid } from "lucide-react"
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<any[]>([])
@@ -14,14 +13,18 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     async function fetchCategories() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from("Category")
-        .select("*")
-        .eq("isActive", true)
-        .order("sortOrder", { ascending: true })
-      setCategories(data || [])
-      setLoading(false)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      try {
+        const res = await fetch(`${API_URL}/api/public/categories`, { cache: 'no-store' })
+        if (res.ok) {
+          const data = await res.json()
+          setCategories(data.data || [])
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories:", err)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchCategories()
   }, [])
@@ -30,103 +33,122 @@ export default function CategoriesPage() {
 
   return (
     <PublicLayout>
-      <main className="pb-24 pt-6 md:pt-8 bg-white">
+      <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          {/* Hero Header */}
-          <div className="mb-4 md:mb-24 text-left md:text-center max-w-2xl mx-auto">
-            <div className="hidden md:inline-flex items-center gap-3 mb-6">
-              <div className="h-px w-8 bg-primary" />
-              <span className="text-sm font-bold text-primary uppercase tracking-[0.2em]">
-                {t("categories") || "Categories"}
-              </span>
+          
+          {/* 🍞 Mobile Responsive Breadcrumbs */}
+          <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
+            <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">{t("home")}</Link>
+            <span className="shrink-0 text-slate-400">/</span>
+            <span className="text-slate-900 font-bold truncate min-w-0">{t("categories")}</span>
+          </div>
+
+          {/* Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-200">
+            <div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
+                {t("categories")}
+              </h1>
+              <p className="text-slate-500 text-xs sm:text-sm font-semibold mt-1">
+                {language === "kh" 
+                  ? "ស្វែងរកផលិតផលជាច្រើនរបស់យើង រួមមានគ្រឿងម៉ាស៊ីនដែលមានប្រសិទ្ធភាពខ្ពស់ ឧបករណ៍ឯកទេស និងគ្រឿងបន្លាស់ពិតប្រាកដ។" 
+                  : "Explore our comprehensive range of high-performance machinery and specialized equipment."}
+              </p>
             </div>
-            <h1 className="text-xl md:text-4xl font-black text-slate-900 mb-2 md:mb-6 tracking-tight uppercase">
-              {t("categories")}
-            </h1>
-            <p className="hidden md:block text-slate-600 font-normal leading-relaxed">
-              {language === "kh" 
-                ? "ស្វែងរកផលិតផលជាច្រើនរបស់យើង រួមមានគ្រឿងម៉ាស៊ីនដែលមានប្រសិទ្ធភាពខ្ពស់ ឧបករណ៍ឯកទេស និងគ្រឿងបន្លាស់ពិតប្រាកដ។" 
-                : "Explore our comprehensive range of high-performance machinery, specialized equipment, and genuine spare parts."}
-            </p>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="aspect-[4/5] bg-slate-50 rounded-2xl animate-pulse" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <div key={n} className="aspect-square bg-slate-50 rounded-2xl animate-pulse border border-slate-100" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+            <div className="space-y-10">
               {mainCategories.map((mainCat: any) => {
                 const subCats = categories.filter(c => c.parentId === mainCat.id)
-                
+
                 return (
-                  <div key={mainCat.id} className="group flex flex-col">
-                    <Link href={`/categories/${mainCat.slug}`} className="block relative h-full">
-                        <div className="bg-white hover:-translate-y-1 md:hover:-translate-y-2 shadow-sm hover:shadow-md transition-all duration-300 flex flex-row md:flex-col h-full group rounded-2xl md:rounded-3xl overflow-hidden border border-slate-100">
-                          {/* Image Header */}
-                          <div className="w-[120px] md:w-full shrink-0 md:aspect-[16/10] bg-slate-50 relative overflow-hidden">
-                            {mainCat.image ? (
-                              <img 
-                                src={mainCat.image} 
-                                alt={mainCat.name} 
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                <Package className="w-8 h-8 md:w-12 md:h-12 stroke-[1.5]" />
-                              </div>
-                            )}
-                            {/* Overlay Title (Desktop Only) */}
-                            <div className="hidden md:flex absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent items-end p-6">
-                              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight">
-                                {language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}
-                              </h3>
-                            </div>
-                          </div>
-
-                        {/* Content Section */}
-                        <div className="p-4 md:p-8 flex flex-col flex-grow bg-white md:bg-slate-50 min-w-0">
-                          {/* Mobile Title */}
-                          <h3 className="md:hidden text-[15px] font-bold text-slate-900 tracking-tight mb-1 truncate">
-                            {language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}
-                          </h3>
-                          
-                          <div className="space-y-3 md:space-y-4 mb-4 md:mb-8 flex-grow">
-                            <p className="text-slate-500 md:text-slate-900 text-[11px] md:text-[13px] font-medium md:font-bold leading-snug line-clamp-2 md:line-clamp-2">
-                              {mainCat.description || (language === "kh" ? `ស្វែងរកដំណោះស្រាយដ៏ល្អបំផុតនៅក្នុងប្រភេទ ${mainCat.nameKhmer || mainCat.name}។` : `Explore elite solutions in the ${mainCat.name.toLowerCase()} category.`)}
-                            </p>
-                            
-                            {/* Subcategories List */}
-                            <div className="flex flex-wrap gap-1.5 md:gap-2">
-                              {subCats.slice(0, 3).map((sub: any) => (
-                                <span key={sub.id} className="px-2 py-1 md:px-3.5 md:py-1.5 bg-slate-50 md:bg-slate-100 text-slate-600 md:text-slate-700 text-[9px] md:text-[10px] font-bold rounded-lg md:rounded-full whitespace-nowrap">
-                                  {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
-                                </span>
-                              ))}
-                              {subCats.length > 3 && (
-                                <span className="px-2 py-1 md:px-3.5 md:py-1.5 bg-slate-50 md:bg-slate-100 text-slate-400 md:text-slate-500 text-[9px] md:text-[10px] font-bold rounded-lg md:rounded-full">
-                                  +{subCats.length - 3}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="mt-auto pt-3 md:pt-6 border-t border-slate-100 flex items-center justify-between">
-                            <span className="text-[10px] md:text-[11px] font-bold text-primary tracking-wide">{t("viewCollection") || "View Collection"}</span>
-                            <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/10 text-primary flex items-center justify-center rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
-                              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
-                            </div>
-                          </div>
+                  <div key={mainCat.id} className="space-y-4">
+                    {/* Main Category Banner Header */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-blue-50 text-[#004691] rounded-xl flex items-center justify-center font-bold">
+                          <LayoutGrid className="w-5 h-5" />
                         </div>
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
+                          {language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}
+                        </h2>
                       </div>
-                    </Link>
+
+                      <Link 
+                        href={`/products/category/${mainCat.slug}`}
+                        className="text-xs sm:text-sm md:text-base font-bold text-[#004691] hover:underline flex items-center gap-1.5"
+                      >
+                        <span>{language === "kh" ? "មើលទាំងអស់" : "View All"}</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+
+                    {/* Subcategories & Main Category Cards Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                      {/* Main Category Card */}
+                      <Link 
+                        href={`/products/category/${mainCat.slug}`}
+                        className="group bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-[#004691] shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                      >
+                        <div className="w-full aspect-square bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center p-3 mb-3 overflow-hidden relative">
+                          {mainCat.image ? (
+                            <img src={mainCat.image} alt={mainCat.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                          ) : (
+                            <Package className="w-10 h-10 text-slate-300" />
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <h3 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#004691] transition-colors truncate">
+                            {language === "kh" ? `ទំនិញទាំងអស់ក្នុង ${mainCat.nameKhmer || mainCat.name}` : `All ${mainCat.name}`}
+                          </h3>
+                          <p className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                            <span>{language === "kh" ? "មើលបណ្តុំផលិតផល" : "Browse collection"}</span>
+                            <ArrowRight className="w-3.5 h-3.5 text-[#004691] group-hover:translate-x-1 transition-transform" />
+                          </p>
+                        </div>
+                      </Link>
+
+                      {/* Subcategory Cards */}
+                      {subCats.map((sub: any) => (
+                        <Link 
+                          key={sub.id}
+                          href={`/products/category/${sub.slug}`}
+                          className="group bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-[#004691] shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                        >
+                          <div className="w-full aspect-square bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center p-3 mb-3 overflow-hidden relative">
+                            {sub.image ? (
+                              <img src={sub.image} alt={sub.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                            ) : (
+                              <Package className="w-10 h-10 text-slate-300" />
+                            )}
+                          </div>
+
+                          <div className="space-y-1">
+                            <h3 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#004691] transition-colors truncate">
+                              {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                            </h3>
+                            <p className="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                              <span>{language === "kh" ? "មើលផលិតផល" : "View products"}</span>
+                              <ArrowRight className="w-3.5 h-3.5 text-[#004691] group-hover:translate-x-1 transition-transform" />
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 )
               })}
             </div>
           )}
+
         </div>
       </main>
     </PublicLayout>
