@@ -1,10 +1,10 @@
-/* eslint-disable */
 "use client"
 
 import Link from "next/link"
-import { Globe, Camera, Send, Play, Mail, Phone, MapPin, Clock } from "lucide-react"
+import { MapPin, Phone, Mail, Send, Clock, CreditCard } from "lucide-react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faFacebook, faYoutube, faTelegram } from "@fortawesome/free-brands-svg-icons"
 import { useLanguage } from "../contexts/LanguageContext"
-
 import { useEffect, useState } from "react"
 
 export default function Footer() {
@@ -13,7 +13,10 @@ export default function Footer() {
   const [settings, setSettings] = useState<any>({
     address: "Building 230, St. 271, Yothapol Khemarak Phoumin Boulevard, Phnom Penh.",
     contact_phone: "010 / 011 / 012 / 070: 309 302",
-    contact_email: "yeungshigroup123@gmail.com"
+    contact_email: "yeungshigroup123@gmail.com",
+    facebook_url: "https://www.facebook.com/YeungShiGroupHeadOffice/",
+    youtube_url: "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
+    telegram_url: ""
   })
 
   useEffect(() => {
@@ -34,178 +37,153 @@ export default function Footer() {
     fetchSettings()
   }, [])
 
-  const sections = [
-    {
-      title: language === "kh" ? "លីងរហ័ស" : "Quick Links",
-      links: [
-        { name: language === "kh" ? "ទំព័រដើម" : "Home", href: "/" },
-        { name: language === "kh" ? "ផលិតផលទាំងអស់" : "Products", href: "/products" },
-        { name: language === "kh" ? "ប្រភេទផលិតផល" : "Categories", href: "/categories" },
-        { name: language === "kh" ? "អំពីយើង" : "About Us", href: "/about" },
-        { name: language === "kh" ? "ទំនាក់ទំនង" : "Contact", href: "/contact" },
-      ]
-    },
-    {
-      title: language === "kh" ? "ផ្នែកជំនួយ" : "Support",
-      links: [
-        { name: language === "kh" ? "តាមដានការបញ្ជាទិញ" : "Track Order", href: "/orders" },
-        { name: language === "kh" ? "មជ្ឈមណ្ឌលជំនួយ" : "Help Center", href: "/help" },
-        { name: language === "kh" ? "គោលការណ៍ឯកជនភាព" : "Privacy Policy", href: "/help" },
-        { name: language === "kh" ? "លក្ខខណ្ឌសេវាកម្ម" : "Terms of Service", href: "/help" },
-      ]
-    }
-  ]
-
   return (
-    <footer className="bg-white text-slate-600 pt-16 pb-32 md:pb-12 border-t border-slate-100 mt-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+    <footer className="bg-[#00224a] text-slate-200 pt-16 pb-24 md:pb-8 mt-12 font-sans selection:bg-white/20 selection:text-white">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 lg:gap-x-12 gap-y-12 mb-16">
           
-          <div className="space-y-6">
-            <Link href="/" className="flex items-center group">
-              <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-10 w-auto object-contain invert brightness-0 opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
+          {/* Column 1: Logo & Description */}
+          <div className="flex flex-col gap-6 lg:col-span-3">
+            <Link href="/" className="inline-block w-[160px] hover:scale-105 transition-transform origin-left">
+              <img 
+                src="/logo/ysg-logo.png" 
+                alt="Yeung Shi Group" 
+                className="w-full h-auto object-contain" 
+              />
             </Link>
-            <p className="text-sm leading-relaxed max-w-xs font-normal text-slate-500">
-              ក្រុមហ៊ុនយ៉ាងស៊ីគ្រុប — Yeung Shi Group Co., Ltd. Premium industrial machinery and equipment supplier in Cambodia.
+            <p className="text-sm md:text-[15px] leading-relaxed opacity-90 font-medium">
+              ក្រុមហ៊ុនយ៉ាងស៊ីគ្រុប — Yeung Shi Group Co., Ltd.<br/>
+              Premium industrial machinery and equipment supplier in Cambodia.
             </p>
-            <div className="flex items-center gap-3">
-              {[Globe, Camera, Send, Play].map((Icon, i) => (
-                <a key={i} href={[
-                  "https://www.facebook.com/YeungShiGroupHeadOffice/",
-                  "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
-                  "#",
-                  "#"
-                ][i]} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors shadow-sm">
-                  <Icon className="w-4.5 h-4.5" />
-                </a>
-              ))}
-            </div>
           </div>
 
-          {sections.map((section, i) => (
-            <div key={i}>
-              <h3 className="text-slate-900 font-bold text-sm mb-6">{section.title}</h3>
-              <ul className="space-y-4">
-                {section.links.map((link, j) => (
-                  <li key={j}>
-                    <Link href={link.href} className="text-sm font-medium text-slate-500 hover:text-primary transition-colors flex items-center gap-2 group">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/20 group-hover:bg-primary transition-colors" />
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Column 2: Quick Links */}
+          <div className="lg:col-span-5">
+            <h3 className="text-lg md:text-xl font-black mb-6 tracking-wide text-white">
+              {language === "kh" ? "ផ្សេងៗ" : "Quick Links"}
+            </h3>
+            <ul className="grid grid-cols-2 gap-y-4 gap-x-4">
+              <li>
+                <Link href="/" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "ទំព័រដើម" : "Home"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "ផលិតផលទាំងអស់" : "Products"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/categories" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "ប្រភេទផលិតផល" : "Categories"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "អំពីយើង" : "About Us"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "ទំនាក់ទំនង" : "Contact"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/orders" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "តាមដានការបញ្ជាទិញ" : "Track Order"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/help" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "មជ្ឈមណ្ឌលជំនួយ" : "Help Center"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "គោលការណ៍ឯកជនភាព" : "Privacy Policy"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/40" /> {language === "kh" ? "លក្ខខណ្ឌសេវាកម្ម" : "Terms of Service"}
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-          <div className="space-y-6">
-            <h3 className="text-slate-900 font-bold text-sm mb-6">{language === "kh" ? "ទំនាក់ទំនងយើងខ្ញុំ" : "Contact Us"}</h3>
-            <div className="space-y-5">
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                  <MapPin className="w-4.5 h-4.5 text-primary" />
-                </div>
-                <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "ការិយាល័យកណ្តាល" : "Headquarters"}</p>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-slate-500 leading-relaxed hover:text-primary transition-colors"
-                  >
-                    {settings.address}
+          {/* Column 3: Follow Us */}
+          <div className="lg:col-span-2">
+            <h3 className="text-lg md:text-xl font-black mb-6 tracking-wide text-white">
+              {language === "kh" ? "តាមដានពួកយើង" : "Follow Us"}
+            </h3>
+            <ul className="space-y-4">
+              {settings.facebook_url && (
+                <li>
+                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-3">
+                    <FontAwesomeIcon icon={faFacebook} className="w-5 h-5 text-[#1877F2]" /> Facebook
                   </a>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                  <Clock className="w-4 h-4 text-primary" />
-                </div>
-                <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours"}</p>
-                  <p className="font-medium text-slate-500">{language === "kh" ? "៨:០០ ព្រឹក – ៥:៣០ ល្ងាច (ចន្ទ – សៅរ៍)" : "8:00 am – 5:30 pm (Mon – Sat)"}</p>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                  <Phone className="w-4.5 h-4.5 text-primary" />
-                </div>
-                <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "លេខទូរស័ព្ទ" : "Phone"}</p>
-                  <a
-                    href={`tel:${settings.contact_phone?.replace(/\s/g, "")}`}
-                    className="text-sm font-medium text-slate-500 hover:text-primary transition-colors"
-                  >
-                    {settings.contact_phone}
-                  </a>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
-                  <Mail className="w-4.5 h-4.5 text-primary" />
-                </div>
-                <div className="text-sm">
-                  <p className="text-slate-900 font-bold mb-0.5">{language === "kh" ? "អ៊ីមែល" : "Email"}</p>
-                  <a
-                    href={`mailto:${settings.contact_email}`}
-                    className="text-sm font-medium text-slate-500 hover:text-primary transition-colors"
-                  >
-                    {settings.contact_email}
-                  </a>
-                </div>
-              </div>
-              {/* WhatsApp */}
-              {settings.whatsapp_url && (
-                <div className="flex gap-4 group">
-                  <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-green-100 transition-colors">
-                    <span className="text-green-500 text-lg">💬</span>
-                  </div>
-                  <div className="text-sm">
-                    <p className="text-slate-900 font-bold mb-0.5">WhatsApp</p>
-                    <a
-                      href={`https://wa.me/${settings.whatsapp_url.replace(/[^0-9]/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-slate-500 hover:text-green-600 transition-colors"
-                    >
-                      {settings.whatsapp_url}
-                    </a>
-                  </div>
-                </div>
+                </li>
               )}
-              {/* Telegram */}
+              {settings.youtube_url && (
+                <li>
+                  <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-3">
+                    <FontAwesomeIcon icon={faYoutube} className="w-5 h-5 text-[#FF0000]" /> YouTube
+                  </a>
+                </li>
+              )}
               {settings.telegram_url && (
-                <div className="flex gap-4 group">
-                  <div className="w-10 h-10 bg-sky-50 rounded-full flex items-center justify-center shrink-0 group-hover:bg-sky-100 transition-colors">
-                    <span className="text-sky-500 text-lg">✈️</span>
-                  </div>
-                  <div className="text-sm">
-                    <p className="text-slate-900 font-bold mb-0.5">Telegram</p>
-                    <a
-                      href={settings.telegram_url.startsWith("http") ? settings.telegram_url : `https://t.me/${settings.telegram_url.replace("@", "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-slate-500 hover:text-sky-600 transition-colors"
-                    >
-                      {settings.telegram_url}
-                    </a>
-                  </div>
-                </div>
+                <li>
+                  <a href={settings.telegram_url.startsWith("http") ? settings.telegram_url : `https://t.me/${settings.telegram_url.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="text-sm md:text-[15px] font-medium opacity-80 hover:opacity-100 hover:text-white transition-all flex items-center gap-3">
+                    <FontAwesomeIcon icon={faTelegram} className="w-5 h-5 text-[#229ED9]" /> Telegram
+                  </a>
+                </li>
               )}
+            </ul>
+          </div>
+
+          {/* Column 4: Contact Us */}
+          <div className="lg:col-span-2">
+            <h3 className="text-lg md:text-xl font-black mb-6 tracking-wide text-white">
+              {language === "kh" ? "ទាក់ទងមកពួកយើង" : "Contact Us"}
+            </h3>
+            <ul className="space-y-5">
+              <li className="flex items-start gap-3 opacity-90 hover:opacity-100 transition-opacity">
+                <Phone className="w-5 h-5 shrink-0 mt-0.5 text-white/70" />
+                <a href={`tel:${settings.contact_phone?.replace(/\s/g, "")}`} className="text-sm md:text-[15px] font-medium">
+                  {settings.contact_phone}
+                </a>
+              </li>
+              <li className="flex items-start gap-3 opacity-90 hover:opacity-100 transition-opacity">
+                <Mail className="w-5 h-5 shrink-0 mt-0.5 text-white/70" />
+                <a href={`mailto:${settings.contact_email}`} className="text-sm md:text-[15px] font-medium">
+                  {settings.contact_email}
+                </a>
+              </li>
+              <li className="flex items-start gap-3 opacity-90 hover:opacity-100 transition-opacity">
+                <MapPin className="w-5 h-5 shrink-0 mt-0.5 text-white/70" />
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`} target="_blank" rel="noopener noreferrer" className="text-sm md:text-[15px] font-medium leading-relaxed">
+                  {settings.address}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-xs md:text-sm font-medium opacity-80 text-center md:text-left">
+            រក្សាសិទ្ធិ © {currentYear} ដោយ Yeung Shi Group. រក្សាសិទ្ធិគ្រប់យ៉ាង.
+          </p>
+          <div className="flex items-center gap-4 text-xs md:text-sm font-medium opacity-80">
+            <span>{language === "kh" ? "ទទួលយកការទូទាត់:" : "Payment accepted:"}</span>
+            <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full">
+              <CreditCard className="w-4 h-4" />
+              <span>ABA Pay / KHQR</span>
             </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs font-medium text-slate-500">
-            © {currentYear} Yeung Shi Group Co., Ltd. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6 text-xs font-medium text-slate-500">
-            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-primary transition-colors">Terms</Link>
-            <Link href="/sitemap" className="hover:text-primary transition-colors">Sitemap</Link>
-          </div>
-        </div>
       </div>
     </footer>
   )

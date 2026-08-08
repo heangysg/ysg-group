@@ -80,7 +80,9 @@ export default function AddProduct() {
   }
 
   const generateSlug = (name: string) => {
-    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+    const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+    const shortId = "p" + Math.floor(1000 + Math.random() * 9000)
+    return `${baseSlug}-${shortId}`
   }
 
   const handleCategoryChange = (categoryId: string) => {

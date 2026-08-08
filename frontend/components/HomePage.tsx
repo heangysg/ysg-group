@@ -9,13 +9,19 @@ import { useLanguage } from "../contexts/LanguageContext"
 import { useRouter } from "next/navigation"
 import ProductCard from "./ProductCard"
 
+// Module-level cache to enable instant scroll restoration when navigating back
+let _cachedTopCategories: any[] = []
+let _cachedHotProducts: any[] = []
+let _cachedPopularProducts: any[] = []
+
 export default function HomePage() {
-  const [topCategories, setTopCategories] = useState<any[]>([])
-  const [hotProducts, setHotProducts] = useState<any[]>([])
-  const [popularProducts, setPopularProducts] = useState<any[]>([])
+  const [topCategories, setTopCategories] = useState<any[]>(_cachedTopCategories)
+  const [hotProducts, setHotProducts] = useState<any[]>(_cachedHotProducts)
+  const [popularProducts, setPopularProducts] = useState<any[]>(_cachedPopularProducts)
   const [banners, setBanners] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [isReady, setIsReady] = useState(false)
+  const [loading, setLoading] = useState(_cachedPopularProducts.length === 0)
+  const [isReady, setIsReady] = useState(_cachedPopularProducts.length > 0)
+  const [isRestored] = useState(_cachedPopularProducts.length > 0)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [displayLimit, setDisplayLimit] = useState(12)
 
@@ -26,34 +32,32 @@ export default function HomePage() {
     async function fetchHomeData() {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       try {
-        const [catRes, prodRes, bannerRes] = await Promise.all([
+        const [catRes, prodRes] = await Promise.all([
           fetch(`${API_URL}/api/public/categories`, { cache: 'no-store' }),
-          fetch(`${API_URL}/api/public/products`, { cache: 'no-store' }),
-          fetch(`${API_URL}/api/public/banners`, { cache: 'no-store' })
+          fetch(`${API_URL}/api/public/products`, { cache: 'no-store' })
         ])
 
         const catData = catRes.ok ? await catRes.json() : { data: [] }
         const prodData = prodRes.ok ? await prodRes.json() : { data: [] }
-        const bannerData = bannerRes.ok ? await bannerRes.json() : { data: [] }
 
         if (catData.data) {
           const mainCats = catData.data.filter((c: any) => !c.parentId)
+          _cachedTopCategories = mainCats
           setTopCategories(mainCats)
         }
 
         if (prodData.data) {
           const prods = prodData.data
-          setHotProducts(prods.filter((p: any) => p.isFeatured === true))
+          const hot = prods.filter((p: any) => p.isFeatured === true)
+          _cachedHotProducts = hot
+          _cachedPopularProducts = prods
+          setHotProducts(hot)
           setPopularProducts(prods)
         }
 
-        if (bannerData.data && bannerData.data.length > 0) {
-          setBanners(bannerData.data)
-        } else {
-          setBanners([
-            { id: 1, image: "", title: "Yeung Shi Group - Quality Equipment" }
-          ])
-        }
+        setBanners([
+          { id: 1, image: "", title: "Premium Heavy Equipment Solutions" }
+        ])
       } catch (err) {
         console.error("Home Data Fetch Error:", err)
       } finally {
@@ -63,9 +67,11 @@ export default function HomePage() {
     }
 
     fetchHomeData()
-    // Small delay to prevent flash/stuck on very first paint
-    const readyTimer = setTimeout(() => setIsReady(true), 50)
-    return () => clearTimeout(readyTimer)
+    // Small delay to prevent flash/stuck on very first paint only if not cached
+    if (_cachedPopularProducts.length === 0) {
+      const readyTimer = setTimeout(() => setIsReady(true), 50)
+      return () => clearTimeout(readyTimer)
+    }
   }, [])
 
   useEffect(() => {
@@ -75,6 +81,39 @@ export default function HomePage() {
     }, 5000)
     return () => clearInterval(timer)
   }, [banners.length])
+
+  // 🎯 Bulletproof Manual Scroll Restoration
+  useEffect(() => {
+    if (!isReady) return
+
+    // 1. Check if this was a page refresh
+    const navEntries = window.performance.getEntriesByType("navigation")
+    const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload"
+
+    if (isReload) {
+      sessionStorage.removeItem('ysg_home_scroll')
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    } else {
+      // Restore previous scroll position instantly if navigating back
+      const savedScroll = sessionStorage.getItem('ysg_home_scroll')
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' })
+        }, 50)
+      }
+    }
+
+    // 2. Track scrolling to save for when user hits Back button
+    const handleScroll = () => {
+      // Prevent Next.js router from overwriting with 0 during page transitions
+      if (window.scrollY > 10) {
+        sessionStorage.setItem('ysg_home_scroll', window.scrollY.toString())
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isReady])
 
   if (!isReady) {
     return (
@@ -108,11 +147,11 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 md:pt-6 relative z-20 space-y-6 md:space-y-10">
 
         {/* Hero Banner Showcase */}
-        <section className="relative rounded-lg md:rounded-xl overflow-hidden bg-slate-900 h-[180px] sm:h-[240px] md:h-[380px] shadow-2xs group border border-slate-200">
+        <section className="relative rounded-lg md:rounded-xl overflow-hidden bg-slate-100 h-[180px] sm:h-[240px] md:h-[380px] shadow-2xs group border border-slate-200">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0, scale: 1.05 }}
+              initial={isRestored ? false : { opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7, ease: "easeInOut" }}
@@ -125,10 +164,15 @@ export default function HomePage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-[#004691] flex flex-col items-center justify-center p-6 text-white text-center">
-                  <img src="/logo/ysg-logo.png" alt="YSG Logo" className="h-12 md:h-16 w-auto object-contain mb-3 brightness-0 invert" />
-                  <h2 className="text-lg md:text-2xl font-bold tracking-wide">
-                    {banners[currentSlide]?.title || "Yeung Shi Group - Quality Equipment"}
+                <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex flex-col items-center justify-center p-6 text-center shadow-inner relative overflow-hidden">
+                  {/* Decorative faint logo in background */}
+                  <div className="absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none">
+                    <img src="/logo/ysg-logo.png" alt="Decoration" className="w-[400px] h-auto grayscale" />
+                  </div>
+                  
+                  <img src="/logo/ysg-logo.png" alt="YSG Logo" className="h-16 md:h-24 w-auto object-contain mb-4 relative z-10" />
+                  <h2 className="text-xl md:text-3xl font-extrabold tracking-tight text-[#004691] relative z-10">
+                    {banners[currentSlide]?.title || "Premium Heavy Equipment Solutions"}
                   </h2>
                 </div>
               )}
@@ -171,9 +215,9 @@ export default function HomePage() {
               topCategories.map((cat, idx) => (
                 <motion.div 
                   key={cat.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={isRestored ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.04 }}
+                  transition={{ delay: isRestored ? 0 : idx * 0.04 }}
                   className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px]"
                 >
                   <Link 
@@ -221,8 +265,8 @@ export default function HomePage() {
                   <div key={n} className="aspect-[3/4] bg-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
                 ))
               ) : (
-                hotProducts.slice(0, 8).map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                hotProducts.slice(0, 8).map((product, idx) => (
+                  <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                 ))
               )}
             </div>
@@ -251,8 +295,8 @@ export default function HomePage() {
                 <div key={n} className="aspect-[3/4] bg-slate-50 border border-slate-100 rounded-2xl animate-pulse" />
               ))
             ) : (
-              popularProducts.slice(0, displayLimit).map((product) => (
-                <ProductCard key={product.id} product={product} />
+              popularProducts.slice(0, displayLimit).map((product, idx) => (
+                <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
               ))
             )}
           </div>

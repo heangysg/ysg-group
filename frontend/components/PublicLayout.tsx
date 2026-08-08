@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Home, Package, FolderOpen, Mail, Info, ShoppingCart, Menu, X, User as UserIcon, Heart, Search, ChevronRight, HelpCircle } from "lucide-react"
+import { Home, Package, FolderOpen, Mail, Info, ShoppingCart, Menu, X, User as UserIcon, Heart, Search, ChevronRight, ChevronDown, HelpCircle } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import { useCart } from "../contexts/CartContext"
 import { useWishlist } from "../contexts/WishlistContext"
@@ -83,13 +83,25 @@ export default function PublicLayout({
   }, [searchQuery])
 
   useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const [isAuthChecking, setIsAuthChecking] = useState(true)
+
+  useEffect(() => {
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null)
+      setIsAuthChecking(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null)
+      setIsAuthChecking(false)
     })
 
     if (typeof window !== "undefined") {
@@ -132,14 +144,6 @@ export default function PublicLayout({
     fetch(`${API_URL}/api/public/categories`).then(r => r.json()).then(res => {
       if (res.data) setCategories(res.data)
     }).catch(err => console.error("Failed to fetch categories for menu", err))
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   return (
@@ -233,14 +237,21 @@ export default function PublicLayout({
                     )}
                   </Link>
 
-                  <Link
-                    href={user ? "/account" : "/login"}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-lg transition-colors"
-                  >
-                    <UserIcon className="w-4 h-4 text-slate-500" />
-                    <span>{user ? (language === "kh" ? "គណនីរបស់ខ្ញុំ" : "My Account") : (language === "kh" ? "ចូលគណនី" : "Sign In")}</span>
-                  </Link>
+                  {isAuthChecking ? (
+                    <div className="flex items-center gap-3 px-3 py-2.5">
+                      <div className="w-4 h-4 rounded-full bg-slate-200 animate-pulse" />
+                      <div className="w-24 h-4 rounded bg-slate-200 animate-pulse" />
+                    </div>
+                  ) : (
+                    <Link
+                      href={user ? "/account" : "/login"}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-lg transition-colors"
+                    >
+                      <UserIcon className="w-4 h-4 text-slate-500" />
+                      <span>{user ? (language === "kh" ? "គណនីរបស់ខ្ញុំ" : "My Account") : (language === "kh" ? "ចូលគណនី" : "Sign In")}</span>
+                    </Link>
+                  )}
 
                   <Link
                     href="/about"
@@ -287,7 +298,7 @@ export default function PublicLayout({
                             <button
                               onClick={() => {
                                 setExpandedCategories(prev => 
-                                  prev.includes(cat.slug) ? prev.filter(s => s !== cat.slug) : [...prev, cat.slug]
+                                  prev.includes(cat.slug) ? [] : [cat.slug]
                                 )
                               }}
                               className="flex-1 flex items-center justify-between px-3.5 py-2.5 text-sm font-bold text-slate-800 text-left"
@@ -312,7 +323,7 @@ export default function PublicLayout({
                             <Link
                               href={`/products/category/${cat.slug}`}
                               onClick={() => setMobileMenuOpen(false)}
-                              className="px-2.5 py-2 text-xs md:text-sm font-bold text-slate-500 hover:text-[#004691] hover:bg-slate-50 rounded-md"
+                              className="px-2.5 py-2 text-sm md:text-base font-bold text-slate-500 hover:text-[#004691] hover:bg-slate-50 rounded-md"
                             >
                               {language === "kh" ? `ទំនិញទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
                             </Link>
@@ -322,7 +333,7 @@ export default function PublicLayout({
                                 key={sub.id}
                                 href={`/products/category/${sub.slug}`}
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="px-2.5 py-2 text-xs md:text-sm font-medium text-slate-700 hover:text-[#004691] rounded-md"
+                                className="px-2.5 py-2 text-sm md:text-base font-medium text-slate-700 hover:text-[#004691] rounded-md"
                               >
                                 {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
                               </Link>
@@ -407,7 +418,11 @@ export default function PublicLayout({
                   )}
                 </button>
 
-                {user ? (
+                {isAuthChecking ? (
+                  <div className="p-1.5 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-slate-200 animate-pulse" />
+                  </div>
+                ) : user ? (
                   <Link href="/account" className="p-1.5 text-slate-700 hover:text-[#004691]">
                     {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
                       <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
@@ -561,6 +576,62 @@ export default function PublicLayout({
                 <nav className="flex items-center gap-8 text-sm md:text-base font-bold tracking-wide">
                   {navItems.map((item) => {
                     const isActive = pathname === item.href
+                    
+                    if (item.href === "/categories") {
+                      return (
+                        <div key={item.href} className="group relative py-6 -my-6">
+                          <Link
+                            href={item.href}
+                            className={`transition-colors py-2 border-b-2 font-semibold flex items-center gap-1 ${
+                              isActive 
+                                ? "text-[#004691] border-[#004691]" 
+                                : "text-slate-700 border-transparent group-hover:text-[#004691]"
+                            }`}
+                          >
+                            {item.name}
+                            <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-[#004691] group-hover:rotate-180 transition-all duration-300" />
+                          </Link>
+
+                          {/* Mega Menu Dropdown */}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-[900px] max-w-[90vw] bg-white border border-slate-200 shadow-[0_20px_40px_-15px_rgba(0,70,145,0.1)] rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[110] p-8 cursor-default">
+                            <div className="grid grid-cols-4 gap-x-8 gap-y-10">
+                              {categories.filter(c => !c.parentId).map(mainCat => {
+                                const subs = categories.filter(sub => sub.parentId === mainCat.id)
+                                return (
+                                  <div key={mainCat.id} className="flex flex-col">
+                                    <Link 
+                                      href={`/products/category/${mainCat.slug}`}
+                                      className="font-black text-slate-800 text-[15px] mb-3 hover:text-[#004691] transition-colors flex items-center justify-between gap-2 border-b border-slate-100 pb-2 group/main"
+                                    >
+                                      <span className="truncate">{language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}</span>
+                                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover/main:text-[#004691] transition-colors shrink-0" />
+                                    </Link>
+                                    <div className="flex flex-col gap-2">
+                                      {subs.map(sub => (
+                                        <Link
+                                          key={sub.id}
+                                          href={`/products/category/${sub.slug}`}
+                                          className="text-[13px] font-semibold text-slate-500 hover:text-[#004691] hover:bg-blue-50/50 px-2 -mx-2 py-1 rounded transition-colors flex items-center gap-2 group/sub"
+                                        >
+                                          <div className="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/sub:bg-[#004691] transition-colors shrink-0" />
+                                          <span className="truncate">{language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}</span>
+                                        </Link>
+                                      ))}
+                                      {subs.length === 0 && (
+                                        <span className="text-[12px] italic text-slate-400 px-2 -mx-2 py-1">
+                                          {language === "kh" ? "គ្មានប្រភេទរងទេ" : "No subcategories"}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    }
+
                     return (
                       <Link
                         key={item.href}
@@ -727,26 +798,20 @@ export default function PublicLayout({
                     <Heart className="w-5 h-5 stroke-[1.8]" />
                     {wishlistItems && wishlistItems.length > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-extrabold min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white">
-                        {wishlistItems.length}
+                          {wishlistItems.length}
                       </span>
                     )}
                   </Link>
 
-                  {/* Cart Icon Button */}
-                  <button onClick={openCart} className="relative p-2 text-slate-700 hover:text-[#004691] transition-colors">
-                    <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-extrabold min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-
                   {/* Account Link */}
-                  {user ? (
+                  {isAuthChecking ? (
+                    <div className="p-2 ml-1 flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-slate-200 animate-pulse" />
+                    </div>
+                  ) : user ? (
                     <Link href="/account" className="p-2 text-slate-700 hover:text-[#004691] transition-colors">
                       {(user.user_metadata?.avatar_url || user.user_metadata?.picture) ? (
-                        <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover" referrerPolicy="no-referrer" />
+                        <img src={user.user_metadata.avatar_url || user.user_metadata.picture} alt="Avatar" className="w-5 h-5 rounded-full object-cover shadow-2xs" referrerPolicy="no-referrer" />
                       ) : (
                         <UserIcon className="w-5 h-5 stroke-[1.8]" />
                       )}

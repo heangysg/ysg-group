@@ -5,7 +5,7 @@ import Link from "next/link"
 import PublicLayout from "./PublicLayout"
 import ProductCard from "./ProductCard"
 import { useLanguage } from "../contexts/LanguageContext"
-import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDown, Check, ArrowRight } from "lucide-react"
+import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDown, Check, ArrowRight, Star } from "lucide-react"
 import { useRouter, useParams, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -24,9 +24,10 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
   const isFeatured = initialFeatured || searchParams.get("featured") === "true"
   const urlSearch = (params?.query as string) || searchParams.get("search") || initialSearch
 
-  const [allProducts, setAllProducts] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [allProducts, setAllProducts] = useState<any[]>(_cachedProducts)
+  const [categories, setCategories] = useState<any[]>(_cachedCategories)
+  const [loading, setLoading] = useState(_cachedProducts.length === 0)
+  const [isRestored] = useState(_cachedProducts.length > 0)
   const [searchQuery, setSearchQuery] = useState(urlSearch)
   const [selectedCategory, setSelectedCategory] = useState(urlCategory)
   const [showFilters, setShowFilters] = useState(false)
@@ -73,24 +74,63 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
     fetchData()
   }, [isFeatured])
 
+  // 🎯 Bulletproof Manual Scroll Restoration for Products Page
+  useEffect(() => {
+    if (loading) return
+
+    // 1. Check if this was a page refresh
+    const navEntries = window.performance.getEntriesByType("navigation")
+    const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload"
+
+    if (isReload) {
+      sessionStorage.removeItem(`ysg_products_scroll_${selectedCategory}`)
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    } else {
+      // Restore previous scroll position instantly if navigating back
+      const savedScroll = sessionStorage.getItem(`ysg_products_scroll_${selectedCategory}`)
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' })
+        }, 50)
+      }
+    }
+
+    // 2. Track scrolling to save for when user hits Back button
+    const handleScroll = () => {
+      // Prevent Next.js router from overwriting with 0 during page transitions
+      if (window.scrollY > 10) {
+        sessionStorage.setItem(`ysg_products_scroll_${selectedCategory}`, window.scrollY.toString())
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [loading, selectedCategory])
+
   const toggleCategoryExpand = (slug: string, e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
     setExpandedCategories(prev => 
-      prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]
+      prev.includes(slug) ? [] : [slug]
     )
   }
 
   const handleCategorySelect = (slug: string, isMobile: boolean = false) => {
-    setSelectedCategory(slug)
     if (isMobile) {
       setShowFilters(false)
     }
 
     const targetUrl = slug === "all" ? "/products" : `/products/category/${slug}`
-    startTransition(() => {
-      router.push(targetUrl, { scroll: false })
-    })
+
+    // If we are currently on the Featured page, we must use router.push to actually navigate 
+    // away and remount the normal category component.
+    if (isFeatured) {
+      router.push(targetUrl)
+    } else {
+      setSelectedCategory(slug)
+      // Use pushState for instant client-side URL update between normal categories
+      window.history.pushState(null, '', targetUrl)
+    }
   }
 
   // ⚡ Instant Client-Side Category & Search Filtering (Zero Flash / Glitch)
@@ -132,10 +172,24 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
   const renderCategoryFilters = (isMobile: boolean = false) => (
     <div className="flex flex-col gap-1">
+      {/* Featured Machines Sidebar Button (Top) */}
+      <button
+        onClick={() => {
+          if (isMobile) setShowFilters(false)
+          router.push('/products/featured')
+        }}
+        className={`flex items-center justify-between px-3.5 py-2.5 text-sm md:text-base font-bold rounded-lg transition-all ${
+          isFeatured ? "bg-[#004691] text-white shadow-2xs" : "text-slate-700 hover:bg-slate-100"
+        }`}
+      >
+        <span>{language === "kh" ? "ម៉ាស៊ីនពិសេស" : "Featured Machines"}</span>
+      </button>
+
+      {/* All Products Sidebar Button */}
       <button
         onClick={() => handleCategorySelect("all", isMobile)}
-        className={`flex items-center justify-between px-3.5 py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all ${
-          selectedCategory === "all" ? "bg-[#004691] text-white shadow-2xs" : "text-slate-700 hover:bg-slate-100"
+        className={`flex items-center justify-between px-3.5 py-2.5 text-sm md:text-base font-bold rounded-lg transition-all ${
+          selectedCategory === "all" && !isFeatured ? "bg-[#004691] text-white shadow-2xs" : "text-slate-700 hover:bg-slate-100"
         }`}
       >
         <span>{t("allProducts")}</span>
@@ -183,7 +237,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   {/* Option to view all products under this main category */}
                   <button
                     onClick={() => handleCategorySelect(cat.slug, isMobile)}
-                    className={`text-left px-2.5 py-2 text-xs md:text-sm font-bold rounded-md transition-all ${
+                    className={`text-left px-2.5 py-2 text-sm md:text-base font-bold rounded-md transition-all ${
                       selectedCategory === cat.slug ? "text-[#004691] bg-blue-50" : "text-slate-500 hover:text-[#004691] hover:bg-slate-50"
                     }`}
                   >
@@ -194,7 +248,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                     <button
                       key={sub.id}
                       onClick={() => handleCategorySelect(sub.slug, isMobile)}
-                      className={`text-left px-2.5 py-2 text-xs md:text-sm rounded-md transition-all ${
+                      className={`text-left px-2.5 py-2 text-sm md:text-base rounded-md transition-all ${
                         selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                       }`}
                     >
@@ -254,7 +308,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               </span>
 
               <div className="flex items-center gap-2">
-                <span className="hidden sm:inline font-bold text-sm sm:text-base text-slate-800">{t("sortBy") || "Sort by"}:</span>
+                <span className="hidden sm:inline font-bold text-sm sm:text-base text-slate-800">
+                  {language === "kh" ? "តម្រៀបតាម" : "Sort by"}:
+                </span>
                 
                 {/* 🤍 Custom White Dropdown Popover */}
                 <div className="relative">
@@ -407,8 +463,8 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   // Flat grid for a specific subcategory
                   return (
                     <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
-                      {filteredProducts.map(product => (
-                        <ProductCard key={product.id} product={product} />
+                      {filteredProducts.map((product, idx) => (
+                        <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                       ))}
                     </div>
                   )
@@ -498,8 +554,8 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
                           {/* Product grid for this group */}
                           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
-                            {displayProducts.map(product => (
-                              <ProductCard key={product.id} product={product} />
+                            {displayProducts.map((product, idx) => (
+                              <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                             ))}
                           </div>
 
@@ -542,8 +598,8 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                           <div className="h-0.5 flex-1 bg-slate-200" />
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
-                          {ungrouped.map(product => (
-                            <ProductCard key={product.id} product={product} />
+                          {ungrouped.map((product, idx) => (
+                            <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                           ))}
                         </div>
                       </div>

@@ -138,8 +138,17 @@ export default function EditProduct() {
 
 
 
-  const generateSlug = (name: string) => {
-    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+  const generateSlug = (name: string, oldSlug: string) => {
+    const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+    // Extract -pXXXX from oldSlug if it exists
+    const match = oldSlug.match(/-p\d+$/)
+    if (match) {
+      return `${baseSlug}${match[0]}`
+    }
+    
+    // If it's an old format (like -1785746484266-352), let's just keep the old slug 
+    // entirely rather than generating a completely new one that breaks links.
+    return oldSlug
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,7 +205,7 @@ export default function EditProduct() {
 
     const finalImages = [...images, ...uploadedUrls]
 
-    const newSlug = generateSlug(formData.name)
+    const newSlug = generateSlug(formData.name, slug)
 
     const token = localStorage.getItem("ysg_admin_token")
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'

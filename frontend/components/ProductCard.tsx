@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin, Package, ShoppingCart, ArrowUpRight, Heart } from "lucide-react"
+import { Package, ShoppingCart, Heart } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import { useCart } from "../contexts/CartContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import toast from "react-hot-toast"
 import { getValidImages, getOptimizedImageUrl } from "../lib/imageUtils"
+import { motion } from "framer-motion"
 
 type ProductCardProps = {
   product: {
@@ -22,9 +23,11 @@ type ProductCardProps = {
     thumbnail?: string
     model?: string
   }
+  index?: number
+  disableAnimation?: boolean
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, disableAnimation = false }: ProductCardProps) {
   const { language, t } = useLanguage()
   const { addToCart } = useCart()
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
@@ -34,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "decimal",
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
     }).format(price)
   }
 
@@ -73,57 +76,73 @@ export default function ProductCard({ product }: ProductCardProps) {
   let imageUrl = getOptimizedImageUrl(images[0] || "", 'card')
 
   return (
-    <div className="group flex flex-col h-full relative bg-white transition-all duration-300 p-2 md:p-3 rounded-lg hover:shadow-xs">
+    <motion.div 
+      initial={disableAnimation ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, ease: "easeOut", delay: disableAnimation ? 0 : Math.min(index * 0.05, 0.3) }}
+      className="group flex flex-col h-full relative bg-white transition-all duration-300 border border-slate-200 rounded-xl overflow-hidden hover:shadow-xl hover:shadow-[#004691]/5"
+    >
       <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0" aria-label={`View ${product.name}`} />
       
-      {/* 🖼️ Floating Clean Image Container */}
-      <div className="relative aspect-square w-full bg-white overflow-hidden p-4 flex items-center justify-center mb-3">
+      {/* 🖼️ Image Container */}
+      <div className="relative aspect-square w-full bg-white flex items-center justify-center p-4">
         {imageUrl && imageUrl !== "" ? (
           <Image 
             src={imageUrl} 
             alt={product.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-contain transition-transform duration-500 group-hover:scale-105"
+            className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-50 rounded-md">
-            <Package className="w-10 h-10 text-slate-300 group-hover:text-slate-600 transition-colors" />
+          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+            <Package className="w-10 h-10 text-slate-300" />
           </div>
         )}
-        
-        {/* Wishlist Icon (Always Visible) */}
-        <div className="absolute top-1 right-1 z-20 transition-opacity duration-200">
-          <button 
-            onClick={handleToggleWishlist}
-            className={`w-7 h-7 rounded-md flex items-center justify-center border bg-white shadow-2xs ${
-              inWishlist ? "text-[#004691] border-[#004691] bg-blue-50" : "text-slate-400 border-slate-200 hover:text-[#004691]"
-            }`}
-          >
-            <Heart className={`w-3.5 h-3.5 ${inWishlist ? "fill-[#004691]" : ""}`} />
-          </button>
-        </div>
       </div>
 
-      {/* 📝 Centered Title & Price (Matching Gyeon Image 2) */}
-      <div className="flex flex-col items-center text-center flex-1 z-10 pointer-events-none">
-        <h3 className="text-sm md:text-base font-medium text-slate-900 leading-snug line-clamp-2 min-h-[42px] group-hover:text-[#004691] transition-colors duration-200 mb-1">
+      {/* 📝 Product Info & Actions */}
+      <div className="flex flex-col flex-1 p-3 pt-1 z-10 pointer-events-none">
+        
+        {/* Title */}
+        <h3 className="text-[13px] sm:text-sm font-semibold text-slate-800 leading-snug line-clamp-2 min-h-[40px] group-hover:text-[#004691] transition-colors duration-300 mb-2">
           {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
         </h3>
         
-        <div className="mt-auto pt-1 flex items-center justify-center gap-2 pointer-events-auto">
-          <span className="text-base md:text-xl font-extrabold text-[#004691] tracking-tight">
-            ${formatPrice(product.price)}
-          </span>
-          <button 
-            onClick={handleAddToCart}
-            className="w-7 h-7 bg-slate-900 hover:bg-[#004691] text-white rounded-full flex items-center justify-center transition-colors shadow-2xs active:scale-95 ml-1"
-            title={language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-          </button>
+        {/* Bottom Row: Price & Buttons */}
+        <div className="mt-auto flex items-center justify-between">
+          
+          {/* Price */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[15px] sm:text-lg font-bold text-red-500 tracking-tight leading-none">
+              ${formatPrice(product.price)}
+            </span>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1.5 pointer-events-auto shrink-0 pl-1">
+            <button 
+              onClick={handleAddToCart}
+              className="w-7 h-7 sm:w-8 sm:h-8 bg-[#00224a] hover:bg-[#004691] text-white rounded-md flex items-center justify-center transition-colors shadow-xs hover:scale-105 active:scale-95"
+              title={language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
+            >
+              <ShoppingCart className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
+            </button>
+            <button 
+              onClick={handleToggleWishlist}
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md flex items-center justify-center transition-colors shadow-xs hover:scale-105 active:scale-95 ${
+                inWishlist 
+                  ? "bg-blue-50 text-[#004691] border border-[#004691]" 
+                  : "bg-[#00224a] hover:bg-[#004691] text-white border border-transparent"
+              }`}
+              title={language === "kh" ? "បញ្ជីចំណូលចិត្ត" : "Wishlist"}
+            >
+              <Heart className={`w-[14px] h-[14px] sm:w-4 sm:h-4 ${inWishlist ? "fill-[#004691]" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

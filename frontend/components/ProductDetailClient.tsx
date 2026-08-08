@@ -197,7 +197,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           
           {/* 📍 Mobile Responsive Breadcrumbs (Increased font size) */}
-          <div className="mb-4 md:mb-6 flex items-center gap-2 text-sm sm:text-base font-semibold text-slate-600 overflow-hidden whitespace-nowrap">
+          <div className="mb-4 md:mb-6 flex items-center gap-2 text-sm sm:text-base font-medium text-slate-600 overflow-hidden whitespace-nowrap">
             <Link href="/" className="hover:text-[#004691] shrink-0 transition-colors">
               {language === "kh" ? "ទំព័រដើម" : "Home"}
             </Link>
@@ -214,10 +214,10 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
           </div>
 
           {/* 🛍️ Main Product Detail Grid */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start mb-12">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-12">
             
             {/* Left: Image Showcase & Thumbnails */}
-            <div className="space-y-4">
+            <div className="space-y-4 lg:col-span-5 w-full max-w-lg mx-auto lg:mx-0">
               <div className="bg-white rounded-2xl aspect-square relative overflow-hidden flex items-center justify-center p-6 shadow-2xs border border-slate-100">
                 {images.length > 0 && images[activeImage] ? (
                   <Image
@@ -255,11 +255,11 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
             </div>
 
             {/* Right: Product Info & Actions (100% Gyeon Cambodia Clone) */}
-            <div className="flex flex-col space-y-4 pt-2">
+            <div className="flex flex-col space-y-4 pt-2 lg:col-span-7">
               
               {/* Title & Favorite / Share Buttons */}
               <div className="flex items-start justify-between gap-4">
-                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">
                   {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
                 </h1>
 
@@ -283,7 +283,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
               </div>
 
               {/* Category */}
-              <div className="text-xs font-semibold text-slate-500">
+              <div className="text-sm md:text-base font-semibold text-slate-500">
                 <span>{language === "kh" ? "ប្រភេទ: " : "Category: "}</span>
                 <Link href={`/products/category/${categoryObj?.slug || product.category?.slug || product.categorySlug || 'all'}`} className="text-slate-800 hover:text-[#004691] font-bold">
                   {(() => {
@@ -300,7 +300,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
               {/* Price Tag */}
               <div className="pt-2">
-                <span className="text-3xl md:text-4xl font-extrabold text-[#004691] font-sans">
+                <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] font-sans">
                   ${product.price ? Number(product.price).toLocaleString() : "0.00"}
                 </span>
               </div>
@@ -338,7 +338,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
               {/* Description Details */}
               <div className="pt-4 border-t border-slate-200/80 space-y-3">
-                <p className="text-xs md:text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-line">
+                <p className="text-base md:text-lg text-slate-700 leading-relaxed font-medium whitespace-pre-line">
                   {language === "kh" && product.descriptionKhmer ? product.descriptionKhmer.trim() : product.description?.trim()}
                 </p>
               </div>
