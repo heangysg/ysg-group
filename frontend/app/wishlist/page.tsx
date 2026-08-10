@@ -40,9 +40,6 @@ export default function WishlistPage() {
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
                   {t("wishlist")}
                 </h1>
-                <span className="bg-blue-50 text-[#004691] px-3 py-1 rounded-full text-xs sm:text-sm font-bold border border-blue-100">
-                  {wishlistItems.length} {language === "kh" ? "មុខ" : "items"}
-                </span>
               </div>
               <p className="text-slate-500 text-xs sm:text-sm font-semibold mt-1">
                 {language === "kh" ? "ទំនិញដែលបានរក្សាទុកសម្រាប់ទិញពេលក្រោយ" : "Saved items for future purchase"}

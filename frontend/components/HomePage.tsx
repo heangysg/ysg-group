@@ -67,9 +67,35 @@ export default function HomePage() {
           setPopularProducts(prods)
         }
 
-        setBanners([
-          { id: 1, image: "", title: "Premium Heavy Equipment Solutions" }
-        ])
+        let dynamicBanners = [
+          { id: 1, imageUrl: "", title: "Premium Heavy Equipment Solutions", link: "" }
+        ]
+
+        try {
+          const settingsRes = await fetch(`${API_URL}/api/public/settings`, { cache: 'no-store' })
+          if (settingsRes.ok) {
+            const data = await settingsRes.json()
+            const settings = data.data || {}
+            if (settings.homepage_banners) {
+              const parsed = typeof settings.homepage_banners === 'string' 
+                ? JSON.parse(settings.homepage_banners) 
+                : settings.homepage_banners
+              const activeBanners = parsed.filter((b: any) => b.isActive).sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+              if (activeBanners.length > 0) {
+                dynamicBanners = activeBanners.map((b: any) => ({
+                  id: b.id,
+                  imageUrl: b.imageUrl,
+                  title: b.alt || "",
+                  link: b.link || ""
+                }))
+              }
+            }
+          }
+        } catch (e) {
+          console.error("Failed to fetch banners", e)
+        }
+
+        setBanners(dynamicBanners)
       } catch (err) {
         console.error("Home Data Fetch Error:", err)
       } finally {
@@ -169,12 +195,22 @@ export default function HomePage() {
               transition={{ duration: 0.7, ease: "easeInOut" }}
               className="absolute inset-0"
             >
-              {banners[currentSlide]?.image ? (
-                <img 
-                  src={banners[currentSlide].image}
-                  alt="Promotion"
-                  className="w-full h-full object-cover"
-                />
+              {banners[currentSlide]?.imageUrl ? (
+                banners[currentSlide].link ? (
+                  <Link href={banners[currentSlide].link} className="block w-full h-full">
+                    <img 
+                      src={banners[currentSlide].imageUrl}
+                      alt={banners[currentSlide].title}
+                      className="w-full h-full object-cover"
+                    />
+                  </Link>
+                ) : (
+                  <img 
+                    src={banners[currentSlide].imageUrl}
+                    alt={banners[currentSlide].title}
+                    className="w-full h-full object-cover"
+                  />
+                )
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-slate-50 to-slate-200 flex flex-col items-center justify-center p-6 text-center shadow-inner relative overflow-hidden">
                   {/* Decorative faint logo in background */}

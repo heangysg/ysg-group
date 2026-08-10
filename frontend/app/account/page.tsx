@@ -155,6 +155,7 @@ export default function AccountPage() {
     switch (status?.toUpperCase()) {
       case "PAID":
       case "COMPLETED": return "bg-emerald-50 text-emerald-700 border border-emerald-200"
+      case "CONFIRMED": return "bg-blue-50 text-blue-700 border border-blue-200"
       case "PENDING": return "bg-amber-50 text-amber-700 border border-amber-200"
       case "CANCELLED": return "bg-rose-50 text-rose-700 border border-rose-200"
       default: return "bg-slate-50 text-slate-700 border border-slate-200"
@@ -165,6 +166,7 @@ export default function AccountPage() {
     switch (status?.toUpperCase()) {
       case "PAID":
       case "COMPLETED": return language === "kh" ? "បានទូទាត់ប្រាក់" : "Paid"
+      case "CONFIRMED": return language === "kh" ? "បានបញ្ជាក់" : "Confirmed"
       case "PENDING": return language === "kh" ? "កំពុងរង់ចាំ" : "Pending"
       case "CANCELLED": return language === "kh" ? "បានបោះបង់" : "Cancelled"
       default: return status || (language === "kh" ? "កំពុងដំណើរការ" : "Processing")
@@ -308,7 +310,7 @@ export default function AccountPage() {
                   {/* 📊 Responsive Stats Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                     {[
-                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0).toLocaleString()}`, icon: CreditCard },
+                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, icon: CreditCard },
                       { label: t("totalOrders"), value: orders.length, icon: Package },
                       { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield }
                     ].map((stat, i) => (

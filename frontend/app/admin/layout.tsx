@@ -21,7 +21,8 @@ import {
   Camera,
   Globe,
   Plus,
-  ShoppingBag
+  ShoppingBag,
+  Image as ImageIcon
 } from "lucide-react"
 import { Check, Loader2, Upload, Trash2, Edit2, Shield, Key, Edit, ListPlus, MessageSquare } from "lucide-react"
 import { useLanguage } from "../../contexts/LanguageContext"
@@ -167,6 +168,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
     { name: t("products"), href: "/admin/products", icon: Package },
     { name: t("categories"), href: "/admin/categories", icon: FolderOpen },
+    { name: t("banners") || "Banners", href: "/admin/banners", icon: ImageIcon },
     { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
     { name: t("orders"), href: "/admin/orders", icon: History },
     ...(isSuperAdmin ? [

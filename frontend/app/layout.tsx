@@ -1,9 +1,10 @@
-﻿import type { Metadata, Viewport } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Outfit, Kantumruy_Pro, Oswald } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "../contexts/LanguageContext"
 import { CartProvider } from "../contexts/CartContext"
 import { WishlistProvider } from "../contexts/WishlistContext"
+import NextTopLoader from 'nextjs-toploader'
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" })
@@ -107,8 +108,35 @@ export default function RootLayout({
         <meta name="theme-color" content="#004691" />
         <meta name="msapplication-TileColor" content="#004691" />
         <meta name="msapplication-TileImage" content="/logo.png" />
+        {/* Google Analytics GA4 - set NEXT_PUBLIC_GA_ID in .env to activate */}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', { page_path: window.location.pathname });
+                `,
+              }}
+            />
+          </>
+        )}
       </head>
       <body className="font-sans antialiased" suppressHydrationWarning>
+        <NextTopLoader 
+          color="#004691"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #004691,0 0 5px #004691"
+        />
         <LanguageProvider>
           <CartProvider>
             <WishlistProvider>
