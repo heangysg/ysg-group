@@ -1,6 +1,6 @@
 "use client" 
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import PublicLayout from "../../components/PublicLayout"
@@ -34,6 +34,22 @@ export default function AccountPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
+  const contentRef = useRef<HTMLDivElement>(null)
+  const navRef = useRef<HTMLDivElement>(null)
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+    // Auto-scroll active tab into center of the tab bar (mobile)
+    setTimeout(() => {
+      const nav = navRef.current
+      const activeBtn = nav?.querySelector(`[data-tab="${tabId}"]`) as HTMLElement
+      if (nav && activeBtn) {
+        const navCenter = nav.offsetWidth / 2
+        const btnCenter = activeBtn.offsetLeft + activeBtn.offsetWidth / 2
+        nav.scrollTo({ left: btnCenter - navCenter, behavior: 'smooth' })
+      }
+    }, 30)
+  }
   const [orders, setOrders] = useState<any[]>([])
   const [fetchingOrders, setFetchingOrders] = useState(false)
   
@@ -256,14 +272,15 @@ export default function AccountPage() {
             {/* Navigation Tabs */}
             <div className="lg:col-span-3 lg:sticky lg:top-24 mb-2 lg:mb-0">
               {/* Mobile Horizontal Tabs */}
-              <nav className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4 border-b border-slate-100">
+              <nav ref={navRef} className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4 border-b border-slate-100">
                 {menuItems.map((item) => {
                   const isActive = activeTab === item.id
                   const Icon = item.icon
                   return (
                     <button 
                       key={item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      data-tab={item.id}
+                      onClick={() => handleTabChange(item.id)}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-bold shrink-0 transition-all ${
                         isActive 
                           ? "bg-[#004691] text-white shadow-sm" 
@@ -303,24 +320,36 @@ export default function AccountPage() {
               </nav>
             </div>
 
-            <div className="lg:col-span-9">
+            <div className="lg:col-span-9" ref={contentRef}>
               {activeTab === "overview" && (
                 <div className="space-y-6 md:space-y-8">
                   
-                  {/* 📊 Responsive Stats Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                  {/* 📊 Responsive Stats Grid - always 3 col */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
                     {[
-                      { label: language === "kh" ? "ចំណាយសរុប" : "Portfolio Value", value: `$${orders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, icon: CreditCard },
-                      { label: t("totalOrders"), value: orders.length, icon: Package },
-                      { label: language === "kh" ? "ពិន្ទុរង្វាន់" : "Loyalty Points", value: "1,250", icon: Shield }
+                      { 
+                        label: language === "kh" ? "ចំណាយសរុប" : "Total Spent", 
+                        value: `$${orders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 
+                        icon: CreditCard 
+                      },
+                      { 
+                        label: language === "kh" ? "ការបញ្ជាទិញ" : "Total Orders", 
+                        value: orders.length, 
+                        icon: Package 
+                      },
+                      { 
+                        label: language === "kh" ? "សមាជិកតាំងពី" : "Member Since", 
+                        value: user?.created_at ? new Date(user.created_at).toLocaleDateString(language === "kh" ? "km-KH" : "en-US", { month: "short", year: "numeric" }) : "—", 
+                        icon: Shield 
+                      }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-white p-4 sm:p-5 md:p-6 rounded-xl md:rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between">
-                        <div className="w-9 h-9 sm:w-11 sm:h-11 bg-blue-50 text-[#004691] rounded-xl flex items-center justify-center mb-3">
-                          <stat.icon className="w-5 h-5" />
+                      <div key={i} className="bg-white p-3 sm:p-5 md:p-6 rounded-xl md:rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 bg-blue-50 text-[#004691] rounded-xl flex items-center justify-center mb-2 sm:mb-3">
+                          <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-xs sm:text-sm font-bold text-slate-500 truncate">{stat.label}</p>
-                          <p className="text-lg sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight truncate">{stat.value}</p>
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] sm:text-sm font-bold text-slate-500 truncate leading-tight">{stat.label}</p>
+                          <p className="text-sm sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight truncate">{stat.value}</p>
                         </div>
                       </div>
                     ))}
@@ -361,9 +390,13 @@ export default function AccountPage() {
                         ))}
                       </div>
                     ) : (
-                      <div className="bg-slate-50 p-12 text-center rounded-2xl border-2 border-dashed border-slate-200">
-                        <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                      <div className="bg-slate-50 p-10 text-center rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center gap-4">
+                        <Package className="w-12 h-12 text-slate-300" />
                         <p className="text-sm font-bold text-slate-600">{t("noRecentActivity")}</p>
+                        <Link href="/products" className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004691] hover:bg-[#003366] text-white text-xs font-bold rounded-lg transition-all shadow-sm">
+                          {language === "kh" ? "រកមើលផលិតផល" : "Browse Products"}
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
                       </div>
                     )}
                   </div>

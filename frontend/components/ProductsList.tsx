@@ -292,9 +292,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           </div>
 
           {/* Header Bar: Category Title + Count + Custom Sort & Filter */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 mb-6 border-b border-slate-200 gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight">
+          <div className="flex flex-row justify-between items-center pb-4 mb-6 border-b border-slate-200 gap-3">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] tracking-tight truncate">
                 {(() => {
                   if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
                   if (isFeatured) return language === "kh" ? "ផលិតផលពិសេស" : "Featured Machines"
@@ -306,7 +306,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               </h1>
             </div>
 
-            <div className="flex items-center justify-end gap-4 w-full sm:w-auto text-sm font-semibold text-slate-700">
+            <div className="flex items-center gap-2 shrink-0 text-sm font-semibold text-slate-700">
               <div className="flex items-center gap-2">
                 <span className="hidden sm:inline font-bold text-sm sm:text-base text-slate-800">
                   {language === "kh" ? "តម្រៀបតាម" : "Sort by"}:
@@ -316,15 +316,15 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                 <div className="relative">
                   <button
                     onClick={() => setSortOpen(!sortOpen)}
-                    className="flex items-center gap-2 py-2 px-4 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition-all"
+                    className="flex items-center gap-1.5 py-1.5 px-3 bg-white border border-slate-200 rounded-lg text-xs sm:text-sm font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition-all whitespace-nowrap"
                   >
                     <span>
                       {sortBy === "newest" && (language === "kh" ? "ថ្មីបំផុត" : "Newest")}
-                      {sortBy === "price_asc" && (language === "kh" ? "តម្លៃ (ទាប ទៅ ខ្ពស់)" : "Price (Low to High)")}
-                      {sortBy === "price_desc" && (language === "kh" ? "តម្លៃ (ខ្ពស់ ទៅ ទាប)" : "Price (High to Low)")}
+                      {sortBy === "price_asc" && (language === "kh" ? "តម្លៃ (ទាប→ខ្ពស់)" : "Price ↑")}
+                      {sortBy === "price_desc" && (language === "kh" ? "តម្លៃ (ខ្ពស់→ទាប)" : "Price ↓")}
                       {sortBy === "name_az" && (language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z")}
                     </span>
-                    <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${sortOpen ? "rotate-180 text-[#004691]" : ""}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${sortOpen ? "rotate-180 text-[#004691]" : ""}`} />
                   </button>
 
                   <AnimatePresence>
@@ -366,7 +366,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                 {/* Mobile Filter Button */}
                 <button 
                   onClick={() => setShowFilters(true)}
-                  className="p-2 lg:hidden rounded-lg border bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200 transition-all flex items-center gap-1.5 text-xs sm:text-sm font-bold"
+                  className="p-1.5 lg:hidden rounded-lg border bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200 transition-all flex items-center gap-1 text-xs sm:text-sm font-bold"
                 >
                   <Filter className="w-4 h-4 text-[#004691]" />
                   <span className="hidden xs:inline">{t("filter") || "Filter"}</span>

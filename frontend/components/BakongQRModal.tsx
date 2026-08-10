@@ -144,7 +144,7 @@ export default function BakongQRModal({ isOpen, onClose, qrString, amount, order
           {/* 3. Card Body */}
           <div className="p-6 pt-5 flex flex-col">
             {/* Merchant Name */}
-            <h2 className="text-[15px] font-extrabold text-[#004691] leading-tight mb-2 mt-1 uppercase tracking-wide">
+            <h2 className="text-[15px] font-extrabold text-slate-900 leading-tight mb-2 mt-1 uppercase tracking-wide">
               {merchantName}
             </h2>
 
