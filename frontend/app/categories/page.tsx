@@ -34,7 +34,7 @@ export default function CategoriesPage() {
   return (
     <PublicLayout>
       <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -98,7 +98,7 @@ export default function CategoriesPage() {
                         className="group bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-[#004691] shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
                       >
                         <div className="w-full aspect-square bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center p-3 mb-3 overflow-hidden relative">
-                          {mainCat.image ? (
+                          {mainCat.image && !mainCat.image.includes('no.png') ? (
                             <img src={mainCat.image} alt={mainCat.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                           ) : (
                             <Package className="w-10 h-10 text-slate-300" />
@@ -124,7 +124,7 @@ export default function CategoriesPage() {
                           className="group bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-[#004691] shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
                         >
                           <div className="w-full aspect-square bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center p-3 mb-3 overflow-hidden relative">
-                            {sub.image ? (
+                            {sub.image && !sub.image.includes('no.png') ? (
                               <img src={sub.image} alt={sub.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                             ) : (
                               <Package className="w-10 h-10 text-slate-300" />

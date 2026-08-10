@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { logActivity } from "../../../../lib/audit"
-import { Eye, Trash2, Search, Filter, Package, ArrowLeft, RefreshCcw } from "lucide-react"
+import { Eye, Trash2, Search, Filter, Package, ArrowLeft, RefreshCcw, X } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../../contexts/LanguageContext"
 

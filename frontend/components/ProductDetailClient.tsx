@@ -194,7 +194,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
   return (
     <PublicLayout>
       <main className="min-h-screen bg-white pb-24 pt-4 md:pt-6 font-sans">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-8">
           
           {/* 📍 Mobile Responsive Breadcrumbs (Increased font size) */}
           <div className="mb-4 md:mb-6 flex items-center gap-2 text-sm sm:text-base font-medium text-slate-600 overflow-hidden whitespace-nowrap">
@@ -300,7 +300,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
 
               {/* Price Tag */}
               <div className="pt-2">
-                <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#004691] font-sans">
+                <span className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-red-600 font-sans">
                   ${product.price ? Number(product.price).toLocaleString() : "0.00"}
                 </span>
               </div>

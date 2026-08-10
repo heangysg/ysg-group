@@ -17,7 +17,7 @@ export default function CartPage() {
   return (
     <PublicLayout>
       <main className="min-h-screen bg-white pb-24 pt-4 md:pt-6 font-sans">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -88,7 +88,7 @@ export default function CartPage() {
                       <h3 className="text-xs sm:text-base font-extrabold text-slate-900 truncate mb-1">
                         {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                       </h3>
-                      <span className="text-xs sm:text-sm font-black text-[#004691] block mb-2 sm:mb-3">
+                      <span className="text-xs sm:text-sm font-black text-red-600 block mb-2 sm:mb-3">
                         ${item.price?.toLocaleString()}
                       </span>
 
@@ -113,7 +113,7 @@ export default function CartPage() {
                         </div>
 
                         <span className="text-[11px] sm:text-xs font-extrabold text-slate-700">
-                          {language === "kh" ? "សរុប:" : "Total:"} <span className="text-[#004691] font-black">${(item.price * item.quantity).toLocaleString()}</span>
+                          {language === "kh" ? "សរុប:" : "Total:"} <span className="text-red-600 font-black">${(item.price * item.quantity).toLocaleString()}</span>
                         </span>
                       </div>
                     </div>

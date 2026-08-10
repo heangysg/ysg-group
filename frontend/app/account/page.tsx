@@ -1,4 +1,4 @@
-"use client"
+"use client" 
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
@@ -194,7 +194,7 @@ export default function AccountPage() {
         
         {/* 👤 Account Banner Header */}
         <section className="bg-slate-50 border-b border-slate-200 py-6 md:py-10">
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="max-w-5xl mx-auto px-4 md:px-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
               
               <div className="flex items-center gap-4">
@@ -248,7 +248,7 @@ export default function AccountPage() {
           </div>
         </section>
 
-        <section className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-10">
+        <section className="max-w-5xl mx-auto px-4 md:px-8 py-6 md:py-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
             {/* Navigation Tabs */}

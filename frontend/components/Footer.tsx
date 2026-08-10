@@ -39,7 +39,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#00224a] text-slate-200 pt-16 pb-24 md:pb-8 mt-12 font-sans selection:bg-white/20 selection:text-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-5xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-8 lg:gap-x-12 gap-y-12 mb-16">
           
           {/* Column 1: Logo & Description */}

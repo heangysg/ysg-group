@@ -193,7 +193,6 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
         }`}
       >
         <span>{t("allProducts")}</span>
-        <span className="text-xs opacity-80">({allProducts.length})</span>
       </button>
       
       {categories.filter(c => !c.parentId).map(cat => {
@@ -208,20 +207,25 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               isSelected ? "bg-[#004691]/10 text-[#004691]" : "text-slate-800 hover:bg-slate-50"
             }`}>
               <button
-                onClick={(e) => {
-                  if (hasSubs) {
-                    toggleCategoryExpand(cat.slug, e)
-                  } else {
-                    handleCategorySelect(cat.slug, isMobile)
+                onClick={() => {
+                  handleCategorySelect(cat.slug, isMobile)
+                  if (hasSubs && !expandedCategories.includes(cat.slug)) {
+                    setExpandedCategories([cat.slug])
                   }
                 }}
-                className="flex-1 text-left px-3.5 py-2.5 text-sm md:text-base font-bold flex items-center justify-between"
+                className="flex-1 text-left px-3.5 py-2.5 text-base md:text-lg font-bold"
               >
-                <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
-                {hasSubs && (
-                  <ChevronRight className={`w-4 h-4 transition-transform duration-200 shrink-0 ${isExpanded ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />
-                )}
+                {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
               </button>
+              
+              {hasSubs && (
+                <button
+                  onClick={(e) => toggleCategoryExpand(cat.slug, e)}
+                  className="px-3 py-2.5 h-full flex items-center justify-center shrink-0 text-slate-400 hover:text-[#004691]"
+                >
+                  <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90 text-[#004691]' : ''}`} />
+                </button>
+              )}
             </div>
 
             {/* Smooth Animated Accordion for Nested Subcategories */}
@@ -237,7 +241,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   {/* Option to view all products under this main category */}
                   <button
                     onClick={() => handleCategorySelect(cat.slug, isMobile)}
-                    className={`text-left px-2.5 py-2 text-sm md:text-base font-bold rounded-md transition-all ${
+                    className={`text-left px-2.5 py-2 text-[15px] md:text-[17px] font-bold rounded-md transition-all ${
                       selectedCategory === cat.slug ? "text-[#004691] bg-blue-50" : "text-slate-500 hover:text-[#004691] hover:bg-slate-50"
                     }`}
                   >
@@ -248,7 +252,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                     <button
                       key={sub.id}
                       onClick={() => handleCategorySelect(sub.slug, isMobile)}
-                      className={`text-left px-2.5 py-2 text-sm md:text-base rounded-md transition-all ${
+                      className={`text-left px-2.5 py-2 text-[15px] md:text-[17px] rounded-md transition-all ${
                         selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                       }`}
                     >
@@ -267,7 +271,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
   return (
     <PublicLayout>
       <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -302,11 +306,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               </h1>
             </div>
 
-            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto text-sm font-semibold text-slate-700">
-              <span className="text-slate-600 font-semibold text-sm sm:text-base">
-                {language === "kh" ? `បង្ហាញ ${filteredProducts.length} លទ្ធផល` : `Showing ${filteredProducts.length} results`}
-              </span>
-
+            <div className="flex items-center justify-end gap-4 w-full sm:w-auto text-sm font-semibold text-slate-700">
               <div className="flex items-center gap-2">
                 <span className="hidden sm:inline font-bold text-sm sm:text-base text-slate-800">
                   {language === "kh" ? "តម្រៀបតាម" : "Sort by"}:
@@ -380,7 +380,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             {/* Desktop Sidebar Accordion Filters */}
             <aside className="hidden lg:block lg:w-64 shrink-0">
               <div className="bg-white rounded-xl border border-slate-200 p-4 sticky top-28 shadow-2xs">
-                <h3 className="text-sm font-bold text-[#004691] uppercase tracking-wider mb-3 px-2">
+                <h3 className="text-base font-bold text-[#004691] uppercase tracking-wider mb-3 px-2">
                   {t("categories")}
                 </h3>
                 {renderCategoryFilters(false)}
@@ -412,7 +412,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                     <div className="p-4 border-b border-slate-100 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Filter className="w-4.5 h-4.5 text-[#004691]" />
-                        <h3 className="text-sm font-bold text-slate-900">
+                        <h3 className="text-base font-bold text-slate-900">
                           {t("categories")}
                         </h3>
                       </div>
@@ -436,7 +436,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             {/* Product Grid */}
             <div className="flex-1">
               {loading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                <div className="grid grid-cols-2 sm:grid-cols-3  gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
                     <div key={n} className="aspect-[4/5] bg-white rounded-3xl border border-slate-100 animate-pulse shadow-sm" />
                   ))}
@@ -462,7 +462,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                 if (!shouldGroup) {
                   // Flat grid for a specific subcategory
                   return (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3  gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                       {filteredProducts.map((product, idx) => (
                         <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                       ))}
@@ -542,18 +542,18 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                             <div className="h-0.5 flex-1 bg-slate-200" />
                             <button
                               onClick={() => handleCategorySelect(group.cat.slug)}
-                              className="flex items-center gap-2 shrink-0 group"
+                              className="flex items-center gap-2 shrink overflow-hidden group max-w-[70%]"
                             >
-                              <span className="text-base sm:text-lg md:text-xl font-black text-slate-700 group-hover:text-[#004691] transition-colors whitespace-nowrap tracking-tight">
+                              <span className="text-base sm:text-lg md:text-xl font-black text-slate-700 group-hover:text-[#004691] transition-colors truncate tracking-tight">
                                 {group.subLabel}
                               </span>
-                              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#004691] transition-colors" />
+                              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#004691] transition-colors shrink-0" />
                             </button>
                             <div className="h-0.5 flex-1 bg-slate-200" />
                           </div>
 
                           {/* Product grid for this group */}
-                          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                          <div className="grid grid-cols-2 sm:grid-cols-3  gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                             {displayProducts.map((product, idx) => (
                               <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                             ))}
@@ -597,7 +597,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                           </span>
                           <div className="h-0.5 flex-1 bg-slate-200" />
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+                        <div className="grid grid-cols-2 sm:grid-cols-3  gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
                           {ungrouped.map((product, idx) => (
                             <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
                           ))}

@@ -408,7 +408,6 @@ export default function AdminCategories() {
                   <input type="number" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white outline-none font-bold text-xs font-medium transition-all" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
                 </div>
 
-                {modalType === "main" && (
                   <div>
                     <label className="block text-base font-bold text-slate-700 font-medium mb-2 ml-1">{t("categoryImage") || "Category Image"}</label>
                     {!previewImage && !formData.image ? (
@@ -436,7 +435,6 @@ export default function AdminCategories() {
                       </div>
                     )}
                   </div>
-                )}
 
                 <div className="flex gap-8 pt-2">
                   <label className="flex items-center gap-3 cursor-pointer group">

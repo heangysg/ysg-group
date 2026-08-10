@@ -118,7 +118,7 @@ export default function CheckoutPage() {
     <PublicLayout>
       <Toaster position="top-center" />
       <div className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8">
 
           {/* 🍞 Mobile Responsive Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -339,7 +339,7 @@ export default function CheckoutPage() {
                           ${item.price?.toLocaleString()} × {item.quantity}
                         </span>
                       </div>
-                      <span className="text-xs font-black text-[#004691] shrink-0">
+                      <span className="text-xs font-black text-red-600 shrink-0">
                         ${(item.price * item.quantity).toLocaleString()}
                       </span>
                     </div>

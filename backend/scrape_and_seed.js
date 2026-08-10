@@ -86,8 +86,8 @@ async function main() {
       where: { categoryId: category.id }
     });
 
-    if (productsCount === 0) {
-      console.log(`\nSeeding products for empty category: ${category.name}`);
+    if (productsCount < 4) {
+      console.log(`\nSeeding products for category with less than 4 items: ${category.name}`);
       
       const oldId = oldCategoryMap[category.name] || 2;
       const scrapedProducts = await scrapeCategory(oldId);
@@ -97,12 +97,16 @@ async function main() {
         continue;
       }
       
-      const count = Math.min(4, scrapedProducts.length);
+      const countToInsert = 4 - productsCount;
+      const count = Math.min(countToInsert, scrapedProducts.length);
       const dummyProducts = [];
       const khmerPrefix = khmerPrefixes[category.name] || 'ផលិតផល';
       
+      // We skip the first few to avoid duplicating existing ones (heuristically)
+      const startIndex = Math.min(productsCount, scrapedProducts.length - count);
+      
       for (let i = 0; i < count; i++) {
-        const prod = scrapedProducts[i];
+        const prod = scrapedProducts[startIndex + i];
         
         dummyProducts.push({
           categoryId: category.id,

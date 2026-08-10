@@ -106,39 +106,39 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
       <div className="flex flex-col flex-1 p-3 pt-1 z-10 pointer-events-none">
         
         {/* Title */}
-        <h3 className="text-[13px] sm:text-sm font-semibold text-slate-800 leading-snug line-clamp-2 min-h-[40px] group-hover:text-[#004691] transition-colors duration-300 mb-2">
+        <h3 className="text-[13px] sm:text-sm font-semibold text-slate-800 leading-snug truncate group-hover:text-[#004691] transition-colors duration-300 mb-2">
           {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
         </h3>
         
         {/* Bottom Row: Price & Buttons */}
-        <div className="mt-auto flex items-center justify-between">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-1">
           
           {/* Price */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5">
             <span className="text-[15px] sm:text-lg font-bold text-red-500 tracking-tight leading-none">
               ${formatPrice(product.price)}
             </span>
           </div>
           
           {/* Action Buttons */}
-          <div className="flex items-center gap-1.5 pointer-events-auto shrink-0 pl-1">
+          <div className="flex items-center gap-1.5 pointer-events-auto shrink-0">
             <button 
               onClick={handleAddToCart}
-              className="w-7 h-7 sm:w-8 sm:h-8 bg-[#00224a] hover:bg-[#004691] text-white rounded-md flex items-center justify-center transition-colors shadow-xs hover:scale-105 active:scale-95"
+              className="w-6 h-6 sm:w-7 sm:h-7 bg-[#00224a] hover:bg-[#004691] text-white rounded-full flex items-center justify-center transition-colors shadow-xs hover:scale-105 active:scale-95"
               title={language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
             >
-              <ShoppingCart className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
+              <ShoppingCart className="w-[12px] h-[12px] sm:w-[14px] sm:h-[14px]" />
             </button>
             <button 
               onClick={handleToggleWishlist}
-              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md flex items-center justify-center transition-colors shadow-xs hover:scale-105 active:scale-95 ${
+              className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-colors shadow-xs hover:scale-105 active:scale-95 ${
                 inWishlist 
                   ? "bg-blue-50 text-[#004691] border border-[#004691]" 
                   : "bg-[#00224a] hover:bg-[#004691] text-white border border-transparent"
               }`}
               title={language === "kh" ? "បញ្ជីចំណូលចិត្ត" : "Wishlist"}
             >
-              <Heart className={`w-[14px] h-[14px] sm:w-4 sm:h-4 ${inWishlist ? "fill-[#004691]" : ""}`} />
+              <Heart className={`w-[12px] h-[12px] sm:w-[14px] sm:h-[14px] ${inWishlist ? "fill-[#004691]" : ""}`} />
             </button>
           </div>
         </div>

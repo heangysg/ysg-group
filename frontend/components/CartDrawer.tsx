@@ -109,7 +109,7 @@ export default function CartDrawer() {
                       {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
                     </h4>
 
-                    <div className="text-sm font-black text-[#004691] mb-1">
+                    <div className="text-sm font-black text-red-600 mb-1">
                       ${item.price.toLocaleString()}
                     </div>
 

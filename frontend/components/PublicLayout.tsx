@@ -131,7 +131,6 @@ export default function PublicLayout({
     { name: t("home"), href: "/", icon: Home },
     { name: t("allProducts"), href: "/products", icon: Package },
     { name: t("categories"), href: "/categories", icon: FolderOpen },
-    { name: t("wishlist"), href: "/wishlist", icon: Heart },
     { name: t("contact"), href: "/contact", icon: Mail },
     { name: t("about"), href: "/about", icon: Info },
   ]
@@ -371,7 +370,7 @@ export default function PublicLayout({
       {/* 🚀 Top Navigation Header */}
       {!hideNav && (
         <header className="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-slate-200 shadow-2xs">
-          <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="max-w-5xl mx-auto px-4 md:px-8">
             
             {/* 📱 Mobile Top Header Bar (100% Match with Gyeon Image) */}
             <div className="flex lg:hidden items-center justify-between h-14 relative px-1">
@@ -439,142 +438,169 @@ export default function PublicLayout({
 
             </div>
 
-            {/* Mobile Expandable Search Bar */}
-            {mobileSearchOpen && (
-              <div className="lg:hidden pb-3 pt-1 border-t border-slate-100 relative">
-                <form 
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (searchQuery.trim()) {
-                      router.push(`/products/search/${encodeURIComponent(searchQuery.trim())}`);
-                      setMobileSearchOpen(false);
-                      setSearchOpen(false);
-                    }
-                  }} 
-                  className="w-full flex items-center bg-slate-100 rounded-full px-4 py-2 text-xs border border-transparent focus-within:border-[#004691] focus-within:bg-white"
-                >
-                  <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                  <input 
-                    name="search"
-                    type="text" 
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value)
-                      setSearchOpen(true)
-                    }}
-                    onFocus={() => setSearchOpen(true)}
-                    placeholder={language === "kh" ? "តើអ្នកកំពុងស្វែងរកអ្វី?" : "What are you looking for?"}
-                    className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-xs font-medium"
-                    autoFocus
-                  />
-                  <button type="button" onClick={() => {
+            {/* Unified Centered Modal Pop-up Search (Mobile & Desktop) */}
+            <AnimatePresence>
+              {mobileSearchOpen && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-start justify-center pt-16 md:pt-24 p-4"
+                  onClick={() => {
                     setMobileSearchOpen(false)
                     setSearchOpen(false)
                     setSearchQuery("")
-                  }} className="p-1 text-slate-400">
-                    <X className="w-4 h-4" />
-                  </button>
-                </form>
-
-                {/* 🛍️ Live Instant Search Product Modal Mobile (One Row per Product) */}
-                <AnimatePresence>
-                  {searchOpen && searchQuery.trim().length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 p-2"
-                    >
-                      <div className="text-[11px] font-extrabold text-slate-400 px-3 py-1.5 uppercase tracking-wider flex justify-between items-center border-b border-slate-100 pb-2">
-                        <span>{language === "kh" ? "លទ្ធផលស្វែងរក" : "Live Product Results"}</span>
-                        {isSearching ? (
-                          <span className="text-xs font-bold text-[#004691] animate-pulse">
-                            {language === "kh" ? "កំពុងស្វែងរក..." : "Searching..."}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] bg-blue-50 text-[#004691] px-2 py-0.5 rounded-full font-bold">
-                            {searchResults.length} {language === "kh" ? "ផល" : "found"}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto py-1">
-                        {searchResults.length > 0 ? (
-                          searchResults.map((product) => (
-                            <Link
-                              key={product.id}
-                              href={`/products/${product.id}`}
-                              onClick={() => {
-                                setSearchOpen(false)
-                                setMobileSearchOpen(false)
-                                setSearchQuery("")
-                              }}
-                              className="flex items-center gap-3 p-2 hover:bg-blue-50/60 rounded-xl transition-all group"
-                            >
-                              {/* Product Thumbnail Row Image */}
-                              <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shrink-0 overflow-hidden">
-                                {getValidImages(product)[0] ? (
-                                  <img src={getOptimizedImageUrl(getValidImages(product)[0], 'thumb')} alt={product.name} className="w-full h-full object-contain" />
-                                ) : (
-                                  <Package className="w-4 h-4 text-slate-400" />
-                                )}
-                              </div>
-
-                              {/* Product Info Row Title & Category */}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-slate-800 truncate">
-                                  {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
-                                </p>
-                                <span className="text-[9px] font-semibold text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded-full inline-block">
-                                  {product.category?.name || "Equipment"}
-                                </span>
-                              </div>
-
-                              {/* Row Price */}
-                              <div className="text-right shrink-0">
-                                <span className="text-xs font-extrabold text-[#004691]">
-                                  ${parseFloat(product.price).toFixed(2)}
-                                </span>
-                              </div>
-                            </Link>
-                          ))
-                        ) : !isSearching ? (
-                          <div className="p-4 text-center text-xs font-semibold text-slate-500">
-                            {language === "kh" ? "រកមិនឃើញផលិតផលទេ" : "No matching products found"}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="p-2 border-t border-slate-100 bg-slate-50 rounded-b-xl">
-                        <button
+                  }}
+                >
+                  <motion.div
+                    initial={{ scale: 0.95, y: -20, opacity: 0 }}
+                    animate={{ scale: 1, y: 0, opacity: 1 }}
+                    exit={{ scale: 0.95, y: -20, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full max-w-xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col max-h-[80vh]"
+                  >
+                    <div className="p-4 md:p-5 pb-0 border-b border-slate-100 shrink-0">
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg md:text-xl font-black text-slate-900">
+                          {language === "kh" ? "ស្វែងរកផលិតផល" : "Search Products"}
+                        </h2>
+                        <button 
                           onClick={() => {
-                            router.push(`/products/search/${encodeURIComponent(searchQuery.trim())}`)
-                            setSearchOpen(false)
                             setMobileSearchOpen(false)
-                          }}
-                          className="w-full py-1.5 text-xs font-bold text-[#004691] hover:bg-blue-100/60 rounded-lg transition-colors text-center"
+                            setSearchOpen(false)
+                            setSearchQuery("")
+                          }} 
+                          className="p-1.5 text-slate-400 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
                         >
-                          {language === "kh" ? `មើលលទ្ធផលទាំងអស់ (${searchResults.length})` : `View all results for "${searchQuery}"`}
+                          <X className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
+                      
+                      <form 
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (searchQuery.trim()) {
+                            router.push(`/products/search/${encodeURIComponent(searchQuery.trim())}`);
+                            setMobileSearchOpen(false);
+                            setSearchOpen(false);
+                          }
+                        }} 
+                        className="relative flex items-center bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus-within:border-[#004691] focus-within:bg-white transition-all w-full mb-5 shadow-inner"
+                      >
+                        <Search className="w-4 h-4 md:w-5 md:h-5 text-slate-400 mr-3 shrink-0" />
+                        <input 
+                          name="search"
+                          type="text" 
+                          value={searchQuery}
+                          onChange={(e) => {
+                            setSearchQuery(e.target.value)
+                            setSearchOpen(true)
+                          }}
+                          onFocus={() => setSearchOpen(true)}
+                          placeholder={language === "kh" ? "វាយបញ្ចូលឈ្មោះផលិតផល..." : "Type a product name..."}
+                          className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-base md:text-base font-medium"
+                          autoFocus
+                        />
+                      </form>
+                    </div>
+
+                    {/* Live Results Display Area */}
+                    <div className="overflow-y-auto p-4 md:p-5 bg-slate-50/50 flex-1">
+                      {searchOpen && searchQuery.trim().length > 0 ? (
+                        <>
+                          <div className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider flex justify-between items-center mb-3">
+                            <span>{language === "kh" ? "លទ្ធផលស្វែងរក" : "Live Results"}</span>
+                            {isSearching ? (
+                              <span className="text-[#004691] animate-pulse">
+                                {language === "kh" ? "កំពុងស្វែងរក..." : "Searching..."}
+                              </span>
+                            ) : (
+                              <span className="bg-blue-100 text-[#004691] px-2 py-0.5 rounded-full font-bold">
+                                {searchResults.length} {language === "kh" ? "ផល" : "found"}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {searchResults.length > 0 ? (
+                              searchResults.slice(0, 6).map((product) => (
+                                <Link
+                                  key={product.id}
+                                  href={`/products/${product.id}`}
+                                  onClick={() => {
+                                    setSearchOpen(false)
+                                    setMobileSearchOpen(false)
+                                    setSearchQuery("")
+                                  }}
+                                  className="flex items-center gap-3 p-2 bg-white border border-slate-200 hover:border-[#004691] hover:shadow-sm rounded-lg transition-all group"
+                                >
+                                  <div className="w-12 h-12 rounded-md bg-slate-50 border border-slate-100 p-1.5 flex items-center justify-center shrink-0 overflow-hidden">
+                                    {getValidImages(product)[0] ? (
+                                      <img src={getOptimizedImageUrl(getValidImages(product)[0], 'thumb')} alt={product.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                                    ) : (
+                                      <Package className="w-4 h-4 text-slate-300" />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-xs font-bold text-slate-800 truncate group-hover:text-[#004691] transition-colors leading-tight mb-0.5">
+                                      {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
+                                    </h4>
+                                    <span className="text-[11px] font-extrabold text-red-600 block">
+                                      ${parseFloat(product.price).toFixed(2)}
+                                    </span>
+                                  </div>
+                                </Link>
+                              ))
+                            ) : !isSearching ? (
+                              <div className="col-span-1 sm:col-span-2 p-6 text-center text-slate-400 font-bold text-xs bg-white rounded-lg border border-slate-200 border-dashed">
+                                {language === "kh" ? "រកមិនឃើញផលិតផលដែលត្រូវគ្នានឹងការស្វែងរករបស់អ្នកទេ" : "No matching products found"}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          {searchResults.length > 6 && (
+                            <div className="text-center mt-5">
+                              <button
+                                onClick={() => {
+                                  router.push(`/products/search/${encodeURIComponent(searchQuery.trim())}`)
+                                  setSearchOpen(false)
+                                  setMobileSearchOpen(false)
+                                }}
+                                className="px-6 py-2 text-sm bg-[#004691] text-white hover:bg-[#003066] rounded-full font-bold transition-colors shadow-md"
+                              >
+                                {language === "kh" ? "មើលផលិតផលបន្ថែម" : "View more products"}
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="h-24 flex items-center justify-center text-slate-400 font-medium text-sm">
+                          {language === "kh" ? "ចាប់ផ្តើមវាយដើម្បីស្វែងរកផលិតផល..." : "Start typing to search products..."}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* 💻 Desktop Header (Clean Single-Row Gyeon Style Layout) */}
             <div className="hidden lg:block">
-              <div className="flex items-center justify-between h-20 gap-6">
+              <div className="flex items-center h-20">
                 
                 {/* Logo */}
-                <Link href="/" className="flex items-center shrink-0">
-                  <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 w-auto object-contain" />
-                </Link>
+                <div className="flex-1 flex justify-start">
+                  <Link href="/" className="flex items-center shrink-0">
+                    <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 w-auto object-contain" />
+                  </Link>
+                </div>
 
                 {/* Center Navigation Menu */}
-                <nav className="flex items-center gap-8 text-sm md:text-base font-bold tracking-wide">
-                  {navItems.map((item) => {
+                <div className="shrink-0">
+                  <nav className="flex items-center gap-4 lg:gap-6 text-sm md:text-base font-bold tracking-wide">
+                    {navItems.map((item) => {
                     const isActive = pathname === item.href
                     
                     if (item.href === "/categories") {
@@ -582,7 +608,7 @@ export default function PublicLayout({
                         <div key={item.href} className="group relative py-6 -my-6">
                           <Link
                             href={item.href}
-                            className={`transition-colors py-2 border-b-2 font-semibold flex items-center gap-1 ${
+                            className={`transition-colors py-2 border-b-2 font-semibold flex items-center gap-1 whitespace-nowrap ${
                               isActive 
                                 ? "text-[#004691] border-[#004691]" 
                                 : "text-slate-700 border-transparent group-hover:text-[#004691]"
@@ -636,160 +662,49 @@ export default function PublicLayout({
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`transition-colors py-2 border-b-2 font-semibold ${
+                        className={`transition-colors py-2 border-b-2 font-semibold flex items-center gap-1.5 ${
                           isActive 
                             ? "text-[#004691] border-[#004691]" 
                             : "text-slate-700 border-transparent hover:text-[#004691]"
                         }`}
                       >
+                        <item.icon className="w-4 h-4" />
                         {item.name}
                       </Link>
                     )
                   })}
-                </nav>
+                  </nav>
+                </div>
 
                 {/* Right Side: Search + Language + Wishlist + Cart + Account */}
-                <div className="flex items-center gap-4 shrink-0">
-                  {/* Search Input Box with Live Popup Modal */}
-                  <div className="relative">
-                    <form 
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (searchQuery.trim()) {
-                          router.push(`/products/search/${encodeURIComponent(searchQuery.trim())}`);
-                          setSearchOpen(false);
-                        }
-                      }} 
-                      className="flex items-center bg-slate-100/80 hover:bg-slate-100 rounded-lg px-3.5 py-2 text-xs border border-slate-200/80 focus-within:border-[#004691] focus-within:bg-white w-56 transition-all"
-                    >
-                      <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
-                      <input 
-                        name="search"
-                        type="text" 
-                        value={searchQuery}
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value)
-                          setSearchOpen(true)
-                        }}
-                        onFocus={() => setSearchOpen(true)}
-                        placeholder={language === "kh" ? "ស្វែងរក..." : "Search..."}
-                        className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-xs font-medium"
-                      />
-                      {searchQuery && (
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            setSearchQuery("")
-                            setSearchOpen(false)
-                          }}
-                          className="text-slate-400 hover:text-slate-600 text-xs font-bold px-1"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </form>
-
-                    {/* 🛍️ Live Instant Search Product Modal (One Row per Product) */}
-                    <AnimatePresence>
-                      {searchOpen && searchQuery.trim().length > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                          transition={{ duration: 0.15 }}
-                          className="absolute top-full right-0 mt-2 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 p-2"
-                        >
-                          <div className="text-[11px] font-extrabold text-slate-400 px-3 py-1.5 uppercase tracking-wider flex justify-between items-center border-b border-slate-100 pb-2">
-                            <span>{language === "kh" ? "លទ្ធផលស្វែងរក" : "Live Product Results"}</span>
-                            {isSearching ? (
-                              <span className="text-xs font-bold text-[#004691] animate-pulse">
-                                {language === "kh" ? "កំពុងស្វែងរក..." : "Searching..."}
-                              </span>
-                            ) : (
-                              <span className="text-[10px] bg-blue-50 text-[#004691] px-2 py-0.5 rounded-full font-bold">
-                                {searchResults.length} {language === "kh" ? "ផល" : "found"}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="divide-y divide-slate-100 max-h-80 overflow-y-auto py-1">
-                            {searchResults.length > 0 ? (
-                              searchResults.map((product) => (
-                                <Link
-                                  key={product.id}
-                                  href={`/products/${product.id}`}
-                                  onClick={() => {
-                                    setSearchOpen(false)
-                                    setSearchQuery("")
-                                  }}
-                                  className="flex items-center gap-3 p-2.5 hover:bg-blue-50/60 rounded-xl transition-all group"
-                                >
-                                  {/* Product Thumbnail Row Image */}
-                                  <div className="w-12 h-12 rounded-lg bg-slate-50 border border-slate-200 p-1 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-[#004691] transition-colors">
-                                    {getValidImages(product)[0] ? (
-                                      <img src={getOptimizedImageUrl(getValidImages(product)[0], 'thumb')} alt={product.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
-                                    ) : (
-                                      <Package className="w-5 h-5 text-slate-400" />
-                                    )}
-                                  </div>
-
-                                  {/* Product Info Row Title & Category */}
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs sm:text-sm font-bold text-slate-800 truncate group-hover:text-[#004691] transition-colors">
-                                      {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
-                                    </p>
-                                    <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-0.5">
-                                      {product.category?.name || "Equipment"}
-                                    </span>
-                                  </div>
-
-                                  {/* Row Price */}
-                                  <div className="text-right shrink-0">
-                                    <span className="text-xs sm:text-sm font-extrabold text-[#004691]">
-                                      ${parseFloat(product.price).toFixed(2)}
-                                    </span>
-                                  </div>
-                                </Link>
-                              ))
-                            ) : !isSearching ? (
-                              <div className="p-6 text-center text-xs font-semibold text-slate-500">
-                                {language === "kh" ? "រកមិនឃើញផលិតផលដែលត្រូវគ្នានឹងការស្វែងរករបស់អ្នកទេ" : "No matching products found"}
-                              </div>
-                            ) : null}
-                          </div>
-
-                          <div className="p-2 border-t border-slate-100 bg-slate-50 rounded-b-xl">
-                            <button
-                              onClick={() => {
-                                router.push(`/products/search/${encodeURIComponent(searchQuery.trim())}`)
-                                setSearchOpen(false)
-                              }}
-                              className="w-full py-2 text-xs font-bold text-[#004691] hover:bg-blue-100/60 rounded-lg transition-colors text-center"
-                            >
-                              {language === "kh" ? `មើលលទ្ធផលទាំងអស់សម្រាប់ "${searchQuery}"` : `View all results for "${searchQuery}"`}
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                <div className="flex-1 flex justify-end">
+                  <div className="flex items-center gap-4 shrink-0">
+                  <button 
+                    onClick={() => {
+                      setMobileSearchOpen(!mobileSearchOpen)
+                      if (!mobileSearchOpen) {
+                        setTimeout(() => {
+                          const input = document.querySelector('input[name="search"]') as HTMLInputElement
+                          if (input) input.focus()
+                        }, 100)
+                      }
+                    }}
+                    className="p-2 text-slate-700 hover:text-[#004691] transition-colors bg-slate-50 hover:bg-slate-100 rounded-full"
+                    title={language === "kh" ? "ស្វែងរក" : "Search"}
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
 
                   {/* Single Flag Toggle Language Switcher Button */}
                   <button 
                     onClick={() => setLanguage(language === "en" ? "kh" : "en")}
                     title={language === "en" ? "Switch to ភាសាខ្មែរ" : "Switch to English"}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200/80 border border-slate-200 rounded-full text-xs font-bold transition-all shadow-2xs active:scale-95 group cursor-pointer"
+                    className="flex items-center justify-center w-9 h-9 bg-slate-50 hover:bg-slate-100 rounded-full transition-all active:scale-95 group cursor-pointer"
                   >
                     {language === "en" ? (
-                      <>
-                        <img src="https://flagcdn.com/w40/gb.png" alt="English" className="w-4 h-3 object-cover rounded-xs shrink-0" />
-                        <span className="text-xs font-black text-slate-800 group-hover:text-[#004691]">EN</span>
-                      </>
+                      <img src="https://flagcdn.com/w40/gb.png" alt="English" className="w-5 h-3.5 object-cover rounded-[2px]" />
                     ) : (
-                      <>
-                        <img src="https://flagcdn.com/w40/kh.png" alt="Khmer" className="w-4 h-3 object-cover rounded-xs shrink-0" />
-                        <span className="text-xs font-black text-slate-800 group-hover:text-[#004691]">KH</span>
-                      </>
+                      <img src="https://flagcdn.com/w40/kh.png" alt="Khmer" className="w-5 h-3.5 object-cover rounded-[2px]" />
                     )}
                   </button>
 
@@ -802,6 +717,16 @@ export default function PublicLayout({
                       </span>
                     )}
                   </Link>
+
+                  {/* Cart Icon Link */}
+                  <button onClick={openCart} className="relative p-2 text-slate-700 hover:text-[#004691] transition-colors">
+                    <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-extrabold min-w-[16px] h-[16px] flex items-center justify-center rounded-full border border-white">
+                        {cartCount}
+                      </span>
+                    )}
+                  </button>
 
                   {/* Account Link */}
                   {isAuthChecking ? (
@@ -821,7 +746,7 @@ export default function PublicLayout({
                       <UserIcon className="w-5 h-5 stroke-[1.8]" />
                     </Link>
                   )}
-
+                </div>
                 </div>
 
               </div>

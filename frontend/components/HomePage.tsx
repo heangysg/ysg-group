@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, ShoppingBag, ChevronRight, Star, ShieldCheck, ArrowRight, TrendingUp, Sparkles, X, LayoutGrid } from "lucide-react"
+import { Search, ShoppingBag, ChevronRight, Star, ShieldCheck, ArrowRight, TrendingUp, Sparkles, X, LayoutGrid, Compass } from "lucide-react"
 import { useLanguage } from "../contexts/LanguageContext"
 import { useRouter } from "next/navigation"
 import ProductCard from "./ProductCard"
@@ -27,6 +27,18 @@ export default function HomePage() {
 
   const { t, language } = useLanguage()
   const router = useRouter()
+  
+  const observer = useRef<IntersectionObserver | null>(null)
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return
+    if (observer.current) observer.current.disconnect()
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && popularProducts.length > displayLimit) {
+        setDisplayLimit(prev => prev + 12)
+      }
+    })
+    if (node) observer.current.observe(node)
+  }, [loading, popularProducts.length, displayLimit])
 
   useEffect(() => {
     async function fetchHomeData() {
@@ -118,7 +130,7 @@ export default function HomePage() {
   if (!isReady) {
     return (
       <div className="bg-white min-h-screen pb-24 font-sans">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 md:pt-6 space-y-6 md:space-y-10">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 pt-4 md:pt-6 space-y-6 md:space-y-10">
           {/* Hero skeleton */}
           <div className="rounded-lg md:rounded-xl bg-slate-100 animate-pulse h-[180px] sm:h-[240px] md:h-[380px]" />
           {/* Category row skeleton */}
@@ -144,7 +156,7 @@ export default function HomePage() {
   return (
     <div className="bg-white min-h-screen pb-24 font-sans selection:bg-[#004691]/20">
       
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 md:pt-6 relative z-20 space-y-6 md:space-y-10">
+      <div className="max-w-5xl mx-auto px-4 md:px-8 pt-4 md:pt-6 relative z-20 space-y-6 md:space-y-10">
 
         {/* Hero Banner Showcase */}
         <section className="relative rounded-lg md:rounded-xl overflow-hidden bg-slate-100 h-[180px] sm:h-[240px] md:h-[380px] shadow-2xs group border border-slate-200">
@@ -233,7 +245,7 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                    <span className="text-[11px] sm:text-xs md:text-sm font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
+                    <span className="text-xs sm:text-sm md:text-base font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
                       {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
                     </span>
                   </Link>
@@ -278,15 +290,12 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4 md:mb-6 px-1 sm:px-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 text-[#004691] rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5" />
+                <Compass className="w-5 h-5" />
               </div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
                 {language === "kh" ? "រុករកផលិតផល" : "Discover More"}
               </h2>
             </div>
-            <span className="text-xs sm:text-sm font-semibold text-slate-400">
-              {loading ? "" : `${Math.min(displayLimit, popularProducts.length)} / ${popularProducts.length} ${language === "kh" ? "ផលិតផល" : "items"}`}
-            </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
@@ -301,16 +310,10 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Load More Action Button */}
+          {/* Infinite Scroll Loader */}
           {!loading && popularProducts.length > displayLimit && (
-            <div className="mt-10 flex justify-center pb-8">
-              <button 
-                onClick={() => setDisplayLimit(prev => prev + 12)}
-                className="group bg-white border border-slate-200 text-slate-900 px-8 py-3.5 rounded-full text-sm sm:text-base font-bold hover:border-[#004691] hover:text-[#004691] hover:bg-blue-50/50 transition-all flex items-center gap-2 shadow-2xs active:scale-95"
-              >
-                <span>{language === "kh" ? "មើលផលិតផលបន្ថែម" : "Load More Products"}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-[#004691]" />
-              </button>
+            <div ref={lastElementRef} className="mt-10 flex justify-center pb-8">
+              <div className="w-8 h-8 border-4 border-[#004691]/30 border-t-[#004691] rounded-full animate-spin" />
             </div>
           )}
 
@@ -318,10 +321,10 @@ export default function HomePage() {
             <div className="mt-10 flex justify-center pb-8">
               <Link 
                 href="/products"
-                className="group bg-slate-100 text-slate-700 px-8 py-3.5 rounded-full text-sm sm:text-base font-bold hover:bg-[#004691] hover:text-white transition-all flex items-center gap-2 shadow-2xs"
+                className="group bg-[#004691] text-white px-8 py-3.5 rounded-full text-sm sm:text-base font-bold hover:bg-[#003066] transition-all flex items-center gap-2 shadow-md"
               >
-                <span>{language === "kh" ? "ទស្សនាផលិតផលទាំងអស់" : "View All Products Catalog"}</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <span>{language === "kh" ? "មើលទាំងអស់" : "View All Products Catalog"}</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-white" />
               </Link>
             </div>
           )}

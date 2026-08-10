@@ -35,7 +35,7 @@ export default function CategorySubgrid({ category, subcategories }: { category:
                   <div className="bg-white hover:-translate-y-1 md:hover:-translate-y-2 shadow-sm hover:shadow-md transition-all duration-300 flex flex-row md:flex-col h-full group rounded-2xl md:rounded-3xl overflow-hidden border border-slate-100">
                     {/* Image Header */}
                     <div className="w-[120px] md:w-full shrink-0 md:aspect-[16/10] bg-slate-50 relative overflow-hidden">
-                      {subCat.image ? (
+                      {subCat.image && !subCat.image.includes('no.png') ? (
                         <img 
                           src={subCat.image} 
                           alt={subCat.name} 

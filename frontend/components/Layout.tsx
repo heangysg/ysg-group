@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/90 backdrop-blur-md shadow-md" : "bg-white border-b"}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-2xl font-medium text-[#003485]">
               YSG<span className="text-black">Machinery</span>
@@ -90,7 +90,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       <footer className="bg-gray-900 text-white mt-20">
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-5xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-xl font-medium mb-4">Yeung Shi Group</h3>

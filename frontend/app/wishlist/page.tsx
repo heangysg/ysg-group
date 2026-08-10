@@ -24,7 +24,7 @@ export default function WishlistPage() {
   return (
     <PublicLayout>
       <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -78,7 +78,7 @@ export default function WishlistPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+            <div className="grid grid-cols-2 sm:grid-cols-3  gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
               {wishlistItems.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
