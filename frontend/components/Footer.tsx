@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MapPin, Phone, Mail, CreditCard } from "lucide-react"
+import { MapPin, Phone, Mail, CreditCard, Clock } from "lucide-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faFacebook, faYoutube, faTelegram } from "@fortawesome/free-brands-svg-icons"
 import { useLanguage } from "../contexts/LanguageContext"
@@ -11,9 +11,10 @@ export default function Footer() {
   const { t, language } = useLanguage()
   const currentYear = new Date().getFullYear()
   const [settings, setSettings] = useState<any>({
-    address: "Building 230, St. 271, Yothapol Khemarak Phoumin Boulevard, Phnom Penh.",
-    contact_phone: "010 / 011 / 012 / 070: 309 302",
+    address: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
+    contact_phone: "010 / 011 / 012 / 070 : 309 302",
     contact_email: "yeungshigroup123@gmail.com",
+    working_hours: "8 : 00 am – 5:30pm ( Mon – Sat )",
     facebook_url: "https://www.facebook.com/YeungShiGroupHeadOffice/",
     youtube_url: "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
     telegram_url: ""
@@ -40,7 +41,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#00224a] text-slate-200 pt-12 pb-24 md:pb-10 mt-12 font-sans">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
 
         {/* Main Grid: 2-col mobile → 4-col desktop */}
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 mb-10">
@@ -50,10 +51,17 @@ export default function Footer() {
             <Link href="/" className="inline-block w-[140px] hover:opacity-80 transition-opacity">
               <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="w-full h-auto object-contain" />
             </Link>
-            <p className="text-sm leading-relaxed text-slate-400 font-medium max-w-xs">
-              ក្រុមហ៊ុនយ៉ាងស៊ីគ្រុប — Yeung Shi Group Co., Ltd.<br />
-              Premium industrial machinery and equipment supplier in Cambodia.
-            </p>
+            <div className="text-sm leading-relaxed text-slate-400 font-medium max-w-sm mt-2">
+              {language === "kh" ? (
+                <p>
+                  <strong className="text-white">ក្រុមហ៊ុនយ៉ាងស៊ីគ្រុប (Yeung Shi Group)</strong> ត្រូវបានបង្កើតឡើងនៅទីក្រុងក្វាងចូវ ប្រទេសចិនតាំងពីទសវត្សរ៍ឆ្នាំ ១៩៩០ និងបានពង្រីកប្រតិបត្តិការមកកាន់ប្រទេសកម្ពុជានៅឆ្នាំ ២០០៥។ យើងគឺជាអ្នកផ្គត់ផ្គង់គ្រឿងម៉ាស៊ីន និងឧបករណ៍ឧស្សាហកម្មឈានមុខគេនៅកម្ពុជា។
+                </p>
+              ) : (
+                <p>
+                  <strong className="text-white">Yeung Shi Group Co., Ltd.</strong> was established in Guangzhou, China in the 1990s and expanded to Cambodia in 2005. We are a premium industrial machinery and equipment supplier in Cambodia.
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Col 2: Quick Links */}
@@ -131,6 +139,12 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
+                  <div className="text-sm font-medium text-slate-300 flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-white/50 shrink-0 mt-0.5" />
+                    <span className="leading-relaxed">{settings.working_hours || "8 : 00 am – 5:30pm ( Mon – Sat )"}</span>
+                  </div>
+                </li>
+                <li>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`}
                     target="_blank"
@@ -155,6 +169,7 @@ export default function Footer() {
           <div className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full font-medium whitespace-nowrap">
             <CreditCard className="w-3.5 h-3.5" />
             <span>{language === "kh" ? "ទទួលយកការទូទាត់:" : "Accepted:"} ABA Pay / KHQR</span>
+            <img src="/logo/khqr-logo.png" alt="KHQR" className="h-5 object-contain ml-1 rounded-sm bg-white p-0.5" />
           </div>
         </div>
 

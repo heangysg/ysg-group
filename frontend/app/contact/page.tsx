@@ -12,9 +12,10 @@ export default function ContactPage() {
   const { t, language } = useLanguage()
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" })
   const [settings, setSettings] = useState<any>({
-    address: "Building 230, St. 271, Yothapol Khemarak Phoumin Boulevard, Phnom Penh.",
-    contact_phone: "010 / 011 / 012 / 070: 309 302",
-    contact_email: "yeungshigroup123@gmail.com"
+    address: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
+    contact_phone: "010 / 011 / 012 / 070 : 309 302",
+    contact_email: "yeungshigroup123@gmail.com",
+    working_hours: "8 : 00 am – 5:30pm ( Mon – Sat )"
   })
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function ContactPage() {
     <PublicLayout>
       <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
         <Toaster position="top-center" />
-        <div className="max-w-5xl mx-auto px-4 md:px-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
           
           {/* 🍞 Mobile Responsive Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -100,7 +101,7 @@ export default function ContactPage() {
                   { icon: Phone, label: t("phone"), value: settings.contact_phone, color: "text-primary" },
                   { icon: Mail, label: t("email"), value: settings.contact_email, color: "text-primary" },
                   { icon: MapPin, label: t("location"), value: settings.address, color: "text-primary" },
-                  { icon: Clock, label: language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours", value: "8:00 am – 5:30 pm (Mon – Sat)", color: "text-primary" }
+                  { icon: Clock, label: language === "kh" ? "ម៉ោងធ្វើការ" : "Working Hours", value: settings.working_hours || "8 : 00 am – 5:30pm ( Mon – Sat )", color: "text-primary" }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-6 items-center p-6 bg-slate-50 rounded-3xl border border-slate-100 group hover:bg-slate-100 transition-all cursor-pointer">
                     <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform">
