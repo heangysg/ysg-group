@@ -33,15 +33,15 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white font-bold rounded-2xl md:rounded-[1rem] transition-all duration-300 hover:bg-primary-dark shadow-lg shadow-primary/30 active:scale-95 flex items-center justify-center border border-primary-dark;
+    @apply bg-primary text-white font-bold rounded-md transition-all duration-300 hover:bg-primary-dark shadow-lg shadow-primary/30 active:scale-95 flex items-center justify-center border border-primary-dark;
   }
   
   .solid-card {
-    @apply bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-all duration-300;
+    @apply bg-white rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 transition-all duration-300;
   }
 
   .solid-panel {
-    @apply bg-white text-slate-900 border border-slate-100 rounded-[1.5rem] md:rounded-[2rem] shadow-sm transition-all duration-300;
+    @apply bg-white text-slate-900 border border-slate-100 rounded-md shadow-sm transition-all duration-300;
   }
 
   .btn-fab {

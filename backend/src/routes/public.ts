@@ -102,8 +102,7 @@ router.get('/categories', async (req: Request, res: Response): Promise<void> => 
   try {
     const pgClient = await getPgClient();
     try {
-      const { rows } = await pgClient.query('SELECT * FROM "Category" WHERE "isActive" = true ORDER BY "sortOrder" ASC');
-      res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+      const { rows } = await pgClient.query('SELECT * FROM "Category" WHERE "isActive" = true ORDER BY "sortOrder" ASC NULLS LAST');
       res.json({ data: rows });
     } finally {
       await pgClient.release();

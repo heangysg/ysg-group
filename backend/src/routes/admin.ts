@@ -340,4 +340,43 @@ router.post('/upload', authenticateJWT, async (req: AuthRequest, res: Response):
   }
 });
 
+router.post('/products/bulk', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const { products } = req.body;
+    if (!Array.isArray(products) || products.length === 0) {
+      res.status(400).json({ error: "No products provided" });
+      return;
+    }
+
+    pgClient = await getPgClient();
+    await pgClient.query('BEGIN');
+    
+    let count = 0;
+    for (const p of products) {
+      if (!p.updatedAt) p.updatedAt = new Date().toISOString();
+      if (!p.createdAt) p.createdAt = new Date().toISOString();
+      
+      const keys = Object.keys(p);
+      const values = Object.values(p);
+      
+      const columns = keys.map(k => `"${k}"`).join(', ');
+      const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
+      const query = `INSERT INTO "Product" (${columns}) VALUES (${placeholders})`;
+      
+      await pgClient.query(query, values);
+      count++;
+    }
+
+    await pgClient.query('COMMIT');
+    res.json({ message: "Successfully imported", count });
+  } catch (err: any) {
+    if (pgClient) await pgClient.query('ROLLBACK');
+    console.error("Bulk Import Error:", err);
+    res.status(500).json({ error: err.message || "Failed to import products" });
+  } finally {
+    if (pgClient) pgClient.release();
+  }
+});
+
 export default router;

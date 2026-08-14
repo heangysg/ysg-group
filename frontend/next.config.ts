@@ -1,63 +1,63 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'flagcdn.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.ysg-group.com',
-      }
-    ],
-  },
+ images: {
+ remotePatterns: [
+ {
+ protocol: 'https',
+ hostname: 'res.cloudinary.com',
+ },
+ {
+ protocol: 'https',
+ hostname: 'flagcdn.com',
+ },
+ {
+ protocol: 'https',
+ hostname: 'avatars.githubusercontent.com',
+ },
+ {
+ protocol: 'https',
+ hostname: 'lh3.googleusercontent.com',
+ },
+ {
+ protocol: 'https',
+ hostname: 'images.unsplash.com',
+ },
+ {
+ protocol: 'https',
+ hostname: 'www.ysg-group.com',
+ }
+ ],
+ },
 
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload',
-          },
-        ],
-      },
-    ];
-  },
+ typescript: {
+ ignoreBuildErrors: true,
+ },
+ async headers() {
+ return [
+ {
+ source: '/(.*)',
+ headers: [
+ {
+ key: 'X-Content-Type-Options',
+ value: 'nosniff',
+ },
+ {
+ key: 'X-Frame-Options',
+ value: 'DENY',
+ },
+ {
+ key: 'Referrer-Policy',
+ value: 'strict-origin-when-cross-origin',
+ },
+ {
+ key: 'Strict-Transport-Security',
+ value: 'max-age=31536000; includeSubDomains; preload',
+ },
+ ],
+ },
+ ];
+ },
 };
 
 export default nextConfig;

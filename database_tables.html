@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='UTF-8'>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; padding: 20px; }
+  .table-container { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 30px; padding: 20px; max-width: 800px; }
+  h2 { margin-top: 0; font-size: 18px; color: #333; border-bottom: 2px solid #0056b3; padding-bottom: 10px; display: inline-block; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 12px; border: 1px solid #ddd; }
+  th { background-color: #f4f6f8; color: #333; font-weight: 600; }
+  tr:nth-child(even) { background-color: #f9fafc; }
+  td code { background: #eee; padding: 2px 4px; border-radius: 4px; font-family: monospace; color: #d63384; }
+</style>
+</head>
+<body>
+<h1>Sale Management System Database Dictionary</h1>
+<p>You can take clear, compact screenshots of the tables below!</p>
+<div class='table-container'>
+<h2>Table: AuditLog</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id @default(dbgenerated("gen_random_uuid()")) @db.Uuid</td></tr>
+<tr><td><code>userId</code></td><td>Int?</td><td></td></tr>
+<tr><td><code>userName</code></td><td>String?</td><td></td></tr>
+<tr><td><code>userEmail</code></td><td>String?</td><td></td></tr>
+<tr><td><code>action</code></td><td>String</td><td></td></tr>
+<tr><td><code>entity</code></td><td>String?</td><td></td></tr>
+<tr><td><code>entityid</code></td><td>String?</td><td></td></tr>
+<tr><td><code>details</code></td><td>Json?</td><td></td></tr>
+<tr><td><code>ipAddress</code></td><td>String?</td><td></td></tr>
+<tr><td><code>userAgent</code></td><td>String?</td><td></td></tr>
+<tr><td><code>status</code></td><td>String?</td><td>@default("SUCCESS")</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime?</td><td>@default(now()) @db.Timestamp(6)</td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Category</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>name</code></td><td>String</td><td></td></tr>
+<tr><td><code>slug</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>description</code></td><td>String?</td><td></td></tr>
+<tr><td><code>image</code></td><td>String?</td><td></td></tr>
+<tr><td><code>icon</code></td><td>String?</td><td></td></tr>
+<tr><td><code>isFeatured</code></td><td>Boolean</td><td>@default(false)</td></tr>
+<tr><td><code>sortOrder</code></td><td>Int</td><td>@default(0)</td></tr>
+<tr><td><code>parentId</code></td><td>String?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+<tr><td><code>nameKhmer</code></td><td>String?</td><td></td></tr>
+<tr><td><code>descriptionKhmer</code></td><td>String?</td><td></td></tr>
+<tr><td><code>isActive</code></td><td>Boolean?</td><td>@default(true)</td></tr>
+<tr><td><code>Product</code></td><td>Product[]</td><td></td></tr>
+<tr><td><code>Subcategory</code></td><td>Subcategory[]</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: ContactMessage</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>name</code></td><td>String</td><td></td></tr>
+<tr><td><code>email</code></td><td>String</td><td></td></tr>
+<tr><td><code>phone</code></td><td>String?</td><td></td></tr>
+<tr><td><code>subject</code></td><td>String?</td><td></td></tr>
+<tr><td><code>message</code></td><td>String</td><td></td></tr>
+<tr><td><code>status</code></td><td>MessageStatus</td><td>@default(UNREAD)</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Inquiry</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>productId</code></td><td>String?</td><td></td></tr>
+<tr><td><code>userId</code></td><td>String?</td><td></td></tr>
+<tr><td><code>customerName</code></td><td>String</td><td></td></tr>
+<tr><td><code>companyName</code></td><td>String?</td><td></td></tr>
+<tr><td><code>email</code></td><td>String</td><td></td></tr>
+<tr><td><code>phone</code></td><td>String?</td><td></td></tr>
+<tr><td><code>country</code></td><td>String?</td><td></td></tr>
+<tr><td><code>message</code></td><td>String</td><td></td></tr>
+<tr><td><code>quantity</code></td><td>Int?</td><td></td></tr>
+<tr><td><code>status</code></td><td>InquiryStatus</td><td>@default(NEW)</td></tr>
+<tr><td><code>source</code></td><td>String?</td><td></td></tr>
+<tr><td><code>notes</code></td><td>String?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Order</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime?</td><td>@default(now()) @db.Timestamptz(6)</td></tr>
+<tr><td><code>customerName</code></td><td>String</td><td></td></tr>
+<tr><td><code>customerPhone</code></td><td>String</td><td></td></tr>
+<tr><td><code>customerEmail</code></td><td>String?</td><td></td></tr>
+<tr><td><code>address</code></td><td>String</td><td></td></tr>
+<tr><td><code>paymentMethod</code></td><td>String</td><td></td></tr>
+<tr><td><code>totalAmount</code></td><td>Decimal</td><td>@db.Decimal(12, 2)</td></tr>
+<tr><td><code>items</code></td><td>Json</td><td></td></tr>
+<tr><td><code>status</code></td><td>String?</td><td>@default("pending")</td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Page</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>title</code></td><td>String</td><td></td></tr>
+<tr><td><code>slug</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>content</code></td><td>Json?</td><td></td></tr>
+<tr><td><code>excerpt</code></td><td>String?</td><td></td></tr>
+<tr><td><code>metaTitle</code></td><td>String?</td><td></td></tr>
+<tr><td><code>metaDescription</code></td><td>String?</td><td></td></tr>
+<tr><td><code>status</code></td><td>PageStatus</td><td>@default(DRAFT)</td></tr>
+<tr><td><code>createdById</code></td><td>String?</td><td></td></tr>
+<tr><td><code>updatedById</code></td><td>String?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Product</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id @default(dbgenerated("gen_random_uuid()"))</td></tr>
+<tr><td><code>categoryId</code></td><td>String</td><td></td></tr>
+<tr><td><code>subcategoryId</code></td><td>String?</td><td></td></tr>
+<tr><td><code>name</code></td><td>String</td><td></td></tr>
+<tr><td><code>slug</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>shortDescription</code></td><td>String?</td><td></td></tr>
+<tr><td><code>model</code></td><td>String?</td><td></td></tr>
+<tr><td><code>brand</code></td><td>String?</td><td></td></tr>
+<tr><td><code>sku</code></td><td>String?</td><td>@unique</td></tr>
+<tr><td><code>price</code></td><td>Decimal?</td><td>@db.Decimal(12, 2)</td></tr>
+<tr><td><code>currency</code></td><td>String?</td><td>@default("USD")</td></tr>
+<tr><td><code>stock</code></td><td>Int</td><td>@default(0)</td></tr>
+<tr><td><code>status</code></td><td>ProductStatus</td><td>@default(DRAFT)</td></tr>
+<tr><td><code>isFeatured</code></td><td>Boolean</td><td>@default(false)</td></tr>
+<tr><td><code>isPublished</code></td><td>Boolean</td><td>@default(false)</td></tr>
+<tr><td><code>thumbnail</code></td><td>String?</td><td></td></tr>
+<tr><td><code>brochureUrl</code></td><td>String?</td><td></td></tr>
+<tr><td><code>videoUrl</code></td><td>String?</td><td></td></tr>
+<tr><td><code>metaTitle</code></td><td>String?</td><td></td></tr>
+<tr><td><code>metaDescription</code></td><td>String?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+<tr><td><code>titleKhmer</code></td><td>String?</td><td></td></tr>
+<tr><td><code>shortDescriptionKhmer</code></td><td>String?</td><td></td></tr>
+<tr><td><code>isActive</code></td><td>Boolean?</td><td>@default(true)</td></tr>
+<tr><td><code>title</code></td><td>String?</td><td></td></tr>
+<tr><td><code>year</code></td><td>Int?</td><td></td></tr>
+<tr><td><code>hours</code></td><td>Int?</td><td></td></tr>
+<tr><td><code>priceOnRequest</code></td><td>Boolean?</td><td>@default(false)</td></tr>
+<tr><td><code>condition</code></td><td>String?</td><td></td></tr>
+<tr><td><code>location</code></td><td>String?</td><td></td></tr>
+<tr><td><code>description</code></td><td>String?</td><td></td></tr>
+<tr><td><code>descriptionKhmer</code></td><td>String?</td><td></td></tr>
+<tr><td><code>specifications</code></td><td>Json?</td><td></td></tr>
+<tr><td><code>features</code></td><td>String[]</td><td>@default([])</td></tr>
+<tr><td><code>metaDesc</code></td><td>String?</td><td></td></tr>
+<tr><td><code>viewCount</code></td><td>Int?</td><td>@default(0)</td></tr>
+<tr><td><code>inquiryCount</code></td><td>Int?</td><td>@default(0)</td></tr>
+<tr><td><code>publishedAt</code></td><td>DateTime?</td><td>@db.Timestamp(6)</td></tr>
+<tr><td><code>nameKhmer</code></td><td>String?</td><td></td></tr>
+<tr><td><code>Inquiry</code></td><td>Inquiry[]</td><td></td></tr>
+<tr><td><code>ProductDetail</code></td><td>ProductDetail[]</td><td></td></tr>
+<tr><td><code>ProductImage</code></td><td>ProductImage[]</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: ProductDetail</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>productId</code></td><td>String</td><td></td></tr>
+<tr><td><code>label</code></td><td>String</td><td></td></tr>
+<tr><td><code>value</code></td><td>String</td><td></td></tr>
+<tr><td><code>groupName</code></td><td>String?</td><td></td></tr>
+<tr><td><code>sortOrder</code></td><td>Int</td><td>@default(0)</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: ProductImage</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>productId</code></td><td>String</td><td></td></tr>
+<tr><td><code>imageUrl</code></td><td>String</td><td></td></tr>
+<tr><td><code>altText</code></td><td>String?</td><td></td></tr>
+<tr><td><code>isPrimary</code></td><td>Boolean</td><td>@default(false)</td></tr>
+<tr><td><code>sortOrder</code></td><td>Int</td><td>@default(0)</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+<tr><td><code>url</code></td><td>String?</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Role</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>name</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>description</code></td><td>String?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+<tr><td><code>User</code></td><td>User[]</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Setting</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>key</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>value</code></td><td>Json?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: Subcategory</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id</td></tr>
+<tr><td><code>categoryId</code></td><td>String</td><td></td></tr>
+<tr><td><code>name</code></td><td>String</td><td></td></tr>
+<tr><td><code>slug</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>description</code></td><td>String?</td><td></td></tr>
+<tr><td><code>image</code></td><td>String?</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+<tr><td><code>Product</code></td><td>Product[]</td><td></td></tr>
+</table>
+</div>
+
+<div class='table-container'>
+<h2>Table: User</h2>
+<table>
+<tr><th>Column Name</th><th>Data Type</th><th>Constraints / Default</th></tr>
+<tr><td><code>id</code></td><td>String</td><td>@id @default(dbgenerated("gen_random_uuid()"))</td></tr>
+<tr><td><code>name</code></td><td>String</td><td></td></tr>
+<tr><td><code>email</code></td><td>String</td><td>@unique</td></tr>
+<tr><td><code>password</code></td><td>String</td><td></td></tr>
+<tr><td><code>phone</code></td><td>String?</td><td></td></tr>
+<tr><td><code>avatar</code></td><td>String?</td><td></td></tr>
+<tr><td><code>status</code></td><td>UserStatus</td><td>@default(ACTIVE)</td></tr>
+<tr><td><code>roleId</code></td><td>String</td><td></td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>@default(now())</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td></td></tr>
+<tr><td><code>isSuperAdmin</code></td><td>Boolean?</td><td>@default(false)</td></tr>
+<tr><td><code>lastLogin</code></td><td>DateTime?</td><td>@db.Timestamp(6)</td></tr>
+<tr><td><code>isActive</code></td><td>Boolean?</td><td>@default(true)</td></tr>
+<tr><td><code>Inquiry</code></td><td>Inquiry[]</td><td></td></tr>
+</table>
+</div>
+
+</body></html>
