@@ -35,6 +35,12 @@ export default function BakongQRModal({
   const [timeLeft, setTimeLeft] = useState(300)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadSuccess, setDownloadSuccess] = useState(false)
+  
+  // 📱 Touch drag state for pull-to-dismiss gesture
+  const [dragY, setDragY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const touchStartY = useRef<number>(0)
+  
   const qrRef = useRef<HTMLDivElement>(null)
   const merchantName = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_NAME || "Yeung Shi Group"
 
@@ -121,6 +127,33 @@ export default function BakongQRModal({
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  // 🖐️ Touch Drag Gestures for Pull Notch & Red Header (អូសចុះក្រោមដើម្បីបិទ)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY
+    setIsDragging(true)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return
+    const currentY = e.touches[0].clientY
+    const deltaY = currentY - touchStartY.current
+    if (deltaY > 0) {
+      // Dragging downward
+      setDragY(deltaY)
+    } else {
+      setDragY(0)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    setIsDragging(false)
+    if (dragY > 80) {
+      // Swiped down far enough -> close modal
+      onClose()
+    }
+    setDragY(0)
+  }
+
   // 📸 Ultra-crisp, Complete KHQR Card Image Generator
   const handleDownloadQR = async () => {
     try {
@@ -179,28 +212,28 @@ export default function BakongQRModal({
 
       // 3. Merchant Name
       ctx.fillStyle = "#0f172a"
-      ctx.font = "bold 34px Inter, sans-serif"
+      ctx.font = "600 28px Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
       ctx.textAlign = "left"
-      ctx.fillText(merchantName, 55, 235)
+      ctx.fillText(merchantName, 55, 230)
 
-      // 4. Amount Text
+      // 4. Amount Text (Balanced, crisp weight - not overly bold)
       const formattedAmount = typeof amount === 'number' ? amount.toLocaleString() : amount
       ctx.fillStyle = "#0f172a"
-      ctx.font = "900 58px Inter, sans-serif"
-      ctx.fillText(formattedAmount, 55, 305)
+      ctx.font = "700 46px Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      ctx.fillText(formattedAmount, 55, 295)
 
       const amountWidth = ctx.measureText(formattedAmount).width
       ctx.fillStyle = "#64748b"
-      ctx.font = "bold 28px Inter, sans-serif"
-      ctx.fillText("USD", 55 + amountWidth + 14, 305)
+      ctx.font = "600 22px Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+      ctx.fillText("USD", 55 + amountWidth + 12, 295)
 
       // 5. Dashed Divider Line
       ctx.strokeStyle = "#64748b"
-      ctx.lineWidth = 3
-      ctx.setLineDash([16, 12])
+      ctx.lineWidth = 2.5
+      ctx.setLineDash([14, 10])
       ctx.beginPath()
-      ctx.moveTo(55, 345)
-      ctx.lineTo(W - 55, 345)
+      ctx.moveTo(55, 335)
+      ctx.lineTo(W - 55, 335)
       ctx.stroke()
       ctx.setLineDash([])
 
@@ -288,27 +321,36 @@ export default function BakongQRModal({
 
   return (
     <div 
-      className="fixed inset-0 bg-black/75 backdrop-blur-xs z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 bg-black/75 backdrop-blur-xs z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <Toaster position="top-center" />
 
       {/* 100% Full-Width Bottom Sheet on Phone / Centered Modal on Desktop */}
       <div 
-        className="w-full sm:max-w-[340px] bg-white rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl relative font-sans animate-in slide-in-from-bottom duration-300 max-h-[90vh] flex flex-col"
+        className="w-full sm:max-w-[340px] bg-white rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl relative font-sans animate-in slide-in-from-bottom duration-300 max-h-[92vh] flex flex-col will-change-transform"
+        style={{
+          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+          transition: isDragging ? 'none' : 'transform 0.2s ease-out'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* 1. Header: Bakong Red (100% Width) */}
-        <div className="w-full bg-[#E1232E] pt-2.5 pb-3.5 sm:py-3.5 px-4 flex flex-col items-center justify-center relative shrink-0">
-          {/* Pull Notch Indicator */}
-          <div className="w-12 h-1 bg-white/45 rounded-full mb-1.5 sm:hidden" />
+        {/* 1. Header: Bakong Red with Interactive Pull-to-Dismiss Gesture */}
+        <div 
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="w-full bg-[#E1232E] pt-2 pb-3.5 sm:py-3.5 px-4 flex flex-col items-center justify-center relative shrink-0 cursor-grab active:cursor-grabbing select-none touch-none"
+        >
+          {/* Pull Notch Indicator (Drag down to dismiss) */}
+          <div className="w-12 h-1.5 bg-white/50 hover:bg-white/70 active:bg-white/90 rounded-full mb-1.5 sm:hidden transition-colors" />
 
           {/* Centered KHQR Logo */}
           <img
             src="/logo/KHQR Logo.png"
             alt="KHQR"
-            className="h-5 sm:h-5.5 w-auto object-contain"
+            className="h-5 sm:h-5.5 w-auto object-contain pointer-events-none"
           />
 
           {/* Right Side Downward Cutout Tail */}
