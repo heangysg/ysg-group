@@ -180,28 +180,28 @@ export default function BakongQRModal({
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* 1. Header: Bakong Red (Increased height a bit) */}
-        <div className="bg-[#E1232E] h-[58px] sm:h-[62px] px-4 flex flex-col items-center justify-center relative shrink-0">
+        {/* 1. Header: Bakong Red (Sleek reduced height) */}
+        <div className="bg-[#E1232E] h-[48px] sm:h-[50px] px-4 flex flex-col items-center justify-center relative shrink-0">
           {/* Pull Notch (Inside Red Header) */}
-          <div className="w-10 h-1 bg-white/40 rounded-full mb-1.5 sm:hidden" />
+          <div className="w-9 h-1 bg-white/40 rounded-full mb-1 sm:hidden" />
 
           {/* Centered KHQR Logo */}
           <img
             src="/logo/KHQR Logo.png"
             alt="KHQR"
-            className="h-5.5 sm:h-6 object-contain"
+            className="h-4.5 sm:h-5 object-contain"
           />
 
           {/* Right Side Downward Cutout Tail */}
-          <div className="absolute top-full right-0 w-0 h-0 border-t-[16px] border-t-[#E1232E] border-l-[24px] border-l-transparent" />
+          <div className="absolute top-full right-0 w-0 h-0 border-t-[12px] border-t-[#E1232E] border-l-[18px] border-l-transparent" />
 
           {/* Close Button (Desktop Only) */}
           <button
             onClick={onClose}
-            className="hidden sm:flex absolute right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white items-center justify-center transition-all cursor-pointer"
+            className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-6.5 h-6.5 rounded-full bg-white/20 hover:bg-white/30 text-white items-center justify-center transition-all cursor-pointer"
             aria-label="Close"
           >
-            <X className="w-4 h-4 stroke-[2.5]" />
+            <X className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
         </div>
 
