@@ -207,10 +207,10 @@ export default function BakongQRModal({
 
         {/* 2. Scrollable Card Body */}
         <div className="p-5 pt-4 pb-8 sm:pb-5 flex flex-col overflow-y-auto">
-          {/* Merchant Name */}
-          <p className="text-xs font-bold text-slate-900 leading-tight mb-1">
+          {/* Merchant Name - Bakong Standard Typography & Increased Size */}
+          <h2 className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-tight mb-1 font-[family-name:var(--font-inter)] tracking-tight">
             {merchantName}
-          </p>
+          </h2>
 
           {/* Amount */}
           <div className="flex items-baseline gap-1.5 mb-3">
