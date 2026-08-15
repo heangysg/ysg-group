@@ -121,6 +121,7 @@ export default function BakongQRModal({
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  // 📸 Ultra-crisp, Complete KHQR Card Image Generator
   const handleDownloadQR = async () => {
     try {
       setIsDownloading(true)
@@ -128,36 +129,154 @@ export default function BakongQRModal({
       if (!svg) throw new Error("SVG not found")
 
       const svgData = new XMLSerializer().serializeToString(svg)
+      const qrImage = new Image()
+      qrImage.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
+
+      const khqrLogo = new Image()
+      khqrLogo.src = "/logo/KHQR Logo.png"
+
+      await Promise.all([
+        new Promise((resolve) => { qrImage.onload = resolve; qrImage.onerror = resolve; }),
+        new Promise((resolve) => { khqrLogo.onload = resolve; khqrLogo.onerror = resolve; })
+      ])
+
+      // High-resolution Canvas (800 x 1150 px)
       const canvas = document.createElement("canvas")
+      const W = 800
+      const H = 1150
+      canvas.width = W
+      canvas.height = H
       const ctx = canvas.getContext("2d")
-      if (!ctx) throw new Error("Canvas context failed")
+      if (!ctx) throw new Error("Canvas context error")
 
-      const size = 1000
-      canvas.width = size
-      canvas.height = size
+      // 1. Clean White Background
+      ctx.fillStyle = "#ffffff"
+      ctx.fillRect(0, 0, W, H)
 
-      const img = new Image()
-      img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)))
+      // 2. Red Header Bar (#E1232E)
+      ctx.fillStyle = "#E1232E"
+      ctx.fillRect(0, 0, W, 140)
 
-      img.onload = () => {
-        // Draw white background
+      // Header Cutout Triangle on bottom-right
+      ctx.beginPath()
+      ctx.moveTo(W, 140)
+      ctx.lineTo(W, 185)
+      ctx.lineTo(W - 60, 140)
+      ctx.closePath()
+      ctx.fill()
+
+      // Draw KHQR Logo inside Red Header
+      if (khqrLogo.complete && khqrLogo.naturalWidth > 0) {
+        const logoHeight = 65
+        const logoWidth = (khqrLogo.naturalWidth / khqrLogo.naturalHeight) * logoHeight
+        ctx.drawImage(khqrLogo, (W - logoWidth) / 2, (140 - logoHeight) / 2, logoWidth, logoHeight)
+      } else {
         ctx.fillStyle = "#ffffff"
-        ctx.fillRect(0, 0, size, size)
-        ctx.drawImage(img, 0, 0, size, size)
+        ctx.font = "bold 42px Inter, sans-serif"
+        ctx.textAlign = "center"
+        ctx.fillText("KHQR", W / 2, 85)
+      }
 
-        const pngUrl = canvas.toDataURL("image/png")
+      // 3. Merchant Name
+      ctx.fillStyle = "#0f172a"
+      ctx.font = "bold 34px Inter, sans-serif"
+      ctx.textAlign = "left"
+      ctx.fillText(merchantName, 55, 235)
+
+      // 4. Amount Text
+      const formattedAmount = typeof amount === 'number' ? amount.toLocaleString() : amount
+      ctx.fillStyle = "#0f172a"
+      ctx.font = "900 58px Inter, sans-serif"
+      ctx.fillText(formattedAmount, 55, 305)
+
+      const amountWidth = ctx.measureText(formattedAmount).width
+      ctx.fillStyle = "#64748b"
+      ctx.font = "bold 28px Inter, sans-serif"
+      ctx.fillText("USD", 55 + amountWidth + 14, 305)
+
+      // 5. Dashed Divider Line
+      ctx.strokeStyle = "#64748b"
+      ctx.lineWidth = 3
+      ctx.setLineDash([16, 12])
+      ctx.beginPath()
+      ctx.moveTo(55, 345)
+      ctx.lineTo(W - 55, 345)
+      ctx.stroke()
+      ctx.setLineDash([])
+
+      // 6. Centered QR Code
+      const qrSize = 540
+      const qrX = (W - qrSize) / 2
+      const qrY = 385
+      ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize)
+
+      // 7. Centered Emblem ($ on black circle)
+      const emblemSize = 90
+      const emblemX = (W - emblemSize) / 2
+      const emblemY = qrY + (qrSize - emblemSize) / 2
+
+      ctx.beginPath()
+      ctx.arc(emblemX + emblemSize / 2, emblemY + emblemSize / 2, emblemSize / 2, 0, Math.PI * 2)
+      ctx.fillStyle = "#000000"
+      ctx.fill()
+      ctx.lineWidth = 6
+      ctx.strokeStyle = "#ffffff"
+      ctx.stroke()
+
+      ctx.fillStyle = "#ffffff"
+      ctx.font = "bold 44px Inter, sans-serif"
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      ctx.fillText("$", emblemX + emblemSize / 2, emblemY + emblemSize / 2 + 2)
+
+      // 8. Footer Brand Text
+      ctx.textBaseline = "alphabetic"
+      ctx.fillStyle = "#004691"
+      ctx.font = "bold 28px Inter, sans-serif"
+      ctx.textAlign = "center"
+      ctx.fillText("Scan with any Mobile Banking app supporting KHQR", W / 2, 990)
+
+      ctx.fillStyle = "#94a3b8"
+      ctx.font = "500 22px Inter, sans-serif"
+      ctx.fillText(`Order ID: #${orderId || 'PAYMENT'} • Yeung Shi Group`, W / 2, 1035)
+
+      // 9. Clean Download via Native Mobile Share / Blob
+      canvas.toBlob(async (blob) => {
+        if (!blob) throw new Error("Blob creation failed")
+        const fileName = `YSG-KHQR-${orderId || 'payment'}.png`
+        const file = new File([blob], fileName, { type: "image/png" })
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: "KHQR Payment - Yeung Shi Group",
+            })
+            setDownloadSuccess(true)
+            setTimeout(() => setDownloadSuccess(false), 2000)
+            setIsDownloading(false)
+            return
+          } catch (shareErr) {
+            // User cancelled share sheet or fallback to direct download
+          }
+        }
+
+        // Standard File Download Fallback
+        const url = URL.createObjectURL(blob)
         const downloadLink = document.createElement("a")
-        downloadLink.href = pngUrl
-        downloadLink.download = `YSG-KHQR-${orderId || 'payment'}.png`
+        downloadLink.href = url
+        downloadLink.download = fileName
         document.body.appendChild(downloadLink)
         downloadLink.click()
         document.body.removeChild(downloadLink)
+        setTimeout(() => URL.revokeObjectURL(url), 1000)
 
         setDownloadSuccess(true)
-        toast.success(language === "kh" ? "បានទាញយក QR Code រួចរាល់!" : "QR Code downloaded!")
+        toast.success(language === "kh" ? "បានទាញយក QR Code រួចរាល់!" : "KHQR image saved!")
         setTimeout(() => setDownloadSuccess(false), 2000)
         setIsDownloading(false)
-      }
+      }, "image/png", 1.0)
+
     } catch (err) {
       console.error("Failed to download QR:", err)
       toast.error(language === "kh" ? "មិនអាចទាញយកបានទេ" : "Failed to download QR image")
@@ -174,40 +293,40 @@ export default function BakongQRModal({
     >
       <Toaster position="top-center" />
 
-      {/* Modal / Bottom Sheet Card */}
+      {/* 100% Full-Width Bottom Sheet on Phone / Centered Modal on Desktop */}
       <div 
-        className="w-full sm:max-w-[340px] bg-white rounded-t-[1.75rem] sm:rounded-2xl overflow-hidden shadow-2xl relative font-sans animate-in slide-in-from-bottom duration-300 max-h-[92vh] flex flex-col"
+        className="w-full sm:max-w-[340px] bg-white rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl relative font-sans animate-in slide-in-from-bottom duration-300 max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* 1. Header: Bakong Red (Sleek reduced height) */}
-        <div className="bg-[#E1232E] h-[48px] sm:h-[50px] px-4 flex flex-col items-center justify-center relative shrink-0">
-          {/* Pull Notch (Inside Red Header) */}
-          <div className="w-9 h-1 bg-white/40 rounded-full mb-1 sm:hidden" />
+        {/* 1. Header: Bakong Red (100% Width) */}
+        <div className="w-full bg-[#E1232E] pt-2.5 pb-3.5 sm:py-3.5 px-4 flex flex-col items-center justify-center relative shrink-0">
+          {/* Pull Notch Indicator */}
+          <div className="w-12 h-1 bg-white/45 rounded-full mb-1.5 sm:hidden" />
 
           {/* Centered KHQR Logo */}
           <img
             src="/logo/KHQR Logo.png"
             alt="KHQR"
-            className="h-4.5 sm:h-5 object-contain"
+            className="h-5 sm:h-5.5 w-auto object-contain"
           />
 
           {/* Right Side Downward Cutout Tail */}
-          <div className="absolute top-full right-0 w-0 h-0 border-t-[12px] border-t-[#E1232E] border-l-[18px] border-l-transparent" />
+          <div className="absolute top-full right-0 w-0 h-0 border-t-[14px] border-t-[#E1232E] border-l-[22px] border-l-transparent pointer-events-none" />
 
           {/* Close Button (Desktop Only) */}
           <button
             onClick={onClose}
-            className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-6.5 h-6.5 rounded-full bg-white/20 hover:bg-white/30 text-white items-center justify-center transition-all cursor-pointer"
+            className="hidden sm:flex absolute right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white items-center justify-center transition-all cursor-pointer"
             aria-label="Close"
           >
-            <X className="w-3.5 h-3.5 stroke-[2.5]" />
+            <X className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
 
-        {/* 2. Scrollable Card Body (Reduced height & compact spacing) */}
-        <div className="p-4 sm:p-4.5 pt-2.5 pb-6 sm:pb-4 flex flex-col overflow-y-auto">
-          {/* Merchant Name - Bakong Standard Typography */}
+        {/* 2. Scrollable Card Body */}
+        <div className="w-full p-5 pt-3 pb-8 sm:pb-4 flex flex-col overflow-y-auto">
+          {/* Merchant Name */}
           <h2 className="text-[14px] sm:text-[15px] font-bold text-slate-900 leading-tight mb-0.5 font-[family-name:var(--font-inter)] tracking-tight">
             {merchantName}
           </h2>
@@ -223,7 +342,7 @@ export default function BakongQRModal({
           </div>
 
           {/* Dashed Separator (Edge-to-Edge) */}
-          <div className="-mx-4 sm:-mx-4.5 my-2.5 flex items-center overflow-hidden">
+          <div className="-mx-5 my-2.5 flex items-center overflow-hidden">
             <svg className="w-full h-1" preserveAspectRatio="none">
               <line
                 x1="0"
@@ -237,15 +356,15 @@ export default function BakongQRModal({
             </svg>
           </div>
 
-          {/* QR Code Container (Compact Size) */}
+          {/* QR Code Container */}
           <div ref={qrRef} className="relative flex justify-center w-full my-0.5">
-            <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-2xs">
+            <div className="p-2 bg-white rounded-xl border border-slate-100 shadow-2xs">
               <QRCodeSVG
                 value={qrString}
                 size={155}
                 level="H"
                 includeMargin={false}
-                className="w-full max-w-[155px] h-auto aspect-square"
+                className="w-[155px] h-[155px]"
               />
             </div>
             {/* Custom Center Emblem */}
@@ -265,12 +384,12 @@ export default function BakongQRModal({
             {language === "kh" ? "ឬ" : "or"}
           </span>
 
-          {/* Download QR Button (Compact ABA Style) */}
+          {/* Download QR Button (ABA Style) */}
           <button
             type="button"
             onClick={handleDownloadQR}
             disabled={isDownloading}
-            className="w-full py-2 px-3 bg-[#f0f9ff] hover:bg-[#e0f2fe] text-[#0284c7] hover:text-[#0369a1] border border-[#bae6fd] rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-2xs mb-1.5 cursor-pointer"
+            className="w-full py-2.5 px-3 bg-[#f0f9ff] hover:bg-[#e0f2fe] text-[#0284c7] hover:text-[#0369a1] border border-[#bae6fd] rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-2xs mb-1.5 cursor-pointer"
           >
             {downloadSuccess ? (
               <>
@@ -303,13 +422,6 @@ export default function BakongQRModal({
               {language === "kh" ? "ផុតកំណត់ក្នុងរយៈពេល:" : "Expires in:"} <strong className="text-slate-700">{formatTime(timeLeft)}</strong>
             </span>
           </div>
-
-          {/* Polling verification indicator */}
-          {isChecking && (
-            <div className="absolute bottom-3 right-3 flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md text-[11px] font-semibold animate-pulse">
-              <Loader2 className="w-3 h-3 animate-spin" /> Verifying...
-            </div>
-          )}
         </div>
       </div>
     </div>
