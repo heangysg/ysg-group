@@ -125,9 +125,8 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
 router.get('/user/find', async (req: Request, res: Response): Promise<void> => {
   const email = (req.query.email as string || '').trim();
   const phone = (req.query.phone as string || '').trim();
-  const userId = (req.query.userId as string || '').trim();
 
-  if (!email && !phone && !userId) {
+  if (!email && !phone) {
     res.json({ data: [] });
     return;
   }
@@ -138,11 +137,13 @@ router.get('/user/find', async (req: Request, res: Response): Promise<void> => {
       SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
       FROM "Order" 
       WHERE ($1 <> '' AND "customerEmail" ILIKE $1)
-         OR ($2 <> '' AND "customerPhone" = $2)
-         OR ($3 <> '' AND id = $3)
+         OR ($2 <> '' AND (
+            "customerPhone" = $2
+            OR REPLACE(REPLACE(REPLACE("customerPhone", ' ', ''), '-', ''), '+855', '0') = REPLACE(REPLACE(REPLACE($2, ' ', ''), '-', ''), '+855', '0')
+         ))
       ORDER BY "createdAt" DESC
     `;
-    const { rows } = await pgClient.query(query, [email, phone, userId]);
+    const { rows } = await pgClient.query(query, [email, phone]);
     res.json({ data: rows });
   } catch (error) {
     console.error("Fetch User Orders Error:", error);

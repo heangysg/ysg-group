@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useCart } from "../../contexts/CartContext"
@@ -13,6 +15,9 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { getValidImages, getOptimizedImageUrl } from "../../lib/imageUtils"
+import { generateBakongQR } from "../../lib/bakong"
+import BakongQRModal from "../../components/BakongQRModal"
+import PaymentSuccessModal from "../../components/PaymentSuccessModal"
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart, isLoaded } = useCart()
@@ -26,6 +31,18 @@ export default function CheckoutPage() {
     address: "",
     paymentMethod: "Bakong"
   })
+
+  // Bakong & Success Modal States
+  const [showBakongModal, setShowBakongModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [bakongData, setBakongData] = useState<{
+    qrString: string
+    md5: string
+    orderId: string
+    amount: number
+    expiresAt: number
+  } | null>(null)
+  const [completedOrderId, setCompletedOrderId] = useState<string>("")
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -77,8 +94,37 @@ export default function CheckoutPage() {
 
       if (response.ok && data.order) {
         clearCart()
-        toast.success(language === "kh" ? "ការបញ្ជាទិញបានជោគជ័យ!" : "Order placed successfully!")
-        router.push(`/orders/${data.order.id}`)
+        
+        if (formData.paymentMethod === "Bakong") {
+          // Seamlessly generate Bakong QR code without glitching or page redirects
+          const orderExpiresAt = new Date(data.order.createdAt).getTime() + (5 * 60 * 1000)
+          const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
+          
+          try {
+            const generated = await generateBakongQR(data.order.totalAmount, data.order.id, expirationToUse)
+            if (generated && generated.qrString) {
+              const qrPayload = {
+                qrString: generated.qrString,
+                md5: generated.md5,
+                orderId: data.order.id,
+                amount: data.order.totalAmount,
+                expiresAt: expirationToUse
+              }
+              localStorage.setItem(`bakong_qr_${data.order.id}`, JSON.stringify(qrPayload))
+              setBakongData(qrPayload)
+              setShowBakongModal(true)
+            } else {
+              router.push(`/orders/${data.order.id}`)
+            }
+          } catch (qrErr) {
+            console.error("Bakong generation error:", qrErr)
+            router.push(`/orders/${data.order.id}`)
+          }
+        } else {
+          // Cash on Delivery
+          toast.success(language === "kh" ? "ការបញ្ជាទិញបានបង្កើតដោយជោគជ័យ!" : "Order placed successfully!")
+          router.push(`/orders/${data.order.id}`)
+        }
       } else {
         toast.error(data.error || (language === "kh" ? "មានបញ្ហាក្នុងការបញ្ជាទិញ" : "Failed to place order"))
       }
@@ -90,7 +136,22 @@ export default function CheckoutPage() {
     }
   }
 
-  if (isLoaded && items.length === 0) {
+  const handleBakongPaymentSuccess = () => {
+    if (bakongData) {
+      setCompletedOrderId(bakongData.orderId)
+      setShowBakongModal(false)
+      setShowSuccessModal(true)
+    }
+  }
+
+  const handleBakongModalClose = () => {
+    setShowBakongModal(false)
+    if (bakongData) {
+      router.push(`/orders/${bakongData.orderId}`)
+    }
+  }
+
+  if (isLoaded && items.length === 0 && !showBakongModal && !showSuccessModal) {
     return (
       <PublicLayout>
         <div className="bg-white min-h-screen pt-16 sm:pt-20 md:pt-16 pb-32 font-sans">
@@ -158,160 +219,168 @@ export default function CheckoutPage() {
                 {/* Step 1: Customer Info Section */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2.5 border-b border-slate-200 pb-3">
-                    <div className="w-7 h-7 rounded-full bg-[#004691] text-white flex items-center justify-center text-xs font-bold shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-[#004691] text-white text-xs font-bold flex items-center justify-center shrink-0">
                       1
-                    </div>
-                    <div>
-                      <h2 className="text-sm sm:text-base font-bold text-slate-900">
-                        {language === "kh" ? "ព័ត៌មានអតិថិជន និងការដឹកជញ្ជូន" : "Customer & Delivery Details"}
-                      </h2>
-                      <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
-                        {language === "kh" ? "សូមបញ្ចូលព័ត៌មានទំនាក់ទំនងរបស់អ្នកសម្រាប់ការដឹកជញ្ជូន" : "Enter your contact info for order delivery"}
-                      </p>
-                    </div>
+                    </span>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <User className="w-4 h-4 text-[#004691]" />
+                      <span>{language === "kh" ? "ព័ត៌មានអតិថិជន និងការដឹកជញ្ជូន" : "Customer & Shipping Information"}</span>
+                    </h2>
                   </div>
 
-                  <div className="space-y-3 pt-0.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Full Name */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700 block">
+                    <div className="space-y-1.5">
+                      <label className="text-xs sm:text-sm font-bold text-slate-700">
                         {language === "kh" ? "ឈ្មោះពេញ *" : "Full Name *"}
                       </label>
                       <div className="relative">
-                        <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           name="customerName"
                           required
                           value={formData.customerName}
                           onChange={handleInputChange}
-                          placeholder={language === "kh" ? "ឧ. សុខ ដារ៉ា" : "e.g. Sok Dara"}
-                          className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all"
+                          placeholder={language === "kh" ? "ឧ. សុខ ចាន់ដារ៉ា" : "e.g. John Doe"}
+                          className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-900 text-sm font-medium focus:border-[#004691] focus:ring-1 focus:ring-[#004691] outline-none transition-all"
                         />
+                        <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       </div>
                     </div>
 
-                    {/* Phone & Email Row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 block">
-                          {language === "kh" ? "លេខទូរស័ព្ទ *" : "Phone Number *"}
-                        </label>
-                        <div className="relative">
-                          <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                          <input
-                            type="tel"
-                            name="customerPhone"
-                            required
-                            value={formData.customerPhone}
-                            onChange={handleInputChange}
-                            placeholder="012 345 678"
-                            className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-700 block">
-                          {language === "kh" ? "អ៊ីមែល (មិនបាច់បំពេញក៏បាន)" : "Email Address (Optional)"}
-                        </label>
-                        <input
-                          type="email"
-                          name="customerEmail"
-                          value={formData.customerEmail}
-                          onChange={handleInputChange}
-                          placeholder="client@example.com"
-                          className="w-full px-4 py-2.5 sm:py-3 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Delivery Address */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700 block">
-                        {language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន *" : "Delivery Address *"}
+                    {/* Phone Number */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs sm:text-sm font-bold text-slate-700">
+                        {language === "kh" ? "លេខទូរស័ព្ទ *" : "Phone Number *"}
                       </label>
                       <div className="relative">
-                        <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-                        <textarea
-                          name="address"
+                        <input
+                          type="tel"
+                          name="customerPhone"
                           required
-                          rows={2.5}
-                          value={formData.address}
+                          value={formData.customerPhone}
                           onChange={handleInputChange}
-                          placeholder={language === "kh" ? "ផ្ទះលេខ ផ្លូវ សង្កាត់ ខណ្ឌ រាជធានី/ខេត្ត..." : "House/Street, Sangkat, Khan, City/Province..."}
-                          className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 transition-all resize-none"
+                          placeholder="012 345 678"
+                          className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-900 text-sm font-medium focus:border-[#004691] focus:ring-1 focus:ring-[#004691] outline-none transition-all"
                         />
+                        <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Email Address (Optional) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs sm:text-sm font-bold text-slate-700">
+                      {language === "kh" ? "អ៊ីមែល (មិនបង្ខំ)" : "Email Address (Optional)"}
+                    </label>
+                    <input
+                      type="email"
+                      name="customerEmail"
+                      value={formData.customerEmail}
+                      onChange={handleInputChange}
+                      placeholder="example@domain.com"
+                      className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-900 text-sm font-medium focus:border-[#004691] focus:ring-1 focus:ring-[#004691] outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs sm:text-sm font-bold text-slate-700">
+                      {language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន *" : "Delivery Address *"}
+                    </label>
+                    <div className="relative">
+                      <textarea
+                        name="address"
+                        required
+                        rows={2}
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        placeholder={language === "kh" ? "ផ្ទះលេខ, ផ្លូវ, សង្កាត់/ឃុំ, ខណ្ឌ/ស្រុក, រាជធានី/ខេត្ត" : "House/Street, Sangkat, Khan, Province/City"}
+                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-900 text-sm font-medium focus:border-[#004691] focus:ring-1 focus:ring-[#004691] outline-none transition-all resize-none"
+                      />
+                      <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
                     </div>
                   </div>
                 </div>
 
-                {/* Step 2: Payment Method Section (Brought closer) */}
-                <div className="space-y-3.5 pt-4 border-t border-slate-200">
+                {/* Step 2: Payment Method Section */}
+                <div className="space-y-3 pt-2 border-t border-slate-200">
                   <div className="flex items-center gap-2.5 pb-1">
-                    <div className="w-7 h-7 rounded-full bg-[#004691] text-white flex items-center justify-center text-xs font-bold shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-[#004691] text-white text-xs font-bold flex items-center justify-center shrink-0">
                       2
-                    </div>
-                    <div>
-                      <h2 className="text-sm sm:text-base font-bold text-slate-900">
-                        {language === "kh" ? "វិធីសាស្ត្រទូទាត់ប្រាក់" : "Payment Method"}
-                      </h2>
-                      <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
-                        {language === "kh" ? "ជ្រើសរើសវិធីសាស្ត្រទូទាត់ប្រាក់ដែលអ្នកពេញចិត្ត" : "Select your preferred payment method"}
-                      </p>
-                    </div>
+                    </span>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-[#004691]" />
+                      <span>{language === "kh" ? "វិធីសាស្ត្រទូទាត់ប្រាក់" : "Payment Method"}</span>
+                    </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
-                    {/* Bakong KHQR Option */}
-                    <label
-                      onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "Bakong" }))}
-                      className={`flex items-center gap-3 p-3.5 rounded-md border-2 cursor-pointer transition-all ${formData.paymentMethod === "Bakong"
-                          ? "bg-[#E1232E]/5 border-[#E1232E] shadow-sm"
-                          : "bg-white border-slate-200 hover:border-slate-300"
-                        }`}
-                    >
-                      <div className="w-9 h-9 bg-[#E1232E] rounded-md flex items-center justify-center shrink-0 shadow-sm">
-                        <img src="/logo/KHQR Logo.png" alt="KHQR" className="w-6 h-6 object-contain" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Option 1: Bakong KHQR */}
+                    <label className={`relative flex items-center gap-3 p-3.5 rounded-md border-2 cursor-pointer transition-all ${
+                      formData.paymentMethod === "Bakong"
+                        ? "border-[#E1232E] bg-red-50/40"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Bakong"
+                        checked={formData.paymentMethod === "Bakong"}
+                        onChange={handleInputChange}
+                        className="sr-only"
+                      />
+                      <div className="w-8 h-8 rounded-full bg-[#E1232E] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <CreditCard className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs font-bold text-slate-900 block">
-                          {language === "kh" ? "បាគង KHQR" : "Bakong KHQR"}
-                        </span>
-                        <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold block">
-                          {language === "kh" ? "ស្កេនជាមួយ App ធនាគារ" : "Scan with Banking App"}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-slate-900 text-sm">Bakong (KHQR)</span>
+                          <span className="px-1.5 py-0.5 bg-[#E1232E] text-white text-[10px] font-bold rounded">
+                            {language === "kh" ? "ស្កេន QR" : "Instant"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                          {language === "kh" ? "ទូទាត់តាម App ធនាគារទាំងអស់" : "Any Mobile Banking App"}
+                        </p>
                       </div>
-                      <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0 ${formData.paymentMethod === "Bakong" ? "border-[#E1232E] bg-[#E1232E]" : "border-slate-300"
-                        }`}>
-                        {formData.paymentMethod === "Bakong" && <Check className="w-3 h-3 text-white stroke-[3]" />}
-                      </div>
+                      {formData.paymentMethod === "Bakong" && (
+                        <div className="w-5 h-5 rounded-full bg-[#E1232E] text-white flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </div>
+                      )}
                     </label>
 
-                    {/* Cash / Direct Option */}
-                    <label
-                      onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "Cash" }))}
-                      className={`flex items-center gap-3 p-3.5 rounded-md border-2 cursor-pointer transition-all ${formData.paymentMethod === "Cash"
-                          ? "bg-blue-50/70 border-[#004691] shadow-sm"
-                          : "bg-white border-slate-200 hover:border-slate-300"
-                        }`}
-                    >
-                      <div className="w-9 h-9 bg-[#004691] text-white rounded-md flex items-center justify-center shrink-0 font-bold shadow-sm">
-                        <Truck className="w-4.5 h-4.5" />
+                    {/* Option 2: Cash on Delivery */}
+                    <label className={`relative flex items-center gap-3 p-3.5 rounded-md border-2 cursor-pointer transition-all ${
+                      formData.paymentMethod === "Cash on Delivery"
+                        ? "border-[#004691] bg-blue-50/40"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="Cash on Delivery"
+                        checked={formData.paymentMethod === "Cash on Delivery"}
+                        onChange={handleInputChange}
+                        className="sr-only"
+                      />
+                      <div className="w-8 h-8 rounded-full bg-[#004691] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <Truck className="w-4 h-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs font-bold text-slate-900 block">
-                          {language === "kh" ? "ទូទាត់ពេលប្រគល់" : "Cash / Transfer"}
+                        <span className="font-bold text-slate-900 text-sm">
+                          {language === "kh" ? "ទូទាត់ពេលទទួល" : "Cash on Delivery"}
                         </span>
-                        <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold block">
-                          {language === "kh" ? "ទូទាត់ពេលទទួលបានទំនិញ" : "Pay upon delivery"}
-                        </span>
+                        <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                          {language === "kh" ? "ទូទាត់ពេលទំនិញដល់ដៃ" : "Pay when received"}
+                        </p>
                       </div>
-                      <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center shrink-0 ${formData.paymentMethod === "Cash" ? "border-[#004691] bg-[#004691]" : "border-slate-300"
-                        }`}>
-                        {formData.paymentMethod === "Cash" && <Check className="w-3 h-3 text-white stroke-[3]" />}
-                      </div>
+                      {formData.paymentMethod === "Cash on Delivery" && (
+                        <div className="w-5 h-5 rounded-full bg-[#004691] text-white flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </div>
+                      )}
                     </label>
                   </div>
                 </div>
@@ -319,34 +388,39 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Right: Order Items Summary & Final CTA (5 cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="bg-white border border-slate-200 rounded-md p-5 sm:p-7 space-y-5 shadow-sm lg:sticky lg:top-24">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-3.5">
-                  <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                    {language === "kh" ? "សេចក្តីសង្ខេបការបញ្ជាទិញ" : "Order Summary"}
+            {/* Right: Order Summary Card (5 cols) */}
+            <div className="lg:col-span-5">
+              <div className="bg-white border border-slate-200 rounded-md p-4 sm:p-6 shadow-sm sticky top-24 space-y-5">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Package className="w-5 h-5 text-[#004691]" />
+                    <span>{language === "kh" ? "សេចក្តីសង្ខេបការបញ្ជាទិញ" : "Order Summary"}</span>
                   </h2>
                   <span className="text-xs font-bold text-slate-500">
-                    {items.length} {language === "kh" ? "មុខ" : "items"}
+                    {items.length} {language === "kh" ? "មុខទំនិញ" : "items"}
                   </span>
                 </div>
 
-                {/* Items List */}
-                <div className="divide-y divide-slate-100 max-h-64 sm:max-h-72 overflow-y-auto pr-1">
-                  {items.map((item) => (
-                    <div key={item.id} className="py-3 flex items-center gap-3">
-                      <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-md p-1 shrink-0 flex items-center justify-center overflow-hidden">
-                        {getValidImages(item)[0] ? (
-                          <img src={getOptimizedImageUrl(getValidImages(item)[0], 'thumb')} alt={item.name} className="w-full h-full object-contain" />
+                {/* Items Mini List */}
+                <div className="divide-y divide-slate-100 max-h-60 overflow-y-auto no-scrollbar pr-1 space-y-2">
+                  {items.map(item => (
+                    <div key={item.id} className="flex items-center gap-3 pt-2 first:pt-0">
+                      <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-md overflow-hidden shrink-0 flex items-center justify-center p-1">
+                        {item.image ? (
+                          <img
+                            src={getOptimizedImageUrl(item.image)}
+                            alt={item.name}
+                            className="w-full h-full object-contain"
+                          />
                         ) : (
-                          <Package className="w-5 h-5 text-slate-400" />
+                          <Package className="w-5 h-5 text-slate-300" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-900 truncate">
-                          {language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}
-                        </p>
-                        <span className="text-[11px] text-slate-500 font-semibold block">
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-800 truncate">
+                          {item.name}
+                        </h3>
+                        <span className="text-[11px] text-slate-500 font-semibold">
                           ${item.price?.toLocaleString()} × {item.quantity}
                         </span>
                       </div>
@@ -383,7 +457,11 @@ export default function CheckoutPage() {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <span>{language === "kh" ? "បញ្ជាក់ការបញ្ជាទិញ" : "Place Order Now"}</span>
+                      <span>
+                        {formData.paymentMethod === "Bakong"
+                          ? (language === "kh" ? "ទូទាត់តាម Bakong (KHQR)" : "Pay with Bakong (KHQR)")
+                          : (language === "kh" ? "បញ្ជាក់ការបញ្ជាទិញ" : "Place Order Now")}
+                      </span>
                       <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </>
                   )}
@@ -400,6 +478,31 @@ export default function CheckoutPage() {
 
         </div>
       </div>
+
+      {/* Bakong KHQR Modal */}
+      {bakongData && (
+        <BakongQRModal
+          isOpen={showBakongModal}
+          onClose={handleBakongModalClose}
+          qrString={bakongData.qrString}
+          amount={bakongData.amount}
+          orderId={bakongData.orderId}
+          md5={bakongData.md5}
+          expiresAt={bakongData.expiresAt}
+          onSuccess={handleBakongPaymentSuccess}
+        />
+      )}
+
+      {/* Payment Success Modal */}
+      <PaymentSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false)
+          router.push(`/orders/${completedOrderId}`)
+        }}
+        orderId={completedOrderId}
+        amount={bakongData?.amount || cartTotal}
+      />
     </PublicLayout>
   )
 }
