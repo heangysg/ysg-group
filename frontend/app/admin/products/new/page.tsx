@@ -372,7 +372,7 @@ export default function AddProduct() {
  <>
  <ImageIcon className="w-10 h-10" />
  <span className="text-sm font-bold font-medium">{t("clickToUpload") || "Click to upload images"}</span>
- <span className="text-xs font-bold text-slate-500 font-medium">PNG, JPG up to 10MB each</span>
+ <span className="text-xs font-bold text-slate-500 font-medium">{t("imageUploadHint") || "PNG, JPG up to 10MB each"}</span>
  </>
  )}
  </div>

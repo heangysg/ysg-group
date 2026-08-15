@@ -317,7 +317,10 @@ export const translations = {
  register: "Create Account",
  editCategory: "Edit Category",
  modifyCategoryInfo: "Modify the details of this category.",
- createNewTopLevel: "Create a new top-level category."
+ createNewTopLevel: "Create a new top-level category.",
+ productImages: "Product Images",
+ clickToUpload: "Click to upload images",
+ imageUploadHint: "PNG, JPG up to 10MB each"
  },
  kh: {
  activity: "សកម្មភាព",
@@ -328,6 +331,9 @@ export const translations = {
  settings: "ការកំណត់",
  logout: "ចាកចេញ",
  addNew: "បន្ថែមថ្មី",
+ productImages: "រូបភាពផលិតផល",
+ clickToUpload: "ចុចដើម្បីបន្ថែមរូបភាព",
+ imageUploadHint: "PNG, JPG ទំហំអតិបរមា 10MB ក្នុងមួយរូប",
  edit: "កែប្រែ",
  delete: "លុប",
  save: "រក្សាទុក",

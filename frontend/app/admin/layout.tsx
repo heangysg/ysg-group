@@ -394,7 +394,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  <div className="relative" ref={notificationRef}>
  <button
  onClick={() => setShowNotifications(!showNotifications)}
- className={`p-2 transition-all border-2 ${showNotifications ? 'bg-primary text-slate-900 border-slate-200 shadow-sm' : 'text-slate-900 border-transparent hover:border-slate-200 hover:shadow-sm'}`}
+ className={`p-2 transition-all border-2 ${showNotifications ? 'bg-primary text-white border-primary shadow-sm' : 'text-slate-900 border-transparent hover:border-slate-200 hover:shadow-sm'}`}
  >
  <Bell className="w-5 h-5" />
  {notifications.length > 0 && (
@@ -518,7 +518,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </div>
  <button
  onClick={() => fileInputRef.current?.click()}
- className="absolute -bottom-2 -right-2 p-2 bg-primary text-slate-900 border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+ className="absolute -bottom-2 -right-2 p-2 bg-primary text-white border border-primary shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
  >
  <Camera className="w-3 h-3" />
  </button>

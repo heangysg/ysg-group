@@ -12,9 +12,9 @@ if (!connectionString) {
 const pool = new Pool({
   connectionString,
   ssl: { rejectUnauthorized: false },
-  max: 5,
-  idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 2000,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 15000,
 });
 
 export const getPgClient = async () => {

@@ -350,11 +350,11 @@ export default function AdminProducts() {
  onChange={toggleSelectAll}
  />
  </th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("productInfo")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("category")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("price")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("status")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("actions")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("productInfo")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("category")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("price")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("status")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
  </tr>
  </thead>
  <tbody className="divide-y-2 divide-slate-900">

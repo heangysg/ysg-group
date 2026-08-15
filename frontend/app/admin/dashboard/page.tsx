@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { logActivity } from "../../../lib/audit"
 import { 
  Package, 
@@ -32,6 +33,7 @@ import {
 } from "recharts"
 
 export default function AdminDashboard() {
+ const router = useRouter()
  const { t, language } = useLanguage()
  const [stats, setStats] = useState({
  products: 0,
@@ -61,6 +63,11 @@ export default function AdminDashboard() {
 
  if (data.error) {
  console.error("Dashboard Fetch Error:", data.error)
+ if (data.error === "Invalid or expired token" || res.status === 401 || res.status === 403) {
+ localStorage.removeItem("ysg_admin_token")
+ localStorage.removeItem("ysg_admin_user")
+ router.push("/admin/login")
+ }
  return
  }
 
@@ -179,8 +186,8 @@ export default function AdminDashboard() {
  {/* Recent Orders Table */}
  <div className="lg:col-span-2 solid-card bg-white flex flex-col">
  <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-primary">
- <h2 className="text-lg font-bold text-slate-900 font-medium">{t("recentOrders")}</h2>
- <Link href="/admin/orders" className="text-xs font-bold text-slate-900 hover:text-white transition-colors flex items-center gap-1 font-medium">
+ <h2 className="text-lg font-bold text-white font-medium">{t("recentOrders")}</h2>
+ <Link href="/admin/orders" className="text-xs font-bold text-white hover:text-slate-200 transition-colors flex items-center gap-1 font-medium">
  {t("viewAll")} <ChevronRight className="w-3 h-3" />
  </Link>
  </div>

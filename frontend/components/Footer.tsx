@@ -48,7 +48,7 @@ export default function Footer() {
  {/* Col 1: Branding */}
  <div className="lg:col-span-4 flex flex-col gap-5">
  <Link href="/" className="inline-block w-[140px] hover:opacity-80 transition-opacity">
- <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="w-full h-auto object-contain brightness-0 invert" />
+ <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="w-full h-auto object-contain" />
  </Link>
  <div className="text-sm leading-relaxed text-slate-400 max-w-sm mt-2">
  {language === "kh" ? (

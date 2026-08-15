@@ -404,7 +404,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4 md:mb-6 px-1 sm:px-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 text-[#004691] rounded-md flex items-center justify-center">
-                <Compass className="w-5 h-5" />
+                <ShoppingBag className="w-5 h-5" />
               </div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 ">
                 {language === "kh" ? "រុករកផលិតផល" : "Discover More"}

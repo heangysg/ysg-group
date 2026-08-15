@@ -147,11 +147,11 @@ export default function AuditLogsPage() {
  <table className="w-full text-left">
  <thead className="bg-primary border-b border-slate-200">
  <tr>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("user")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("action")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">Entity</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("details")}</th>
- <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium">{t("date")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("user")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("action")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">Entity</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("details")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("date")}</th>
  </tr>
  </thead>
  <tbody className="divide-y-2 divide-slate-900">
