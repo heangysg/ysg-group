@@ -180,8 +180,8 @@ export default function BakongQRModal({
         onClick={(e) => e.stopPropagation()}
       >
         
-        {/* 1. Header: Bakong Red with rounded top and top notch */}
-        <div className="bg-[#E1232E] pt-2 pb-3.5 sm:py-3.5 px-4 flex flex-col items-center justify-center relative shrink-0">
+        {/* 1. Header: Bakong Red (Increased height a bit) */}
+        <div className="bg-[#E1232E] h-[58px] sm:h-[62px] px-4 flex flex-col items-center justify-center relative shrink-0">
           {/* Pull Notch (Inside Red Header) */}
           <div className="w-10 h-1 bg-white/40 rounded-full mb-1.5 sm:hidden" />
 
@@ -189,11 +189,11 @@ export default function BakongQRModal({
           <img
             src="/logo/KHQR Logo.png"
             alt="KHQR"
-            className="h-5 sm:h-5.5 object-contain"
+            className="h-5.5 sm:h-6 object-contain"
           />
 
           {/* Right Side Downward Cutout Tail */}
-          <div className="absolute top-full right-0 w-0 h-0 border-t-[14px] border-t-[#E1232E] border-l-[22px] border-l-transparent" />
+          <div className="absolute top-full right-0 w-0 h-0 border-t-[16px] border-t-[#E1232E] border-l-[24px] border-l-transparent" />
 
           {/* Close Button (Desktop Only) */}
           <button
@@ -205,25 +205,25 @@ export default function BakongQRModal({
           </button>
         </div>
 
-        {/* 2. Scrollable Card Body */}
-        <div className="p-5 pt-4 pb-8 sm:pb-5 flex flex-col overflow-y-auto">
-          {/* Merchant Name - Bakong Standard Typography & Increased Size */}
-          <h2 className="text-[15px] sm:text-[16px] font-bold text-slate-900 leading-tight mb-1 font-[family-name:var(--font-inter)] tracking-tight">
+        {/* 2. Scrollable Card Body (Reduced height & compact spacing) */}
+        <div className="p-4 sm:p-4.5 pt-2.5 pb-6 sm:pb-4 flex flex-col overflow-y-auto">
+          {/* Merchant Name - Bakong Standard Typography */}
+          <h2 className="text-[14px] sm:text-[15px] font-bold text-slate-900 leading-tight mb-0.5 font-[family-name:var(--font-inter)] tracking-tight">
             {merchantName}
           </h2>
 
           {/* Amount */}
-          <div className="flex items-baseline gap-1.5 mb-3">
-            <span className="text-2xl sm:text-[26px] font-black text-slate-900 leading-none">
+          <div className="flex items-baseline gap-1.5 mb-2">
+            <span className="text-xl sm:text-2xl font-black text-slate-900 leading-none">
               {typeof amount === 'number' ? amount.toLocaleString() : amount}
             </span>
-            <span className="text-xs sm:text-sm font-bold text-slate-500">
+            <span className="text-xs font-bold text-slate-500">
               USD
             </span>
           </div>
 
-          {/* Dashed Separator (Edge-to-Edge with crisp, slim, visible dark gray) */}
-          <div className="-mx-5 my-3.5 flex items-center overflow-hidden">
+          {/* Dashed Separator (Edge-to-Edge) */}
+          <div className="-mx-4 sm:-mx-4.5 my-2.5 flex items-center overflow-hidden">
             <svg className="w-full h-1" preserveAspectRatio="none">
               <line
                 x1="0"
@@ -237,69 +237,69 @@ export default function BakongQRModal({
             </svg>
           </div>
 
-          {/* QR Code Container */}
+          {/* QR Code Container (Compact Size) */}
           <div ref={qrRef} className="relative flex justify-center w-full my-0.5">
-            <div className="p-2.5 bg-white rounded-xl border border-slate-100 shadow-xs">
+            <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-2xs">
               <QRCodeSVG
                 value={qrString}
-                size={175}
+                size={155}
                 level="H"
                 includeMargin={false}
-                className="w-full max-w-[175px] h-auto aspect-square"
+                className="w-full max-w-[155px] h-auto aspect-square"
               />
             </div>
             {/* Custom Center Emblem */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-black rounded-full border-2 border-white flex items-center justify-center shadow-xs">
-              <span className="text-white text-sm font-bold mt-0.5">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 bg-black rounded-full border-2 border-white flex items-center justify-center shadow-2xs">
+              <span className="text-white text-xs font-bold mt-0.5">
                 $
               </span>
             </div>
           </div>
 
           {/* Scan to Pay text */}
-          <p className="text-center font-black text-slate-800 text-sm mt-3 mb-0.5">
+          <p className="text-center font-bold text-slate-800 text-xs mt-2 mb-0.5">
             {language === "kh" ? "ស្កេនដើម្បីទូទាត់ប្រាក់" : "Scan to Pay"}
           </p>
 
-          <span className="text-center text-xs text-slate-400 font-medium mb-2">
+          <span className="text-center text-[11px] text-slate-400 font-medium mb-1">
             {language === "kh" ? "ឬ" : "or"}
           </span>
 
-          {/* Download QR Button (ABA Style) */}
+          {/* Download QR Button (Compact ABA Style) */}
           <button
             type="button"
             onClick={handleDownloadQR}
             disabled={isDownloading}
-            className="w-full py-2.5 px-4 bg-[#f0f9ff] hover:bg-[#e0f2fe] text-[#0284c7] hover:text-[#0369a1] border border-[#bae6fd] rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-98 shadow-2xs mb-2 cursor-pointer"
+            className="w-full py-2 px-3 bg-[#f0f9ff] hover:bg-[#e0f2fe] text-[#0284c7] hover:text-[#0369a1] border border-[#bae6fd] rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-2xs mb-1.5 cursor-pointer"
           >
             {downloadSuccess ? (
               <>
-                <Check className="w-4 h-4 text-emerald-600 stroke-[2.5]" />
-                <span className="text-emerald-700">{language === "kh" ? "បានទាញយករួច!" : "Downloaded!"}</span>
+                <Check className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
+                <span className="text-emerald-700 text-xs">{language === "kh" ? "បានទាញយករួច!" : "Downloaded!"}</span>
               </>
             ) : isDownloading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-[#0284c7]" />
-                <span>{language === "kh" ? "កំពុងទាញយក..." : "Downloading..."}</span>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0284c7]" />
+                <span className="text-xs">{language === "kh" ? "កំពុងទាញយក..." : "Downloading..."}</span>
               </>
             ) : (
               <>
-                <Download className="w-4 h-4 text-[#0284c7]" />
-                <span>{language === "kh" ? "ទាញយក QR Code" : "Download QR"}</span>
+                <Download className="w-3.5 h-3.5 text-[#0284c7]" />
+                <span className="text-xs">{language === "kh" ? "ទាញយក QR Code" : "Download QR"}</span>
               </>
             )}
           </button>
 
           {/* Subtext info */}
-          <p className="text-center text-[11px] text-slate-400 font-medium leading-relaxed mb-3">
+          <p className="text-center text-[10px] text-slate-400 font-medium leading-snug mb-2">
             {language === "kh"
               ? "ហើយបញ្ចូលរូបភាពទៅក្នុង Mobile Banking ដែលគាំទ្រ KHQR"
               : "and upload to Mobile Banking app supporting KHQR"}
           </p>
 
           {/* Expiry Timer */}
-          <div className="flex flex-col items-center pt-2.5 border-t border-slate-100">
-            <span className="text-slate-500 font-medium text-xs">
+          <div className="flex flex-col items-center pt-2 border-t border-slate-100">
+            <span className="text-slate-500 font-medium text-[11px]">
               {language === "kh" ? "ផុតកំណត់ក្នុងរយៈពេល:" : "Expires in:"} <strong className="text-slate-700">{formatTime(timeLeft)}</strong>
             </span>
           </div>
