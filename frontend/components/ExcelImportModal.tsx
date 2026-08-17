@@ -3,6 +3,7 @@ import { Upload, X, FileSpreadsheet, Check, AlertTriangle } from "lucide-react"
 import * as XLSX from "xlsx"
 import toast from "react-hot-toast"
 import { useLanguage } from "../contexts/LanguageContext"
+import Portal from "./Portal"
 
 interface ExcelImportModalProps {
   onClose: () => void
@@ -119,96 +120,119 @@ export default function ExcelImportModal({ onClose, onSuccess }: ExcelImportModa
   }
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-      <div className="bg-white rounded-md shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
-          <h3 className="font-bold text-slate-900 flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-[#004691]" />
-            {language === "kh" ? "បញ្ចូលទិន្នន័យផលិតផលតាម Excel" : "Import Products via Excel"}
-          </h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-200 rounded-md transition-colors text-slate-500">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <Portal>
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-200">
+        <div className="bg-white rounded-md shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+            <h3 className="font-bold text-slate-900 flex items-center gap-2">
+              <FileSpreadsheet className="w-5 h-5 text-[#004691]" />
+              {language === "kh" ? "បញ្ចូលទិន្នន័យផលិតផលតាម Excel" : "Import Products via Excel"}
+            </h3>
+            <button onClick={onClose} className="p-1 hover:bg-slate-200 rounded-md transition-colors text-slate-500">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        <div className="p-6">
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md border border-red-100 flex items-start gap-2 text-sm font-medium">
-              <AlertTriangle className="w-5 h-5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {parsedData.length === 0 ? (
-            <div className="space-y-6">
-              <div 
-                className="border-2 border-dashed border-slate-300 rounded-lg p-10 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 hover:border-[#004691] transition-all"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="w-10 h-10 text-slate-400 mb-3" />
-                <p className="font-bold text-slate-700 text-base mb-1">
-                  {language === "kh" ? "ចុចទីនេះដើម្បីជ្រើសរើសឯកសារ .xlsx" : "Click here to upload .xlsx file"}
-                </p>
-                <p className="text-xs text-slate-500 font-medium">
-                  {language === "kh" ? "គាំទ្រឯកសារ Excel និង CSV" : "Supports Excel and CSV files"}
-                </p>
-                <input 
-                  type="file" 
-                  ref={fileInputRef}
-                  className="hidden" 
-                  accept=".xlsx, .xls, .csv"
-                  onChange={handleFileUpload}
-                />
+          <div className="p-6">
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md border border-red-100 flex items-start gap-2 text-sm font-medium">
+                <AlertTriangle className="w-5 h-5 shrink-0" />
+                <span>{error}</span>
               </div>
+            )}
 
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-md border border-blue-100">
-                <div className="text-sm">
-                  <p className="font-bold text-[#004691]">{language === "kh" ? "មិនទាន់មានទម្រង់មែនទេ?" : "Don't have a template?"}</p>
-                  <p className="text-slate-600 mt-0.5">{language === "kh" ? "ទាញយកទម្រង់គំរូជា Excel សម្រាប់បញ្ចូលទិន្នន័យ" : "Download the sample Excel template"}</p>
+            {!parsedData.length ? (
+              <div className="space-y-4">
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-slate-300 hover:border-[#004691] bg-slate-50 hover:bg-blue-50/30 p-8 rounded-md text-center cursor-pointer transition-colors flex flex-col items-center justify-center gap-3"
+                >
+                  <div className="p-3 bg-blue-100/50 text-[#004691] rounded-full">
+                    <Upload className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-800 text-sm">
+                      {language === "kh" ? "ចុចដើម្បីជ្រើសរើសឯកសារ Excel" : "Click to select an Excel file"}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">.xlsx, .xls, .csv</p>
+                  </div>
+                  <input 
+                    ref={fileInputRef} 
+                    type="file" 
+                    accept=".xlsx, .xls, .csv" 
+                    className="hidden" 
+                    onChange={handleFileUpload} 
+                  />
                 </div>
-                <button 
-                  onClick={downloadTemplate}
-                  className="px-4 py-2 bg-white text-[#004691] font-bold text-xs border border-[#004691]/20 rounded-md hover:bg-[#004691] hover:text-white transition-colors"
-                >
-                  {language === "kh" ? "ទាញយក" : "Download"}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-md text-center">
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Check className="w-6 h-6 text-emerald-600" />
-                </div>
-                <h4 className="text-emerald-800 font-bold text-lg mb-1">
-                  {language === "kh" ? `បានរកឃើញផលិតផលចំនួន ${parsedData.length}` : `Found ${parsedData.length} products`}
-                </h4>
-                <p className="text-emerald-600 text-sm font-medium">
-                  {language === "kh" ? "ទិន្នន័យរួចរាល់សម្រាប់ការបញ្ចូល" : "Data is ready to be imported"}
-                </p>
-              </div>
 
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => setParsedData([])}
-                  disabled={loading}
-                  className="flex-1 py-3 text-slate-700 bg-white border border-slate-200 font-bold rounded-md hover:bg-slate-50 transition-colors disabled:opacity-50"
-                >
-                  {language === "kh" ? "បោះបង់" : "Cancel"}
-                </button>
-                <button 
-                  onClick={handleImport}
-                  disabled={loading}
-                  className="flex-1 py-3 bg-[#004691] text-white font-bold rounded-md hover:bg-blue-800 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                  {language === "kh" ? "បញ្ចូលឥឡូវនេះ" : "Import Now"}
-                </button>
+                <div className="flex items-center justify-between text-xs pt-2">
+                  <span className="text-slate-500">{language === "kh" ? "ត្រូវការទម្រង់គំរូ?" : "Need a template?"}</span>
+                  <button 
+                    type="button" 
+                    onClick={downloadTemplate}
+                    className="text-[#004691] font-bold hover:underline"
+                  >
+                    {language === "kh" ? "ទាញយកគំរូ Excel" : "Download Template"}
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-md flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500 text-white rounded-full">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-emerald-900 text-sm">
+                      {language === "kh" 
+                        ? `បានអានផលិតផលចំនួន ${parsedData.length} ដោយជោគជ័យ` 
+                        : `Successfully parsed ${parsedData.length} products`}
+                    </p>
+                    <p className="text-xs text-emerald-700 mt-0.5">
+                      {language === "kh" ? "រួចរាល់សម្រាប់ការបញ្ចូលទៅកាន់ប្រព័ន្ធ" : "Ready to import into database"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="max-h-48 overflow-y-auto border border-slate-200 rounded-md divide-y divide-slate-100 text-xs">
+                  {parsedData.slice(0, 5).map((p, idx) => (
+                    <div key={idx} className="p-2.5 flex items-center justify-between bg-white hover:bg-slate-50">
+                      <span className="font-medium text-slate-800 truncate max-w-[200px]">{p.name || p.nameKhmer}</span>
+                      <span className="font-bold text-slate-600">${p.price}</span>
+                    </div>
+                  ))}
+                  {parsedData.length > 5 && (
+                    <div className="p-2 text-center text-slate-400 font-medium bg-slate-50">
+                      + {parsedData.length - 5} more items...
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button 
+                    onClick={() => {
+                      setParsedData([])
+                      if (fileInputRef.current) fileInputRef.current.value = ""
+                    }}
+                    disabled={loading}
+                    className="flex-1 py-3 text-slate-700 bg-white border border-slate-200 font-bold rounded-md hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    {language === "kh" ? "បោះបង់" : "Cancel"}
+                  </button>
+                  <button 
+                    onClick={handleImport}
+                    disabled={loading}
+                    className="flex-1 py-3 bg-[#004691] text-white font-bold rounded-md hover:bg-blue-800 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {loading && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                    {language === "kh" ? "បញ្ចូលឥឡូវនេះ" : "Import Now"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </Portal>
   )
 }

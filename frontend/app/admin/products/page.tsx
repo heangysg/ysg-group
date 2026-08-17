@@ -7,6 +7,7 @@ import { Plus, Eye, Edit, Trash2, Search, Filter, Package, ChevronRight, MoreHor
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import ExcelImportModal from "../../../components/ExcelImportModal"
+import Portal from "../../../components/Portal"
 
 export default function AdminProducts() {
  const [products, setProducts] = useState<any[]>([])
@@ -496,7 +497,8 @@ export default function AdminProducts() {
  
  {/* ─── Delete Confirmation Modal ─── */}
  {deleteConfirm && (
- <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
+ <Portal>
+ <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
  <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-md p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
  {/* drag handle for mobile */}
  <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-md mx-auto mb-2" />
@@ -527,6 +529,7 @@ export default function AdminProducts() {
  </div>
  </div>
  </div>
+ </Portal>
  )}
  {importModalOpen && (
    <ExcelImportModal 

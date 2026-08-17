@@ -21,20 +21,20 @@ export default function Footer() {
  })
 
  useEffect(() => {
- const fetchSettings = async () => {
- try {
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- const res = await fetch(`${API_URL}/api/public/settings`)
- if (res.ok) {
- const { data } = await res.json()
- if (data) setSettings((prev: any) => ({ ...prev, ...data }))
- }
- } catch (err) {
- console.error("Failed to fetch settings:", err)
- }
- }
- fetchSettings()
- }, [])
+    const fetchSettings = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const res = await fetch(`${API_URL}/api/public/settings`)
+        if (res.ok) {
+          const { data } = await res.json()
+          if (data) setSettings((prev: any) => ({ ...prev, ...data }))
+        }
+      } catch {
+        // Silently fallback to default settings on network errors
+      }
+    }
+    fetchSettings()
+  }, [])
 
  const linkClass = "text-[13px] sm:text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2"
 

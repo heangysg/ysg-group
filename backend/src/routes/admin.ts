@@ -73,7 +73,8 @@ router.post('/login', loginLimiter, async (req: Request, res: Response): Promise
         name: user.name,
         isSuperAdmin: user.isSuperAdmin,
         avatar: user.avatar,
-        image: user.image
+        image: user.image,
+        bio: user.bio
       }
     });
   } catch (err: any) {
@@ -374,6 +375,78 @@ router.post('/products/bulk', authenticateJWT, async (req: AuthRequest, res: Res
     if (pgClient) await pgClient.query('ROLLBACK');
     console.error("Bulk Import Error:", err);
     res.status(500).json({ error: err.message || "Failed to import products" });
+  } finally {
+    if (pgClient) pgClient.release();
+  }
+});
+
+// --- Profile Endpoints ---
+
+router.get('/profile', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const userId = req.user.id;
+    pgClient = await getPgClient();
+    const { rows } = await pgClient.query('SELECT id, name, email, phone, bio, avatar FROM "User" WHERE id = $1 LIMIT 1', [userId]);
+    
+    if (rows.length === 0) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    
+    res.json({ user: rows[0] });
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ error: "Failed to fetch profile" });
+  } finally {
+    if (pgClient) pgClient.release();
+  }
+});
+
+router.put('/profile', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const userId = req.user.id;
+    const { name, email, phone, currentPassword, newPassword } = req.body;
+    
+    pgClient = await getPgClient();
+    
+    const { rows } = await pgClient.query('SELECT password FROM "User" WHERE id = $1 LIMIT 1', [userId]);
+    if (rows.length === 0) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    
+    const user = rows[0];
+    
+    if (newPassword) {
+      if (!currentPassword) {
+        res.status(400).json({ error: "Current password is required to set a new password." });
+        return;
+      }
+      
+      let isMatch = false;
+      if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+        isMatch = await bcrypt.compare(currentPassword, user.password);
+      } else {
+        isMatch = user.password === currentPassword;
+      }
+      
+      if (!isMatch) {
+        res.status(400).json({ error: "Incorrect current password." });
+        return;
+      }
+      
+      const hashedPw = await bcrypt.hash(newPassword, 10);
+      await pgClient.query('UPDATE "User" SET password = $1 WHERE id = $2', [hashedPw, userId]);
+    }
+    
+    await pgClient.query('UPDATE "User" SET name = $1, email = $2, phone = $3 WHERE id = $4', [name, email, phone, userId]);
+    
+    res.json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Failed to update profile" });
   } finally {
     if (pgClient) pgClient.release();
   }

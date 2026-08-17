@@ -226,6 +226,7 @@ model User {
   password                    String
   phone                       String?
   avatar                      String?
+  bio                         String?
   status                      UserStatus @default(ACTIVE)
   roleId                      String
   createdAt                   DateTime   @default(now())

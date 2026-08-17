@@ -104,10 +104,29 @@ const initializeDatabase = async () => {
           "updatedAt" TIMESTAMP DEFAULT NOW()
         )
       `);
+      await pgClient.query(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "bakongMd5" TEXT;`);
+      // Ensure Inquiry table has all required columns
+      await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS email TEXT;`);
+      await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS "companyName" TEXT;`);
+      await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS source TEXT;`);
+      await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS "customerPhone" TEXT;`);
+      // Ensure audit_logs table exists
       await pgClient.query(`
-        ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "bakongMd5" TEXT;
+        CREATE TABLE IF NOT EXISTS audit_logs (
+          id SERIAL PRIMARY KEY,
+          user_email TEXT NOT NULL,
+          action TEXT NOT NULL,
+          entity_type TEXT,
+          entity_id TEXT,
+          details JSONB DEFAULT '{}',
+          ip_address TEXT,
+          user_agent TEXT,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
       `);
       console.log('✅ Database tables and schema verified.');
+
+
     } finally {
       await pgClient.release();
     }

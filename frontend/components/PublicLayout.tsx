@@ -72,10 +72,9 @@ export default function PublicLayout({
  )
  setSearchResults(filtered.slice(0, 5))
  }
- } catch (err) {
- console.error("Live search error:", err)
- _isFetchingSearch = false
- } finally {
+      } catch {
+        _isFetchingSearch = false
+      } finally {
  setIsSearching(false)
  }
  }, 150) // Reduced delay for snappier feel
@@ -153,15 +152,30 @@ export default function PublicLayout({
     { name: t("about"), href: "/about", icon: Building2 },
   ]
 
- const [categories, setCategories] = useState<any[]>([])
- const [expandedCategories, setExpandedCategories] = useState<string[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([])
 
- useEffect(() => {
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- fetch(`${API_URL}/api/public/categories`).then(r => r.json()).then(res => {
- if (res.data) setCategories(res.data)
- }).catch(err => console.error("Failed to fetch categories for menu", err))
- }, [])
+  useEffect(() => {
+    let isMounted = true
+    const fetchCategories = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const r = await fetch(`${API_URL}/api/public/categories`)
+        if (r.ok) {
+          const res = await r.json()
+          if (res?.data && isMounted) {
+            setCategories(res.data)
+          }
+        }
+      } catch {
+        // Silently handle any momentary network disconnects
+      }
+    }
+    fetchCategories()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
  return (
  <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans selection:bg-[#004691]/10 selection:text-[#004691]">
@@ -175,7 +189,7 @@ export default function PublicLayout({
  initial={{ opacity: 0 }}
  animate={{ opacity: 1 }}
  exit={{ opacity: 0 }}
- className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
+ className="absolute inset-0 bg-slate-900/50"
  onClick={() => setMobileMenuOpen(false)}
  />
 
@@ -464,7 +478,7 @@ export default function PublicLayout({
  animate={{ opacity: 1 }}
  exit={{ opacity: 0 }}
  transition={{ duration: 0.15 }}
- className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-start justify-center pt-16 md:pt-24 p-4"
+ className="fixed inset-0 z-[200] bg-slate-900/60 flex items-start justify-center pt-16 md:pt-24 p-4"
  onClick={() => {
  setMobileSearchOpen(false)
  setSearchOpen(false)

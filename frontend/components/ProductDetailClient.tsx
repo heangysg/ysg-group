@@ -371,7 +371,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
  {/* Inquiry Modal */}
  {showInquiry && (
  <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
- <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowInquiry(false)}></div>
+ <div className="absolute inset-0 bg-slate-900/60" onClick={() => setShowInquiry(false)}></div>
  <div className="bg-white rounded-md w-full max-w-lg p-8 md:p-10 relative animate-in fade-in zoom-in duration-300 shadow-2xl border border-slate-100">
  <button onClick={() => setShowInquiry(false)} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-900 bg-slate-50 rounded-md transition-all hover:bg-slate-100">
  <X className="w-5 h-5" />

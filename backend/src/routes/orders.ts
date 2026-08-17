@@ -181,9 +181,10 @@ router.get('/user/:identifier', async (req: Request, res: Response): Promise<voi
 });
 
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
+  const rawParam = req.params.id;
+  const rawId = (Array.isArray(rawParam) ? rawParam[0] : (rawParam || '')).toString().trim();
   
-  if (!id || typeof id !== 'string') {
+  if (!rawId) {
     res.status(400).json({ error: "Invalid order ID" });
     return;
   }
@@ -193,10 +194,10 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const query = `
       SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
       FROM "Order" 
-      WHERE id = $1 
+      WHERE UPPER(TRIM(id)) = UPPER(TRIM($1)) OR id = $1
       LIMIT 1
     `;
-    const { rows } = await pgClient.query(query, [id]);
+    const { rows } = await pgClient.query(query, [rawId]);
     
     if (rows.length === 0) {
       res.status(404).json({ error: "Order not found" });
@@ -213,22 +214,29 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 });
 
 router.post('/track', async (req: Request, res: Response): Promise<void> => {
-  const { orderId, phone } = req.body;
+  const rawOrderId = (req.body.orderId || '').toString().trim();
+  const rawPhone = (req.body.phone || '').toString().trim();
   
-  if (!orderId || !phone) {
+  if (!rawOrderId || !rawPhone) {
     res.status(400).json({ error: "Order ID and Phone number are required" });
     return;
   }
+
+  const cleanOrderId = rawOrderId.replace(/^#/, '').trim();
 
   const pgClient = await getPgClient();
   try {
     const query = `
       SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
       FROM "Order" 
-      WHERE id = $1 AND "customerPhone" = $2
+      WHERE (UPPER(TRIM(id)) = UPPER(TRIM($1)) OR id = $1)
+        AND (
+          "customerPhone" = $2
+          OR REPLACE(REPLACE(REPLACE("customerPhone", ' ', ''), '-', ''), '+855', '0') = REPLACE(REPLACE(REPLACE($2, ' ', ''), '-', ''), '+855', '0')
+        )
       LIMIT 1
     `;
-    const { rows } = await pgClient.query(query, [orderId, phone]);
+    const { rows } = await pgClient.query(query, [cleanOrderId, rawPhone]);
     
     if (rows.length === 0) {
       res.status(404).json({ error: "Order not found or phone number does not match." });

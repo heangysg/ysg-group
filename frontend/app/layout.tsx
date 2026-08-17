@@ -30,8 +30,8 @@ export async function generateMetadata(): Promise<Metadata> {
  if (json.data.meta_description) meta_description = json.data.meta_description
  }
  }
- } catch (error) {
- console.error("Failed to fetch settings metadata", error)
+ } catch {
+ // Graceful fallback to static metadata
  }
 
  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'

@@ -6,6 +6,7 @@ import { logActivity } from "../../../../lib/audit"
 import { Eye, Trash2, Search, Filter, Package, ArrowLeft, RefreshCcw, X } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../../contexts/LanguageContext"
+import Portal from "../../../../components/Portal"
 
 export default function AdminTrashProducts() {
  const [products, setProducts] = useState<any[]>([])
@@ -196,14 +197,14 @@ export default function AdminTrashProducts() {
  }
 
  const selectedProductsData = products.filter(p => selectedProducts.includes(p.id))
-
  return (
  <div className="space-y-6">
  <Toaster position="top-right" />
 
  {/* ─── Delete Confirmation Modal ─── */}
  {deleteConfirm && (
- <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4">
+ <Portal>
+ <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
  <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-md p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
  {/* drag handle for mobile */}
  <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-md mx-auto mb-2" />
@@ -234,6 +235,7 @@ export default function AdminTrashProducts() {
  </div>
  </div>
  </div>
+ </Portal>
  )}
 
  {/* Header section */}

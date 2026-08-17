@@ -20,8 +20,8 @@ export default function CategoriesPage() {
  const data = await res.json()
  setCategories(data.data || [])
  }
- } catch (err) {
- console.error("Failed to fetch categories:", err)
+ } catch {
+ // Quietly fallback on network error
  } finally {
  setLoading(false)
  }

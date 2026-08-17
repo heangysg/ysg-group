@@ -15,31 +15,37 @@ router.post('/contact', formLimiter, async (req: Request, res: Response): Promis
   try {
     const { name, email, phone, message } = req.body;
 
-    if (!name || !email || !message) {
+    if (!name || !message) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
 
-    if (name.length > 100 || email.length > 100 || (phone && phone.length > 50) || message.length > 1000) {
+    if (name.length > 100 || (email && email.length > 100) || (phone && phone.length > 50) || message.length > 1000) {
       res.status(400).json({ error: "Input exceeds maximum allowed length" });
       return;
     }
 
     const pgClient = await getPgClient();
     try {
-      const query = `
-        INSERT INTO "ContactMessage" (name, email, phone, message, "createdAt", "updatedAt")
-        VALUES ($1, $2, $3, $4, NOW(), NOW())
-        RETURNING id;
-      `;
-      const values = [name, email, phone || null, message];
-      
-      const result = await pgClient.query(query, values);
-      
-      const tgMsg = `📬 *New Contact Message!*\n*Name:* ${name}\n*Email:* ${email}\n*Phone:* ${phone || 'N/A'}\n*Message:* ${message}`;
+      // Save to ContactMessage table
+      await pgClient.query(
+        `INSERT INTO "ContactMessage" (id, name, email, phone, message, "createdAt", "updatedAt")
+         VALUES (gen_random_uuid(), $1, $2, $3, $4, NOW(), NOW())`,
+        [name, email || null, phone || null, message]
+      );
+
+      // Also save to Inquiry table so it appears in Admin Inquiries panel
+      await pgClient.query(
+        `INSERT INTO "Inquiry" (id, "customerName", "customerPhone", email, message, source, status, "createdAt", "updatedAt")
+         VALUES (gen_random_uuid(), $1, $2, $3, $4, 'contact-form', 'new', NOW(), NOW())`,
+        [name, phone || null, email || null, message]
+      );
+
+      // Auto-send Telegram notification from server
+      const tgMsg = `📬 *ទំនាក់ទំនងថ្មី (New Contact Message)!*\n*ឈ្មោះ (Name):* ${name}\n*អ៊ីមែល (Email):* ${email || 'N/A'}\n*ទូរស័ព្ទ (Phone):* ${phone || 'N/A'}\n*សារ (Message):* ${message}`;
       sendTelegramNotification(tgMsg);
 
-      res.json({ success: true, id: result.rows[0].id });
+      res.json({ success: true });
     } finally {
       await pgClient.release();
     }
@@ -49,16 +55,17 @@ router.post('/contact', formLimiter, async (req: Request, res: Response): Promis
   }
 });
 
+
 router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { customerName, customerPhone, message, productId } = req.body;
+    const { customerName, customerPhone, email, message, productId, companyName, quantity, source } = req.body;
 
-    if (!customerName || !customerPhone || !message) {
+    if (!customerName || !message) {
       res.status(400).json({ error: "Missing required fields" });
       return;
     }
 
-    if (customerName.length > 100 || customerPhone.length > 50 || message.length > 1000) {
+    if (customerName.length > 100 || (customerPhone && customerPhone.length > 50) || message.length > 1000) {
       res.status(400).json({ error: "Input exceeds maximum allowed length" });
       return;
     }
@@ -66,15 +73,15 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
     const pgClient = await getPgClient();
     try {
       const query = `
-        INSERT INTO "Inquiry" ("customerName", "customerPhone", message, "productId", status, "createdAt", "updatedAt")
-        VALUES ($1, $2, $3, $4, 'pending', NOW(), NOW())
+        INSERT INTO "Inquiry" (id, "customerName", "customerPhone", email, "companyName", message, "productId", source, status, "createdAt", "updatedAt")
+        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, 'new', NOW(), NOW())
         RETURNING id;
       `;
-      const values = [customerName, customerPhone, message, productId || null];
+      const values = [customerName, customerPhone || null, email || null, companyName || null, message, productId || null, source || 'inquiry-form'];
       
       const result = await pgClient.query(query, values);
       
-      let productName = "Unknown Product";
+      let productName = "N/A";
       if (productId) {
         const prodRes = await pgClient.query('SELECT name, "nameKhmer" FROM "Product" WHERE id = $1', [productId]);
         if (prodRes.rows.length > 0) {
@@ -85,7 +92,7 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
         }
       }
 
-      const tgMsg = `🚨 *New Product Inquiry!* 🚨\n*Product:* ${productName}\n*Customer:* ${customerName}\n*Phone:* ${customerPhone}\n*Message:* ${message}`;
+      const tgMsg = `🚨 *សំណើរថ្មី (New Inquiry)!* 🚨\n*ឈ្មោះ (Name):* ${customerName}\n*ទូរស័ព្ទ (Phone):* ${customerPhone || 'N/A'}\n*អ៊ីមែល (Email):* ${email || 'N/A'}\n*ផលិតផល (Product):* ${productName}\n*ក្រុមហ៊ុន (Company):* ${companyName || 'N/A'}\n*ចំនួន (Qty):* ${quantity || 'N/A'}\n*សារ (Message):* ${message}`;
       sendTelegramNotification(tgMsg);
 
       res.json({ success: true, id: result.rows[0].id });
@@ -97,6 +104,7 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
     res.status(500).json({ error: "Failed to submit inquiry" });
   }
 });
+
 
 router.get('/categories', async (req: Request, res: Response): Promise<void> => {
   try {

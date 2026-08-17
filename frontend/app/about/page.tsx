@@ -19,8 +19,8 @@ export default function AboutPage() {
  const data = await res.json()
  setSettings(data.data || {})
  }
- } catch (err) {
- console.error("Failed to fetch settings:", err)
+ } catch {
+ // Silently fallback to default stats on network error
  }
  }
  fetchSettings()

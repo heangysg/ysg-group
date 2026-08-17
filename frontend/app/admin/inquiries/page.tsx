@@ -94,12 +94,17 @@ export default function AdminInquiries() {
  <Mail className="w-6 h-6" />
  </div>
  <div>
- <h3 className="font-bold text-white text-xl uppercase tracking-wider">{inquiry.name || inquiry.customerName || t("walkInCustomer")}</h3>
- <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-blue-100 font-bold font-medium">
- <span>{inquiry.email}</span>
- <span className="text-white">|</span>
- <span>{inquiry.phone || t("noPhoneProvided") || "No phone"}</span>
- </div>
+  <h3 className="font-bold text-white text-xl uppercase tracking-wider">{inquiry.name || inquiry.customerName || t("walkInCustomer")}</h3>
+  <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-blue-100 font-bold font-medium">
+  <span>{inquiry.email || "—"}</span>
+  <span className="text-white">|</span>
+  <span>{inquiry.phone || inquiry.customerPhone || t("noPhoneProvided") || "No phone"}</span>
+  {inquiry.source && (
+  <span className="px-2 py-0.5 bg-white/20 text-white text-xs font-bold rounded">
+    {inquiry.source === 'contact-form' ? (language === 'kh' ? 'ទំព័រទំនាក់ទំនង' : 'Contact Form') : inquiry.source === 'contact-inquiry-tab' ? (language === 'kh' ? 'ទំព័រតម្រូវការ' : 'Inquiry Tab') : inquiry.source}
+  </span>
+  )}
+  </div>
  </div>
  </div>
 
@@ -149,7 +154,7 @@ export default function AdminInquiries() {
  <div className="w-24 h-24 bg-primary border border-slate-200 shadow-sm flex items-center justify-center mx-auto mb-8">
  <Mail className="w-10 h-10 text-white" />
  </div>
- <h3 className="text-2xl font-bold text-slate-900 font-medium">{t("noActivityFound")}</h3>
+ <h3 className="text-2xl font-bold text-slate-900 font-medium">{language === 'kh' ? 'មិនទាន់មានសំណួរអតិថិជន' : 'No Inquiries Yet'}</h3>
  <p className="text-slate-500 mt-4 font-bold font-medium text-xs">{t("noInquiriesDesc") || "Customer messages will appear here once they contact you."}</p>
  </div>
  )}

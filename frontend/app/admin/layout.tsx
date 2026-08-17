@@ -22,12 +22,14 @@ import {
  Globe,
  Plus,
  ShoppingBag,
- Image as ImageIcon
+ Image as ImageIcon,
+ BarChart3
 } from "lucide-react"
 import { Check, Loader2, Upload, Trash2, Edit2, Shield, Key, Edit, ListPlus, MessageSquare } from "lucide-react"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { uploadImageToSecureProxy } from "../../lib/upload"
 import toast, { Toaster } from "react-hot-toast"
+import Portal from "../../components/Portal"
 import imageCompression from "browser-image-compression"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -95,60 +97,78 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
 
 
- async function fetchNotifications() {
- try {
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- const token = localStorage.getItem("ysg_admin_token")
- const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+  async function fetchNotifications() {
+    const token = typeof window !== "undefined" ? localStorage.getItem("ysg_admin_token") : null
+    if (!token) return
 
- const [inquiriesRes, ordersRes] = await Promise.all([
- fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Inquiry", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json()),
- fetch(`${API_URL}/api/admin/read`, { method: "POST", headers, body: JSON.stringify({ table: "Order", order: { column: "createdAt", ascending: false }, limit: 5 }) }).then(r => r.json())
- ])
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
 
- const latestInquiries = inquiriesRes.data
- const latestOrders = ordersRes.data
+      const safeFetchTable = async (table: string) => {
+        try {
+          const res = await fetch(`${API_URL}/api/admin/read`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ table, order: { column: "createdAt", ascending: false }, limit: 5 })
+          })
+          if (!res.ok) return { data: [] }
+          return await res.json()
+        } catch {
+          return { data: [] }
+        }
+      }
 
- const allNotes: any[] = []
+      const [inquiriesRes, ordersRes] = await Promise.all([
+        safeFetchTable("Inquiry"),
+        safeFetchTable("Order")
+      ])
 
- if (latestInquiries) {
- latestInquiries.forEach((item: any) => {
- allNotes.push({
- id: item.id,
- type: 'inquiry',
- titleKey: "newInquiryReceived",
- rawMessage: item.message,
- time: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
- icon: Mail,
- color: 'text-purple-600',
- bg: 'bg-purple-50',
- createdAt: new Date(item.createdAt)
- })
- })
- }
+      const latestInquiries = inquiriesRes?.data || []
+      const latestOrders = ordersRes?.data || []
 
- if (latestOrders) {
- latestOrders.forEach((item: any) => {
- allNotes.push({
- id: item.id,
- type: 'order',
- titleKey: "newOrderReceived",
- orderId: item.id ? String(item.id).slice(-6).toUpperCase() : 'N/A',
- amount: item.totalAmount || 0,
- time: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
- icon: ShoppingBag,
- color: 'text-emerald-600',
- bg: 'bg-emerald-50',
- createdAt: new Date(item.createdAt)
- })
- })
- }
+      const allNotes: any[] = []
 
- setNotifications(allNotes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 8))
- } catch (err) {
- console.error("Notifications Fetch Error:", err)
- }
- }
+      if (Array.isArray(latestInquiries)) {
+        latestInquiries.forEach((item: any) => {
+          if (!item || !item.createdAt) return
+          allNotes.push({
+            id: item.id,
+            type: 'inquiry',
+            titleKey: "newInquiryReceived",
+            rawMessage: item.message,
+            time: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            icon: Mail,
+            color: 'text-purple-600',
+            bg: 'bg-purple-50',
+            createdAt: new Date(item.createdAt)
+          })
+        })
+      }
+
+      if (Array.isArray(latestOrders)) {
+        latestOrders.forEach((item: any) => {
+          if (!item || !item.createdAt) return
+          allNotes.push({
+            id: item.id,
+            type: 'order',
+            titleKey: "newOrderReceived",
+            orderId: item.id ? String(item.id).slice(-6).toUpperCase() : 'N/A',
+            amount: item.totalAmount || 0,
+            time: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            icon: ShoppingBag,
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-50',
+            createdAt: new Date(item.createdAt)
+          })
+        })
+      }
+
+      setNotifications(allNotes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 8))
+    } catch {
+      // Quietly ignore transient network issues
+    }
+  }
 
  useEffect(() => {
  const handleResize = () => {
@@ -167,10 +187,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
  const menuItems = [
  { name: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
+ { name: t("reports"), href: "/admin/reports", icon: BarChart3 },
  { name: t("products"), href: "/admin/products", icon: Package },
  { name: t("categories"), href: "/admin/categories", icon: FolderOpen },
  { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
  { name: t("orders"), href: "/admin/orders", icon: History },
+ { name: t("profile"), href: "/admin/profile", icon: User },
  ...(isSuperAdmin ? [
  { name: t("users"), href: "/admin/users", icon: Users },
  { name: t("auditLogs"), href: "/admin/audit-logs", icon: History },
@@ -226,12 +248,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  const updateRes = await fetch(`${API_URL}/api/admin/users`, {
  method: "PATCH",
  headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
- body: JSON.stringify({ id: user.id, name: adminName, avatar: finalImageUrl })
+ body: JSON.stringify({ id: user.id, name: adminName, avatar: finalImageUrl, bio: adminBio })
  })
 
  if (!updateRes.ok) throw new Error("Failed to update profile in database")
 
- const updatedUser = { ...user, name: adminName, avatar: finalImageUrl }
+ const updatedUser = { ...user, name: adminName, avatar: finalImageUrl, bio: adminBio }
  localStorage.setItem("ysg_admin_user", JSON.stringify(updatedUser))
 
  setAdminProfileImage(finalImageUrl)
@@ -255,7 +277,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  {/* Sidebar Overlay */}
  {isMobile && sidebarOpen && (
  <div
- className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[40] transition-all"
+ className="fixed inset-0 bg-slate-900/50 z-[40] transition-all"
  onClick={() => setSidebarOpen(false)}
  />
  )}
@@ -287,7 +309,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </div>
 
  {/* Navigation */}
- <nav className="flex-1 overflow-y-auto p-6 space-y-2 custom-scrollbar">
+ <nav className="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar">
  {menuItems.map((item) => {
  const isActive = pathname === item.href
  return (
@@ -310,10 +332,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </nav>
 
  {/* Logout */}
- <div className="p-6 border-t border-slate-200">
+ <div className="p-4 border-t border-slate-200">
  <button
  onClick={handleLogout}
- className="flex items-center gap-3 w-full px-4 py-3 text-red-600 border-2 border-transparent hover:border-red-600 hover:shadow-sm-red bg-red-50 font-bold font-medium text-xs transition-all"
+ className="flex items-center gap-3 w-full px-4 py-2 text-red-600 border-2 border-transparent hover:border-red-600 hover:shadow-sm-red bg-red-50 font-bold font-medium text-xs transition-all"
  >
  <LogOut className="w-5 h-5" />
  {t("logout")}
@@ -338,6 +360,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  <span className="text-slate-200 text-[14px] font-normal leading-none -mt-0.5">/</span>
  <span className="text-slate-900">
  {pathname === "/admin/dashboard" ? t("dashboard") :
+ pathname.includes("/admin/reports") ? t("reports") :
  pathname.includes("/admin/products") ? t("products") :
  pathname.includes("/admin/categories") ? t("categories") :
  pathname.includes("/admin/inquiries") ? t("inquiries") :
@@ -482,102 +505,104 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </main>
  </div>
 
- {/* Profile Modal */}
- {showProfileModal && (
- <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
- <div className="solid-card bg-white w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
- <div className="p-6 border-b border-slate-200 bg-primary text-white">
- <div className="flex justify-between items-start">
- <div>
- <h2 className="text-xl font-bold uppercase text-white">My Profile</h2>
- <p className="text-xs font-medium text-blue-100 mt-1">{t("updatePhotoAndHistory")}</p>
- </div>
- <button
- onClick={() => setShowProfileModal(false)}
- className="p-2 bg-white border border-slate-200 text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
- >
- <X className="w-4 h-4" />
- </button>
- </div>
- </div>
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <Portal>
+          <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-6 animate-in fade-in duration-200">
+            <div className="solid-card bg-white w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="p-6 border-b border-slate-200 bg-primary text-white">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-bold uppercase text-white">My Profile</h2>
+                    <p className="text-xs font-medium text-blue-100 mt-1">{t("updatePhotoAndHistory")}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowProfileModal(false)}
+                    className="p-2 bg-white border border-slate-200 text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
 
- <div className="p-6 space-y-6">
- {/* Profile Image Section */}
- <div className="flex items-center gap-6">
- <div className="relative group">
- <div className="w-20 h-20 bg-slate-100 border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center">
- {adminProfileImage ? (
- <img
- src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage}
- alt="Profile"
- className="w-full h-full object-cover transition-transform group-hover:scale-110"
- />
- ) : (
- <User className="w-8 h-8 text-slate-900" />
- )}
- </div>
- <button
- onClick={() => fileInputRef.current?.click()}
- className="absolute -bottom-2 -right-2 p-2 bg-primary text-white border border-primary shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
- >
- <Camera className="w-3 h-3" />
- </button>
- <input
- type="file"
- ref={fileInputRef}
- className="hidden"
- accept="image/*"
- onChange={handleImageUpload}
- />
- </div>
- <div className="flex-1">
- <label className="text-sm font-medium text-slate-400 font-medium ml-1">{t("fullName")}</label>
- <input
- type="text"
- value={adminName}
- onChange={(e) => setAdminName(e.target.value)}
- className="w-full mt-1.5 px-4 py-2.5 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all font-medium text-[11px]"
- />
- </div>
- </div>
+              <div className="p-6 space-y-6">
+                {/* Profile Image Section */}
+                <div className="flex items-center gap-6">
+                  <div className="relative group">
+                    <div className="w-20 h-20 bg-slate-100 border border-slate-200 overflow-hidden shadow-sm flex items-center justify-center">
+                      {adminProfileImage ? (
+                        <img
+                          src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage}
+                          alt="Profile"
+                          className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                        />
+                      ) : (
+                        <User className="w-8 h-8 text-slate-900" />
+                      )}
+                    </div>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute -bottom-2 -right-2 p-2 bg-primary text-white border border-primary shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                    >
+                      <Camera className="w-3 h-3" />
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-sm font-medium text-slate-400 font-medium ml-1">{t("fullName")}</label>
+                    <input
+                      type="text"
+                      value={adminName}
+                      onChange={(e) => setAdminName(e.target.value)}
+                      className="w-full mt-1.5 px-4 py-2.5 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all font-medium text-[11px]"
+                    />
+                  </div>
+                </div>
 
- {/* Bio Section */}
- <div className="space-y-1.5">
- <label className="text-sm font-medium text-slate-400 font-medium ml-1">{t("backgroundHistory")}</label>
- <textarea
- value={adminBio}
- onChange={(e) => setAdminBio(e.target.value)}
- placeholder={t("writeBio")}
- className="w-full mt-1.5 px-4 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all h-24 resize-none font-medium text-[11px]"
- />
- </div>
+                {/* Bio Section */}
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-400 font-medium ml-1">{t("backgroundHistory")}</label>
+                  <textarea
+                    value={adminBio}
+                    onChange={(e) => setAdminBio(e.target.value)}
+                    placeholder={t("writeBio")}
+                    className="w-full mt-1.5 px-4 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all h-24 resize-none font-medium text-[11px]"
+                  />
+                </div>
 
- <div className="pt-4 flex gap-4">
- <button
- onClick={() => setShowProfileModal(false)}
- className="flex-1 py-4 px-6 border border-slate-200 text-slate-900 font-bold text-xs font-medium hover:bg-slate-100 hover:shadow-sm transition-all bg-white"
- >
- {t("cancel")}
- </button>
- <button
- onClick={saveProfile}
- disabled={savingProfile}
- className="flex-1 btn-primary py-4 px-6 flex items-center justify-center gap-3 text-xs"
- >
- {savingProfile ? (
- <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" />
- ) : (
- <>
- <Plus className="w-5 h-5" />
- {t("saveAndClose")}
- </>
- )}
- </button>
- </div>
- </div>
- </div>
- </div>
- )}
- </div>
- )
+                <div className="pt-4 flex gap-4">
+                  <button
+                    onClick={() => setShowProfileModal(false)}
+                    className="flex-1 py-4 px-6 border border-slate-200 text-slate-900 font-bold text-xs font-medium hover:bg-slate-100 hover:shadow-sm transition-all bg-white"
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button
+                    onClick={saveProfile}
+                    disabled={savingProfile}
+                    className="flex-1 btn-primary py-4 px-6 flex items-center justify-center gap-3 text-xs"
+                  >
+                    {savingProfile ? (
+                      <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5" />
+                        {t("saveAndClose")}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+    </div>
+  )
 }

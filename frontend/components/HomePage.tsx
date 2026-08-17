@@ -89,9 +89,9 @@ function BannerSlider() {
           />
           {/* Gradient Overlay for Text Readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-          
+
           <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-16 lg:px-24 max-w-3xl">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
@@ -124,19 +124,18 @@ function BannerSlider() {
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all shadow-sm ${
-              i === index ? "bg-[#004691] w-6 md:w-8" : "bg-white/50 hover:bg-white/80"
-            }`}
+            className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all shadow-sm ${i === index ? "bg-[#004691] w-6 md:w-8" : "bg-white/50 hover:bg-white/80"
+              }`}
           />
         ))}
       </div>
-      <button 
+      <button
         onClick={() => setIndex((prev) => (prev - 1 + bannerData.length) % bannerData.length)}
         className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
       >
         <ChevronRight className="w-4 h-4 md:w-6 md:h-6 rotate-180" />
       </button>
-      <button 
+      <button
         onClick={() => setIndex((prev) => (prev + 1) % bannerData.length)}
         className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
       >
@@ -184,21 +183,28 @@ export default function HomePage() {
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       try {
-        const [catRes, prodRes] = await Promise.all([
-          fetch(`${API_URL}/api/public/categories`, { cache: "no-store" }),
-          fetch(`${API_URL}/api/public/products`, { cache: "no-store" }),
+        const safeFetch = async (url: string) => {
+          try {
+            const res = await fetch(url, { cache: "no-store" });
+            if (!res.ok) return { data: [] };
+            return await res.json();
+          } catch {
+            return { data: [] };
+          }
+        };
+
+        const [catData, prodData] = await Promise.all([
+          safeFetch(`${API_URL}/api/public/categories`),
+          safeFetch(`${API_URL}/api/public/products`),
         ]);
 
-        const catData = catRes.ok ? await catRes.json() : { data: [] };
-        const prodData = prodRes.ok ? await prodRes.json() : { data: [] };
-
-        if (catData.data) {
+        if (catData?.data && Array.isArray(catData.data) && catData.data.length > 0) {
           const mainCats = catData.data.filter((c: any) => !c.parentId);
           _cachedTopCategories = mainCats;
           setTopCategories(mainCats);
         }
 
-        if (prodData.data) {
+        if (prodData?.data && Array.isArray(prodData.data) && prodData.data.length > 0) {
           const prods = prodData.data;
           const hot = prods.filter((p: any) => p.isFeatured === true);
           const popular = prods.filter((p: any) => !p.isFeatured);
@@ -207,8 +213,8 @@ export default function HomePage() {
           setHotProducts(hot);
           setPopularProducts(popular);
         }
-      } catch (err) {
-        console.error("Home Data Fetch Error:", err);
+      } catch {
+        // Quietly fallback to existing cached categories/products
       } finally {
         setLoading(false);
         setIsReady(true);
@@ -223,7 +229,6 @@ export default function HomePage() {
     }
   }, []);
 
-  // 🎯 Bulletproof Manual Scroll Restoration
   useEffect(() => {
     if (!isReady) return;
 
@@ -314,47 +319,47 @@ export default function HomePage() {
           <div className="flex overflow-x-auto no-scrollbar gap-2 sm:gap-3 md:gap-6 pb-4 snap-x">
             {loading
               ? [1, 2, 3, 4, 5, 6].map((n) => (
-                  <div
-                    key={n}
-                    className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px] flex flex-col items-center gap-2"
-                  >
-                    <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-slate-100 rounded-full animate-pulse" />
-                    <div className="w-14 sm:w-16 h-3 bg-slate-100 rounded animate-pulse" />
-                  </div>
-                ))
+                <div
+                  key={n}
+                  className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px] flex flex-col items-center gap-2"
+                >
+                  <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-slate-100 rounded-full animate-pulse" />
+                  <div className="w-14 sm:w-16 h-3 bg-slate-100 rounded animate-pulse" />
+                </div>
+              ))
               : topCategories.map((cat, idx) => (
-                  <motion.div
-                    key={cat.id}
-                    initial={isRestored ? false : { opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: isRestored ? 0 : idx * 0.04 }}
-                    className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px]"
+                <motion.div
+                  key={cat.id}
+                  initial={isRestored ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: isRestored ? 0 : idx * 0.04 }}
+                  className="snap-start min-w-[80px] sm:min-w-[100px] md:min-w-[130px]"
+                >
+                  <Link
+                    href={`/products/category/${cat.slug}`}
+                    className="flex flex-col items-center gap-1.5 sm:gap-2 md:gap-3 group"
                   >
-                    <Link
-                      href={`/products/category/${cat.slug}`}
-                      className="flex flex-col items-center gap-1.5 sm:gap-2 md:gap-3 group"
-                    >
-                      <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-white rounded-full shadow-2xs border border-slate-200 flex items-center justify-center p-2 sm:p-3 md:p-4 group-hover:border-[#004691] transition-all duration-300 overflow-hidden relative">
-                        {cat.image ? (
-                          <img
-                            src={cat.image}
-                            alt={cat.name}
-                            className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-slate-100 to-slate-50 relative z-10 flex items-center justify-center">
-                            <LayoutGrid className="w-7 h-7 sm:w-8 sm:h-8 text-slate-400" />
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-xs sm:text-sm md:text-base font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
-                        {language === "kh" && cat.nameKhmer
-                          ? cat.nameKhmer
-                          : cat.name}
-                      </span>
-                    </Link>
-                  </motion.div>
-                ))}
+                    <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-white rounded-full shadow-2xs border border-slate-200 flex items-center justify-center p-2 sm:p-3 md:p-4 group-hover:border-[#004691] transition-all duration-300 overflow-hidden relative">
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-gradient-to-br from-slate-100 to-slate-50 relative z-10 flex items-center justify-center">
+                          <LayoutGrid className="w-7 h-7 sm:w-8 sm:h-8 text-slate-400" />
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs sm:text-sm md:text-base font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
+                      {language === "kh" && cat.nameKhmer
+                        ? cat.nameKhmer
+                        : cat.name}
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
           </div>
         </section>
 
@@ -380,21 +385,21 @@ export default function HomePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
               {loading
                 ? [1, 2, 3, 4].map((n) => (
-                    <div
-                      key={n}
-                      className="aspect-[3/4] bg-slate-50 border border-slate-100 rounded-md animate-pulse"
-                    />
-                  ))
+                  <div
+                    key={n}
+                    className="aspect-[3/4] bg-slate-50 border border-slate-100 rounded-md animate-pulse"
+                  />
+                ))
                 : hotProducts
-                    .slice(0, 8)
-                    .map((product, idx) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        index={idx}
-                        disableAnimation={isRestored}
-                      />
-                    ))}
+                  .slice(0, 8)
+                  .map((product, idx) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      index={idx}
+                      disableAnimation={isRestored}
+                    />
+                  ))}
             </div>
           </section>
         )}
@@ -415,21 +420,21 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
             {loading
               ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
-                  <div
-                    key={n}
-                    className="aspect-[3/4] bg-slate-50 border border-slate-100 rounded-md animate-pulse"
-                  />
-                ))
+                <div
+                  key={n}
+                  className="aspect-[3/4] bg-slate-50 border border-slate-100 rounded-md animate-pulse"
+                />
+              ))
               : popularProducts
-                  .slice(0, displayLimit)
-                  .map((product, idx) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      index={idx}
-                      disableAnimation={isRestored}
-                    />
-                  ))}
+                .slice(0, displayLimit)
+                .map((product, idx) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    index={idx}
+                    disableAnimation={isRestored}
+                  />
+                ))}
           </div>
 
           {/* Infinite Scroll Loader */}

@@ -14,141 +14,133 @@ import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
 
 export default function OrderDetailsPage() {
- const { id } = useParams()
- const { t, language } = useLanguage()
- const [order, setOrder] = useState<any>(null)
- const [loading, setLoading] = useState(true)
- const [showQR, setShowQR] = useState(false)
- const [showSuccessModal, setShowSuccessModal] = useState(false)
- const [qrData, setQrData] = useState<any>(null)
+  const params = useParams()
+  const rawId = params?.id
+  const orderId = Array.isArray(rawId) ? rawId[0] : (rawId as string || '').trim()
+  const { t, language } = useLanguage()
+  const [order, setOrder] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [showQR, setShowQR] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [qrData, setQrData] = useState<any>(null)
 
- useEffect(() => {
- if (!id) return
+  // 1. Fetch Order Details
+  useEffect(() => {
+    if (!orderId) return
 
- const fetchOrder = async () => {
- try {
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- const response = await fetch(`${API_URL}/api/orders/${id}`);
- const data = await response.json();
+    let isMounted = true
 
- if (!response.ok) {
- throw new Error(data.error || "Order not found");
- }
+    const fetchOrder = async () => {
+      setLoading(true)
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await fetch(`${API_URL}/api/orders/${encodeURIComponent(orderId)}`)
+        if (!response.ok) {
+          if (isMounted) setOrder(null)
+          return
+        }
+        const data = await response.json()
+        if (!data || data.error) {
+          if (isMounted) setOrder(null)
+          return
+        }
 
- if (typeof data.items === 'string') {
- try {
- data.items = JSON.parse(data.items);
- } catch(e) {}
- }
+        if (typeof data.items === 'string') {
+          try {
+            data.items = JSON.parse(data.items)
+          } catch {}
+        }
 
- setOrder(data)
- if (data.status === "pending" && data.paymentMethod === "Bakong") {
- const orderExpiresAt = new Date(data.createdAt).getTime() + (5 * 60 * 1000)
- const cacheKey = `bakong_qr_${data.id}`
- const cachedStr = localStorage.getItem(cacheKey)
- let cachedQR = null;
- if (cachedStr) {
- try {
- cachedQR = JSON.parse(cachedStr);
- } catch (e) {
- console.error("Corrupted QR cache");
- localStorage.removeItem(cacheKey);
- }
- }
- if (cachedQR && Date.now() < cachedQR.expiresAt) {
- setQrData(cachedQR)
- 
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- fetch(`${API_URL}/api/bakong/check-status`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ md5: cachedQR.md5, orderId: data.id })
- }).then(r => r.json()).then(res => {
- if (res.responseCode === 0) {
- setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
- } else {
- setShowQR(true)
- }
- }).catch(e => {
- setShowQR(true)
- })
- } else {
- const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
- const generated = await generateBakongQR(data.totalAmount, data.id, expirationToUse)
- if (generated && generated.qrString) {
- const qrPayload = { ...generated, expiresAt: expirationToUse }
- setQrData(qrPayload)
- localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
- setShowQR(true)
- } else {
- toast.error(language === "kh" ? "មិនអាចបង្កើតកូដ QR បានទេ" : "Failed to generate payment QR");
- }
- }
- }
- } catch (err: any) {
- console.error("Error fetching order:", err)
- toast.error("Order not found")
- } finally {
- setLoading(false)
- }
- }
+        if (isMounted) {
+          setOrder(data)
+        }
+      } catch {
+        if (isMounted) setOrder(null)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
 
- fetchOrder()
+    fetchOrder()
 
- }, [id])
+    return () => {
+      isMounted = false
+    }
+  }, [orderId])
 
- useEffect(() => {
- if (order?.status !== 'pending' || !qrData || showQR) return;
+  // 2. Handle Bakong KHQR generation if order is pending
+  useEffect(() => {
+    if (!order || order.status !== "pending" || order.paymentMethod !== "Bakong") return
 
- let isSubscribed = true;
- let isFetching = false;
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- 
- const intervalId = setInterval(async () => {
- if (!isSubscribed || isFetching) return;
- 
- if (Date.now() > qrData.expiresAt) {
- clearInterval(intervalId);
- return;
- }
+    let isMounted = true
 
- isFetching = true;
- try {
- const response = await fetch(`${API_URL}/api/bakong/check-status`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ md5: qrData.md5, orderId: order.id })
- });
- const res = await response.json();
+    const setupBakongQR = async () => {
+      try {
+        const orderExpiresAt = new Date(order.createdAt).getTime() + (5 * 60 * 1000)
+        const cacheKey = `bakong_qr_${order.id}`
+        const cachedStr = typeof window !== "undefined" ? localStorage.getItem(cacheKey) : null
+        let cachedQR = null
+        if (cachedStr) {
+          try {
+            cachedQR = JSON.parse(cachedStr)
+          } catch {
+            localStorage.removeItem(cacheKey)
+          }
+        }
 
- if (res.responseCode === 0 && isSubscribed) {
- setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
- setShowQR(false)
- setShowSuccessModal(true)
- clearInterval(intervalId);
- }
- } catch (err) {
- console.error("Polling error:", err);
- } finally {
- isFetching = false;
- }
- }, 3000);
+        if (cachedQR && Date.now() < cachedQR.expiresAt) {
+          if (isMounted) {
+            setQrData(cachedQR)
+            const isPaid = await checkBakongTransaction(cachedQR.md5, order.id)
+            if (isPaid) {
+              setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
+            } else {
+              setShowQR(true)
+            }
+          }
+        } else {
+          const expirationToUse = Date.now() < orderExpiresAt ? orderExpiresAt : Date.now() + (5 * 60 * 1000)
+          const generated = await generateBakongQR(order.totalAmount, order.id, expirationToUse)
+          if (generated && generated.qrString && isMounted) {
+            const qrPayload = { ...generated, expiresAt: expirationToUse }
+            setQrData(qrPayload)
+            if (typeof window !== "undefined") {
+              localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
+            }
+            setShowQR(true)
+          }
+        }
+      } catch {
+        // QR generation issue handled gracefully without breaking order state
+      }
+    }
 
- return () => {
- isSubscribed = false;
- clearInterval(intervalId);
- };
- }, [order?.status, qrData, order?.id, showQR])
+    setupBakongQR()
 
- if (loading) {
- return (
- <PublicLayout>
- <div className="min-h-[70vh] flex items-center justify-center bg-white">
- <Loader2 className="w-8 h-8 text-[#004691] animate-spin" />
- </div>
- </PublicLayout>
- )
- }
+    return () => {
+      isMounted = false
+    }
+  }, [order?.id, order?.status, order?.paymentMethod])
+
+  // 3. Success Handler triggered by BakongQRModal
+  const handlePaymentSuccess = () => {
+    setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
+    setShowQR(false)
+    setShowSuccessModal(true)
+  }
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="min-h-[70vh] flex flex-col items-center justify-center bg-white gap-3">
+          <Loader2 className="w-8 h-8 text-[#004691] animate-spin" />
+          <p className="text-xs sm:text-sm font-semibold text-slate-500">
+            {language === "kh" ? "កំពុងទាញយកព័ត៌មានការបញ្ជាទិញ..." : "Loading order details..."}
+          </p>
+        </div>
+      </PublicLayout>
+    )
+  }
 
  if (!order) {
  return (
@@ -232,16 +224,16 @@ export default function OrderDetailsPage() {
  </div>
 
  {/* Status Badge & Print Invoice Action */}
- <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
+ <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 self-start sm:self-center">
  <button
  onClick={() => window.print()}
- className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-md transition-all shadow-2xs cursor-pointer active:scale-95 print:hidden"
+ className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-md transition-all shadow-2xs cursor-pointer active:scale-95 print:hidden whitespace-nowrap shrink-0"
  >
- <Printer className="w-4 h-4 text-slate-600" />
- <span>{language === "kh" ? "បោះពុម្ពវិក្កយបត្រ" : "Print Invoice"}</span>
+ <Printer className="w-4 h-4 text-slate-600 shrink-0" />
+ <span className="whitespace-nowrap">{language === "kh" ? "បោះពុម្ពវិក្កយបត្រ" : "Print Invoice"}</span>
  </button>
 
- <div className={`inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-md border shadow-2xs ${
+ <div className={`inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-md border shadow-2xs whitespace-nowrap shrink-0 ${
  isPaid
  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
  : isCancelled
@@ -250,18 +242,18 @@ export default function OrderDetailsPage() {
  }`}>
  {isPaid ? (
  <>
- <CheckCircle2 className="w-4 h-4 text-emerald-600" />
- <span>{getStatusText(order.status)}</span>
+ <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+ <span className="whitespace-nowrap">{getStatusText(order.status)}</span>
  </>
  ) : isCancelled ? (
  <>
- <XCircle className="w-4 h-4 text-rose-600" />
- <span>{getStatusText(order.status)}</span>
+ <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
+ <span className="whitespace-nowrap">{getStatusText(order.status)}</span>
  </>
  ) : (
  <>
- <Clock className="w-4 h-4 text-amber-600 animate-spin" />
- <span>{getStatusText(order.status)}</span>
+ <Clock className="w-4 h-4 text-amber-600 animate-spin shrink-0" />
+ <span className="whitespace-nowrap">{getStatusText(order.status)}</span>
  </>
  )}
  </div>
@@ -305,12 +297,15 @@ export default function OrderDetailsPage() {
  {order.items?.map((item: any, idx: number) => (
  <div key={idx} className="py-4 flex items-center gap-4">
  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-md border border-slate-100 overflow-hidden shrink-0 p-1 flex items-center justify-center">
- {item.image ? (
- <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
- ) : (
- <div className="w-full h-full bg-slate-100 rounded-md" />
- )}
- </div>
+                  <img 
+                    src={item.image || "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"} 
+                    alt={item.name} 
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"
+                    }}
+                  />
+                </div>
 
  <div className="flex-1 min-w-0">
  <h4 className="text-sm sm:text-base font-bold text-slate-900 truncate mb-1">

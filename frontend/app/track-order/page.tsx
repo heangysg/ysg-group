@@ -22,34 +22,36 @@ export default function TrackOrderPage() {
  setFormData(prev => ({ ...prev, [name]: value }))
  }
 
- const handleTrackOrder = async (e: React.FormEvent) => {
- e.preventDefault()
- if (!formData.orderId || !formData.phone) return
+  const handleTrackOrder = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.orderId || !formData.phone) return
 
- setLoading(true)
- try {
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- const response = await fetch(`${API_URL}/api/orders/track`, {
- method: 'POST',
- headers: {
- 'Content-Type': 'application/json'
- },
- body: JSON.stringify(formData)
- })
+    setLoading(true)
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await fetch(`${API_URL}/api/orders/track`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
 
- const data = await response.json()
+      const data = await response.json()
 
- if (!response.ok) throw new Error(data.error || "Failed to track order")
+      if (!response.ok) {
+        toast.error(language === "kh" ? "រកមិនឃើញការបញ្ជាទិញ ឬលេខទូរស័ព្ទមិនត្រូវគ្នាទេ" : (data.error || "Order not found or phone number does not match"))
+        return
+      }
 
- toast.success(language === "kh" ? "បានរកឃើញការបញ្ជាទិញ!" : "Order found!")
- router.push(`/orders/${data.id}`)
- } catch (error: any) {
- console.error("Tracking Error:", error)
- toast.error(error.message || t("orderNotFound"))
- } finally {
- setLoading(false)
- }
- }
+      toast.success(language === "kh" ? "បានរកឃើញការបញ្ជាទិញ!" : "Order found!")
+      router.push(`/orders/${data.id}`)
+    } catch {
+      toast.error(language === "kh" ? "មានបញ្ហាក្នុងការស្វែងរកការបញ្ជាទិញ" : "Failed to track order")
+    } finally {
+      setLoading(false)
+    }
+  }
 
  return (
  <PublicLayout>

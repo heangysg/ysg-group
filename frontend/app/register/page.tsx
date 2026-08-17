@@ -193,10 +193,10 @@ export default function RegisterPage() {
 
  <div className="relative my-6">
  <div className="absolute inset-0 flex items-center">
- <div className="w-full border-t border-slate-200"></div>
+ <div className="w-full border-t border-slate-400"></div>
  </div>
  <div className="relative flex justify-center text-xs font-bold">
- <span className="px-3 bg-white text-slate-400">{t("orContinueWith") || "Or continue with"}</span>
+ <span className="px-3 bg-white text-slate-600">{t("orContinueWith") || "Or continue with"}</span>
  </div>
  </div>
 

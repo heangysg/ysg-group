@@ -54,24 +54,37 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  }
  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
  try {
- const [catRes, prodRes] = await Promise.all([
- fetch(`${API_URL}/api/public/categories`, { cache: 'no-store' }).then(r => r.json()),
- fetch(`${API_URL}/api/public/products${isFeatured ? '?featured=true' : ''}`, { cache: 'no-store' }).then(r => r.json())
- ])
- const cats = catRes.data || []
- const prods = prodRes.data || []
- _cachedProducts = prods
- _cachedCategories = cats
- setCategories(cats)
- setAllProducts(prods)
- } catch (e) {
- console.error("Failed to fetch products page data", e)
- // On error, keep cached data visible
- } finally {
- setLoading(false)
- }
- }
- fetchData()
+        const safeFetch = async (url: string) => {
+          try {
+            const res = await fetch(url, { cache: 'no-store' })
+            if (!res.ok) return { data: [] }
+            return await res.json()
+          } catch {
+            return { data: [] }
+          }
+        }
+
+        const [catRes, prodRes] = await Promise.all([
+          safeFetch(`${API_URL}/api/public/categories`),
+          safeFetch(`${API_URL}/api/public/products${isFeatured ? '?featured=true' : ''}`)
+        ])
+        const cats = catRes?.data || []
+        const prods = prodRes?.data || []
+        if (prods.length > 0) {
+          _cachedProducts = prods
+          setAllProducts(prods)
+        }
+        if (cats.length > 0) {
+          _cachedCategories = cats
+          setCategories(cats)
+        }
+      } catch {
+        // Quietly fallback to existing cached products/categories
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
  }, [isFeatured])
 
  // 🎯 Bulletproof Manual Scroll Restoration for Products Page
@@ -151,13 +164,28 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  }
  }
 
- // 2. Search Query Filter
- if (searchQuery) {
- const q = searchQuery.toLowerCase()
- const matchName = p.name.toLowerCase().includes(q) || (p.nameKhmer && p.nameKhmer.toLowerCase().includes(q))
- const matchDesc = (p.description && p.description.toLowerCase().includes(q)) || (p.descriptionKhmer && p.descriptionKhmer.toLowerCase().includes(q))
- if (!matchName && !matchDesc) return false
- }
+  // 2. Advanced Search Query Filter
+  if (searchQuery) {
+  const q = searchQuery.toLowerCase().trim()
+  const qSpaceless = q.replace(/\s+/g, '')
+  const tokens = q.split(/\s+/)
+
+  // Check if every word typed matches somewhere in the product (Standard Fuzzy)
+  const isTokenMatch = tokens.every(token => {
+  return p.name.toLowerCase().includes(token) || 
+     (p.nameKhmer && p.nameKhmer.toLowerCase().includes(token)) ||
+     (p.description && p.description.toLowerCase().includes(token)) ||
+     (p.descriptionKhmer && p.descriptionKhmer.toLowerCase().includes(token))
+  })
+
+  // Check if the spaceless versions match (Crucial for Khmer where spaces are optional)
+  const combinedSpaceless = (p.name + (p.nameKhmer || "") + (p.description || "") + (p.descriptionKhmer || ""))
+  .toLowerCase().replace(/\s+/g, '')
+  
+  const isSpacelessMatch = combinedSpaceless.includes(qSpaceless)
+
+  if (!isTokenMatch && !isSpacelessMatch) return false
+  }
 
  return true
  })
@@ -406,7 +434,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  initial={{ opacity: 0 }}
  animate={{ opacity: 1 }}
  exit={{ opacity: 0 }}
- className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs"
+ className="absolute inset-0 bg-slate-900/50"
  onClick={() => setShowFilters(false)}
  />
 

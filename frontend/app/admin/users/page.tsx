@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import toast, { Toaster } from "react-hot-toast"
+import Portal from "../../../components/Portal"
 
 export default function UsersManagementPage() {
  const [users, setUsers] = useState<any[]>([])
@@ -230,7 +231,8 @@ export default function UsersManagementPage() {
 
  {/* Admin Modal */}
  {showModal && (
- <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+ <Portal>
+ <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200">
  <div className="solid-card bg-white w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200">
  {/* Header */}
  <div className="p-5 border-b border-slate-200 bg-primary text-white">
@@ -375,6 +377,7 @@ export default function UsersManagementPage() {
  </div>
  </div>
  </div>
+ </Portal>
  )}
  
  <Toaster position="top-right" />

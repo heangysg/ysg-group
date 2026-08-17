@@ -21,40 +21,40 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount, 
  <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6">
  {/* Backdrop */}
  <div 
- className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+ className="absolute inset-0 bg-slate-900/60 animate-in fade-in duration-200"
  onClick={onClose}
  />
  
  {/* Modal Content */}
  <div className="solid-card relative w-full max-w-xl bg-white overflow-hidden animate-in zoom-in-95 fade-in duration-300 ease-out flex flex-col max-h-[90vh]">
- <div className="p-6 md:p-10 text-center space-y-6 shrink-0 border-b-4 border-slate-200">
- 
- {/* Success Icon */}
- <div className="relative mx-auto w-20 h-20">
- <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping duration-[2000ms]" />
- <div className="relative flex items-center justify-center w-20 h-20 bg-emerald-100 text-emerald-500 rounded-md shadow-sm mx-auto mb-6">
- <Check className="w-10 h-10" />
- </div>
- </div>
+  <div className="p-5 md:p-8 text-center space-y-4 shrink-0 border-b-4 border-slate-200">
+  
+  {/* Success Icon */}
+  <div className="relative mx-auto w-16 h-16 md:w-20 md:h-20">
+  <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping duration-[2000ms]" />
+  <div className="relative flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-emerald-100 text-emerald-500 rounded-md shadow-sm mx-auto">
+  <Check className="w-8 h-8 md:w-10 md:h-10" />
+  </div>
+  </div>
 
- <div className="space-y-2">
- <h2 className="text-2xl md:text-3xl font-bold text-slate-900 font-medium">
- {language === "kh" ? "ការទូទាត់ជោគជ័យ!" : "Payment Successful!"}
- </h2>
- <p className="text-sm text-slate-900 font-bold max-w-md mx-auto leading-relaxed">
- {language === "kh" 
- ? "សូមអរគុណសម្រាប់ការវិនិយោគរបស់អ្នក។ គ្រឿងម៉ាស៊ីនរបស់អ្នកកំពុងត្រូវបានរៀបចំ។" 
- : "Thank you for your investment. We are now preparing your equipment manifest for logistics."}
- </p>
- </div>
- </div>
+  <div className="space-y-2 px-2">
+  <h2 className="text-xl md:text-2xl font-bold text-slate-900 font-medium">
+  {language === "kh" ? "ការទូទាត់ជោគជ័យ!" : "Payment Successful!"}
+  </h2>
+  <p className="text-xs md:text-sm text-slate-900 font-bold max-w-md mx-auto leading-relaxed">
+  {language === "kh" 
+  ? "សូមអរគុណសម្រាប់ការវិនិយោគរបស់អ្នក។ គ្រឿងម៉ាស៊ីនរបស់អ្នកកំពុងត្រូវបានរៀបចំ។" 
+  : "Thank you for your investment. We are now preparing your equipment manifest for logistics."}
+  </p>
+  </div>
+  </div>
 
- {/* Scrollable Content */}
- <div className="overflow-y-auto p-6 md:p-10 space-y-8 bg-slate-50">
- 
- {/* Mini Summary */}
- <div className="bg-white border border-slate-200 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm-sm">
- <div className="space-y-1">
+  {/* Scrollable Content */}
+  <div className="overflow-y-auto p-5 md:p-8 space-y-6 bg-slate-50">
+  
+  {/* Mini Summary */}
+  <div className="bg-white border border-slate-200 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm-sm">
+  <div className="space-y-1">
  <span className="text-[10px] font-bold text-slate-500 font-medium">{language === "kh" ? "លេខបញ្ជាទិញ" : "Order ID"}</span>
  <p className="text-sm font-bold text-slate-900 font-medium">#{orderId.slice(0, 10)}</p>
  </div>
@@ -75,7 +75,14 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount, 
  {items.map((item, idx) => (
  <div key={idx} className="p-4 flex items-center gap-4">
  <div className="w-14 h-14 bg-slate-100 shrink-0 border border-slate-200 overflow-hidden">
- <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image} alt={item.name} className="w-full h-full object-cover" />
+ <img 
+   src={item.image ? (item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image) : "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"} 
+   alt={item.name} 
+   className="w-full h-full object-cover"
+   onError={(e) => {
+     (e.target as HTMLImageElement).src = "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"
+   }}
+ />
  </div>
  <div className="flex-1 min-w-0">
  <h4 className="text-sm font-bold text-slate-900 uppercase truncate">

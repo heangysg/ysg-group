@@ -43,6 +43,7 @@ export default function CheckoutPage() {
     expiresAt: number
   } | null>(null)
   const [completedOrderId, setCompletedOrderId] = useState<string>("")
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -93,6 +94,7 @@ export default function CheckoutPage() {
       const data = await response.json()
 
       if (response.ok && data.order) {
+        setIsOrderPlaced(true)
         clearCart()
         
         if (formData.paymentMethod === "Bakong") {
@@ -151,7 +153,7 @@ export default function CheckoutPage() {
     }
   }
 
-  if (isLoaded && items.length === 0 && !showBakongModal && !showSuccessModal) {
+  if (isLoaded && items.length === 0 && !showBakongModal && !showSuccessModal && !isOrderPlaced) {
     return (
       <PublicLayout>
         <div className="bg-white min-h-screen pt-16 sm:pt-20 md:pt-16 pb-32 font-sans">
