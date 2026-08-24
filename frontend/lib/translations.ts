@@ -2,6 +2,8 @@ export const translations = {
  en: {
  activity: "Activity",
  dashboard: "Dashboard",
+ reports: "Reports",
+ profile: "Profile",
  products: "Products", 
  categories: "Categories",
  inquiries: "Inquiries",
@@ -321,6 +323,8 @@ export const translations = {
  kh: {
  activity: "សកម្មភាព",
  dashboard: "ផ្ទាំងគ្រប់គ្រង",
+ reports: "របាយការណ៍",
+ profile: "ប្រវត្តិរូប",
  products: "ផលិតផល",
  categories: "ប្រភេទ",
  inquiries: "ទំនាក់ទំនង",

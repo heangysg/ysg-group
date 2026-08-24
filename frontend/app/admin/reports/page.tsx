@@ -67,6 +67,26 @@ export default function ReportsPage() {
   // Format currency
   const formatCurrency = (val: number) => `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
+  const translateMonth = (label: string) => {
+    if (language !== 'kh') return label;
+    const months: Record<string, string> = {
+      'Jan': 'មករា', 'Feb': 'កុម្ភៈ', 'Mar': 'មីនា', 'Apr': 'មេសា',
+      'May': 'ឧសភា', 'Jun': 'មិថុនា', 'Jul': 'កក្កដា', 'Aug': 'សីហា',
+      'Sep': 'កញ្ញា', 'Oct': 'តុលា', 'Nov': 'វិច្ឆិកា', 'Dec': 'ធ្នូ'
+    };
+    if (!label) return label;
+    const parts = label.split(' ');
+    if (parts.length >= 2) {
+       return `${months[parts[0]] || parts[0]} ${parts[1]}`;
+    }
+    return months[label] || label;
+  };
+
+  const formattedMonthlyData = data.monthlyRevenue?.map((d: any) => ({
+    ...d,
+    labelKhmer: translateMonth(d.label)
+  })) || [];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -144,7 +164,7 @@ export default function ReportsPage() {
           <div className="p-6">
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data.monthlyRevenue} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <AreaChart data={formattedMonthlyData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -153,7 +173,7 @@ export default function ReportsPage() {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                   <XAxis 
-                    dataKey="label" 
+                    dataKey="labelKhmer" 
                     axisLine={false} 
                     tickLine={false} 
                     tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}

@@ -73,7 +73,7 @@
 html.khmer-mode,
 html.khmer-mode body,
 html.khmer-mode body * {
-  font-family: var(--font-kantumruy), system-ui, sans-serif;
+  font-family: var(--font-kantumruy), system-ui, sans-serif !important;
   line-height: 1.6;
 }
 
