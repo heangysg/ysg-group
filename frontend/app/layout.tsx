@@ -1,14 +1,10 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, Outfit, Kantumruy_Pro, Oswald } from "next/font/google"
+import { Kantumruy_Pro } from "next/font/google"
 import "./globals.css"
 import { LanguageProvider } from "../contexts/LanguageContext"
 import { CartProvider } from "../contexts/CartContext"
 import { WishlistProvider } from "../contexts/WishlistContext"
 import NextTopLoader from 'nextjs-toploader'
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" })
-const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" })
 
 const kantumruy = Kantumruy_Pro({ 
  subsets: ["khmer"], 
@@ -93,7 +89,7 @@ export default function RootLayout({
  children: React.ReactNode
 }) {
  return (
- <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable} ${kantumruy.variable} ${oswald.variable}`}>
+ <html lang="en" suppressHydrationWarning className={kantumruy.variable}>
  <head>
  <meta charSet="utf-8" />
  <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />

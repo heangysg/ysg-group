@@ -20,10 +20,10 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-kantumruy)', 'var(--font-oswald)', 'var(--font-inter)', 'sans-serif'],
+        sans: ['"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
         khmer: ['var(--font-kantumruy)', 'sans-serif'],
-        heading: ['var(--font-oswald)', 'var(--font-kantumruy)', 'sans-serif'],
-        condensed: ['var(--font-oswald)', 'var(--font-kantumruy)', 'sans-serif'],
+        heading: ['"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        condensed: ['"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
       },
       boxShadow: {
         'lux': '0 4px 20px -4px rgba(0, 0, 0, 0.05)',
