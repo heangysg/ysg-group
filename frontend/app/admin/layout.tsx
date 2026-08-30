@@ -192,6 +192,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  { name: t("categories"), href: "/admin/categories", icon: FolderOpen },
  { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
  { name: t("orders"), href: "/admin/orders", icon: History },
+ { name: t("customers") || "Customers", href: "/admin/customers", icon: Users },
  { name: t("profile"), href: "/admin/profile", icon: User },
  ...(isSuperAdmin ? [
  { name: t("users"), href: "/admin/users", icon: Users },

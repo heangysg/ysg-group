@@ -18,18 +18,31 @@ import { getValidImages, getOptimizedImageUrl } from "../../lib/imageUtils"
 import { generateBakongQR } from "../../lib/bakong"
 import BakongQRModal from "../../components/BakongQRModal"
 import PaymentSuccessModal from "../../components/PaymentSuccessModal"
+import nextDynamic from "next/dynamic"
+
+const MapLocationPicker = nextDynamic(() => import("../../components/MapLocationPicker"), { ssr: false })
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart, isLoaded } = useCart()
   const { t, language } = useLanguage()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    customerName: string;
+    customerPhone: string;
+    customerEmail: string;
+    address: string;
+    paymentMethod: string;
+    latitude: number | null;
+    longitude: number | null;
+  }>({
     customerName: "",
     customerPhone: "",
     customerEmail: "",
     address: "",
-    paymentMethod: "Bakong"
+    paymentMethod: "Bakong",
+    latitude: null,
+    longitude: null
   })
 
   // Bakong & Success Modal States
@@ -68,10 +81,17 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.customerName || !formData.customerPhone || !formData.address) {
-      toast.error(language === "kh" ? "សូមបំពេញព័ត៌មានដែលបានតម្រូវ" : "Please fill in all required fields")
+    if (!formData.customerName || !formData.customerPhone) {
+      toast.error(language === "kh" ? "សូមបំពេញឈ្មោះនិងលេខទូរស័ព្ទ" : "Please fill in your name and phone number")
       return
     }
+
+    if (!formData.address && (!formData.latitude || !formData.longitude)) {
+      toast.error(language === "kh" ? "សូមបញ្ចូលអាសយដ្ឋាន ឬជ្រើសរើសទីតាំងលើផែនទី" : "Please provide a delivery address or drop a pin on the map")
+      return
+    }
+
+    const finalAddress = formData.address || "Pinned on Map";
 
     setLoading(true)
     try {
@@ -81,6 +101,7 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          address: finalAddress,
           items: items.map(item => ({
             id: item.id,
             slug: item.slug,
@@ -288,12 +309,11 @@ export default function CheckoutPage() {
                   {/* Delivery Address */}
                   <div className="space-y-1.5">
                     <label className="text-xs sm:text-sm font-bold text-slate-700">
-                      {language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន *" : "Delivery Address *"}
+                      {language === "kh" ? "អាសយដ្ឋានដឹកជញ្ជូន" : "Delivery Address"}
                     </label>
                     <div className="relative">
                       <textarea
                         name="address"
-                        required
                         rows={2}
                         value={formData.address}
                         onChange={handleInputChange}
@@ -301,6 +321,16 @@ export default function CheckoutPage() {
                         className="w-full pl-9 pr-3 py-2.5 bg-white border border-slate-300 rounded-md text-slate-900 text-sm font-medium focus:border-[#004691] focus:ring-1 focus:ring-[#004691] outline-none transition-all resize-none"
                       />
                       <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    </div>
+                    <div className="mt-3">
+                      <label className="text-xs sm:text-sm font-bold text-slate-700 block mb-1">
+                        {language === "kh" ? "ទីតាំងនៅលើផែនទី (Map Location)" : "Map Location"}
+                      </label>
+                      <MapLocationPicker
+                        latitude={formData.latitude}
+                        longitude={formData.longitude}
+                        onChange={(lat, lng) => setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }))}
+                      />
                     </div>
                   </div>
                 </div>
@@ -317,7 +347,7 @@ export default function CheckoutPage() {
                     </h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {/* Option 1: Bakong KHQR */}
                     <label className={`relative flex items-center gap-3 p-3.5 rounded-md border-2 cursor-pointer transition-all ${
                       formData.paymentMethod === "Bakong"
@@ -348,38 +378,6 @@ export default function CheckoutPage() {
                       </div>
                       {formData.paymentMethod === "Bakong" && (
                         <div className="w-5 h-5 rounded-full bg-[#E1232E] text-white flex items-center justify-center shrink-0">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </div>
-                      )}
-                    </label>
-
-                    {/* Option 2: Cash on Delivery */}
-                    <label className={`relative flex items-center gap-3 p-3.5 rounded-md border-2 cursor-pointer transition-all ${
-                      formData.paymentMethod === "Cash on Delivery"
-                        ? "border-[#004691] bg-blue-50/40"
-                        : "border-slate-200 bg-white hover:border-slate-300"
-                    }`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="Cash on Delivery"
-                        checked={formData.paymentMethod === "Cash on Delivery"}
-                        onChange={handleInputChange}
-                        className="sr-only"
-                      />
-                      <div className="w-8 h-8 rounded-full bg-[#004691] text-white flex items-center justify-center shrink-0 shadow-xs">
-                        <Truck className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-bold text-slate-900 text-sm">
-                          {language === "kh" ? "ទូទាត់ពេលទទួល" : "Cash on Delivery"}
-                        </span>
-                        <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
-                          {language === "kh" ? "ទូទាត់ពេលទំនិញដល់ដៃ" : "Pay when received"}
-                        </p>
-                      </div>
-                      {formData.paymentMethod === "Cash on Delivery" && (
-                        <div className="w-5 h-5 rounded-full bg-[#004691] text-white flex items-center justify-center shrink-0">
                           <Check className="w-3 h-3 stroke-[3]" />
                         </div>
                       )}

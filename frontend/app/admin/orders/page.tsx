@@ -298,11 +298,24 @@ export default function AdminOrders() {
 
                   <div className="space-y-2.5 bg-slate-50/80 p-3.5 rounded-lg border border-slate-200/80">
                     <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t("shippingAddress")}</h3>
-                    <div className="flex gap-2 text-slate-900 text-xs sm:text-sm">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0" />
-                      <span className="font-medium text-slate-800 leading-relaxed break-words">
-                        {selectedOrder.address || "Local Pickup / Address not provided"}
-                      </span>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2 text-slate-900 text-xs sm:text-sm">
+                        <MapPin className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0" />
+                        <span className="font-medium text-slate-800 leading-relaxed break-words">
+                          {selectedOrder.address || "Local Pickup / Address not provided"}
+                        </span>
+                      </div>
+                      {selectedOrder.latitude && selectedOrder.longitude && (
+                        <a 
+                          href={`https://www.google.com/maps?q=${selectedOrder.latitude},${selectedOrder.longitude}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors font-bold text-xs rounded-md w-fit"
+                        >
+                          <MapPin className="w-3.5 h-3.5" />
+                          View on Google Maps
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -88,6 +88,22 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       LIMIT 5
     `;
 
+    // 9. Top Customers
+    const topCustomersQuery = `
+      SELECT 
+        "customerName", 
+        "customerEmail", 
+        "customerPhone",
+        COUNT(*) as order_count, 
+        SUM("totalAmount") as total_spent 
+      FROM "Order" 
+      WHERE status NOT IN ('cancelled', 'failed') 
+        AND "customerName" IS NOT NULL
+      GROUP BY "customerName", "customerEmail", "customerPhone" 
+      ORDER BY total_spent DESC 
+      LIMIT 10
+    `;
+
     const [
       productsRes,
       categoriesRes,
@@ -100,7 +116,8 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       monthlyRevenueRes,
       stockRes,
       topProductsRes,
-      yearlyRevenueRes
+      yearlyRevenueRes,
+      topCustomersRes
     ] = await Promise.all([
       pgClient.query(productsCountQuery),
       pgClient.query(categoriesCountQuery),
@@ -114,6 +131,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       pgClient.query(stockQuery),
       pgClient.query(topProductsQuery),
       pgClient.query(yearlyRevenueQuery),
+      pgClient.query(topCustomersQuery),
     ]);
 
     const stats = {
@@ -163,6 +181,14 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       orders: parseInt(row.orders || '0'),
     }));
 
+    const topCustomers = topCustomersRes.rows.map((row: any) => ({
+      customerName: row.customerName,
+      customerEmail: row.customerEmail,
+      customerPhone: row.customerPhone,
+      orderCount: parseInt(row.order_count || '0'),
+      totalSpent: parseFloat(row.total_spent || '0')
+    }));
+
     res.json({
       stats,
       statusData,
@@ -172,6 +198,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       stock,
       topProducts,
       yearlyRevenue,
+      topCustomers,
     });
   } catch (err: any) {
     console.error("Stats Error:", err);

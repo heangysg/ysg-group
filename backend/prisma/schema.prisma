@@ -95,6 +95,8 @@ model Order {
   paymentMethod String
   totalAmount   Decimal   @db.Decimal(12, 2)
   items         Json
+  latitude      Float?
+  longitude     Float?
   status        String?   @default("pending")
 }
 

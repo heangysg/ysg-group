@@ -370,14 +370,14 @@ export default function HomePage() {
               <div className="flex items-center gap-3">
                 <div className="h-6 md:h-8 w-1.5 md:w-2 bg-[#004691] rounded-full"></div>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 ">
-                  {language === "kh" ? "ផលិតផលពិសេស" : "Featured Machines"}
+                  {t("featuredEquipment") || "Featured Machines"}
                 </h2>
               </div>
               <Link
                 href="/products/featured"
                 className="flex items-center gap-1 md:gap-2 text-[11px] sm:text-xs md:text-sm font-bold text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-md transition-colors"
               >
-                {language === "kh" ? "មើលទាំងអស់" : "View All"}
+                {t("viewAll") || "View All"}
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -412,7 +412,7 @@ export default function HomePage() {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 ">
-                {language === "kh" ? "រុករកផលិតផល" : "Discover More"}
+                {t("discoverMore") || "Discover More"}
               </h2>
             </div>
           </div>
@@ -456,9 +456,7 @@ export default function HomePage() {
                   className="group bg-[#004691] text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-[#003066] transition-all flex items-center gap-2 shadow-md"
                 >
                   <span>
-                    {language === "kh"
-                      ? "មើលទាំងអស់"
-                      : "View All Products Catalog"}
+                    {t("viewAllProductsCatalog") || "View All Products Catalog"}
                   </span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-white" />
                 </Link>

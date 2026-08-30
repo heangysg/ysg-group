@@ -40,7 +40,7 @@ export default function UsersManagementPage() {
  name: "",
  email: "",
  password: "",
- isSuperAdmin: false
+ roleType: "admin"
  })
 
  useEffect(() => {
@@ -115,19 +115,23 @@ export default function UsersManagementPage() {
  }
 
  const openAddModal = () => {
- setFormData({ id: "", name: "", email: "", password: "", isSuperAdmin: false })
+ setFormData({ id: "", name: "", email: "", password: "", roleType: "admin" })
  setIsEditing(false)
  setActiveTab("details")
  setShowModal(true)
  }
 
  const openEditModal = async (user: any) => {
+ let roleType = "admin";
+ if (user.roleName === "STAFF") roleType = "staff";
+ else if (user.isSuperAdmin) roleType = "superadmin";
+
  setFormData({
  id: user.id,
  name: user.name,
  email: user.email,
  password: "", 
- isSuperAdmin: user.isSuperAdmin
+ roleType: roleType
  })
  setIsEditing(true)
  setActiveTab("details")
@@ -177,47 +181,51 @@ export default function UsersManagementPage() {
  </button>
  </div>
 
- <div className="solid-card bg-white p-0 overflow-hidden flex flex-col">
+ <div className="solid-card bg-white overflow-hidden p-0 border border-slate-200 shadow-sm rounded-2xl">
  <div className="overflow-x-auto">
- <table className="w-full text-left">
+ <table className="w-full text-left border-collapse">
  <thead>
- <tr className="bg-primary text-white border-b border-slate-200">
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("user")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("emailAddress")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("role")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
+ <tr className="bg-primary border-b border-slate-200">
+ <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("user")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("emailAddress")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("role")}</th>
+ <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">{t("actions")}</th>
  </tr>
  </thead>
- <tbody className="divide-y-2 divide-slate-900">
+ <tbody className="divide-y-2 divide-slate-100">
  {users.map((user) => (
- <tr key={user.id} className="group hover:bg-primary/5 transition-all">
+ <tr key={user.id} className="group hover:bg-slate-50 transition-colors">
  <td className="px-6 py-4">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-white border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
+ <div className="flex items-center gap-3">
+ <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary font-bold text-sm uppercase overflow-hidden">
  {user.image ? (
  <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
  ) : (
- <User className="w-5 h-5 text-slate-900" />
+ <User className="w-5 h-5 text-primary" />
  )}
  </div>
- <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">{user.name}</span>
+ <span className="font-bold text-slate-900 text-sm">{user.name}</span>
  </div>
  </td>
  <td className="px-6 py-4">
  <span className="text-xs font-bold text-slate-900 font-medium">{user.email}</span>
  </td>
  <td className="px-6 py-4">
- <div className="flex items-center gap-2">
- <div className={`w-2 h-2 border border-slate-200 shadow-sm ${user.isSuperAdmin ? "bg-primary" : "bg-emerald-500"}`} />
- <span className="text-xs font-bold text-slate-900 font-medium">
- {user.isSuperAdmin ? t("superadmin") : t("admin")}
- </span>
- </div>
+  <div className="flex items-center gap-2">
+  <div className={`w-2 h-2 rounded-full ${
+  user.roleName === 'STAFF' ? "bg-amber-500" 
+  : user.isSuperAdmin ? "bg-primary" 
+  : "bg-emerald-500"
+  }`} />
+  <span className="text-xs font-bold text-slate-900 font-medium">
+  {user.roleName === 'STAFF' ? (language === 'kh' ? 'បុគ្គលិក' : 'Staff') : (user.isSuperAdmin ? t("superadmin") : t("admin"))}
+  </span>
+  </div>
  </td>
  <td className="px-6 py-4 text-right">
  <button 
  onClick={() => openEditModal(user)}
- className="p-2 bg-white text-slate-900 border border-transparent hover:border-slate-200 hover:shadow-sm transition-all"
+ className="p-2 bg-white text-slate-900 rounded-lg border border-slate-200 hover:border-primary hover:text-primary hover:shadow-sm transition-all"
  >
  <Pencil className="w-4 h-4" />
  </button>
@@ -318,6 +326,20 @@ export default function UsersManagementPage() {
  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
  />
  </div>
+  <div className="space-y-2">
+  <label className="text-sm font-bold text-slate-900 font-medium ml-1">
+  {language === 'kh' ? 'តួនាទី (Role)' : 'Role'}
+  </label>
+  <select
+  value={formData.roleType}
+  onChange={e => setFormData({ ...formData, roleType: e.target.value })}
+  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium appearance-none"
+  >
+  <option value="superadmin">{language === 'kh' ? 'អ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Super Admin)' : 'Super Admin'}</option>
+  <option value="admin">{language === 'kh' ? 'អ្នកគ្រប់គ្រង (Admin)' : 'Admin'}</option>
+  <option value="staff">{language === 'kh' ? 'បុគ្គលិក (Staff)' : 'Staff'}</option>
+  </select>
+  </div>
  </div>
 
  <div className="pt-8 flex gap-6 border-t border-slate-200">

@@ -121,7 +121,12 @@ router.get('/users', authenticateJWT, async (req: AuthRequest, res: Response): P
   let pgClient;
   try {
     pgClient = await getPgClient();
-    const { rows: users } = await pgClient.query('SELECT id, name, email, "isSuperAdmin", "roleId", "isActive", "createdAt", "updatedAt" FROM "User" ORDER BY "createdAt" DESC');
+    const { rows: users } = await pgClient.query(`
+      SELECT u.id, u.name, u.email, u."isSuperAdmin", u."isActive", u."createdAt", u."updatedAt", r.name as "roleName"
+      FROM "User" u
+      LEFT JOIN "Role" r ON u."roleId" = r.id
+      ORDER BY u."createdAt" DESC
+    `);
     res.json({ users });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -133,7 +138,7 @@ router.get('/users', authenticateJWT, async (req: AuthRequest, res: Response): P
 router.post('/users', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   let pgClient;
   try {
-    const { name, email, password, isSuperAdmin } = req.body;
+    const { name, email, password, roleType } = req.body;
     
     if (!password || typeof password !== 'string' || password.length < 8 || password.length > 255) {
       res.status(400).json({ error: "Password must be between 8 and 255 characters long." });
@@ -157,11 +162,30 @@ router.post('/users', authenticateJWT, async (req: AuthRequest, res: Response): 
 
     pgClient = await getPgClient();
 
-    const roleName = isSuperAdmin ? 'ADMIN' : 'USER';
-    const { rows: roleRows } = await pgClient.query('SELECT id FROM "Role" WHERE name = $1 LIMIT 1', [roleName]);
+    let roleName = 'USER';
+    let isSuperAdmin = false;
+    
+    if (roleType === 'superadmin') {
+      roleName = 'ADMIN';
+      isSuperAdmin = true;
+    } else if (roleType === 'admin') {
+      roleName = 'ADMIN';
+      isSuperAdmin = false;
+    } else if (roleType === 'staff') {
+      roleName = 'STAFF';
+      isSuperAdmin = false;
+    }
+
+    let { rows: roleRows } = await pgClient.query('SELECT id FROM "Role" WHERE name = $1 LIMIT 1', [roleName]);
     
     if (roleRows.length === 0) {
-      throw new Error(`Could not find role: ${roleName}`);
+      // Auto-create role if missing
+      await pgClient.query(
+        'INSERT INTO "Role" (id, name, description, "updatedAt") VALUES ($1, $2, $3, NOW())',
+        [`role_${roleName.toLowerCase()}`, roleName, `${roleName} Role`]
+      );
+      const { rows: newRole } = await pgClient.query('SELECT id FROM "Role" WHERE name = $1 LIMIT 1', [roleName]);
+      roleRows = newRole;
     }
     const roleId = roleRows[0].id;
 
@@ -187,7 +211,7 @@ router.post('/users', authenticateJWT, async (req: AuthRequest, res: Response): 
 router.patch('/users', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   let pgClient;
   try {
-    const { id, password, ...updateData } = req.body;
+    const { id, password, roleType, ...updateData } = req.body;
 
     if (!req.user?.isSuperAdmin && req.user?.id !== id) {
       res.status(403).json({ error: "You can only update your own profile." });
@@ -208,6 +232,34 @@ router.patch('/users', authenticateJWT, async (req: AuthRequest, res: Response):
     }
 
     pgClient = await getPgClient();
+    
+    if (roleType && req.user?.isSuperAdmin) {
+      let roleName = 'USER';
+      let isSuperAdmin = false;
+      
+      if (roleType === 'superadmin') {
+        roleName = 'ADMIN';
+        isSuperAdmin = true;
+      } else if (roleType === 'admin') {
+        roleName = 'ADMIN';
+        isSuperAdmin = false;
+      } else if (roleType === 'staff') {
+        roleName = 'STAFF';
+        isSuperAdmin = false;
+      }
+
+      let { rows: roleRows } = await pgClient.query('SELECT id FROM "Role" WHERE name = $1 LIMIT 1', [roleName]);
+      if (roleRows.length === 0) {
+        await pgClient.query(
+          'INSERT INTO "Role" (id, name, description, "updatedAt") VALUES ($1, $2, $3, NOW())',
+          [`role_${roleName.toLowerCase()}`, roleName, `${roleName} Role`]
+        );
+        const { rows: newRole } = await pgClient.query('SELECT id FROM "Role" WHERE name = $1 LIMIT 1', [roleName]);
+        roleRows = newRole;
+      }
+      updateData.roleId = roleRows[0].id;
+      updateData.isSuperAdmin = isSuperAdmin;
+    }
 
     let query = 'UPDATE "User" SET ';
     const values: any[] = [];
@@ -447,6 +499,33 @@ router.put('/profile', authenticateJWT, async (req: AuthRequest, res: Response):
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ error: "Failed to update profile" });
+  } finally {
+    if (pgClient) pgClient.release();
+  }
+});
+
+router.get('/customers', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    pgClient = await getPgClient();
+    const { rows: customers } = await pgClient.query(`
+      SELECT 
+        "customerName" as name, 
+        "customerEmail" as email, 
+        "customerPhone" as phone,
+        MAX("address") as address,
+        COUNT(*) as order_count, 
+        SUM("totalAmount") as total_spent,
+        MAX("createdAt") as last_order_date
+      FROM "Order" 
+      WHERE "customerName" IS NOT NULL
+      GROUP BY "customerName", "customerEmail", "customerPhone" 
+      ORDER BY last_order_date DESC
+    `);
+    res.json({ customers });
+  } catch (err: any) {
+    console.error("Fetch customers error:", err);
+    res.status(500).json({ error: "Failed to fetch customers" });
   } finally {
     if (pgClient) pgClient.release();
   }

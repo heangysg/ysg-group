@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
-import { BarChart3, Package, DollarSign, TrendingUp, PackageSearch, History } from "lucide-react"
+import { BarChart3, Package, DollarSign, TrendingUp, PackageSearch, History, Users } from "lucide-react"
 
 export default function ReportsPage() {
   const { t, language } = useLanguage()
@@ -308,6 +308,62 @@ export default function ReportsPage() {
                 <tr>
                   <td colSpan={5} className="p-8 text-center text-slate-500 font-bold uppercase tracking-wider">
                     {language === 'kh' ? 'រកមិនឃើញទំនិញទេ' : 'No products found'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Top Customers */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mt-6">
+        <div className="p-6 border-b border-slate-100 bg-white flex justify-between items-center">
+          <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
+            {language === 'kh' ? 'អតិថិជនកំពូលទាំង ១០' : 'Top 10 Customers'}
+          </h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b-2 border-slate-200">
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">#</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">{language === 'kh' ? 'ឈ្មោះអតិថិជន' : 'Customer Name'}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">{language === 'kh' ? 'អ៊ីមែល / ទូរស័ព្ទ' : 'Contact'}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap text-right">{language === 'kh' ? 'ចំនួនការបញ្ជាទិញ' : 'Total Orders'}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap text-right">{language === 'kh' ? 'ចំណាយសរុប' : 'Total Spent'}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {data.topCustomers?.map((customer: any, index: number) => (
+                <tr key={index} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="p-4">
+                    <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold">
+                      {index + 1}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <p className="font-bold text-slate-900">{customer.customerName}</p>
+                  </td>
+                  <td className="p-4">
+                    <p className="font-medium text-slate-700 text-sm">{customer.customerEmail || '-'}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{customer.customerPhone}</p>
+                  </td>
+                  <td className="p-4 text-right">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
+                      {customer.orderCount}
+                    </span>
+                  </td>
+                  <td className="p-4 text-right font-black text-emerald-600">
+                    {formatCurrency(customer.totalSpent)}
+                  </td>
+                </tr>
+              ))}
+              {(!data.topCustomers || data.topCustomers.length === 0) && (
+                <tr>
+                  <td colSpan={5} className="p-8 text-center text-slate-500 font-bold uppercase tracking-wider">
+                    {language === 'kh' ? 'រកមិនឃើញទិន្នន័យអតិថិជនទេ' : 'No customers found'}
                   </td>
                 </tr>
               )}

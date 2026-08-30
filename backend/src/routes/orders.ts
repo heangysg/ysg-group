@@ -7,7 +7,7 @@ const router = Router();
 
 router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { customerName, customerPhone, customerEmail, address, paymentMethod, items } = req.body;
+    const { customerName, customerPhone, customerEmail, address, paymentMethod, items, latitude, longitude } = req.body;
 
     if (!customerName || String(customerName).length > 100) return res.status(400).json({ error: "Invalid or overly long customer name (max 100)" }) as any;
     if (!customerPhone || String(customerPhone).length > 20) return res.status(400).json({ error: "Invalid or overly long phone number (max 20)" }) as any;
@@ -78,8 +78,8 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
       const shortId = Array.from({ length: 10 }, () => alphabet.charAt(crypto.randomInt(0, alphabet.length))).join('');
       
       const query = `
-        INSERT INTO "Order" (id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt")
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+        INSERT INTO "Order" (id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, latitude, longitude, "createdAt")
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
         RETURNING *;
       `;
       const values = [
@@ -91,11 +91,23 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
         paymentMethod, 
         totalAmount, 
         JSON.stringify(validatedItems), 
-        "pending"
+        "pending",
+        latitude || null,
+        longitude || null
       ];
       
       const result = await pgClient.query(query, values);
       const newOrder = result.rows[0];
+
+      // Deep Thesis Fix: Real-time Stock Reduction
+      for (const item of validatedItems) {
+        try {
+          const identifier = item.id || item.slug;
+          await pgClient.query('UPDATE "Product" SET stock = GREATEST(stock - $1, 0) WHERE id = $2 OR slug = $2', [item.quantity, identifier]);
+        } catch (err) {
+          console.error("Stock reduction failed for item:", item, err);
+        }
+      }
       
       // Dispatch Telegram Sales Notification Alert (Background)
       const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -134,7 +146,7 @@ router.get('/user/find', async (req: Request, res: Response): Promise<void> => {
   const pgClient = await getPgClient();
   try {
     const query = `
-      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, latitude, longitude, "createdAt"
       FROM "Order" 
       WHERE ($1 <> '' AND "customerEmail" ILIKE $1)
          OR ($2 <> '' AND (
@@ -164,7 +176,7 @@ router.get('/user/:identifier', async (req: Request, res: Response): Promise<voi
   const pgClient = await getPgClient();
   try {
     const query = `
-      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, latitude, longitude, "createdAt"
       FROM "Order" 
       WHERE "customerEmail" ILIKE $1 OR "customerPhone" = $1 OR id = $1
       ORDER BY "createdAt" DESC
@@ -192,7 +204,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   const pgClient = await getPgClient();
   try {
     const query = `
-      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, latitude, longitude, "createdAt"
       FROM "Order" 
       WHERE UPPER(TRIM(id)) = UPPER(TRIM($1)) OR id = $1
       LIMIT 1
@@ -227,7 +239,7 @@ router.post('/track', async (req: Request, res: Response): Promise<void> => {
   const pgClient = await getPgClient();
   try {
     const query = `
-      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, "createdAt"
+      SELECT id, "customerName", "customerPhone", "customerEmail", address, "paymentMethod", "totalAmount", items, status, latitude, longitude, "createdAt"
       FROM "Order" 
       WHERE (UPPER(TRIM(id)) = UPPER(TRIM($1)) OR id = $1)
         AND (

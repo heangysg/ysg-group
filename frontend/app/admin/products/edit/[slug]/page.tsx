@@ -36,7 +36,8 @@ export default function EditProduct() {
  isPublished: true,
  isFeatured: false,
  categoryId: "",
- subcategoryId: ""
+ subcategoryId: "",
+ stock: "1"
  })
  const router = useRouter()
  const { t, language } = useLanguage()
@@ -119,7 +120,8 @@ export default function EditProduct() {
  isPublished: data.isPublished ?? true,
  isFeatured: data.isFeatured ?? false,
  categoryId: mainCatId,
- subcategoryId: subCatId
+ subcategoryId: subCatId,
+ stock: data.stock?.toString() || "0"
  })
 
  if (mainCatId) {
@@ -240,6 +242,7 @@ export default function EditProduct() {
  isFeatured: formData.isFeatured,
  categoryId: formData.subcategoryId || formData.categoryId || null,
  subcategoryId: null,
+ stock: parseInt(formData.stock) || 0,
  thumbnail: finalImages[0] || null,
  updatedAt: new Date().toISOString()
  }
@@ -439,6 +442,21 @@ export default function EditProduct() {
                 <option value="used">USED</option>
                 <option value="refurbished">REFURBISHED</option>
               </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-slate-700">{t("inStock") || "Stock Quantity"}</label>
+              <div className="relative">
+                <Package className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="number"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                  placeholder="1"
+                  min="0"
+                />
+              </div>
             </div>
           </div>
         </div>
