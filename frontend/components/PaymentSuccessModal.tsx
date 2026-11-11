@@ -3,6 +3,7 @@
 import { Check, CheckCircle2, Package, Home, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useLanguage } from "../contexts/LanguageContext"
+import { getOptimizedImageUrl } from "../lib/imageUtils"
 
 interface PaymentSuccessModalProps {
  isOpen: boolean
@@ -76,11 +77,11 @@ export default function PaymentSuccessModal({ isOpen, onClose, orderId, amount, 
  <div key={idx} className="p-4 flex items-center gap-4">
  <div className="w-14 h-14 bg-slate-100 shrink-0 border border-slate-200 overflow-hidden">
  <img 
-   src={item.image ? (item.image.includes('cloudinary.com') ? item.image.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : item.image) : "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"} 
+   src={getOptimizedImageUrl(item.image, 'thumb') || "https://res.cloudinary.com/dn4ciyses/image/upload/w_200,h_200,c_limit,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"} 
    alt={item.name} 
    className="w-full h-full object-cover"
    onError={(e) => {
-     (e.target as HTMLImageElement).src = "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"
+     (e.target as HTMLImageElement).src = "https://res.cloudinary.com/dn4ciyses/image/upload/w_200,h_200,c_limit,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"
    }}
  />
  </div>

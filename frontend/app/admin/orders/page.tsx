@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import Portal from "../../../components/Portal"
+import { getOptimizedImageUrl } from "../../../lib/imageUtils"
 import {
   formatUsd,
   getOrderStatusBadgeClass,
@@ -42,6 +43,7 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -49,6 +51,11 @@ export default function AdminOrders() {
   const [totalCount, setTotalCount] = useState(0)
   const { t, language } = useLanguage()
   const isKh = language === "kh"
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 250)
+    return () => clearTimeout(timer)
+  }, [search])
 
   const fetchOrders = useCallback(async (page: number, activeStatus: string, searchTerm: string) => {
     setLoading(true)
@@ -99,8 +106,8 @@ export default function AdminOrders() {
   }, [])
 
   useEffect(() => {
-    fetchOrders(currentPage, statusFilter, search)
-  }, [currentPage, statusFilter, search, fetchOrders])
+    fetchOrders(currentPage, statusFilter, debouncedSearch)
+  }, [currentPage, statusFilter, debouncedSearch, fetchOrders])
 
   const handleStatusTabChange = (nextStatus: string) => {
     setStatusFilter(nextStatus)
@@ -381,11 +388,7 @@ export default function AdminOrders() {
                           <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 rounded-lg">
                             {item.image ? (
                               <img
-                                src={
-                                  item.image.includes("cloudinary.com")
-                                    ? item.image.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/")
-                                    : item.image
-                                }
+                                src={getOptimizedImageUrl(item.image, 'thumb')}
                                 alt={item.name}
                                 className="w-full h-full object-cover"
                               />

@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X, ShoppingCart, Trash2, ArrowRight, Plus, Minus } from "lucide-react"
 import { useCart } from "../contexts/CartContext"
 import { useLanguage } from "../contexts/LanguageContext"
+import { getOptimizedImageUrl } from "../lib/imageUtils"
 
 export default function CartDrawer() {
  const { isCartOpen, closeCart, items, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart()
@@ -98,7 +99,7 @@ export default function CartDrawer() {
  >
  <div className="w-16 h-16 bg-white rounded-md border border-slate-200 shrink-0 overflow-hidden p-1 flex items-center justify-center">
  {item.image ? (
- <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+ <img src={getOptimizedImageUrl(item.image, 'thumb')} alt={item.name} className="w-full h-full object-contain" />
  ) : (
  <div className="w-full h-full bg-slate-100 rounded-md" />
  )}

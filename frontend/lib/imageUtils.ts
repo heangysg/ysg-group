@@ -34,16 +34,19 @@ export function getValidImages(product: any): string[] {
 export function getOptimizedImageUrl(url: string, size: 'thumb' | 'card' | 'full' = 'card'): string {
  if (!url || typeof url !== 'string') return ''
  
- if (url.includes('cloudinary.com')) {
- if (url.includes('/upload/w_') || url.includes('/upload/c_')) {
- if (size === 'thumb') return url.replace(/\/upload\/[^/]+\//, '/upload/w_200,h_200,c_fill,f_auto,q_auto/')
- if (size === 'card') return url.replace(/\/upload\/[^/]+\//, '/upload/w_600,c_limit,f_auto,q_auto/')
- if (size === 'full') return url.replace(/\/upload\/[^/]+\//, '/upload/w_1200,c_limit,f_auto,q_auto/')
- } else {
- if (size === 'thumb') return url.replace(/\/upload\//, '/upload/w_200,h_200,c_fill,f_auto,q_auto/')
- if (size === 'card') return url.replace(/\/upload\//, '/upload/w_600,c_limit,f_auto,q_auto/')
- if (size === 'full') return url.replace(/\/upload\//, '/upload/w_1200,c_limit,f_auto,q_auto/')
+ if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+ const transform =
+ size === 'thumb'
+ ? 'w_200,h_200,c_limit,f_auto,q_auto'
+ : size === 'card'
+ ? 'w_300,c_limit,f_auto,q_auto'
+ : 'w_1200,c_limit,f_auto,q_auto'
+
+ // Replace any existing transform segment (e.g. f_auto,q_auto or w_600,...) cleanly
+ if (/\/upload\/(?!(?:v\d+\/))[^/]+\//.test(url)) {
+ return url.replace(/\/upload\/(?!(?:v\d+\/))[^/]+\//, `/upload/${transform}/`)
  }
+ return url.replace(/\/upload\//, `/upload/${transform}/`)
  }
 
  return url

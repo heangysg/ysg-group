@@ -20,6 +20,7 @@ import {
 import { useLanguage } from "../contexts/LanguageContext";
 import { useRouter } from "next/navigation";
 import ProductCard from "./ProductCard";
+import { getOptimizedImageUrl } from "../lib/imageUtils";
 
 // Module-level cache to enable instant scroll restoration when navigating back
 let _cachedTopCategories: any[] = [];
@@ -354,7 +355,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-slate-400" />
-              <h2 className="text-xl md:text-2xl font-bold text-slate-900 ">
+              <h2 className="text-xl md:text-2xl font-semibold text-slate-900 ">
                 {t("categories")}
               </h2>
             </div>
@@ -385,8 +386,9 @@ export default function HomePage() {
                     <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] md:w-[120px] md:h-[120px] bg-white rounded-full shadow-2xs border border-slate-200 flex items-center justify-center p-2 sm:p-3 md:p-4 group-hover:border-[#004691] transition-all duration-300 overflow-hidden relative">
                       {cat.image ? (
                         <img
-                          src={cat.image}
+                          src={getOptimizedImageUrl(cat.image, 'thumb')}
                           alt={cat.name}
+                          loading="lazy"
                           className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
@@ -395,7 +397,7 @@ export default function HomePage() {
                         </div>
                       )}
                     </div>
-                    <span className="text-xs sm:text-sm md:text-base font-bold text-slate-800 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
+                    <span className="text-xs sm:text-sm md:text-[15px] font-medium text-slate-700 text-center leading-tight line-clamp-2 w-full px-0.5 group-hover:text-[#004691] transition-colors">
                       {language === "kh" && cat.nameKhmer
                         ? cat.nameKhmer
                         : cat.name}
@@ -412,13 +414,13 @@ export default function HomePage() {
             <div className="flex justify-between items-center mb-4 md:mb-6">
               <div className="flex items-center gap-3">
                 <div className="h-6 md:h-8 w-1.5 md:w-2 bg-[#004691] rounded-full"></div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 ">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-slate-900 ">
                   {t("featuredEquipment") || "Featured Machines"}
                 </h2>
               </div>
               <Link
                 href="/products/featured"
-                className="flex items-center gap-1 md:gap-2 text-[11px] sm:text-xs md:text-sm font-bold text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-md transition-colors"
+                className="flex items-center gap-1 md:gap-2 text-[11px] sm:text-xs md:text-sm font-medium text-slate-800 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-md transition-colors"
               >
                 {t("viewAll") || "View All"}
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -454,7 +456,7 @@ export default function HomePage() {
               <div className="w-10 h-10 bg-blue-50 text-[#004691] rounded-md flex items-center justify-center">
                 <ShoppingBag className="w-5 h-5" />
               </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 ">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-slate-900 ">
                 {t("discoverMore") || "Discover More"}
               </h2>
             </div>

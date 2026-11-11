@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import imageCompression from "browser-image-compression"
+import { getOptimizedImageUrl } from "../../lib/imageUtils"
 import { uploadImageToSecureProxy } from "../../lib/upload"
 import { logActivity } from "../../lib/audit"
 import { useLanguage } from "../../contexts/LanguageContext"
@@ -600,7 +601,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
                         idx === 0 ? "border-primary ring-2 ring-primary/20" : "border-slate-200"
                       }`}
                     >
-                      <img src={item.url} alt={`Product ${idx + 1}`} className="w-full h-28 object-cover" />
+                      <img src={getOptimizedImageUrl(item.url, 'card')} alt={`Product ${idx + 1}`} className="w-full h-28 object-cover" />
 
                       {idx === 0 ? (
                         <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-[10px] bg-primary text-white px-2 py-0.5 rounded-md font-bold shadow">

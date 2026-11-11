@@ -9,6 +9,7 @@ import { useLanguage } from "../../../contexts/LanguageContext"
 import { uploadImageToSecureProxy } from "../../../lib/upload"
 import { useAutoTranslate } from "../../../lib/useAutoTranslate"
 import Portal from "../../../components/Portal"
+import { getOptimizedImageUrl } from "../../../lib/imageUtils"
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<any[]>([])
@@ -494,7 +495,7 @@ export default function AdminCategories() {
                     ) : (
                       <div className="relative group p-2 border border-slate-200 rounded-xl bg-slate-50">
                         <img 
-                          src={previewImage || formData.image} 
+                          src={previewImage || getOptimizedImageUrl(formData.image, 'card')} 
                           alt="Category" 
                           className="w-full h-40 object-cover rounded-lg border border-slate-200" 
                         />

@@ -5,6 +5,7 @@ import Link from "next/link"
 import PublicLayout from "../../components/PublicLayout"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { ChevronRight, Package, ArrowRight, LayoutGrid } from "lucide-react"
+import { getOptimizedImageUrl } from "../../lib/imageUtils"
 
 export default function CategoriesPage() {
  const [categories, setCategories] = useState<any[]>([])
@@ -97,7 +98,7 @@ export default function CategoriesPage() {
  <LayoutGrid className="w-4 h-4" />
  </div>
  {mainCat.image && !mainCat.image.includes('no.png') ? (
- <img src={mainCat.image} alt={mainCat.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 relative z-0 opacity-90 group-hover:opacity-100" />
+ <img src={getOptimizedImageUrl(mainCat.image, 'card')} alt={mainCat.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 relative z-0 opacity-90 group-hover:opacity-100" />
  ) : (
  <LayoutGrid className="w-10 h-10 text-[#004691]/40" />
  )}
@@ -123,7 +124,7 @@ export default function CategoriesPage() {
  >
  <div className="w-full aspect-square bg-slate-50 rounded-md border border-slate-100 flex items-center justify-center p-3 mb-3 overflow-hidden relative">
  {sub.image && !sub.image.includes('no.png') ? (
- <img src={sub.image} alt={sub.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+ <img src={getOptimizedImageUrl(sub.image, 'card')} alt={sub.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
  ) : (
  <Package className="w-10 h-10 text-slate-300" />
  )}

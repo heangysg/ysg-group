@@ -7,6 +7,7 @@ import { Eye, Trash2, Search, Filter, Package, ArrowLeft, RefreshCcw, X } from "
 import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../../contexts/LanguageContext"
 import Portal from "../../../../components/Portal"
+import { getOptimizedImageUrl } from "../../../../lib/imageUtils"
 
 export default function AdminTrashProducts() {
  const [products, setProducts] = useState<any[]>([])
@@ -380,9 +381,9 @@ export default function AdminTrashProducts() {
  <div className="flex items-center gap-4">
  <div className="w-14 h-14 bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm transition-transform">
  {product.images && product.images[0] ? (
- <img src={product.images[0].includes('cloudinary.com') ? product.images[0].replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+ <img src={getOptimizedImageUrl(product.images[0], 'thumb')} alt={product.name} className="w-full h-full object-cover" />
  ) : product.thumbnail ? (
- <img src={product.thumbnail.includes('cloudinary.com') ? product.thumbnail.replace('/upload/f_auto,q_auto/', '/upload/w_300,c_fill,f_auto,q_auto/') : product.thumbnail} alt={product.name} className="w-full h-full object-cover" />
+ <img src={getOptimizedImageUrl(product.thumbnail, 'thumb')} alt={product.name} className="w-full h-full object-cover" />
  ) : (
  <div className="w-full h-full flex items-center justify-center text-slate-900">
  <Package className="w-6 h-6" />

@@ -33,6 +33,7 @@ import { uploadImageToSecureProxy } from "../../lib/upload"
 import toast, { Toaster } from "react-hot-toast"
 import Portal from "../../components/Portal"
 import imageCompression from "browser-image-compression"
+import { getOptimizedImageUrl } from "../../lib/imageUtils"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
  const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -78,21 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  const { t, language, setLanguage } = useLanguage()
  const fileInputRef = useRef<HTMLInputElement>(null)
 
- useEffect(() => {
- const userStr = localStorage.getItem("ysg_admin_user")
- const tokenStr = localStorage.getItem("ysg_admin_token")
-
- if ((!userStr || !tokenStr) && pathname !== "/admin/login") {
- router.push("/admin/login")
- return
- }
- const savedReadAt = Number(localStorage.getItem("ysg_notifications_read_at") || "0")
- if (!Number.isNaN(savedReadAt)) {
- setNotificationsReadAt(savedReadAt)
- }
- if (userStr) {
- const user = JSON.parse(userStr)
- const applyUserSession = (u: any) => {
+ const applySessionState = (u: any, currentPath: string | null) => {
    const superAdmin = u?.isSuperAdmin === true
    const roleNameUpper = String(u?.roleName || "").trim().toUpperCase()
    const roleIdLower = String(u?.roleId || "").trim().toLowerCase()
@@ -107,20 +94,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
    const superAdminPaths = ["/admin/users", "/admin/audit-logs", "/admin/settings"]
    const staffBlockedPaths = ["/admin/dashboard", "/admin/reports", ...superAdminPaths]
 
-   if (staffUser && staffBlockedPaths.some((p) => pathname?.startsWith(p))) {
+   if (staffUser && staffBlockedPaths.some((p) => currentPath?.startsWith(p))) {
      router.replace("/admin/orders")
      return true
    }
-   if (!superAdmin && superAdminPaths.some((p) => pathname?.startsWith(p))) {
+   if (!superAdmin && superAdminPaths.some((p) => currentPath?.startsWith(p))) {
      router.replace("/admin/dashboard")
      return true
    }
    return false
  }
 
- if (applyUserSession(user)) return
+ useEffect(() => {
+ const userStr = localStorage.getItem("ysg_admin_user")
+ const tokenStr = localStorage.getItem("ysg_admin_token")
 
- // Sync latest role/profile in background so stale localStorage sessions stay accurate
+ if ((!userStr || !tokenStr) && pathname !== "/admin/login") {
+ router.push("/admin/login")
+ return
+ }
+ const savedReadAt = Number(localStorage.getItem("ysg_notifications_read_at") || "0")
+ if (!Number.isNaN(savedReadAt)) {
+ setNotificationsReadAt(savedReadAt)
+ }
+ if (userStr) {
+ const user = JSON.parse(userStr)
+ applySessionState(user, pathname)
+ }
+ }, [pathname, router])
+
+ useEffect(() => {
+ const userStr = localStorage.getItem("ysg_admin_user")
+ const tokenStr = localStorage.getItem("ysg_admin_token")
+ if (!userStr || !tokenStr) return
+
+ const user = JSON.parse(userStr)
  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
  fetch(`${API_URL}/api/admin/profile`, {
    headers: { Authorization: `Bearer ${tokenStr}` }
@@ -130,28 +138,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
      if (!data?.user) return
      const merged = { ...user, ...data.user }
      localStorage.setItem("ysg_admin_user", JSON.stringify(merged))
-     applyUserSession(merged)
+     applySessionState(merged, window.location.pathname)
    })
    .catch(() => {})
- }
 
- let isFetching = false;
+ let isFetching = false
  async function pollNotifications() {
- if (isFetching) return;
- isFetching = true;
+ if (isFetching || document.hidden) return
+ isFetching = true
  try {
- await fetchNotifications();
+ await fetchNotifications()
  } finally {
- isFetching = false;
+ isFetching = false
  }
  }
 
  fetchNotifications()
- const interval = setInterval(pollNotifications, 30000) // Poll every 30s
+ const interval = setInterval(pollNotifications, 30000)
  return () => clearInterval(interval)
- }, [pathname, router])
-
-
+ }, [])
 
   async function fetchNotifications() {
     const token = typeof window !== "undefined" ? localStorage.getItem("ysg_admin_token") : null
@@ -161,12 +166,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
 
-      const safeFetchTable = async (table: string) => {
+      const safeFetchTable = async (table: string, select: string) => {
         try {
           const res = await fetch(`${API_URL}/api/admin/read`, {
             method: "POST",
             headers,
-            body: JSON.stringify({ table, order: { column: "createdAt", ascending: false }, limit: 5 })
+            body: JSON.stringify({ table, select, order: { column: "createdAt", ascending: false }, limit: 5 })
           })
           if (!res.ok) return { data: [] }
           return await res.json()
@@ -176,8 +181,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }
 
       const [inquiriesRes, ordersRes] = await Promise.all([
-        safeFetchTable("Inquiry"),
-        safeFetchTable("Order")
+        safeFetchTable("Inquiry", "id,customerName,message,createdAt"),
+        safeFetchTable("Order", "id,customerName,totalAmount,createdAt")
       ])
 
       const latestInquiries = inquiriesRes?.data || []
@@ -698,13 +703,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
  <button
  onClick={() => setShowProfileModal(true)}
- className="flex items-center gap-2.5 p-1 pr-3 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200 hover:shadow-sm group"
+ className="flex items-center gap-2.5 p-1 pr-3 rounded-full hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200 hover:shadow-sm group"
  >
- <div className="w-8 h-8 bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+ <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
  {adminProfileImage ? (
- <img src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage} alt="Profile" className="w-full h-full object-cover" />
+ <img src={getOptimizedImageUrl(adminProfileImage, 'thumb')} alt="Profile" className="w-full h-full object-cover rounded-full" />
  ) : (
- <div className="w-full h-full bg-primary flex items-center justify-center text-white font-bold uppercase text-sm">
+ <div className="w-full h-full rounded-full bg-primary flex items-center justify-center text-white font-bold uppercase text-sm">
  {adminName.charAt(0)}
  </div>
  )}
@@ -756,7 +761,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div className="w-16 h-16 rounded-full bg-slate-100 border-2 border-slate-200 overflow-hidden shadow-xs flex items-center justify-center">
                       {adminProfileImage ? (
                         <img
-                          src={adminProfileImage.includes("cloudinary.com") ? adminProfileImage.replace("/upload/", "/upload/f_auto,q_auto/") : adminProfileImage}
+                          src={getOptimizedImageUrl(adminProfileImage, 'thumb')}
                           alt="Profile"
                           className="w-full h-full object-cover"
                         />

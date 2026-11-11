@@ -115,7 +115,7 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 transform-gpu translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-20 pointer-events-auto">
     <button 
       onClick={handleAddToCart}
-      className="w-full bg-[#004691] hover:bg-[#003366] text-white py-2 sm:py-2.5 rounded-md font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-colors"
+      className="w-full bg-[#004691] hover:bg-[#003366] text-white py-2 sm:py-2.5 rounded-md font-medium text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-colors"
     >
       <ShoppingCart className="w-4 h-4" />
       {language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
@@ -127,13 +127,13 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   <div className="flex flex-col flex-1 p-3 z-10 pointer-events-none bg-white">
   
   {/* Title */}
-  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 leading-snug line-clamp-2 group-hover:text-[#004691] transition-colors duration-200 mb-1 sm:mb-2">
+  <h3 className="text-xs sm:text-sm font-medium text-slate-800 leading-snug line-clamp-2 group-hover:text-[#004691] transition-colors duration-200 mb-1 sm:mb-2">
   {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
   </h3>
   
   {/* Price */}
   <div className="mt-auto">
-  <span className="text-sm sm:text-lg font-bold text-red-600 leading-none block">
+  <span className="text-sm sm:text-lg font-semibold text-red-600 leading-none block">
   ${formatPrice(product.price)}
   </span>
   </div>

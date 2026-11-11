@@ -12,6 +12,7 @@ import BakongQRModal from '../../../components/BakongQRModal'
 import PaymentSuccessModal from '../../../components/PaymentSuccessModal'
 import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
+import { getOptimizedImageUrl } from '../../../lib/imageUtils'
 
 export default function OrderDetailsPage() {
   const params = useParams()
@@ -309,11 +310,11 @@ export default function OrderDetailsPage() {
  <div key={idx} className="py-4 flex items-center gap-4">
  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 rounded-md border border-slate-100 overflow-hidden shrink-0 p-1 flex items-center justify-center">
                   <img 
-                    src={item.image || "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"} 
+                    src={getOptimizedImageUrl(item.image, 'thumb') || "https://res.cloudinary.com/dn4ciyses/image/upload/w_200,h_200,c_limit,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"} 
                     alt={item.name} 
                     className="w-full h-full object-contain"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://res.cloudinary.com/dn4ciyses/image/upload/w_300,c_fill,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"
+                      (e.target as HTMLImageElement).src = "https://res.cloudinary.com/dn4ciyses/image/upload/w_200,h_200,c_limit,f_auto,q_auto/v1786777638/pwjj4fnchbrhzo69dmom.webp"
                     }}
                   />
                 </div>

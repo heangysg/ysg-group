@@ -20,11 +20,13 @@ import { useLanguage } from "../../../contexts/LanguageContext"
 import ExcelImportModal from "../../../components/ExcelImportModal"
 import Portal from "../../../components/Portal"
 import { getAdminHeaders, formatUsd } from "../../../lib/adminAnalytics"
+import { getOptimizedImageUrl } from "../../../lib/imageUtils"
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([])
   const [categories, setCategories] = useState<any[]>([])
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [stockFilter, setStockFilter] = useState("all")
@@ -39,6 +41,11 @@ export default function AdminProducts() {
   const { t, language } = useLanguage()
   const isKh = language === "kh"
 
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 250)
+    return () => clearTimeout(timer)
+  }, [search])
+
   const fetchProducts = useCallback(async (page: number) => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
     const headers = getAdminHeaders()
@@ -47,6 +54,7 @@ export default function AdminProducts() {
 
     const body: any = {
       table: "Product",
+      select: "id,name,nameKhmer,slug,sku,brand,price,stock,thumbnail,categoryId,isPublished,isFeatured,createdAt",
       countExact: true,
       order: { column: "createdAt", ascending: false },
       limit: pageSize,
@@ -54,8 +62,8 @@ export default function AdminProducts() {
       eq: { isActive: true },
     }
 
-    if (search.trim()) {
-      const q = search.trim()
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.trim()
       body.or = `name.ilike.%${q}%,nameKhmer.ilike.%${q}%,brand.ilike.%${q}%,model.ilike.%${q}%,sku.ilike.%${q}%`
     }
     if (selectedCategory) {
@@ -89,7 +97,7 @@ export default function AdminProducts() {
     if (count !== null && count !== undefined) {
       setTotalPages(Math.max(1, Math.ceil(count / pageSize)))
     }
-  }, [search, selectedCategory, statusFilter, stockFilter])
+  }, [debouncedSearch, selectedCategory, statusFilter, stockFilter])
 
   useEffect(() => {
     async function initialFetch() {
@@ -100,7 +108,11 @@ export default function AdminProducts() {
         const catRes = await fetch(`${API_URL}/api/admin/read`, {
           method: "POST",
           headers,
-          body: JSON.stringify({ table: "Category", order: { column: "sortOrder", ascending: true } }),
+          body: JSON.stringify({
+            table: "Category",
+            select: "id,name,nameKhmer,parentId,sortOrder",
+            order: { column: "sortOrder", ascending: true },
+          }),
         }).then((r) => r.json())
         setCategories(catRes.data || [])
         await fetchProducts(1)
@@ -118,7 +130,7 @@ export default function AdminProducts() {
     if (!loading) {
       fetchProducts(1)
     }
-  }, [search, selectedCategory, statusFilter, stockFilter])
+  }, [debouncedSearch, selectedCategory, statusFilter, stockFilter])
 
   useEffect(() => {
     if (!loading) {
@@ -437,11 +449,7 @@ export default function AdminProducts() {
                         <div className="w-14 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-200">
                           {product.thumbnail ? (
                             <img
-                              src={
-                                product.thumbnail.includes("cloudinary.com")
-                                  ? product.thumbnail.replace("/upload/f_auto,q_auto/", "/upload/w_300,c_fill,f_auto,q_auto/")
-                                  : product.thumbnail
-                              }
+                              src={getOptimizedImageUrl(product.thumbnail, 'thumb')}
                               alt={product.name}
                               className="w-full h-full object-cover"
                             />

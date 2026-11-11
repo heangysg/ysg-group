@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import PublicLayout from "../../components/PublicLayout"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { createClient } from "../../lib/supabase/client"
+import { getOptimizedImageUrl } from "../../lib/imageUtils"
 import { 
  User, 
  Package, 
@@ -483,7 +484,7 @@ export default function AccountPage() {
  {order.items?.map((item: any, idx: number) => (
  <div key={idx} className="flex items-center gap-4 p-3.5 bg-slate-50 border border-slate-100 rounded-md">
  <div className="w-12 h-12 bg-white rounded-md border border-slate-200 overflow-hidden flex-shrink-0 p-1 flex items-center justify-center">
- {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-contain" />}
+ {item.image && <img src={getOptimizedImageUrl(item.image, 'thumb')} alt={item.name} className="w-full h-full object-contain" />}
  </div>
  <div className="flex-1 min-w-0">
  <p className="text-xs sm:text-sm font-bold text-slate-900 truncate uppercase">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</p>

@@ -13,7 +13,7 @@ import { useWishlist } from "../contexts/WishlistContext"
 import { ArrowLeft, MapPin, Calendar, Clock, CheckCircle2, ChevronRight, Send, X, Package, ShieldCheck, Star, ArrowRight, ShoppingCart, Share2, Copy, Check, Heart } from "lucide-react"
 import ProductCard from "./ProductCard"
 import ProductNotFound from "./ProductNotFound"
-import { getValidImages } from "../lib/imageUtils"
+import { getValidImages, getOptimizedImageUrl } from "../lib/imageUtils"
 
 export default function ProductDetailClient({ initialProduct }: { initialProduct: any }) {
  const { slug } = useParams()
@@ -221,7 +221,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
  <div className="bg-white rounded-md aspect-square relative overflow-hidden flex items-center justify-center p-6 shadow-2xs border border-slate-100">
  {images.length > 0 && images[activeImage] ? (
  <Image
- src={images[activeImage]}
+ src={getOptimizedImageUrl(images[activeImage], 'full')}
  alt={product.name}
  fill
  sizes="(max-width: 1200px) 100vw, 50vw"
@@ -247,7 +247,7 @@ export default function ProductDetailClient({ initialProduct }: { initialProduct
  activeImage === i ? "border-[#004691] shadow-xs" : "border-slate-200 opacity-70 hover:opacity-100"
  }`}
  >
- <img src={img} alt={`${product.name} ${i}`} className="w-full h-full object-contain" />
+ <img src={getOptimizedImageUrl(img, 'thumb')} alt={`${product.name} ${i}`} className="w-full h-full object-contain" />
  </button>
  ))}
  </div>

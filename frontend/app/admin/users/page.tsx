@@ -20,6 +20,7 @@ import {
 import { useLanguage } from "../../../contexts/LanguageContext"
 import toast, { Toaster } from "react-hot-toast"
 import Portal from "../../../components/Portal"
+import { getOptimizedImageUrl } from "../../../lib/imageUtils"
 
 export default function UsersManagementPage() {
  const [users, setUsers] = useState<any[]>([])
@@ -199,7 +200,7 @@ export default function UsersManagementPage() {
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary font-bold text-sm uppercase overflow-hidden">
  {user.image ? (
- <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+ <img src={getOptimizedImageUrl(user.image, 'thumb')} alt={user.name} className="w-full h-full object-cover" />
  ) : (
  <User className="w-5 h-5 text-primary" />
  )}

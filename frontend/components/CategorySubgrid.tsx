@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useLanguage } from "../contexts/LanguageContext"
 import { Package, ArrowRight } from "lucide-react"
+import { getOptimizedImageUrl } from "../lib/imageUtils"
 
 export default function CategorySubgrid({ category, subcategories }: { category: any, subcategories: any[] }) {
  const { t, language } = useLanguage()
@@ -37,7 +38,7 @@ export default function CategorySubgrid({ category, subcategories }: { category:
  <div className="w-[120px] md:w-full shrink-0 md:aspect-[16/10] bg-slate-50 relative overflow-hidden">
  {subCat.image && !subCat.image.includes('no.png') ? (
  <img 
- src={subCat.image} 
+ src={getOptimizedImageUrl(subCat.image, 'card')} 
  alt={subCat.name} 
  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
  />

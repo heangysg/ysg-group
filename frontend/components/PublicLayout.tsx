@@ -228,14 +228,14 @@ export default function PublicLayout({
  
  {/* 📌 Main Pages Section */}
  <div className="flex flex-col gap-1 pb-3 border-b border-slate-200">
- <span className="px-3 text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1">
+ <span className="px-3 text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1">
  {language === "kh" ? "ទំព័រចម្បង" : "Main Pages"}
  </span>
 
  <Link
  href="/"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <Home className="w-4 h-4 text-slate-500" />
  <span>{t("home")}</span>
@@ -244,7 +244,7 @@ export default function PublicLayout({
  <Link
  href="/products"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <Package className="w-4 h-4 text-slate-500" />
  <span>{t("allProducts")}</span>
@@ -253,7 +253,7 @@ export default function PublicLayout({
  <Link
  href="/categories"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <LayoutGrid className="w-4 h-4 text-slate-500" />
  <span>{t("categories")}</span>
@@ -262,14 +262,14 @@ export default function PublicLayout({
  <Link
  href="/wishlist"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center justify-between px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center justify-between px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <div className="flex items-center gap-3">
  <Heart className="w-4 h-4 text-slate-500" />
  <span>{t("wishlist")}</span>
  </div>
  {wishlistItems && wishlistItems.length > 0 && (
- <span className="bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+ <span className="bg-red-500 text-white text-[10px] font-semibold w-5 h-5 flex items-center justify-center rounded-full">
  {wishlistItems.length}
  </span>
  )}
@@ -284,7 +284,7 @@ export default function PublicLayout({
  <Link
  href={user ? "/account" : "/login"}
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <UserIcon className="w-4 h-4 text-slate-500" />
  <span>{user ? (language === "kh" ? "គណនីរបស់ខ្ញុំ" : "My Account") : (language === "kh" ? "ចូលគណនី" : "Sign In")}</span>
@@ -294,7 +294,7 @@ export default function PublicLayout({
  <Link
  href="/about"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <Building2 className="w-4 h-4 text-slate-500" />
  <span>{t("about")}</span>
@@ -303,7 +303,7 @@ export default function PublicLayout({
  <Link
  href="/contact"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <Mail className="w-4 h-4 text-slate-500" />
  <span>{t("contact")}</span>
@@ -312,7 +312,7 @@ export default function PublicLayout({
  <Link
  href="/help"
  onClick={() => setMobileMenuOpen(false)}
- className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
+ className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 hover:text-[#004691] rounded-md transition-colors"
  >
  <HelpCircle className="w-4 h-4 text-slate-500" />
  <span>{language === "kh" ? "មជ្ឈមណ្ឌលជំនួយ" : "Help Center"}</span>
@@ -321,7 +321,7 @@ export default function PublicLayout({
 
  {/* 📂 Category Tree Accordions */}
  <div className="flex flex-col gap-1">
- <span className="px-3 text-[11px] font-bold uppercase text-slate-400 tracking-wider mb-1">
+ <span className="px-3 text-[11px] font-semibold uppercase text-slate-400 tracking-wider mb-1">
  {language === "kh" ? "ប្រភេទទំនិញ" : "Product Categories"}
  </span>
  {categories.filter(c => !c.parentId).map(cat => {
@@ -339,7 +339,7 @@ export default function PublicLayout({
  prev.includes(cat.slug) ? [] : [cat.slug]
  )
  }}
- className="flex-1 flex items-center justify-between px-3.5 py-2.5 text-sm font-bold text-slate-800 text-left"
+ className="flex-1 flex items-center justify-between px-3.5 py-2.5 text-sm font-medium text-slate-800 text-left"
  >
  <span>{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
  <ChevronRight className={`w-4 h-4 transition-transform duration-200 shrink-0 ${isExpanded ? 'rotate-90 text-[#004691]' : 'text-slate-400'}`} />
@@ -348,7 +348,7 @@ export default function PublicLayout({
  <Link 
  href={`/products/category/${cat.slug}`}
  onClick={() => setMobileMenuOpen(false)}
- className="flex-1 text-left px-3.5 py-2.5 text-sm font-bold text-slate-800"
+ className="flex-1 text-left px-3.5 py-2.5 text-sm font-medium text-slate-800"
  >
  {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
  </Link>
@@ -361,7 +361,7 @@ export default function PublicLayout({
  <Link
  href={`/products/category/${cat.slug}`}
  onClick={() => setMobileMenuOpen(false)}
- className="px-2.5 py-2 text-sm md:text-base font-bold text-slate-500 hover:text-[#004691] hover:bg-slate-50 rounded-md"
+ className="px-2.5 py-2 text-sm font-medium text-slate-500 hover:text-[#004691] hover:bg-slate-50 rounded-md"
  >
  {language === "kh" ? `ទំនិញទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
  </Link>
@@ -371,7 +371,7 @@ export default function PublicLayout({
  key={sub.id}
  href={`/products/category/${sub.slug}`}
  onClick={() => setMobileMenuOpen(false)}
- className="px-2.5 py-2 text-sm md:text-base font-medium text-slate-700 hover:text-[#004691] rounded-md"
+ className="px-2.5 py-2 text-sm font-normal text-slate-600 hover:text-[#004691] rounded-md"
  >
  {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
  </Link>
@@ -634,7 +634,7 @@ export default function PublicLayout({
 
  {/* Center Navigation Menu */}
  <div className="shrink-0">
- <nav className="flex items-center gap-4 lg:gap-6 text-sm md:text-base font-bold tracking-wide">
+ <nav className="flex items-center gap-4 lg:gap-6 text-sm md:text-[15px] font-medium tracking-normal">
  {navItems.map((item) => {
  const isActive = pathname === item.href
  
@@ -643,10 +643,10 @@ export default function PublicLayout({
  <div key={item.href} className="group relative py-6 -my-6">
  <Link
  href={item.href}
- className={`transition-colors py-2 border-b-2 font-semibold flex items-center gap-1.5 whitespace-nowrap ${
+ className={`transition-colors py-2 border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
  isActive 
- ? "text-[#004691] border-[#004691]" 
- : "text-slate-700 border-transparent group-hover:text-[#004691]"
+ ? "text-[#004691] border-[#004691] font-semibold" 
+ : "text-slate-700 border-transparent font-medium group-hover:text-[#004691]"
  }`}
  >
  <item.icon className="w-4 h-4" />
@@ -663,7 +663,7 @@ export default function PublicLayout({
  <div key={mainCat.id} className="flex flex-col">
  <Link 
  href={`/products/category/${mainCat.slug}`}
- className="font-bold text-slate-800 text-[15px] mb-3 hover:text-[#004691] transition-colors flex items-center justify-between gap-2 border-b border-slate-100 pb-2 group/main"
+ className="font-semibold text-slate-800 text-[15px] mb-3 hover:text-[#004691] transition-colors flex items-center justify-between gap-2 border-b border-slate-100 pb-2 group/main"
  >
  <span className="truncate">{language === "kh" && mainCat.nameKhmer ? mainCat.nameKhmer : mainCat.name}</span>
  <ChevronRight className="w-4 h-4 text-slate-300 group-hover/main:text-[#004691] transition-colors shrink-0" />
@@ -673,7 +673,7 @@ export default function PublicLayout({
  <Link
  key={sub.id}
  href={`/products/category/${sub.slug}`}
- className="text-[13px] font-semibold text-slate-500 hover:text-[#004691] hover:bg-blue-50/50 px-2 -mx-2 py-1 rounded transition-colors flex items-center gap-2 group/sub"
+ className="text-[13px] font-normal text-slate-600 hover:text-[#004691] hover:bg-blue-50/50 px-2 -mx-2 py-1 rounded transition-colors flex items-center gap-2 group/sub"
  >
  <div className="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/sub:bg-[#004691] transition-colors shrink-0" />
  <span className="truncate">{language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}</span>
@@ -698,10 +698,10 @@ export default function PublicLayout({
  <Link
  key={item.href}
  href={item.href}
- className={`transition-colors py-2 border-b-2 font-semibold flex items-center gap-1.5 ${
+ className={`transition-colors py-2 border-b-2 flex items-center gap-1.5 ${
  isActive 
- ? "text-[#004691] border-[#004691]" 
- : "text-slate-700 border-transparent hover:text-[#004691]"
+ ? "text-[#004691] border-[#004691] font-semibold" 
+ : "text-slate-700 border-transparent font-medium hover:text-[#004691]"
  }`}
  >
  <item.icon className="w-4 h-4" />

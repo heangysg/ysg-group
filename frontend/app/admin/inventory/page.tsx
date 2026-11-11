@@ -19,23 +19,28 @@ import toast, { Toaster } from "react-hot-toast"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import { logActivity } from "../../../lib/audit"
 import { getAdminHeaders, formatUsd } from "../../../lib/adminAnalytics"
+import { getOptimizedImageUrl } from "../../../lib/imageUtils"
 
 type StockTab = "all" | "out" | "low" | "healthy"
+
+const PAGE_SIZE = 15
+let _cachedInventory: any[] = []
 
 export default function AdminInventoryPage() {
   const { language } = useLanguage()
   const isKh = language === "kh"
 
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<any[]>(_cachedInventory)
   const [draftStocks, setDraftStocks] = useState<Record<string, number>>({})
   const [savingIds, setSavingIds] = useState<Record<string, boolean>>({})
   const [savingAll, setSavingAll] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(_cachedInventory.length === 0)
   const [search, setSearch] = useState("")
   const [tab, setTab] = useState<StockTab>("all")
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const fetchInventory = useCallback(async () => {
-    setLoading(true)
+  const fetchInventory = useCallback(async (background = false) => {
+    if (!background) setLoading(true)
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
     try {
       const res = await fetch(`${API_URL}/api/admin/read`, {
@@ -43,6 +48,7 @@ export default function AdminInventoryPage() {
         headers: getAdminHeaders(),
         body: JSON.stringify({
           table: "Product",
+          select: "id,name,nameKhmer,slug,sku,brand,model,price,stock,thumbnail",
           eq: { isActive: true },
           order: { column: "stock", ascending: true },
           limit: 500,
@@ -50,20 +56,22 @@ export default function AdminInventoryPage() {
       })
       const json = await res.json()
       if (res.ok && !json.error) {
-        setProducts(json.data || [])
-        setDraftStocks({})
+        const rows = json.data || []
+        _cachedInventory = rows
+        setProducts(rows)
+        if (!background) setDraftStocks({})
       } else {
-        toast.error(json.error || "Failed to load inventory")
+        if (!background) toast.error(json.error || "Failed to load inventory")
       }
     } catch {
-      toast.error("Failed to load inventory")
+      if (!background) toast.error("Failed to load inventory")
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    fetchInventory()
+    fetchInventory(_cachedInventory.length > 0)
   }, [fetchInventory])
 
   const getEffectiveStock = (p: any) =>
@@ -192,6 +200,17 @@ export default function AdminInventoryPage() {
       )
     })
   }, [products, search, tab])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, tab])
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedProducts = useMemo(() => {
+    const start = (safePage - 1) * PAGE_SIZE
+    return filteredProducts.slice(start, start + PAGE_SIZE)
+  }, [filteredProducts, safePage])
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -357,7 +376,7 @@ export default function AdminInventoryPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((p) => {
+                  paginatedProducts.map((p) => {
                     const effective = getEffectiveStock(p)
                     const currentSaved = Number(p.stock ?? 0)
                     const isDirty = effective !== currentSaved
@@ -369,7 +388,7 @@ export default function AdminInventoryPage() {
                           <div className="flex items-center gap-3">
                             <div className="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0">
                               {p.thumbnail ? (
-                                <img src={p.thumbnail} alt={p.name} className="w-full h-full object-cover" />
+                                <img src={getOptimizedImageUrl(p.thumbnail, 'thumb')} alt={p.name} className="w-full h-full object-cover" />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center text-slate-700">
                                   <Package className="w-5 h-5" />
@@ -460,6 +479,38 @@ export default function AdminInventoryPage() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="p-4 border-t border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-slate-600 tabular-nums">
+              {isKh
+                ? `បង្ហាញ ${(safePage - 1) * PAGE_SIZE + 1}–${Math.min(safePage * PAGE_SIZE, filteredProducts.length)} នៃ ${filteredProducts.length}`
+                : `Showing ${(safePage - 1) * PAGE_SIZE + 1}–${Math.min(safePage * PAGE_SIZE, filteredProducts.length)} of ${filteredProducts.length}`}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={safePage === 1}
+                className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl font-bold text-xs shadow-sm hover:bg-slate-100 disabled:opacity-50 transition-all cursor-pointer"
+              >
+                {isKh ? "មុន" : "Previous"}
+              </button>
+              <span className="text-xs font-bold text-slate-700 px-2 tabular-nums">
+                {isKh ? `ទំព័រ ${safePage} នៃ ${totalPages}` : `Page ${safePage} of ${totalPages}`}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage === totalPages}
+                className="px-3.5 py-2 bg-white border border-slate-200 rounded-xl font-bold text-xs shadow-sm hover:bg-slate-100 disabled:opacity-50 transition-all cursor-pointer"
+              >
+                {isKh ? "បន្ទាប់" : "Next"}
+              </button>
+            </div>
           </div>
         )}
       </div>

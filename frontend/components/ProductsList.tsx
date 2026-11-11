@@ -252,10 +252,10 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             if (isMobile) setShowFilters(false)
             router.push('/products/featured')
           }}
-          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm rounded-lg transition-all cursor-pointer ${
             isFeatured
-              ? "bg-[#004691] text-white shadow-2xs"
-              : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              ? "bg-[#004691] text-white font-semibold shadow-2xs"
+              : "text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900"
           }`}
         >
           <span className="flex items-center gap-2.5 truncate">
@@ -264,7 +264,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           </span>
           {featuredCount > 0 && (
             <span
-              className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
+              className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
                 isFeatured ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
               }`}
             >
@@ -275,10 +275,10 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
         <button
           onClick={() => handleCategorySelect("all", isMobile)}
-          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm rounded-lg transition-all cursor-pointer ${
             selectedCategory === "all" && !isFeatured
-              ? "bg-[#004691] text-white shadow-2xs"
-              : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              ? "bg-[#004691] text-white font-semibold shadow-2xs"
+              : "text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900"
           }`}
         >
           <span className="flex items-center gap-2.5 truncate">
@@ -287,7 +287,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           </span>
           {!loading && (
             <span
-              className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
+              className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
                 selectedCategory === "all" && !isFeatured ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
               }`}
             >
@@ -299,7 +299,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
       {/* Category Tree Divider */}
       <div className="my-2.5 border-t border-slate-100" />
-      <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+      <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
         {language === "kh" ? "ប្រភេទផលិតផល" : "Categories"}
       </p>
 
@@ -317,10 +317,10 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               <div
                 className={`flex items-center justify-between rounded-lg transition-all ${
                   isSelected
-                    ? "bg-[#004691]/10 text-[#004691]"
+                    ? "bg-[#004691]/10 text-[#004691] font-semibold"
                     : hasSelectedSub
-                    ? "bg-slate-50 text-[#004691]"
-                    : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-slate-50 text-[#004691] font-medium"
+                    : "text-slate-700 font-medium hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
                 <button
@@ -330,14 +330,14 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                       setExpandedCategories([cat.slug])
                     }
                   }}
-                  className="flex-1 min-w-0 flex items-center justify-between gap-2 text-left px-3 py-2 text-sm font-semibold cursor-pointer"
+                  className="flex-1 min-w-0 flex items-center justify-between gap-2 text-left px-3 py-2 text-sm cursor-pointer"
                 >
                   <span className="truncate">
                     {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
                   </span>
                   {!loading && (
                     <span
-                      className={`text-[11px] font-semibold px-1.5 py-0.5 rounded tabular-nums shrink-0 ${
+                      className={`text-[11px] font-normal px-1.5 py-0.5 rounded tabular-nums shrink-0 ${
                         isSelected ? "bg-[#004691]/15 text-[#004691]" : "text-slate-400"
                       }`}
                     >
@@ -371,8 +371,8 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                       onClick={() => handleCategorySelect(cat.slug, isMobile)}
                       className={`text-left px-2.5 py-1.5 text-[13px] rounded-md transition-all cursor-pointer ${
                         selectedCategory === cat.slug
-                          ? "text-[#004691] font-bold bg-blue-50/80"
-                          : "text-slate-500 font-medium hover:text-[#004691] hover:bg-slate-50"
+                          ? "text-[#004691] font-medium bg-blue-50/80"
+                          : "text-slate-500 font-normal hover:text-[#004691] hover:bg-slate-50"
                       }`}
                     >
                       {language === "kh" ? `ទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
@@ -386,15 +386,15 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                           onClick={() => handleCategorySelect(sub.slug, isMobile)}
                           className={`flex items-center justify-between gap-2 text-left px-2.5 py-1.5 text-[13px] rounded-md transition-all cursor-pointer ${
                             selectedCategory === sub.slug
-                              ? "text-[#004691] font-bold bg-blue-50/80"
-                              : "text-slate-600 font-medium hover:text-slate-900 hover:bg-slate-50"
+                              ? "text-[#004691] font-medium bg-blue-50/80"
+                              : "text-slate-600 font-normal hover:text-slate-900 hover:bg-slate-50"
                           }`}
                         >
                           <span className="truncate">
                             {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
                           </span>
                           {!loading && (
-                            <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
+                            <span className="text-[11px] font-normal text-slate-400 tabular-nums shrink-0">
                               {subCount}
                             </span>
                           )}
@@ -447,7 +447,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  {/* Header Bar: Category Title + Count + Custom Sort & Filter */}
  <div className="flex flex-row justify-between items-center pb-4 mb-6 border-b border-slate-200 gap-3">
  <div className="min-w-0 flex items-baseline gap-2.5">
- <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#004691] truncate">
+ <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#004691] truncate">
  {(() => {
  if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
  if (isFeatured) return language === "kh" ? "ផលិតផលពិសេស" : "Featured Machines"
@@ -704,7 +704,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  onClick={() => handleCategorySelect(group.cat.slug)}
  className="flex items-center gap-2 shrink overflow-hidden group max-w-[70%]"
  >
- <span className="text-base sm:text-lg md:text-xl font-bold text-slate-700 group-hover:text-[#004691] transition-colors truncate">
+ <span className="text-base sm:text-lg md:text-xl font-semibold text-slate-700 group-hover:text-[#004691] transition-colors truncate">
  {group.subLabel}
  </span>
  <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-[#004691] transition-colors shrink-0" />
