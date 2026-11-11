@@ -3,6 +3,7 @@
 import { useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import PublicLayout from "../../components/PublicLayout"
+import ProductSearchSelect from "../../components/ProductSearchSelect"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { Send, MessageSquare, User, Phone, Mail, Package, Hash, ArrowLeft } from "lucide-react"
 import Link from "next/link"
@@ -19,6 +20,7 @@ export default function InquiryPage() {
     email: "",
     phone: "",
     productName: "",
+    productId: "",
     quantity: "",
     companyName: "",
     country: "",
@@ -43,7 +45,7 @@ export default function InquiryPage() {
 ចំនួន (Quantity): ${form.quantity || "N/A"}
 សារ (Message): ${form.message}`
 
-    // Save to DB
+    // Save to DB and send group Telegram notification from backend
     try {
       await fetch(`${API_URL}/api/public/inquiry`, {
         method: "POST",
@@ -51,11 +53,13 @@ export default function InquiryPage() {
         body: JSON.stringify({
           customerName: form.customerName,
           email: form.email,
-          phone: form.phone,
+          customerPhone: form.phone,
           companyName: form.companyName,
           country: form.country,
+          productId: form.productId || null,
+          productName: form.productName,
           quantity: form.quantity,
-          message: `[Product: ${form.productName}] ${form.message}`,
+          message: form.message,
           source: "inquiry-page",
         }),
       })
@@ -122,7 +126,7 @@ export default function InquiryPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
-                  onClick={() => { setSubmitted(false); setForm({ customerName: "", email: "", phone: "", productName: "", quantity: "", companyName: "", country: "", message: "" }) }}
+                  onClick={() => { setSubmitted(false); setForm({ customerName: "", email: "", phone: "", productName: "", productId: "", quantity: "", companyName: "", country: "", message: "" }) }}
                   className="inline-flex items-center gap-2 border border-[#004691] text-[#004691] px-6 py-3 rounded-md font-bold text-sm hover:bg-blue-50 transition-all"
                 >
                   {language === "kh" ? "ស្នើសុំម្ដងទៀត" : "Submit Another"}
@@ -219,14 +223,16 @@ export default function InquiryPage() {
                       {language === "kh" ? "ឈ្មោះផលិតផលដែលចាប់អារម្មណ៍ *" : "Product of Interest *"}
                     </span>
                   </label>
-                  <input
+                  <ProductSearchSelect
                     required
-                    name="productName"
+                    language={language}
                     value={form.productName}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder={language === "kh" ? "ឈ្មោះម៉ាស៊ីន / ផលិតផល..." : "Machine / product name..."}
-                    className="w-full px-4 py-3 bg-slate-50 rounded-md border border-slate-200 focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 outline-none transition-all text-slate-900 text-sm font-medium"
+                    selectedId={form.productId}
+                    onChange={(productName, productId) =>
+                      setForm((prev) => ({ ...prev, productName, productId: productId || "" }))
+                    }
+                    placeholder={language === "kh" ? "ស្វែងរក ឬជ្រើសរើសម៉ាស៊ីន / ផលិតផល..." : "Search or select a machine / product..."}
+                    inputClassName="w-full pl-10 pr-16 py-3 bg-slate-50 rounded-md border border-slate-200 focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/20 outline-none transition-all text-slate-900 text-sm font-medium"
                   />
                 </div>
 

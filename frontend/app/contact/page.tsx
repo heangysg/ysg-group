@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import PublicLayout from "../../components/PublicLayout"
+import ProductSearchSelect from "../../components/ProductSearchSelect"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { Send, Phone, Mail, MapPin, Clock, MessageSquare, Package, User, Hash, ChevronRight } from "lucide-react"
 
@@ -64,7 +65,7 @@ export default function ContactPage() {
 
   // --- Inquiry Form ---
   const [inquiryForm, setInquiryForm] = useState({
-    customerName: "", email: "", phone: "", productName: "",
+    customerName: "", email: "", phone: "", productName: "", productId: "",
     quantity: "", companyName: "", message: "",
   })
   const [inquiryLoading, setInquiryLoading] = useState(false)
@@ -83,14 +84,20 @@ export default function ContactPage() {
           customerPhone: inquiryForm.phone,
           email: inquiryForm.email,
           companyName: inquiryForm.companyName,
+          productId: inquiryForm.productId || null,
+          productName: inquiryForm.productName,
           quantity: inquiryForm.quantity,
-          message: `[Product: ${inquiryForm.productName}] ${inquiryForm.message}`,
+          message: inquiryForm.message,
           source: "contact-inquiry-tab",
         }),
       })
 
       if (res.ok) {
         toast.success(language === "kh" ? "សំណើររបស់អ្នកបានផ្ញើដោយជោគជ័យ! យើងនឹងទំនាក់ទំនងមកអ្នកឆាប់ៗ។" : "Inquiry sent successfully! We'll contact you soon.")
+        setInquiryForm({
+          customerName: "", email: "", phone: "", productName: "", productId: "",
+          quantity: "", companyName: "", message: "",
+        })
         setInquirySubmitted(true)
       } else {
         toast.error(language === "kh" ? "មិនអាចផ្ញើបាន សូមព្យាយាមម្ដងទៀត។" : "Failed to send. Please try again.")
@@ -338,10 +345,15 @@ export default function ContactPage() {
                         <label className="text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                           <Package className="w-3.5 h-3.5 text-[#004691]" />{language === "kh" ? "ផលិតផលដែលចាប់អារម្មណ៍ *" : "Product of Interest *"}
                         </label>
-                        <input required name="productName" value={inquiryForm.productName}
-                          onChange={(e) => setInquiryForm({ ...inquiryForm, productName: e.target.value })}
-                          type="text" placeholder={language === "kh" ? "ឧ. ម៉ាស៊ីនកិនស្រូវ..." : "e.g. Rice Mill Machine..."}
-                          className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-md focus:border-[#004691] focus:ring-1 focus:ring-[#004691] outline-none transition-all text-slate-900 text-sm" />
+                        <ProductSearchSelect
+                          required
+                          language={language}
+                          value={inquiryForm.productName}
+                          selectedId={inquiryForm.productId}
+                          onChange={(productName, productId) =>
+                            setInquiryForm((prev) => ({ ...prev, productName, productId: productId || "" }))
+                          }
+                        />
                       </div>
                       
                       <div>

@@ -58,7 +58,7 @@ router.post('/contact', formLimiter, async (req: Request, res: Response): Promis
 
 router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { customerName, customerPhone, email, message, productId, companyName, quantity, source } = req.body;
+    const { customerName, customerPhone, email, message, productId, productName: submittedProductName, companyName, quantity, source } = req.body;
 
     if (!customerName || !message) {
       res.status(400).json({ error: "Missing required fields" });
@@ -70,6 +70,14 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
       return;
     }
 
+    const cleanSubmittedProduct =
+      typeof submittedProductName === 'string' && submittedProductName.trim()
+        ? submittedProductName.trim()
+        : '';
+    const dbMessage = cleanSubmittedProduct
+      ? `[Product: ${cleanSubmittedProduct}]\n${message}`
+      : message;
+
     const pgClient = await getPgClient();
     try {
       const query = `
@@ -77,11 +85,11 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
         VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, 'new', NOW(), NOW())
         RETURNING id;
       `;
-      const values = [customerName, customerPhone || null, email || null, companyName || null, message, productId || null, source || 'inquiry-form'];
+      const values = [customerName, customerPhone || null, email || null, companyName || null, dbMessage, productId || null, source || 'inquiry-form'];
       
       const result = await pgClient.query(query, values);
       
-      let productName = "N/A";
+      let productName = cleanSubmittedProduct || "N/A";
       if (productId) {
         const prodRes = await pgClient.query('SELECT name, "nameKhmer" FROM "Product" WHERE id = $1', [productId]);
         if (prodRes.rows.length > 0) {
@@ -92,8 +100,11 @@ router.post('/inquiry', formLimiter, async (req: Request, res: Response): Promis
         }
       }
 
-      const tgMsg = `🚨 *សំណើរថ្មី (New Inquiry)!* 🚨\n*ឈ្មោះ (Name):* ${customerName}\n*ទូរស័ព្ទ (Phone):* ${customerPhone || 'N/A'}\n*អ៊ីមែល (Email):* ${email || 'N/A'}\n*ផលិតផល (Product):* ${productName}\n*ក្រុមហ៊ុន (Company):* ${companyName || 'N/A'}\n*ចំនួន (Qty):* ${quantity || 'N/A'}\n*សារ (Message):* ${message}`;
-      sendTelegramNotification(tgMsg);
+      const safeMd = (v: unknown) => String(v || '').replace(/[*_`[\]]/g, '');
+      const tgMsg = `🚨 *សំណើរសាកសួរផលិតផលថ្មី (New Product Inquiry)!* 🚨\n*ឈ្មោះ (Name):* ${safeMd(customerName)}\n*ទូរស័ព្ទ (Phone):* ${safeMd(customerPhone || 'N/A')}\n*អ៊ីមែល (Email):* ${safeMd(email || 'N/A')}\n*ផលិតផល (Product):* ${safeMd(productName)}\n*ក្រុមហ៊ុន (Company):* ${safeMd(companyName || 'N/A')}\n*ចំនួន (Qty):* ${safeMd(quantity || 'N/A')}\n*សារ (Message):* ${safeMd(message)}`;
+      sendTelegramNotification(tgMsg).catch((tgErr) =>
+        console.error("Failed to send inquiry Telegram alert:", tgErr)
+      );
 
       res.json({ success: true, id: result.rows[0].id });
     } finally {

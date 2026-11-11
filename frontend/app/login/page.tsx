@@ -107,9 +107,9 @@ export default function LoginPage() {
  <label className="text-xs sm:text-sm font-bold text-slate-700">
  {t("passwordAuth") || "Password"}
  </label>
- <a href="#" className="text-xs font-bold text-[#004691] hover:underline">
+ <Link href="/forgot-password" className="text-xs font-bold text-[#004691] hover:underline">
  {t("forgotPasswordAuth") || "Forgot?"}
- </a>
+ </Link>
  </div>
  <div className="relative group">
  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#004691] transition-colors">
