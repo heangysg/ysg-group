@@ -1,4 +1,4 @@
-"use client" 
+"use client"
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
@@ -7,573 +7,949 @@ import PublicLayout from "../../components/PublicLayout"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { createClient } from "../../lib/supabase/client"
 import { getOptimizedImageUrl } from "../../lib/imageUtils"
-import { 
- User, 
- Package, 
- MapPin, 
- CreditCard, 
- Shield, 
- CheckCircle2,
- LogOut, 
- ChevronRight, 
- Settings, 
- Plus, 
- Check, 
- Lock, 
- Phone, 
- Mail, 
- Edit2, 
- Trash2,
- Clock,
- Sparkles
+import {
+  User,
+  Package,
+  CreditCard,
+  Shield,
+  CheckCircle2,
+  LogOut,
+  ChevronRight,
+  Settings,
+  Lock,
+  Phone,
+  Mail,
+  Printer,
+  ShoppingBag,
+  Calendar,
+  AlertCircle,
 } from "lucide-react"
 
+const formatUsd = (val: unknown) =>
+  `$${(Number(val) || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`
+
+const parseOrderItems = (raw: unknown): any[] => {
+  if (Array.isArray(raw)) return raw
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
 export default function AccountPage() {
- const supabase = createClient()
- const { t, language } = useLanguage()
- const router = useRouter()
- const [user, setUser] = useState<any>(null)
- const [loading, setLoading] = useState(true)
- const [activeTab, setActiveTab] = useState("overview")
- const contentRef = useRef<HTMLDivElement>(null)
- const navRef = useRef<HTMLDivElement>(null)
+  const supabase = createClient()
+  const { t, language } = useLanguage()
+  const isKh = language === "kh"
+  const router = useRouter()
 
- const handleTabChange = (tabId: string) => {
- setActiveTab(tabId)
- // Auto-scroll active tab into center of the tab bar (mobile)
- setTimeout(() => {
- const nav = navRef.current
- const activeBtn = nav?.querySelector(`[data-tab="${tabId}"]`) as HTMLElement
- if (nav && activeBtn) {
- const navCenter = nav.offsetWidth / 2
- const btnCenter = activeBtn.offsetLeft + activeBtn.offsetWidth / 2
- nav.scrollTo({ left: btnCenter - navCenter, behavior: 'smooth' })
- }
- }, 30)
- }
- const [orders, setOrders] = useState<any[]>([])
- const [fetchingOrders, setFetchingOrders] = useState(false)
- 
- // Profile update state
- const [profileData, setProfileData] = useState({
- fullName: "",
- phone: ""
- })
- const [updating, setUpdating] = useState(false)
- const [updateMsg, setUpdateMsg] = useState({ type: "", text: "" })
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("overview")
+  const navRef = useRef<HTMLDivElement>(null)
 
- // Security update state
- const [passwordData, setPasswordData] = useState({
- newPassword: "",
- confirmPassword: ""
- })
- const [updatingPassword, setUpdatingPassword] = useState(false)
- const [passwordMsg, setPasswordMsg] = useState({ type: "", text: "" })
+  const [orders, setOrders] = useState<any[]>([])
+  const [fetchingOrders, setFetchingOrders] = useState(false)
 
- useEffect(() => {
- async function getUser() {
- try {
- const { data: { session } } = await supabase.auth.getSession()
- if (!session) {
- router.push("/login")
- return
- }
- setUser(session.user)
- setProfileData({
- fullName: session.user.user_metadata?.full_name || "",
- phone: session.user.user_metadata?.phone || ""
- })
+  // Profile update state
+  const [profileData, setProfileData] = useState({
+    fullName: "",
+    phone: "",
+  })
+  const [updating, setUpdating] = useState(false)
+  const [updateMsg, setUpdateMsg] = useState({ type: "", text: "" })
 
- // Fetch user orders
- setFetchingOrders(true)
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- const email = session.user.email || ""
- const phone = session.user.user_metadata?.phone || ""
- const userId = session.user.id || ""
+  // Security update state
+  const [passwordData, setPasswordData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  })
+  const [updatingPassword, setUpdatingPassword] = useState(false)
+  const [passwordMsg, setPasswordMsg] = useState({ type: "", text: "" })
 
- const res = await fetch(`${API_URL}/api/orders/user/find?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&userId=${encodeURIComponent(userId)}`)
- if (res.ok) {
- const data = await res.json()
- setOrders(data.data || [])
- }
- } catch (err) {
- console.error("Account error:", err)
- } finally {
- setLoading(false)
- setFetchingOrders(false)
- }
- }
- getUser()
- }, [router])
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+    setTimeout(() => {
+      const nav = navRef.current
+      const activeBtn = nav?.querySelector(`[data-tab="${tabId}"]`) as HTMLElement
+      if (nav && activeBtn) {
+        const navCenter = nav.offsetWidth / 2
+        const btnCenter = activeBtn.offsetLeft + activeBtn.offsetWidth / 2
+        nav.scrollTo({ left: btnCenter - navCenter, behavior: "smooth" })
+      }
+    }, 30)
+  }
 
- const handleLogout = async () => {
- await supabase.auth.signOut()
- router.push("/")
- }
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        if (!session) {
+          router.push("/login")
+          return
+        }
+        setUser(session.user)
+        setProfileData({
+          fullName: session.user.user_metadata?.full_name || "",
+          phone: session.user.user_metadata?.phone || "",
+        })
 
- const handleUpdateProfile = async (e: React.FormEvent) => {
- e.preventDefault()
- setUpdating(true)
- setUpdateMsg({ type: "", text: "" })
+        setFetchingOrders(true)
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+        const email = session.user.email || ""
+        const phone = session.user.user_metadata?.phone || ""
+        const userId = session.user.id || ""
 
- try {
- const { error } = await supabase.auth.updateUser({
- data: {
- full_name: profileData.fullName,
- phone: profileData.phone
- }
- })
+        const res = await fetch(
+          `${API_URL}/api/orders/user/find?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&userId=${encodeURIComponent(userId)}`
+        )
+        if (res.ok) {
+          const data = await res.json()
+          const normalized = (data.data || []).map((o: any) => ({
+            ...o,
+            items: parseOrderItems(o.items),
+          }))
+          setOrders(normalized)
+        }
+      } catch (err) {
+        console.error("Account error:", err)
+      } finally {
+        setLoading(false)
+        setFetchingOrders(false)
+      }
+    }
+    getUser()
+  }, [router])
 
- if (error) throw error
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push("/")
+  }
 
- setUser({
- ...user,
- user_metadata: {
- ...user.user_metadata,
- full_name: profileData.fullName,
- phone: profileData.phone
- }
- })
- setUpdateMsg({ type: "success", text: language === "kh" ? "បានបច្ចុប្បន្នភាពព័ត៌មានដោយជោគជ័យ!" : "Profile updated successfully!" })
- } catch (err: any) {
- setUpdateMsg({ type: "error", text: err.message || "Failed to update profile" })
- } finally {
- setUpdating(false)
- }
- }
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setUpdating(true)
+    setUpdateMsg({ type: "", text: "" })
 
- const handleUpdatePassword = async (e: React.FormEvent) => {
- e.preventDefault()
- if (passwordData.newPassword !== passwordData.confirmPassword) {
- setPasswordMsg({ type: "error", text: language === "kh" ? "ពាក្យសម្ងាត់មិនត្រូវគ្នាទេ!" : "Passwords do not match!" })
- return
- }
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          full_name: profileData.fullName.trim(),
+          phone: profileData.phone.trim(),
+        },
+      })
 
- setUpdatingPassword(true)
- setPasswordMsg({ type: "", text: "" })
+      if (error) throw error
 
- try {
- const { error } = await supabase.auth.updateUser({
- password: passwordData.newPassword
- })
+      setUser({
+        ...user,
+        user_metadata: {
+          ...user.user_metadata,
+          full_name: profileData.fullName.trim(),
+          phone: profileData.phone.trim(),
+        },
+      })
+      setUpdateMsg({
+        type: "success",
+        text: isKh
+          ? "បានរក្សាទុកព័ត៌មានប្រវត្តិរូបដោយជោគជ័យ!"
+          : "Profile updated successfully!",
+      })
+    } catch (err: any) {
+      setUpdateMsg({
+        type: "error",
+        text: err.message || "Failed to update profile",
+      })
+    } finally {
+      setUpdating(false)
+    }
+  }
 
- if (error) throw error
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (passwordData.newPassword.length < 6) {
+      setPasswordMsg({
+        type: "error",
+        text: isKh
+          ? "ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួអក្សរ!"
+          : "Password must be at least 6 characters.",
+      })
+      return
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordMsg({
+        type: "error",
+        text: isKh ? "ពាក្យសម្ងាត់មិនត្រូវគ្នាទេ!" : "Passwords do not match!",
+      })
+      return
+    }
 
- setPasswordMsg({ type: "success", text: language === "kh" ? "បានប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!" : "Password changed successfully!" })
- setPasswordData({ newPassword: "", confirmPassword: "" })
- } catch (err: any) {
- setPasswordMsg({ type: "error", text: err.message || "Failed to update password" })
- } finally {
- setUpdatingPassword(false)
- }
- }
+    setUpdatingPassword(true)
+    setPasswordMsg({ type: "", text: "" })
 
- const getStatusColor = (status: string) => {
- switch (status?.toUpperCase()) {
- case "PAID":
- case "COMPLETED": return "bg-emerald-50 text-emerald-700 border border-emerald-200"
- case "CONFIRMED": return "bg-blue-50 text-blue-700 border border-blue-200"
- case "PENDING": return "bg-amber-50 text-amber-700 border border-amber-200"
- case "CANCELLED": return "bg-rose-50 text-rose-700 border border-rose-200"
- default: return "bg-slate-50 text-slate-700 border border-slate-200"
- }
- }
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword,
+      })
 
- const getStatusLabel = (status: string) => {
- switch (status?.toUpperCase()) {
- case "PAID":
- case "COMPLETED": return language === "kh" ? "បានទូទាត់ប្រាក់" : "Paid"
- case "CONFIRMED": return language === "kh" ? "បានបញ្ជាក់" : "Confirmed"
- case "PENDING": return language === "kh" ? "កំពុងរង់ចាំ" : "Pending"
- case "CANCELLED": return language === "kh" ? "បានបោះបង់" : "Cancelled"
- default: return status || (language === "kh" ? "កំពុងដំណើរការ" : "Processing")
- }
- }
+      if (error) throw error
 
- if (loading) {
- return (
- <PublicLayout>
- <div className="min-h-screen flex items-center justify-center bg-slate-50">
- <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-[#004691]" />
- </div>
- </PublicLayout>
- )
- }
+      setPasswordMsg({
+        type: "success",
+        text: isKh
+          ? "បានផ្លាស់ប្តូរពាក្យសម្ងាត់ដោយជោគជ័យ!"
+          : "Password changed successfully!",
+      })
+      setPasswordData({ newPassword: "", confirmPassword: "" })
+    } catch (err: any) {
+      setPasswordMsg({
+        type: "error",
+        text: err.message || "Failed to update password",
+      })
+    } finally {
+      setUpdatingPassword(false)
+    }
+  }
 
- const menuItems = [
- { id: "overview", label: language === "kh" ? "ទិដ្ឋភាពទូទៅ" : "Dashboard Overview", icon: User },
- { id: "orders", label: t("orderHistory"), icon: Package },
- { id: "profile", label: language === "kh" ? "ព័ត៌មានប្រវត្តិរូប" : "Profile Settings", icon: Settings },
- { id: "security", label: language === "kh" ? "សុវត្ថិភាពគណនី" : "Account Security", icon: Lock },
- ]
+  const getStatusStyle = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "PAID":
+      case "COMPLETED":
+        return {
+          pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          dot: "bg-emerald-500",
+          label: isKh ? "បានទូទាត់" : "Paid",
+        }
+      case "CONFIRMED":
+        return {
+          pill: "bg-blue-50 text-blue-700 border-blue-200",
+          dot: "bg-blue-500",
+          label: isKh ? "បានបញ្ជាក់" : "Confirmed",
+        }
+      case "PENDING":
+        return {
+          pill: "bg-amber-50 text-amber-700 border-amber-200",
+          dot: "bg-amber-500",
+          label: isKh ? "រង់ចាំទូទាត់" : "Pending",
+        }
+      case "CANCELLED":
+        return {
+          pill: "bg-rose-50 text-rose-700 border-rose-200",
+          dot: "bg-rose-500",
+          label: isKh ? "បានបោះបង់" : "Cancelled",
+        }
+      default:
+        return {
+          pill: "bg-slate-100 text-slate-700 border-slate-200",
+          dot: "bg-slate-400",
+          label: status || (isKh ? "កំពុងដំណើរការ" : "Processing"),
+        }
+    }
+  }
 
- return (
- <PublicLayout>
- <main className="min-h-screen bg-white pb-24 font-sans selection:bg-primary/20">
- 
- {/* 👤 Account Banner Header */}
- <section className="bg-slate-50 border-b border-slate-200 py-6 md:py-10">
- <div className="max-w-5xl mx-auto px-4 md:px-8">
- <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
- 
- <div className="flex items-center gap-4">
- <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-[#004691] text-white rounded-md flex items-center justify-center font-bold text-xl sm:text-2xl md:text-3xl shadow-md shrink-0 overflow-hidden relative border-2 border-white">
- {(user?.user_metadata?.avatar_url || user?.user_metadata?.picture) ? (
- <img 
- src={user.user_metadata.avatar_url || user.user_metadata.picture} 
- alt={user?.user_metadata?.full_name || "Profile Picture"} 
- className="w-full h-full object-cover"
- referrerPolicy="no-referrer"
- />
- ) : (
- <span>{user?.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : "U")}</span>
- )}
- </div>
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="min-h-[70vh] flex flex-col items-center justify-center bg-slate-50/60 gap-3">
+          <div className="animate-spin rounded-full h-9 w-9 border-[3px] border-slate-200 border-t-[#004691]" />
+          <p className="text-xs font-medium text-slate-500">
+            {isKh ? "កំពុងផ្ទុកគណនីរបស់អ្នក..." : "Loading your account..."}
+          </p>
+        </div>
+      </PublicLayout>
+    )
+  }
 
- <div className="flex-1 min-w-0 space-y-1">
- <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 truncate">
- {user?.user_metadata?.full_name || t("memberUser")}
- </h1>
- <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-600 truncate">{user?.email}</p>
- <div className="flex flex-wrap items-center gap-2 pt-0.5">
- <div className="px-3 py-1 bg-slate-200 text-xs font-bold text-slate-700 rounded-md">
- {language === "kh" ? "អតិថិជន" : "Customer"}
- </div>
- <div className="px-3 py-1 bg-[#004691]/10 text-xs font-bold text-[#004691] flex items-center gap-1.5 rounded-md">
- <CheckCircle2 className="w-3.5 h-3.5 text-[#004691]" />
- {language === "kh" ? "បញ្ជាក់" : "Verified"}
- </div>
- </div>
- </div>
- </div>
+  const menuItems = [
+    {
+      id: "overview",
+      label: isKh ? "ទិដ្ឋភាពទូទៅ" : "Overview",
+      icon: User,
+    },
+    {
+      id: "orders",
+      label: t("orderHistory"),
+      icon: Package,
+      count: orders.length,
+    },
+    {
+      id: "profile",
+      label: isKh ? "ព័ត៌មានប្រវត្តិរូប" : "Profile",
+      icon: Settings,
+    },
+    {
+      id: "security",
+      label: isKh ? "សុវត្ថិភាព" : "Security",
+      icon: Lock,
+    },
+  ]
 
- <div className="md:text-right shrink-0">
- <button 
- onClick={handleLogout}
- className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 bg-slate-200 hover:bg-red-50 hover:text-red-600 text-slate-700 rounded-md font-bold text-sm transition-all"
- >
- <LogOut className="w-4 h-4" />
- {t("logout")}
- </button>
- <button 
- onClick={handleLogout}
- className="md:hidden flex items-center justify-center px-4 py-2 bg-slate-200 hover:bg-red-50 hover:text-red-600 text-slate-700 rounded-md font-bold text-xs transition-all gap-1.5"
- >
- <LogOut className="w-4 h-4" />
- {t("logout")}
- </button>
- </div>
- </div>
- </div>
- </section>
+  const avatarUrl =
+    user?.user_metadata?.avatar_url || user?.user_metadata?.picture
+  const displayName = user?.user_metadata?.full_name || t("memberUser")
+  const initial = displayName
+    ? String(displayName).charAt(0).toUpperCase()
+    : user?.email
+    ? String(user.email).charAt(0).toUpperCase()
+    : "U"
 
- <section className="max-w-5xl mx-auto px-4 md:px-8 py-6 md:py-10">
- <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
- 
- {/* Navigation Tabs */}
- <div className="lg:col-span-3 lg:sticky lg:top-24 mb-2 lg:mb-0">
- {/* Mobile Horizontal Tabs */}
- <nav ref={navRef} className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-2 -mx-4 px-4 border-b border-slate-100">
- {menuItems.map((item) => {
- const isActive = activeTab === item.id
- const Icon = item.icon
- return (
- <button 
- key={item.id}
- data-tab={item.id}
- onClick={() => handleTabChange(item.id)}
- className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-xs sm:text-sm font-bold shrink-0 transition-all ${
- isActive 
- ? "bg-[#004691] text-white shadow-sm" 
- : "bg-slate-100 text-slate-700 hover:bg-slate-200"
- }`}
- >
- <Icon className="w-4 h-4" />
- <span>{item.label}</span>
- </button>
- )
- })}
- </nav>
+  const paidTotal = orders
+    .filter((o) =>
+      ["paid", "completed", "confirmed", "shipped", "delivered"].includes(
+        String(o.status || "").toLowerCase()
+      )
+    )
+    .reduce((acc, o) => acc + (Number(o.totalAmount) || 0), 0)
 
- {/* Desktop Vertical Sidebar */}
- <nav className="hidden lg:flex flex-col gap-1.5">
- {menuItems.map((item) => {
- const isActive = activeTab === item.id
- const Icon = item.icon
- return (
- <button 
- key={item.id}
- onClick={() => setActiveTab(item.id)}
- className={`flex items-center justify-between px-4 py-3 rounded-md text-sm sm:text-base font-bold transition-all duration-200 ${
- isActive 
- ? "bg-[#004691] text-white shadow-sm" 
- : "bg-transparent text-slate-700 hover:bg-slate-100"
- }`}
- >
- <div className="flex items-center gap-3">
- <Icon className={`w-4.5 h-4.5 ${isActive ? "text-white" : "text-slate-500"}`} />
- <span>{item.label}</span>
- </div>
- <ChevronRight className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
- </button>
- )
- })}
- </nav>
- </div>
+  const totalSpentAll =
+    paidTotal > 0
+      ? paidTotal
+      : orders.reduce((acc, o) => acc + (Number(o.totalAmount) || 0), 0)
 
- <div className="lg:col-span-9" ref={contentRef}>
- {activeTab === "overview" && (
- <div className="space-y-6 md:space-y-8">
- 
- {/* 📊 Responsive Stats Grid - always 3 col */}
- <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6">
- {[
- { 
- label: language === "kh" ? "ចំណាយសរុប" : "Total Spent", 
- value: `$${orders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`, 
- icon: CreditCard 
- },
- { 
- label: language === "kh" ? "ការបញ្ជាទិញ" : "Total Orders", 
- value: orders.length, 
- icon: Package 
- },
- { 
- label: language === "kh" ? "សមាជិកតាំងពី" : "Member Since", 
- value: user?.created_at ? new Date(user.created_at).toLocaleDateString(language === "kh" ? "km-KH" : "en-US", { month: "short", year: "numeric" }) : "—", 
- icon: Shield 
- }
- ].map((stat, i) => (
- <div key={i} className="bg-white p-3 sm:p-5 md:p-6 rounded-md md:rounded-md border border-slate-200 shadow-2xs flex flex-col justify-between">
- <div className="w-8 h-8 sm:w-11 sm:h-11 bg-blue-50 text-[#004691] rounded-md flex items-center justify-center mb-2 sm:mb-3">
- <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
- </div>
- <div className="space-y-0.5">
- <p className="text-[10px] sm:text-sm font-bold text-slate-500 truncate leading-tight">{stat.label}</p>
- <p className="text-sm sm:text-2xl md:text-3xl font-bold text-slate-900 truncate">{stat.value}</p>
- </div>
- </div>
- ))}
- </div>
+  const memberSince = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString(isKh ? "en-GB" : "en-US", {
+        month: "short",
+        year: "numeric",
+      })
+    : "—"
 
- {/* 🛍️ Recent Orders List */}
- <div className="space-y-4">
- <div className="flex items-center justify-between">
- <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 ">
- {language === "kh" ? "សកម្មភាពថ្មីៗ" : "Recent Orders"}
- </h3>
- <button onClick={() => setActiveTab("orders")} className="text-xs sm:text-sm md:text-base font-bold text-[#004691] hover:underline flex items-center gap-1">
- {language === "kh" ? "មើលទាំងអស់" : "View All"} <ChevronRight className="w-4 h-4" />
- </button>
- </div>
- 
- {orders.length > 0 ? (
- <div className="grid grid-cols-1 gap-3">
- {orders.slice(0, 4).map((order) => (
- <Link 
- key={order.id} 
- href={`/orders/${order.id}`}
- className="bg-white border border-slate-200 rounded-md p-4 md:p-5 flex items-center justify-between gap-4 group hover:border-[#004691] transition-all shadow-2xs"
- >
- <div className="flex items-center gap-4 min-w-0">
- <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-50 rounded-md flex items-center justify-center border border-slate-100 shrink-0 group-hover:bg-blue-50 transition-colors">
- <Package className="w-5 h-5 text-slate-400 group-hover:text-[#004691] transition-colors" />
- </div>
- <div className="min-w-0">
- <p className="text-sm md:text-base font-bold text-slate-900 uppercase truncate">#{order.id.slice(0, 8)}</p>
- <p className="text-xs sm:text-sm text-slate-500 font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
- </div>
- </div>
- <div className={`px-3 py-1.5 text-xs font-bold rounded-md border ${getStatusColor(order.status)} shrink-0`}>
- {getStatusLabel(order.status)}
- </div>
- </Link>
- ))}
- </div>
- ) : (
- <div className="bg-slate-50 p-10 text-center rounded-md border-2 border-dashed border-slate-200 flex flex-col items-center gap-4">
- <Package className="w-12 h-12 text-slate-300" />
- <p className="text-sm font-bold text-slate-600">{t("noRecentActivity")}</p>
- <Link href="/products" className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004691] hover:bg-[#003366] text-white text-xs font-bold rounded-md transition-all shadow-sm">
- {language === "kh" ? "រកមើលផលិតផល" : "Browse Products"}
- <ChevronRight className="w-3.5 h-3.5" />
- </Link>
- </div>
- )}
- </div>
- </div>
- )}
+  return (
+    <PublicLayout>
+      <main className="min-h-screen bg-slate-50/70 pb-24 pt-5 md:pt-8 font-sans">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 space-y-6">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 font-medium">
+            <Link href="/" className="hover:text-[#004691] transition-colors">
+              {t("home")}
+            </Link>
+            <span className="text-slate-300">/</span>
+            <span className="text-slate-900 font-semibold">
+              {isKh ? "គណនីរបស់ខ្ញុំ" : "My Account"}
+            </span>
+          </div>
 
- {activeTab === "profile" && (
- <div className="bg-white p-6 md:p-10 rounded-md shadow-2xs border border-slate-200 space-y-8">
- <div className="space-y-1 border-b border-slate-100 pb-4">
- <h3 className="text-xl md:text-2xl font-bold text-slate-900 ">
- {language === "kh" ? "ព័ត៌មានប្រវត្តិរូប" : "Profile Settings"}
- </h3>
- <p className="text-xs sm:text-sm font-medium text-slate-500">{language === "kh" ? "គ្រប់គ្រងព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក" : "Manage your personal information"}</p>
- </div>
+          {/* Clean Profile Header Card */}
+          <section className="relative bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+            <div className="h-20 sm:h-24 bg-gradient-to-r from-[#004691] via-[#0a5bb5] to-[#1a73d9]" />
 
- {updateMsg.text && (
- <div className={`p-4 rounded-md text-xs sm:text-sm font-bold ${updateMsg.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
- {updateMsg.text}
- </div>
- )}
+            <div className="px-5 sm:px-7 pb-6">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 sm:-mt-11">
+                <div className="flex items-end gap-4 min-w-0">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#004691] text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md ring-4 ring-white overflow-hidden shrink-0">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={displayName}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span>{initial}</span>
+                    )}
+                  </div>
 
- <form onSubmit={handleUpdateProfile} className="space-y-6">
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div className="space-y-2">
- <label className="text-xs sm:text-sm font-bold text-slate-700">{t("fullName")}</label>
- <input 
- type="text" 
- required
- value={profileData.fullName}
- onChange={(e) => setProfileData({...profileData, fullName: e.target.value})}
- className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-md focus:border-[#004691] outline-none transition-all text-slate-900 text-sm sm:text-base font-medium"
- placeholder={language === "kh" ? "ឈ្មោះរបស់អ្នក" : "Your Name"}
- />
- </div>
- <div className="space-y-2">
- <label className="text-xs sm:text-sm font-bold text-slate-700">{t("emailAddress")}</label>
- <input 
- type="email" 
- disabled
- value={user?.email}
- className="w-full px-5 py-3.5 bg-slate-100 border border-slate-200 rounded-md text-slate-500 text-sm sm:text-base cursor-not-allowed font-medium"
- />
- </div>
- </div>
- <button 
- type="submit"
- disabled={updating}
- className="px-8 py-3.5 bg-[#004691] hover:bg-[#003366] text-white font-bold text-xs sm:text-sm rounded-md transition-all shadow-md active:scale-95 disabled:opacity-50"
- >
- {updating ? t("updating") : t("saveChanges")}
- </button>
- </form>
- </div>
- )}
+                  <div className="min-w-0 pt-2 sm:pb-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h1 className="text-lg sm:text-2xl font-bold text-slate-900 truncate">
+                        {displayName}
+                      </h1>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#004691] border border-blue-200/80 text-[11px] font-semibold">
+                        <CheckCircle2 className="w-3 h-3" />
+                        {isKh ? "បានផ្ទៀងផ្ទាត់" : "Verified"}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium truncate mt-0.5">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
 
- {activeTab === "orders" && (
- <div className="space-y-6">
- {fetchingOrders ? (
- <div className="bg-white p-20 flex items-center justify-center rounded-md border border-slate-200">
- <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-[#004691]" />
- </div>
- ) : orders.length > 0 ? (
- <div className="space-y-4">
- {orders.map((order) => (
- <div key={order.id} className="bg-white p-5 md:p-8 rounded-md shadow-2xs border border-slate-200 space-y-6">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 bg-blue-50 rounded-md flex items-center justify-center text-[#004691] shrink-0">
- <Package className="w-6 h-6" />
- </div>
- <div className="space-y-1">
- <h3 className="text-base sm:text-lg font-bold text-slate-900 uppercase">#{order.id.slice(0, 8)}</h3>
- <p className="text-xs sm:text-sm font-medium text-slate-500">
- {new Date(order.createdAt).toLocaleDateString()}
- </p>
- </div>
- </div>
- <span className={`px-4 py-1.5 text-xs font-bold rounded-md border w-fit ${getStatusColor(order.status)}`}>
- {getStatusLabel(order.status)}
- </span>
- </div>
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl font-semibold text-xs sm:text-sm transition-all shadow-2xs shrink-0 self-start sm:self-end cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>{t("logout")}</span>
+                </button>
+              </div>
+            </div>
+          </section>
 
- <div className="space-y-3">
- {order.items?.map((item: any, idx: number) => (
- <div key={idx} className="flex items-center gap-4 p-3.5 bg-slate-50 border border-slate-100 rounded-md">
- <div className="w-12 h-12 bg-white rounded-md border border-slate-200 overflow-hidden flex-shrink-0 p-1 flex items-center justify-center">
- {item.image && <img src={getOptimizedImageUrl(item.image, 'thumb')} alt={item.name} className="w-full h-full object-contain" />}
- </div>
- <div className="flex-1 min-w-0">
- <p className="text-xs sm:text-sm font-bold text-slate-900 truncate uppercase">{language === "kh" && item.nameKhmer ? item.nameKhmer : item.name}</p>
- <p className="text-xs font-medium text-slate-500">{language === "kh" ? "តម្លៃ:" : "Price:"} ${item.price.toLocaleString()} • {language === "kh" ? "ចំនួន:" : "Qty:"} {item.quantity}</p>
- </div>
- <p className="text-xs sm:text-sm font-bold text-slate-900">${(item.price * item.quantity).toLocaleString()}</p>
- </div>
- ))}
- </div>
+          {/* Main Grid: Sidebar + Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Navigation */}
+            <aside className="lg:col-span-3 lg:sticky lg:top-24">
+              {/* Mobile Pill Tabs */}
+              <nav
+                ref={navRef}
+                className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 pb-1"
+              >
+                {menuItems.map((item) => {
+                  const isActive = activeTab === item.id
+                  const Icon = item.icon
+                  return (
+                    <button
+                      key={item.id}
+                      data-tab={item.id}
+                      onClick={() => handleTabChange(item.id)}
+                      className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-[#004691] text-white shadow-xs"
+                          : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
+                      {typeof item.count === "number" && item.count > 0 && (
+                        <span
+                          className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            isActive
+                              ? "bg-white/20 text-white"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {item.count}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </nav>
 
- <div className="flex items-center justify-between pt-4 border-t border-slate-100">
- <div>
- <p className="text-xs font-semibold text-slate-500">{language === "kh" ? "តម្លៃសរុប" : "Total Amount"}</p>
- <p className="text-lg sm:text-2xl font-bold text-[#004691]">${order.totalAmount?.toLocaleString()}</p>
- </div>
- <Link 
- href={`/orders/${order.id}`}
- className="px-6 py-3 bg-[#004691] hover:bg-[#003366] text-white text-xs sm:text-sm font-bold rounded-md shadow-md transition-all"
- >
- {language === "kh" ? "មើលលម្អិត" : "Details"}
- </Link>
- </div>
- </div>
- ))}
- </div>
- ) : (
- <div className="bg-white p-16 flex flex-col items-center text-center rounded-md border border-slate-200">
- <Package className="w-16 h-16 text-slate-300 mb-4" />
- <p className="text-sm sm:text-base font-bold text-slate-600">{t("noRecentActivity")}</p>
- </div>
- )}
- </div>
- )}
+              {/* Desktop Sidebar Card */}
+              <nav className="hidden lg:flex flex-col gap-1 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-2xs">
+                {menuItems.map((item) => {
+                  const isActive = activeTab === item.id
+                  const Icon = item.icon
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-[#004691] text-white shadow-xs"
+                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <Icon
+                          className={`w-4 h-4 shrink-0 ${
+                            isActive ? "text-white" : "text-slate-400"
+                          }`}
+                        />
+                        <span className="truncate">{item.label}</span>
+                      </span>
+                      {typeof item.count === "number" && item.count > 0 ? (
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                            isActive
+                              ? "bg-white/20 text-white"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {item.count}
+                        </span>
+                      ) : (
+                        <ChevronRight
+                          className={`w-4 h-4 shrink-0 ${
+                            isActive ? "text-white/80" : "text-slate-300"
+                          }`}
+                        />
+                      )}
+                    </button>
+                  )
+                })}
+              </nav>
+            </aside>
 
- {activeTab === "security" && (
- <div className="bg-white p-6 md:p-10 rounded-md shadow-2xs border border-slate-200 space-y-8">
- <div className="space-y-1 border-b border-slate-100 pb-4">
- <h3 className="text-xl md:text-2xl font-bold text-slate-900 ">
- {language === "kh" ? "សុវត្ថិភាពគណនី" : "Account Security"}
- </h3>
- <p className="text-xs sm:text-sm font-medium text-slate-500">{language === "kh" ? "គ្រប់គ្រងពាក្យសម្ងាត់របស់អ្នក" : "Manage your password and credentials"}</p>
- </div>
+            {/* Tab Content Area */}
+            <div className="lg:col-span-9 min-w-0">
+              {/* Overview Tab */}
+              {activeTab === "overview" && (
+                <div className="space-y-6">
+                  {/* 3 Clean Summary Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#004691] flex items-center justify-center shrink-0">
+                        <CreditCard className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-500">
+                          {isKh ? "ចំណាយសរុប" : "Total Spent"}
+                        </p>
+                        <p className="text-xl font-bold text-slate-900 tabular-nums truncate mt-0.5">
+                          {formatUsd(totalSpentAll)}
+                        </p>
+                      </div>
+                    </div>
 
- {passwordMsg.text && (
- <div className={`p-4 rounded-md text-xs sm:text-sm font-bold ${passwordMsg.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
- {passwordMsg.text}
- </div>
- )}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <Package className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-500">
+                          {isKh ? "ការបញ្ជាទិញ" : "Total Orders"}
+                        </p>
+                        <p className="text-xl font-bold text-slate-900 tabular-nums mt-0.5">
+                          {orders.length}
+                        </p>
+                      </div>
+                    </div>
 
- <form onSubmit={handleUpdatePassword} className="space-y-6">
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div className="space-y-2">
- <label className="text-xs sm:text-sm font-bold text-slate-700">{t("newPassword")}</label>
- <input 
- type="password" 
- required
- value={passwordData.newPassword}
- onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
- className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-md focus:border-[#004691] outline-none transition-all text-slate-900 text-sm sm:text-base font-medium"
- placeholder="••••••••"
- />
- </div>
- <div className="space-y-2">
- <label className="text-xs sm:text-sm font-bold text-slate-700">{t("confirmPassword")}</label>
- <input 
- type="password" 
- required
- value={passwordData.confirmPassword}
- onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
- className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-md focus:border-[#004691] outline-none transition-all text-slate-900 text-sm sm:text-base font-medium"
- placeholder="••••••••"
- />
- </div>
- </div>
- <button 
- type="submit"
- disabled={updatingPassword}
- className="px-8 py-3.5 bg-[#004691] hover:bg-[#003366] text-white font-bold text-xs sm:text-sm rounded-md transition-all shadow-md active:scale-95 disabled:opacity-50"
- >
- {updatingPassword ? t("updating") : t("updatePassword")}
- </button>
- </form>
- </div>
- )}
+                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                        <Calendar className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-slate-500">
+                          {isKh ? "សមាជិកតាំងពី" : "Member Since"}
+                        </p>
+                        <p className="text-xl font-bold text-slate-900 tabular-nums truncate mt-0.5">
+                          {memberSince}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
- </div>
- </div>
- </section>
- </main>
- </PublicLayout>
- )
+                  {/* Recent Orders Card */}
+                  <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+                    <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                      <h2 className="text-base font-bold text-slate-900">
+                        {isKh ? "ការបញ្ជាទិញថ្មីៗ" : "Recent Orders"}
+                      </h2>
+                      {orders.length > 0 && (
+                        <button
+                          onClick={() => setActiveTab("orders")}
+                          className="text-xs font-semibold text-[#004691] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          {isKh ? "មើលទាំងអស់" : "View All"}
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    {orders.length > 0 ? (
+                      <div className="divide-y divide-slate-100">
+                        {orders.slice(0, 4).map((order) => {
+                          const st = getStatusStyle(order.status)
+                          const itemCount = Array.isArray(order.items)
+                            ? order.items.reduce(
+                                (sum: number, i: any) =>
+                                  sum + (Number(i?.quantity) || 1),
+                                0
+                              )
+                            : 0
+
+                          return (
+                            <Link
+                              key={order.id}
+                              href={`/orders/${order.id}`}
+                              className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-slate-50/80 transition-colors group"
+                            >
+                              <div className="flex items-center gap-3.5 min-w-0">
+                                <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-[#004691] flex items-center justify-center shrink-0 transition-colors">
+                                  <Package className="w-5 h-5" />
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm font-bold text-slate-900 font-mono">
+                                      #{String(order.id).slice(0, 8)}
+                                    </p>
+                                    {itemCount > 0 && (
+                                      <span className="text-[11px] text-slate-400 font-medium">
+                                        • {itemCount}{" "}
+                                        {isKh ? "មុខ" : itemCount === 1 ? "item" : "items"}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-slate-500 mt-0.5">
+                                    {new Date(order.createdAt).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3 shrink-0">
+                                <div className="text-right hidden sm:block">
+                                  <p className="text-sm font-bold text-slate-900 tabular-nums">
+                                    {formatUsd(order.totalAmount)}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${st.pill}`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${st.dot}`}
+                                  />
+                                  {st.label}
+                                </span>
+                                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-[#004691] transition-colors" />
+                              </div>
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <div className="p-10 text-center flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                          <ShoppingBag className="w-6 h-6" />
+                        </div>
+                        <p className="text-sm font-semibold text-slate-700">
+                          {t("noRecentActivity")}
+                        </p>
+                        <Link
+                          href="/products"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#004691] hover:bg-[#003570] text-white text-xs font-semibold rounded-xl transition-all shadow-xs"
+                        >
+                          {isKh ? "រកមើលផលិតផល" : "Browse Products"}
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Order History Tab */}
+              {activeTab === "orders" && (
+                <div className="space-y-4">
+                  {fetchingOrders ? (
+                    <div className="bg-white p-16 flex items-center justify-center rounded-2xl border border-slate-200/80">
+                      <div className="animate-spin rounded-full h-9 w-9 border-[3px] border-slate-200 border-t-[#004691]" />
+                    </div>
+                  ) : orders.length > 0 ? (
+                    orders.map((order) => {
+                      const st = getStatusStyle(order.status)
+                      return (
+                        <div
+                          key={order.id}
+                          className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden"
+                        >
+                          {/* Order Card Header */}
+                          <div className="px-5 py-4 bg-slate-50/70 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#004691] flex items-center justify-center shrink-0">
+                                <Package className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <h3 className="text-sm font-bold text-slate-900 font-mono">
+                                  #{String(order.id).slice(0, 8)}
+                                </h3>
+                                <p className="text-xs text-slate-500">
+                                  {new Date(order.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${st.pill}`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${st.dot}`}
+                              />
+                              {st.label}
+                            </span>
+                          </div>
+
+                          {/* Order Items */}
+                          <div className="divide-y divide-slate-100 px-5">
+                            {order.items?.map((item: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className="py-3.5 flex items-center gap-3.5"
+                              >
+                                <div className="w-12 h-12 bg-slate-50 rounded-xl border border-slate-200/70 overflow-hidden shrink-0 p-1 flex items-center justify-center">
+                                  {item.image ? (
+                                    <img
+                                      src={getOptimizedImageUrl(item.image, "thumb")}
+                                      alt={item.name}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  ) : (
+                                    <Package className="w-5 h-5 text-slate-300" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs sm:text-sm font-semibold text-slate-900 truncate">
+                                    {isKh && item.nameKhmer
+                                      ? item.nameKhmer
+                                      : item.name}
+                                  </p>
+                                  <p className="text-xs text-slate-500 tabular-nums mt-0.5">
+                                    {formatUsd(item.price)} × {item.quantity}
+                                  </p>
+                                </div>
+                                <p className="text-xs sm:text-sm font-bold text-slate-900 tabular-nums shrink-0">
+                                  {formatUsd(
+                                    (Number(item.price) || 0) *
+                                      (Number(item.quantity) || 1)
+                                  )}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Order Card Footer */}
+                          <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                              <p className="text-[11px] font-medium text-slate-500">
+                                {isKh ? "តម្លៃសរុប" : "Total Amount"}
+                              </p>
+                              <p className="text-base sm:text-lg font-bold text-[#004691] tabular-nums">
+                                {formatUsd(order.totalAmount)}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/orders/${order.id}/invoice`}
+                                target="_blank"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-all"
+                              >
+                                <Printer className="w-3.5 h-3.5" />
+                                <span>{isKh ? "វិក្កយបត្រ" : "Receipt"}</span>
+                              </Link>
+                              <Link
+                                href={`/orders/${order.id}`}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#004691] hover:bg-[#003570] text-white text-xs font-semibold rounded-xl shadow-xs transition-all"
+                              >
+                                <span>{isKh ? "មើលលម្អិត" : "Details"}</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })
+                  ) : (
+                    <div className="bg-white p-14 flex flex-col items-center text-center rounded-2xl border border-slate-200/80 gap-3">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                        <Package className="w-7 h-7" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-600">
+                        {t("noRecentActivity")}
+                      </p>
+                      <Link
+                        href="/products"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#004691] hover:bg-[#003570] text-white text-xs font-semibold rounded-xl transition-all"
+                      >
+                        {isKh ? "រកមើលផលិតផល" : "Browse Products"}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Profile Settings Tab */}
+              {activeTab === "profile" && (
+                <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-2xs space-y-6">
+                  <div className="border-b border-slate-100 pb-4">
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                      {isKh ? "ព័ត៌មានប្រវត្តិរូប" : "Profile Settings"}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                      {isKh
+                        ? "គ្រប់គ្រងឈ្មោះ និងលេខទូរស័ព្ទទំនាក់ទំនងរបស់អ្នក"
+                        : "Manage your name and contact phone number"}
+                    </p>
+                  </div>
+
+                  {updateMsg.text && (
+                    <div
+                      className={`p-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 border ${
+                        updateMsg.type === "success"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border-rose-200"
+                      }`}
+                    >
+                      {updateMsg.type === "success" ? (
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                      )}
+                      <span>{updateMsg.text}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleUpdateProfile} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700 block">
+                          {t("fullName")}
+                        </label>
+                        <div className="relative">
+                          <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            required
+                            value={profileData.fullName}
+                            onChange={(e) =>
+                              setProfileData({
+                                ...profileData,
+                                fullName: e.target.value,
+                              })
+                            }
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/10 outline-none transition-all text-slate-900 text-sm font-medium"
+                            placeholder={isKh ? "ឈ្មោះរបស់អ្នក" : "Your Name"}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700 block">
+                          {isKh ? "លេខទូរស័ព្ទ" : "Phone Number"}
+                        </label>
+                        <div className="relative">
+                          <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="tel"
+                            value={profileData.phone}
+                            onChange={(e) =>
+                              setProfileData({
+                                ...profileData,
+                                phone: e.target.value,
+                              })
+                            }
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/10 outline-none transition-all text-slate-900 text-sm font-medium"
+                            placeholder="012 345 678"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 md:col-span-2">
+                        <label className="text-xs font-semibold text-slate-700 block">
+                          {t("emailAddress")}
+                        </label>
+                        <div className="relative">
+                          <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="email"
+                            disabled
+                            value={user?.email || ""}
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 text-sm cursor-not-allowed font-medium"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-1">
+                      <button
+                        type="submit"
+                        disabled={updating}
+                        className="px-6 py-2.5 bg-[#004691] hover:bg-[#003570] text-white font-semibold text-xs sm:text-sm rounded-xl transition-all shadow-xs active:scale-98 disabled:opacity-50 cursor-pointer"
+                      >
+                        {updating ? t("updating") : t("saveChanges")}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Account Security Tab */}
+              {activeTab === "security" && (
+                <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-2xs space-y-6">
+                  <div className="border-b border-slate-100 pb-4">
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                      {isKh ? "សុវត្ថិភាពគណនី" : "Account Security"}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                      {isKh
+                        ? "ប្តូរពាក្យសម្ងាត់ថ្មីសម្រាប់គណនីរបស់អ្នក"
+                        : "Update your password to keep your account secure"}
+                    </p>
+                  </div>
+
+                  {passwordMsg.text && (
+                    <div
+                      className={`p-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 border ${
+                        passwordMsg.type === "success"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border-rose-200"
+                      }`}
+                    >
+                      {passwordMsg.type === "success" ? (
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                      )}
+                      <span>{passwordMsg.text}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleUpdatePassword} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700 block">
+                          {t("newPassword")}
+                        </label>
+                        <div className="relative">
+                          <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="password"
+                            required
+                            minLength={6}
+                            value={passwordData.newPassword}
+                            onChange={(e) =>
+                              setPasswordData({
+                                ...passwordData,
+                                newPassword: e.target.value,
+                              })
+                            }
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/10 outline-none transition-all text-slate-900 text-sm font-medium"
+                            placeholder="••••••••"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-slate-700 block">
+                          {t("confirmPassword")}
+                        </label>
+                        <div className="relative">
+                          <Shield className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="password"
+                            required
+                            minLength={6}
+                            value={passwordData.confirmPassword}
+                            onChange={(e) =>
+                              setPasswordData({
+                                ...passwordData,
+                                confirmPassword: e.target.value,
+                              })
+                            }
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#004691] focus:ring-2 focus:ring-[#004691]/10 outline-none transition-all text-slate-900 text-sm font-medium"
+                            placeholder="••••••••"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-1">
+                      <button
+                        type="submit"
+                        disabled={updatingPassword}
+                        className="px-6 py-2.5 bg-[#004691] hover:bg-[#003570] text-white font-semibold text-xs sm:text-sm rounded-xl transition-all shadow-xs active:scale-98 disabled:opacity-50 cursor-pointer"
+                      >
+                        {updatingPassword ? t("updating") : t("updatePassword")}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+    </PublicLayout>
+  )
 }
