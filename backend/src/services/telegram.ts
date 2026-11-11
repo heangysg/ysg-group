@@ -25,6 +25,22 @@ export async function sendTelegramNotification(message: string): Promise<void> {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Telegram API Error (${response.status}):`, errorText);
+
+      // Retry without Markdown parse_mode if special characters in user/product text broke formatting
+      if (response.status === 400) {
+        const plainRes = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message.replace(/[*_`]/g, ''),
+          }),
+        });
+        if (plainRes.ok) {
+          console.log("Telegram notification sent successfully (plain text fallback).");
+          return;
+        }
+      }
     } else {
       console.log("Telegram notification sent successfully.");
     }

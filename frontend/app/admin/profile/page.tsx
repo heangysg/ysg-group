@@ -142,8 +142,8 @@ export default function ProfilePage() {
     <div className="space-y-6 animate-in fade-in duration-500 w-full">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold uppercase text-slate-900">{t("profile")}</h2>
-          <p className="text-sm font-medium text-slate-500 mt-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("profile")}</h2>
+          <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">
             {t("personalInfo")} & {t("passwordPrivacy") || "Security"}
           </p>
         </div>
@@ -156,18 +156,18 @@ export default function ProfilePage() {
             {/* Personal Information Section */}
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold uppercase text-slate-900 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                   <User className="w-5 h-5 text-primary" />
                   {t("personalInfo")}
                 </h3>
-                <p className="mt-1 text-xs font-medium text-slate-500">
-                  Update your personal details.
+                <p className="mt-1 text-xs font-medium text-slate-700">
+                  {t("updatePersonalDetails")}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("adminName")}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -180,13 +180,13 @@ export default function ProfilePage() {
                       required
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("emailAuth")}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -199,13 +199,13 @@ export default function ProfilePage() {
                       required
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("phone")}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -217,13 +217,13 @@ export default function ProfilePage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("backgroundHistory") || "Background History"}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                       value={formData.bio}
                       onChange={handleInputChange}
                       placeholder={t("writeBio") || "Write a short bio or history about yourself..."}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px] h-32 resize-none"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm h-32 resize-none"
                     />
                   </div>
                 </div>
@@ -245,18 +245,18 @@ export default function ProfilePage() {
             {/* Security Section */}
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-bold uppercase text-slate-900 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                   <Lock className="w-5 h-5 text-primary" />
                   {t("changePassword")}
                 </h3>
-                <p className="mt-1 text-xs font-medium text-slate-500">
-                  Leave blank if you don't want to change your password.
+                <p className="mt-1 text-xs font-medium text-slate-700">
+                  {t("leaveBlankPassword")}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("currentPassword")}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -268,13 +268,13 @@ export default function ProfilePage() {
                       name="currentPassword"
                       value={formData.currentPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                       <button
                         type="button"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="text-primary hover:text-gray-500 focus:outline-none"
+                        className="text-primary hover:text-slate-900 focus:outline-none"
                       >
                         {showCurrentPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("newPasswordProfile")}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -295,13 +295,13 @@ export default function ProfilePage() {
                       name="newPassword"
                       value={formData.newPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                       <button
                         type="button"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="text-primary hover:text-gray-500 focus:outline-none"
+                        className="text-primary hover:text-slate-900 focus:outline-none"
                       >
                         {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  <label className="text-xs font-bold text-slate-800 mb-1.5 block">
                     {t("confirmPasswordProfile")}
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
@@ -322,13 +322,13 @@ export default function ProfilePage() {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 py-3 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="text-primary hover:text-gray-500 focus:outline-none"
+                        className="text-primary hover:text-slate-900 focus:outline-none"
                       >
                         {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>

@@ -36,7 +36,15 @@ async function markOrderAsPaid(orderId: string): Promise<void> {
       console.log(`✅ Order ${order.id} marked as PAID!`);
 
       // Deduct product stock atomically once payment is confirmed
-      const items = Array.isArray(order.items) ? order.items : [];
+      let parsedItems = order.items;
+      if (typeof parsedItems === 'string') {
+        try {
+          parsedItems = JSON.parse(parsedItems);
+        } catch {
+          parsedItems = [];
+        }
+      }
+      const items = Array.isArray(parsedItems) ? parsedItems : [];
       for (const item of items) {
         const qty = Math.max(1, parseInt(item?.quantity) || 1);
         const identifier = item?.id || item?.slug;
@@ -52,9 +60,11 @@ async function markOrderAsPaid(orderId: string): Promise<void> {
       }
 
       const total = Number(order.totalAmount || 0).toFixed(2);
+      const safeName = String(order.customerName || '').replace(/[*_`[\]]/g, '');
+      const safePhone = String(order.customerPhone || '').replace(/[*_`[\]]/g, '');
       sendTelegramNotification(
-        `✅ *ទូទាត់ប្រាក់ជោគជ័យ (PAYMENT PAID)*\n\n*Order ID:* \`${order.id}\`\n*Customer:* ${order.customerName}\n*Phone:* ${order.customerPhone}\n*Amount:* $${total}`
-      ).catch(() => {});
+        `✅ *ទូទាត់ប្រាក់ជោគជ័យ (PAYMENT PAID)*\n\n*Order ID:* \`${order.id}\`\n*Customer:* ${safeName}\n*Phone:* ${safePhone}\n*Amount:* $${total}`
+      ).catch((err) => console.error("Telegram Payment Alert Error:", err));
     }
   } catch (err) {
     console.error("Failed to update order status:", err);
@@ -259,12 +269,14 @@ router.post('/check-status', pollingLimiter, async (req: Request, res: Response)
       });
 
       const cutluyData: any = await cutluyRes.json();
-      console.log(`[CutLuy Check] Order: ${orderId} | Payment: ${paymentId} | Status: ${cutluyData?.status}`);
+      const rawCutluyStatus = cutluyData?.status ?? cutluyData?.data?.status;
+      const normalizedStatus = String(rawCutluyStatus || '').toLowerCase();
+      console.log(`[CutLuy Check] Order: ${orderId} | Payment: ${paymentId} | Status: ${rawCutluyStatus}`);
 
-      const isPaid = cutluyRes.ok && cutluyData?.status === 'paid';
+      const isPaid = cutluyRes.ok && (normalizedStatus === 'paid' || normalizedStatus === 'completed' || cutluyData?.paid === true);
       const formattedResult = isPaid
         ? { responseCode: 0, responseMessage: "Success", data: { status: "SUCCESS", cutluy: cutluyData } }
-        : { responseCode: 1, responseMessage: cutluyData?.status || "Pending", data: { status: cutluyData?.status || "PENDING" } };
+        : { responseCode: 1, responseMessage: rawCutluyStatus || "Pending", data: { status: rawCutluyStatus || "PENDING" } };
 
       if (isPaid && orderId) {
         await markOrderAsPaid(orderId);

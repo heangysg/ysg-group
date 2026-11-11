@@ -209,7 +209,7 @@ router.post('/users', authenticateJWT, async (req: AuthRequest, res: Response): 
       name, email, hashedPassword, isSuperAdmin, roleId, true
     ]);
 
-    res.json({ user: userRows[0] });
+    res.json({ user: { ...userRows[0], roleName } });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   } finally {
@@ -302,7 +302,15 @@ router.patch('/users', authenticateJWT, async (req: AuthRequest, res: Response):
 
     const { rows: updatedRows } = await pgClient.query(query, values);
 
-    res.json({ user: updatedRows[0] });
+    const updatedUser = updatedRows[0];
+    if (updatedUser?.roleId) {
+      const { rows: roleLookup } = await pgClient.query('SELECT name FROM "Role" WHERE id = $1 LIMIT 1', [updatedUser.roleId]);
+      if (roleLookup.length > 0) {
+        updatedUser.roleName = roleLookup[0].name;
+      }
+    }
+
+    res.json({ user: updatedUser });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   } finally {
@@ -448,7 +456,14 @@ router.get('/profile', authenticateJWT, async (req: AuthRequest, res: Response):
   try {
     const userId = req.user.id;
     pgClient = await getPgClient();
-    const { rows } = await pgClient.query('SELECT id, name, email, phone, bio, avatar FROM "User" WHERE id = $1 LIMIT 1', [userId]);
+    const { rows } = await pgClient.query(
+      `SELECT u.id, u.name, u.email, u.phone, u.bio, u.avatar, u."isSuperAdmin", r.name as "roleName"
+       FROM "User" u
+       LEFT JOIN "Role" r ON u."roleId" = r.id
+       WHERE u.id = $1
+       LIMIT 1`,
+      [userId]
+    );
     
     if (rows.length === 0) {
       res.status(404).json({ error: "User not found" });

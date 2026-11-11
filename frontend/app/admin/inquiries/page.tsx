@@ -167,8 +167,8 @@ export default function AdminInquiries() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold uppercase text-slate-900">{t("customerInquiries")}</h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("customerInquiries")}</h2>
+          <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">
             {language === "kh" ? "គ្រប់គ្រង និងឆ្លើយតបសំណួររបស់អតិថិជន" : "Respond to customer questions and machinery requests"}
           </p>
         </div>

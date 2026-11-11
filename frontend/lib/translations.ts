@@ -323,7 +323,21 @@ export const translations = {
  createNewTopLevel: "Create a new top-level category.",
  productImages: "Product Images",
  clickToUpload: "Click to upload images",
- imageUploadHint: "PNG, JPG up to 10MB each"
+ imageUploadHint: "PNG, JPG up to 10MB each",
+ personalInfo: "Personal Information",
+ updatePersonalDetails: "Update your personal details.",
+ adminName: "Admin Name",
+ phone: "Phone",
+ changePassword: "Change Password",
+ leaveBlankPassword: "Leave blank if you don't want to change your password.",
+ currentPassword: "Current Password",
+ newPasswordProfile: "New Password",
+ confirmPasswordProfile: "Confirm New Password",
+ updateProfile: "Update Profile",
+ errorLoadingData: "Error loading profile",
+ currentPasswordRequired: "Current password is required",
+ passwordsDoNotMatch: "Passwords do not match",
+ profileUpdated: "Profile updated successfully"
  },
  kh: {
  activity: "សកម្មភាព",
@@ -640,6 +654,20 @@ export const translations = {
  register: "ចុះឈ្មោះ",
  editCategory: "កែប្រែប្រភេទ",
  modifyCategoryInfo: "កែប្រែព័ត៌មានលម្អិតនៃប្រភេទនេះ។",
- createNewTopLevel: "បង្កើតប្រភេទចម្បងថ្មី។"
+ createNewTopLevel: "បង្កើតប្រភេទចម្បងថ្មី។",
+ personalInfo: "ព័ត៌មានផ្ទាល់ខ្លួន",
+ updatePersonalDetails: "ធ្វើបច្ចុប្បន្នភាពព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក។",
+ adminName: "ឈ្មោះអ្នកគ្រប់គ្រង",
+ phone: "លេខទូរស័ព្ទ",
+ changePassword: "ផ្លាស់ប្តូរពាក្យសម្ងាត់",
+ leaveBlankPassword: "ទុកចោលទទេ ប្រសិនបើអ្នកមិនចង់ផ្លាស់ប្តូរពាក្យសម្ងាត់ទេ។",
+ currentPassword: "ពាក្យសម្ងាត់បច្ចុប្បន្ន",
+ newPasswordProfile: "ពាក្យសម្ងាត់ថ្មី",
+ confirmPasswordProfile: "បញ្ជាក់ពាក្យសម្ងាត់ថ្មី",
+ updateProfile: "ធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូប",
+ errorLoadingData: "មានបញ្ហាក្នុងការផ្ទុកប្រវត្តិរូប",
+ currentPasswordRequired: "តម្រូវឱ្យបញ្ចូលពាក្យសម្ងាត់បច្ចុប្បន្ន",
+ passwordsDoNotMatch: "ពាក្យសម្ងាត់មិនត្រូវគ្នាទេ",
+ profileUpdated: "បានធ្វើបច្ចុប្បន្នភាពប្រវត្តិរូបដោយជោគជ័យ"
  }
 }

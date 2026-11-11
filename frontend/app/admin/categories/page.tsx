@@ -277,10 +277,10 @@ export default function AdminCategories() {
     <div>
       <Toaster position="top-right" />
       
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl font-bold uppercase text-slate-900">{t("categories")}</h2>
-          <p className="text-sm font-medium text-slate-500 mt-2">{t("manageMainCategories")}</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("categories")}</h2>
+          <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">{t("manageMainCategories")}</p>
         </div>
         <button
           onClick={openAddMainModal}
@@ -376,65 +376,67 @@ export default function AdminCategories() {
       {/* Add/Edit Modal */}
       {showAddModal && (
         <Portal>
-          <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowAddModal(false)}>
-            <div className="solid-card bg-white max-w-lg w-full max-h-[90vh] overflow-y-auto p-0 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
-              <div className="sticky top-0 bg-primary text-white border-b border-slate-200 px-5 py-3 z-10 flex justify-between items-center">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-[2px] z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowAddModal(false)}>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-0 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+              <div className="sticky top-0 bg-primary text-white border-b border-slate-200 px-5 py-4 z-10 flex justify-between items-start gap-3">
                 <div>
-                  <h2 className="text-base font-bold uppercase text-white">{editingItem ? t("editCategory") : t("addMainCategory")}</h2>
+                  <h2 className="text-base font-bold text-white">{editingItem ? t("editCategory") : t("addMainCategory")}</h2>
                   <p className="text-xs font-medium text-blue-100 mt-0.5">
                     {editingItem ? t("modifyCategoryInfo") : t("createNewTopLevel")}
                   </p>
                 </div>
                 <button 
+                  type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="p-2 bg-white border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                  className="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-colors shrink-0"
+                  aria-label="Close"
                 >
-                  <X className="w-5 h-5 text-slate-900" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-              <form onSubmit={handleSubmit} className="p-5 space-y-6">
+              <form onSubmit={handleSubmit} className="p-5 space-y-5">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 font-medium mb-2 ml-1">{t("categoryName")} (Khmer) *</label>
-                    <input type="text" required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none font-bold text-xs font-medium transition-all" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("categoryName")} (Khmer) *</label>
+                    <input type="text" required className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 font-medium mb-2 ml-1">{t("categoryName")} (English) *</label>
-                    <input type="text" required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none font-bold text-xs font-medium transition-all" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("categoryName")} (English) *</label>
+                    <input type="text" required className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 font-medium mb-2 ml-1">{t("description")} (Khmer)</label>
-                    <textarea rows={3} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none font-bold text-xs font-medium transition-all resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("description")} (Khmer)</label>
+                    <textarea rows={3} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 font-medium mb-2 ml-1">{t("description")} (English)</label>
-                    <textarea rows={3} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none font-bold text-xs font-medium transition-all resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("description")} (English)</label>
+                    <textarea rows={3} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 font-medium mb-2 ml-1">{t("sortOrder")}</label>
-                    <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none font-bold text-xs font-medium transition-all" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value)})} />
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("sortOrder")}</label>
+                    <input type="number" className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all" value={formData.sortOrder} onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value) || 0})} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 font-medium mb-2 ml-1">{t("categoryImage") || "Category Image"}</label>
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("categoryImage") || "Category Image"}</label>
                     {!previewImage && !formData.image ? (
-                      <label className="flex flex-col items-center justify-center w-full h-32 bg-slate-50 border-2 border-dashed border-slate-200 cursor-pointer hover:bg-white transition-all">
-                        <div className="flex flex-col items-center justify-center gap-3 text-slate-900">
-                          <ImageIcon className="w-8 h-8" />
-                          <span className="text-xs font-bold font-medium">{t("clickToSelectImage")}</span>
+                      <label className="flex flex-col items-center justify-center w-full h-32 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-white transition-all">
+                        <div className="flex flex-col items-center justify-center gap-2 text-slate-700">
+                          <ImageIcon className="w-7 h-7" />
+                          <span className="text-xs font-semibold">{t("clickToSelectImage")}</span>
                         </div>
                         <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                       </label>
                     ) : (
-                      <div className="relative group p-2 border border-slate-200 bg-slate-50">
+                      <div className="relative group p-2 border border-slate-200 rounded-xl bg-slate-50">
                         <img 
                           src={previewImage || formData.image} 
                           alt="Category" 
-                          className="w-full h-40 object-cover border border-slate-200" 
+                          className="w-full h-40 object-cover rounded-lg border border-slate-200" 
                         />
                         <button
                           type="button"
                           onClick={removeImage}
-                          className="absolute top-4 right-4 p-2 bg-white text-red-600 border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+                          className="absolute top-3.5 right-3.5 p-1.5 rounded-lg bg-white text-red-600 border border-slate-200 shadow-sm hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -442,22 +444,22 @@ export default function AdminCategories() {
                     )}
                   </div>
 
-                  <div className="flex gap-5 pt-2">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})} className="w-5 h-5 border border-slate-200 accent-primary" />
-                      <span className="text-xs font-bold text-slate-900 font-medium">{t("active")}</span>
+                  <div className="flex gap-5 pt-1">
+                    <label className="flex items-center gap-2.5 cursor-pointer group">
+                      <input type="checkbox" checked={formData.isActive} onChange={(e) => setFormData({...formData, isActive: e.target.checked})} className="w-4 h-4 border border-slate-300 rounded accent-primary" />
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">{t("active")}</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="w-5 h-5 border border-slate-200 accent-primary" />
-                      <span className="text-xs font-bold text-slate-900 font-medium">{t("featured")}</span>
+                    <label className="flex items-center gap-2.5 cursor-pointer group">
+                      <input type="checkbox" checked={formData.isFeatured} onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})} className="w-4 h-4 border border-slate-300 rounded accent-primary" />
+                      <span className="text-xs sm:text-sm font-semibold text-slate-800">{t("featured")}</span>
                     </label>
                   </div>
                 </div>
                 
-                <div className="flex gap-4 pt-6 border-t border-slate-200">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-6 py-4 border border-slate-200 bg-white font-bold text-xs text-slate-900 font-medium hover:bg-slate-50 hover:shadow-sm transition-all">{t("cancel")}</button>
-                  <button type="submit" disabled={uploadingImage} className="flex-1 btn-primary py-4 px-6 font-bold text-xs flex items-center justify-center gap-2">
-                    {uploadingImage ? <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" /> : (editingItem ? t("update") : t("create"))}
+                <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
+                  <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white font-semibold text-xs sm:text-sm text-slate-800 hover:bg-slate-100 transition-colors">{t("cancel")}</button>
+                  <button type="submit" disabled={uploadingImage} className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors disabled:opacity-60">
+                    {uploadingImage ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : (editingItem ? t("update") : t("create"))}
                   </button>
                 </div>
               </form>

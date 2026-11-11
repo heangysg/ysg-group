@@ -13,7 +13,6 @@ import {
   Package,
   X,
   FileSpreadsheet,
-  Star,
   AlertTriangle
 } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
@@ -32,7 +31,6 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [totalCount, setTotalCount] = useState(0)
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
@@ -89,7 +87,6 @@ export default function AdminProducts() {
     const { data, count } = await res.json()
     setProducts(data || [])
     if (count !== null && count !== undefined) {
-      setTotalCount(count)
       setTotalPages(Math.max(1, Math.ceil(count / pageSize)))
     }
   }, [search, selectedCategory, statusFilter, stockFilter])
@@ -264,12 +261,7 @@ export default function AdminProducts() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("products")}</h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-              {totalCount}
-            </span>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("products")}</h2>
           <p className="text-xs sm:text-sm font-medium text-slate-800 mt-1">{t("manageProductInventory")}</p>
         </div>
 
@@ -460,19 +452,12 @@ export default function AdminProducts() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <Link
-                              href={`/admin/products/edit/${product.slug}`}
-                              className="text-sm font-bold text-slate-900 hover:text-primary transition-colors truncate max-w-[260px]"
-                            >
-                              {isKh ? product.nameKhmer || product.name : product.name}
-                            </Link>
-                            {product.isFeatured && (
-                              <span title={isKh ? "ផលិតផលលេចធ្លោ" : "Featured"} className="text-amber-500 shrink-0">
-                                <Star className="w-3.5 h-3.5 fill-amber-400" />
-                              </span>
-                            )}
-                          </div>
+                          <Link
+                            href={`/admin/products/edit/${product.slug}`}
+                            className="block text-sm font-bold text-slate-900 hover:text-primary transition-colors truncate max-w-[260px]"
+                          >
+                            {isKh ? product.nameKhmer || product.name : product.name}
+                          </Link>
                           <p className="text-[11px] font-semibold text-slate-700 mt-0.5">
                             {product.sku ? `SKU: ${product.sku}` : `#${product.id.slice(0, 8)}`}
                             {product.brand ? ` • ${product.brand}` : ""}

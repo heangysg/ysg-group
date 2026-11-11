@@ -241,8 +241,8 @@ export default function AdminTrashProducts() {
  {/* Header section */}
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
  <div>
- <h1 className="text-2xl font-bold uppercase text-slate-900">{language === "kh" ? "ធុងសំរាម" : "Trash"}</h1>
- <p className="text-sm font-medium text-slate-500 mt-2">{language === "kh" ? "ទំនិញដែលបានលុប" : "Deleted products"}</p>
+ <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{language === "kh" ? "ធុងសំរាម" : "Trash"}</h1>
+ <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">{language === "kh" ? "ទំនិញដែលបានលុប" : "Deleted products"}</p>
  </div>
  <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full md:w-auto">
  <Link

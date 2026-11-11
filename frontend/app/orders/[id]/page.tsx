@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 import PublicLayout from '../../../components/PublicLayout'
 import { CheckCircle2, Clock, MapPin, Phone, User, Package, ArrowRight, ArrowLeft, CreditCard, Loader2, Receipt, Truck, XCircle, Printer } from 'lucide-react'
 import { useLanguage } from '../../../contexts/LanguageContext'
-import { generateBakongQR } from '../../../lib/bakong'
+import { generateBakongQR, checkBakongTransaction } from '../../../lib/bakong'
 import BakongQRModal from '../../../components/BakongQRModal'
 import PaymentSuccessModal from '../../../components/PaymentSuccessModal'
 import toast, { Toaster } from 'react-hot-toast'
@@ -92,9 +92,11 @@ export default function OrderDetailsPage() {
           if (isMounted) {
             setQrData(cachedQR)
             const isPaid = await checkBakongTransaction(cachedQR.md5, order.id)
-            if (isPaid) {
+            if (isPaid && isMounted) {
+              toast.success(language === "kh" ? "ការទូទាត់ប្រាក់ជោគជ័យ!" : "Payment confirmed!")
               setOrder((prev: any) => prev ? { ...prev, status: "paid" } : prev)
-            } else {
+              setShowSuccessModal(true)
+            } else if (isMounted) {
               setShowQR(true)
             }
           }

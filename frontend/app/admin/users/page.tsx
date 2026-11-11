@@ -167,10 +167,10 @@ export default function UsersManagementPage() {
  return (
  <div className="space-y-6 animate-in fade-in duration-500">
  
- <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+ <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
  <div>
- <h2 className="text-2xl font-bold uppercase text-slate-900">{t("adminManagement")}</h2>
- <p className="text-sm font-medium text-slate-500 mt-2">{t("createAndManageAdmins")}</p>
+ <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("adminManagement")}</h2>
+ <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">{t("createAndManageAdmins")}</p>
  </div>
  <button
  onClick={openAddModal}
@@ -240,20 +240,22 @@ export default function UsersManagementPage() {
  {/* Admin Modal */}
  {showModal && (
  <Portal>
- <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200">
- <div className="solid-card bg-white w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200">
+ <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-[2px] z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowModal(false)}>
+ <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
  {/* Header */}
- <div className="px-5 py-3 border-b border-slate-200 bg-primary text-white">
- <div className="flex justify-between items-center">
+ <div className="px-5 py-4 border-b border-slate-200 bg-primary text-white">
+ <div className="flex justify-between items-start gap-3">
  <div>
- <h2 className="text-base font-bold text-white font-medium">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
+ <h2 className="text-base font-bold text-white">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
  <p className="text-xs font-medium text-blue-100 mt-0.5">
  {isEditing ? t("updateCredentialsProfile") : t("createCredentialsNewAdmin")}
  </p>
  </div>
  <button 
+ type="button"
  onClick={() => setShowModal(false)} 
- className="p-2 bg-white text-slate-900 border border-slate-200 shadow-sm hover:translate-y-0.5 hover:shadow-none transition-all"
+ className="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-colors shrink-0"
+ aria-label="Close"
  >
  <X className="w-4 h-4" />
  </button>
@@ -261,21 +263,22 @@ export default function UsersManagementPage() {
 
  {/* Tabs */}
  {isEditing && (
- <div className="flex gap-4 mt-3">
+ <div className="flex gap-5 mt-3 -mb-4">
  {[
  { id: "details", label: t("details"), icon: User },
  { id: "history", label: t("backgroundHistory"), icon: History }
  ].map(tab => (
  <button
  key={tab.id}
+ type="button"
  onClick={() => setActiveTab(tab.id)}
- className={`flex items-center gap-2 pb-4 text-xs font-bold font-medium transition-all relative ${
- activeTab === tab.id ? "text-slate-900" : "text-slate-900/60 hover:text-slate-900"
+ className={`flex items-center gap-2 pb-3 text-xs font-semibold transition-all relative ${
+ activeTab === tab.id ? "text-white" : "text-blue-200 hover:text-white"
  }`}
  >
  <tab.icon className="w-4 h-4" />
  {tab.label}
- {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-900" />}
+ {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-full" />}
  </button>
  ))}
  </div>
@@ -283,57 +286,57 @@ export default function UsersManagementPage() {
  </div>
 
  {/* Body */}
- <div className="p-5 overflow-y-auto custom-scrollbar max-h-[60vh]">
+ <div className="p-5 overflow-y-auto custom-scrollbar max-h-[65vh]">
  {activeTab === "details" ? (
- <form onSubmit={handleSubmit} className="space-y-6">
+ <form onSubmit={handleSubmit} className="space-y-5">
  {error && (
- <div className="p-4 bg-red-50 border-2 border-red-900 shadow-sm flex items-center gap-3 text-red-900 text-xs font-bold font-medium">
- <AlertCircle className="w-5 h-5" />
+ <div className="p-3.5 bg-red-50 border border-red-300 rounded-xl flex items-center gap-2.5 text-red-800 text-xs font-semibold">
+ <AlertCircle className="w-4 h-4 shrink-0" />
  {error}
  </div>
  )}
  
- <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
- <div className="space-y-2">
- <label className="text-sm font-bold text-slate-900 font-medium ml-1">{t("fullName")}</label>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ <div className="space-y-1.5">
+ <label className="block text-xs font-bold text-slate-800">{t("fullName")}</label>
  <input
  type="text"
  required
  value={formData.name}
  onChange={e => setFormData({ ...formData, name: e.target.value })}
- className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
+ className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-medium text-xs sm:text-sm text-slate-900"
  />
  </div>
- <div className="space-y-2">
- <label className="text-sm font-bold text-slate-900 font-medium ml-1">{t("emailAddress")}</label>
+ <div className="space-y-1.5">
+ <label className="block text-xs font-bold text-slate-800">{t("emailAddress")}</label>
  <input
  type="email"
  required
  value={formData.email}
  onChange={e => setFormData({ ...formData, email: e.target.value })}
- className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
+ className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-medium text-xs sm:text-sm text-slate-900"
  />
  </div>
- <div className="space-y-2">
- <label className="text-sm font-bold text-slate-900 font-medium ml-1">
- {t("password")} {isEditing && <span className="text-[8px] opacity-60 italic">{t("leaveBlankToKeep")}</span>}
+ <div className="space-y-1.5">
+ <label className="block text-xs font-bold text-slate-800">
+ {t("password")} {isEditing && <span className="text-[11px] font-normal text-slate-600">{t("leaveBlankToKeep")}</span>}
  </label>
  <input
  type="password"
  required={!isEditing}
  value={formData.password}
  onChange={e => setFormData({ ...formData, password: e.target.value })}
- className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium"
+ className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-medium text-xs sm:text-sm text-slate-900"
  />
  </div>
-  <div className="space-y-2">
-  <label className="text-sm font-bold text-slate-900 font-medium ml-1">
+  <div className="space-y-1.5">
+  <label className="block text-xs font-bold text-slate-800">
   {language === 'kh' ? 'តួនាទី (Role)' : 'Role'}
   </label>
   <select
   value={formData.roleType}
   onChange={e => setFormData({ ...formData, roleType: e.target.value })}
-  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-xs text-slate-900 font-medium appearance-none"
+  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all font-medium text-xs sm:text-sm text-slate-900"
   >
   <option value="superadmin">{language === 'kh' ? 'អ្នកគ្រប់គ្រងជាន់ខ្ពស់ (Super Admin)' : 'Super Admin'}</option>
   <option value="admin">{language === 'kh' ? 'អ្នកគ្រប់គ្រង (Admin)' : 'Admin'}</option>
@@ -342,21 +345,21 @@ export default function UsersManagementPage() {
   </div>
  </div>
 
- <div className="pt-8 flex gap-6 border-t border-slate-200">
+ <div className="pt-4 flex items-center justify-end gap-2.5 border-t border-slate-200">
  <button
  type="button"
  onClick={() => setShowModal(false)}
- className="flex-1 py-4 px-6 bg-white border border-slate-200 text-slate-900 font-bold text-xs font-medium hover:bg-slate-50 hover:shadow-sm transition-all"
+ className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-semibold text-xs sm:text-sm hover:bg-slate-100 transition-colors"
  >
  {t("cancel")}
  </button>
  <button
  type="submit"
  disabled={saving}
- className="flex-1 btn-primary py-4 px-6 flex items-center justify-center gap-3 text-xs"
+ className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors disabled:opacity-60"
  >
- {saving ? <div className="w-5 h-5 border border-slate-200 border-t-transparent rounded-full animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
- {isEditing ? t("saveChanges") : t("addNewAdmin")}
+ {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+ <span>{isEditing ? t("saveChanges") : t("addNewAdmin")}</span>
  </button>
  </div>
  </form>

@@ -99,18 +99,18 @@ export default function ActivityPage() {
     <div className="space-y-6 animate-in fade-in duration-500 font-sans">
       
       {/* Header section matching new admin style */}
-      <div className="flex items-center gap-4 border-b border-slate-200 pb-6 mb-6">
+      <div className="flex items-center gap-4 border-b border-slate-200 pb-4 mb-5">
         <Link 
           href="/admin/dashboard"
-          className="p-2 bg-white border border-slate-200 text-slate-400 rounded-md hover:text-[#004691] hover:border-[#004691] transition-all shadow-sm"
+          className="p-2 bg-white border border-slate-200 text-slate-700 rounded-md hover:text-primary hover:border-primary transition-all shadow-sm"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-xl md:text-2xl font-bold uppercase text-[#004691] tracking-wide">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
             {t("viewAllActivity")}
           </h1>
-          <p className="text-sm font-semibold text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">
             {t("trackSystemUpdates") || "Track all system updates and interactions"}
           </p>
         </div>

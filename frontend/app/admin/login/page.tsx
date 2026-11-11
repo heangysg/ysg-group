@@ -48,7 +48,7 @@ export default function AdminLogin() {
           })
         } catch (e) { }
 
-        if (data.user?.roleName === "STAFF" && !data.user?.isSuperAdmin) {
+        if (String(data.user?.roleName || "").trim().toUpperCase() === "STAFF" && !data.user?.isSuperAdmin) {
          router.push("/admin/orders")
        } else {
          router.push("/admin/dashboard")

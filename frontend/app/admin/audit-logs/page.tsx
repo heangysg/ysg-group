@@ -94,10 +94,10 @@ export default function AuditLogsPage() {
 
  return (
  <div>
- <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+ <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
  <div>
- <h2 className="text-2xl font-bold uppercase text-slate-900">{t("auditLogs")}</h2>
- <p className="text-sm font-medium text-slate-500 mt-2">{t("trackActivities")}</p>
+ <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">{t("auditLogs")}</h2>
+ <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">{t("trackActivities")}</p>
  </div>
  </div>
 

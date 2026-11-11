@@ -58,13 +58,13 @@ export default function AdminCustomers() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-2xl font-bold uppercase text-slate-900 flex items-center gap-3">
-            <Users className="w-8 h-8 text-primary" />
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 flex items-center gap-3">
+            <Users className="w-7 h-7 text-primary" />
             {t("customers") || (language === 'kh' ? 'អតិថិជន' : 'Customers')}
           </h2>
-          <p className="text-sm font-medium text-slate-500 mt-2">
+          <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">
             {language === 'kh' ? 'គ្រប់គ្រងអតិថិជន និងប្រវត្តិការទិញរបស់ពួកគេ' : 'Manage customers and their purchase history'}
           </p>
         </div>

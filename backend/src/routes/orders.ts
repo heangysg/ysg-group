@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import { supabase } from '../lib/supabase';
 import { getPgClient } from '../lib/db';
+import { sendTelegramNotification } from '../services/telegram';
 
 const router = Router();
 
@@ -102,18 +103,10 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
       // Stock is deducted atomically in markOrderAsPaid once payment succeeds (not on unpaid pending checkout).
       
       // Dispatch Telegram Sales Notification Alert (Background)
-      const botToken = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_CHAT_ID;
-      if (botToken && chatId) {
-        const itemsText = validatedItems.map(i => `- ${i.name} (x${i.quantity}) - $${(i.price * i.quantity).toFixed(2)}`).join('\n');
-        const tgText = `🛍️ *ការបញ្ជាទិញថ្មី (NEW ORDER)* 🛍️\n\n*Order ID:* \`${newOrder.id}\`\n*Customer:* ${customerName}\n*Phone:* ${customerPhone}\n*Payment:* ${paymentMethod}\n*Total:* $${totalAmount.toFixed(2)}\n\n*Items:*\n${itemsText}`;
-        
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, text: tgText, parse_mode: 'Markdown' })
-        }).catch(err => console.error("Telegram Order Alert Error:", err));
-      }
+      const sanitizeMd = (val: unknown) => String(val || '').replace(/[*_`[\]]/g, '');
+      const itemsText = validatedItems.map(i => `- ${sanitizeMd(i.name)} (x${i.quantity}) - $${(i.price * i.quantity).toFixed(2)}`).join('\n');
+      const tgText = `🛍️ *ការបញ្ជាទិញថ្មី (NEW ORDER)* 🛍️\n\n*Order ID:* \`${newOrder.id}\`\n*Customer:* ${sanitizeMd(customerName)}\n*Phone:* ${sanitizeMd(customerPhone)}\n*Payment:* ${sanitizeMd(paymentMethod)}\n*Total:* $${totalAmount.toFixed(2)}\n\n*Items:*\n${itemsText}`;
+      sendTelegramNotification(tgText).catch(err => console.error("Telegram Order Alert Error:", err));
 
       res.json({ order: newOrder });
     } finally {

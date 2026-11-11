@@ -44,10 +44,14 @@ export default function BakongQRModal({
   const touchStartY = useRef<number>(0)
 
   const qrRef = useRef<HTMLDivElement>(null)
+  const hasSucceededRef = useRef(false)
   const merchantName = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_NAME || "Yeung Shi Group"
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      hasSucceededRef.current = false
+      return
+    }
 
     let initialTime = 300
     if (expiresAt) {
@@ -118,7 +122,10 @@ export default function BakongQRModal({
   }, [isOpen, md5, orderId, expiresAt])
 
   const handleSuccess = async () => {
+    if (hasSucceededRef.current) return
+    hasSucceededRef.current = true
     setIsChecking(true)
+    toast.success(language === "kh" ? "ការទូទាត់ប្រាក់ជោគជ័យ!" : "Payment confirmed!")
     try {
       if (onSuccess) {
         setTimeout(onSuccess, 500)
@@ -138,7 +145,6 @@ export default function BakongQRModal({
     try {
       const isPaid = await checkBakongTransaction(md5, orderId)
       if (isPaid) {
-        toast.success(language === "kh" ? "ការទូទាត់ប្រាក់ជោគជ័យ!" : "Payment confirmed!")
         handleSuccess()
       } else {
         toast(
