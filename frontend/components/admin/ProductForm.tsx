@@ -41,9 +41,8 @@ interface ProductFormProps {
 }
 
 function generateAutoSku(): string {
-  const timePart = Date.now().toString(36).slice(-4).toUpperCase()
-  const randPart = Math.random().toString(36).substring(2, 4).toUpperCase()
-  return `YSG-${timePart}${randPart}`
+  const digits = Math.floor(100000 + Math.random() * 900000);
+  return `YSG-${digits}`;
 }
 
 function buildProductSlug(name: string, existingSlug?: string): string {
@@ -390,7 +389,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
 
   const stockNum = parseInt(formData.stock || "0") || 0
   const inputCls =
-    "w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400"
+    "w-full h-10 px-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium text-slate-900 placeholder:text-slate-800"
 
   if (fetching) {
     return (
@@ -410,21 +409,15 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
           <button
             type="button"
             onClick={() => router.back()}
-            className="p-2.5 bg-white rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+            className="p-2.5 bg-white rounded-xl border border-slate-300 text-slate-800 hover:bg-slate-50 hover:text-slate-950 transition-colors shadow-sm"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                {mode === "create" ? t("addProduct") : t("editProduct") || "Edit Product"}
-              </h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                <Lock className="w-3 h-3 text-slate-500" />
-                {sku}
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-950 tracking-tight">
+              {mode === "create" ? t("addProduct") : t("editProduct") || "Edit Product"}
+            </h1>
+            <p className="text-xs sm:text-sm font-medium text-slate-700 mt-1">
               {mode === "create"
                 ? t("fillInDetails")
                 : t("modifyProductInfo") || "Update product details, pricing, stock & gallery"}
@@ -508,7 +501,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
                   )}
                 </label>
                 <div className="relative">
-                  <Tag className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Tag className="w-4 h-4 text-slate-700 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     className={`${inputCls} pl-10`}
@@ -518,7 +511,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
                   />
                 </div>
                 {!formData.name && formData.nameKhmer && !isTranslatingName && (
-                  <p className="text-[11px] text-slate-400 flex items-center gap-1">
+                  <p className="text-[11px] text-slate-700 flex items-center gap-1">
                     <Info className="w-3 h-3" /> {isKh ? "នឹងបំពេញជាភាសាអង់គ្លេសដោយស្វ័យប្រវត្តិ" : "Will auto-fill from Khmer input"}
                   </p>
                 )}
@@ -527,12 +520,12 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
               <div className="pt-2 border-t border-slate-100 space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-slate-400" />
+                    <FileText className="w-3.5 h-3.5 text-slate-700" />
                     {t("fullDescriptionKhmer")}
                   </label>
                   <textarea
                     rows={3}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400"
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-slate-900 placeholder:text-slate-800"
                     value={formData.descriptionKhmer}
                     onChange={(e) => setFormData({ ...formData, descriptionKhmer: e.target.value })}
                     placeholder="ពិពណ៌នាអំពីផលិតផល ជាភាសាខ្មែរ..."
@@ -550,7 +543,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
                   </label>
                   <textarea
                     rows={4}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-slate-900 placeholder:text-slate-400"
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-slate-900 placeholder:text-slate-800"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Detailed product description and features..."
@@ -574,12 +567,12 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
 
             <div className="p-5 space-y-4">
               <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 cursor-pointer hover:bg-slate-100 hover:border-primary/50 transition-colors">
-                <div className="flex flex-col items-center justify-center gap-2 text-slate-600">
-                  <UploadCloud className="w-8 h-8 text-slate-400" />
+                <div className="flex flex-col items-center justify-center gap-2 text-slate-800">
+                  <UploadCloud className="w-8 h-8 text-slate-700" />
                   <span className="text-xs sm:text-sm font-bold">
                     {t("clickToUpload") || "Click to upload product images"}
                   </span>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-700">
                     {isKh ? "អាចជ្រើសរើសរូបច្រើនសន្លឹក (PNG, JPG)" : "Upload multiple PNG or JPG images"}
                   </span>
                 </div>
@@ -641,18 +634,18 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
                   <span>SKU</span>
-                  <span className="text-[10px] font-semibold text-slate-400 normal-case">
+                  <span className="text-[10px] font-semibold text-slate-700 normal-case">
                     {isKh ? "បង្កើតស្វ័យប្រវត្តិ (មិនអាចកែ)" : "Auto-generated (Read-only)"}
                   </span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-700 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     readOnly
                     disabled
                     value={sku}
-                    className="w-full h-10 pl-10 pr-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 cursor-not-allowed select-all"
+                    className="w-full h-10 pl-10 pr-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 cursor-not-allowed select-all"
                   />
                 </div>
               </div>
@@ -692,7 +685,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">{t("priceUsd")}</label>
                 <div className="relative">
-                  <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <DollarSign className="w-4 h-4 text-slate-700 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="number"
                     min="0"
@@ -727,7 +720,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
                   </span>
                 </div>
                 <div className="relative">
-                  <Package className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Package className="w-4 h-4 text-slate-700 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="number"
                     min="0"
@@ -811,7 +804,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">{t("year")}</label>
                   <div className="relative">
-                    <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Calendar className="w-4 h-4 text-slate-700 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="number"
                       className={`${inputCls} pl-9`}

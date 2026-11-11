@@ -204,7 +204,7 @@ export default function AdminInventoryPage() {
             <Boxes className="w-7 h-7 text-primary" />
             {isKh ? "ការគ្រប់គ្រងស្តុកទំនិញ" : "Stock & Inventory Management"}
           </h1>
-          <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm font-medium text-slate-800 mt-1">
             {isKh
               ? "តាមដាន និងកែសម្រួលចំនួនស្តុកផលិតផលភ្លាមៗ (កាត់ស្តុកស្វ័យប្រវត្តិពេលបង់ប្រាក់រួច)"
               : "Monitor stock levels and restock products quickly (auto-deducted on paid orders)"}
@@ -241,48 +241,48 @@ export default function AdminInventoryPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ស្តុកសរុប (គ្រឿង)" : "Total Units"}
             </span>
             <Boxes className="w-4 h-4 text-primary" />
           </div>
           <p className="text-2xl font-black text-slate-900">{summary.totalUnits.toLocaleString()}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-1">
+          <p className="text-[11px] font-semibold text-slate-700 mt-1">
             {summary.totalSkus} SKU • {formatUsd(summary.totalValue, 0)}
           </p>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ស្តុកគ្រប់គ្រាន់ (>5)" : "In Stock (>5)"}
             </span>
             <PackageCheck className="w-4 h-4 text-emerald-600" />
           </div>
           <p className="text-2xl font-black text-emerald-600">{summary.healthyCount}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-1">{isKh ? "មុខទំនិញ" : "products"}</p>
+          <p className="text-[11px] font-semibold text-slate-700 mt-1">{isKh ? "មុខទំនិញ" : "products"}</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ស្តុកទាប (1-5)" : "Low Stock (1-5)"}
             </span>
             <AlertTriangle className="w-4 h-4 text-amber-500" />
           </div>
           <p className="text-2xl font-black text-amber-600">{summary.lowCount}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-1">{isKh ? "គួរបន្ថែមស្តុក" : "need restock"}</p>
+          <p className="text-[11px] font-semibold text-slate-700 mt-1">{isKh ? "គួរបន្ថែមស្តុក" : "need restock"}</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <span className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "អស់ស្តុក (0)" : "Out of Stock (0)"}
             </span>
             <PackageX className="w-4 h-4 text-red-600" />
           </div>
           <p className="text-2xl font-black text-red-600">{summary.outCount}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-1">{isKh ? "មិនមានក្នុងស្តុក" : "unavailable"}</p>
+          <p className="text-[11px] font-semibold text-slate-700 mt-1">{isKh ? "មិនមានក្នុងស្តុក" : "unavailable"}</p>
         </div>
       </div>
 
@@ -302,7 +302,7 @@ export default function AdminInventoryPage() {
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
                 tab === item.id
                   ? "bg-primary text-white border-primary shadow-sm"
-                  : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                  : "bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100"
               }`}
             >
               {item.label}
@@ -311,7 +311,7 @@ export default function AdminInventoryPage() {
         </div>
 
         <div className="relative w-full lg:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
           <input
             type="text"
             value={search}
@@ -322,7 +322,7 @@ export default function AdminInventoryPage() {
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-700 hover:text-red-600"
             >
               <X className="w-4 h-4" />
             </button>
@@ -352,7 +352,7 @@ export default function AdminInventoryPage() {
               <tbody className="divide-y divide-slate-100">
                 {filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-xs font-bold text-slate-400">
+                    <td colSpan={6} className="px-6 py-16 text-center text-xs font-bold text-slate-700">
                       {isKh ? "មិនមានទំនិញក្នុងបញ្ជីនេះទេ" : "No products match this stock filter"}
                     </td>
                   </tr>
@@ -371,7 +371,7 @@ export default function AdminInventoryPage() {
                               {p.thumbnail ? (
                                 <img src={p.thumbnail} alt={p.name} className="w-full h-full object-cover" />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                <div className="w-full h-full flex items-center justify-center text-slate-700">
                                   <Package className="w-5 h-5" />
                                 </div>
                               )}
@@ -380,11 +380,11 @@ export default function AdminInventoryPage() {
                               <p className="text-xs sm:text-sm font-bold text-slate-900 truncate max-w-[240px]">
                                 {isKh ? p.nameKhmer || p.name : p.name}
                               </p>
-                              <p className="text-[11px] text-slate-400 font-medium">{p.brand || "-"}</p>
+                              <p className="text-[11px] text-slate-700 font-medium">{p.brand || "-"}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 text-xs font-bold text-slate-600">
+                        <td className="px-5 py-3.5 text-xs font-bold text-slate-800">
                           {p.sku || `#${String(p.id).slice(0, 8)}`}
                         </td>
                         <td className="px-5 py-3.5 text-xs sm:text-sm font-bold text-slate-900">
@@ -447,7 +447,7 @@ export default function AdminInventoryPage() {
                             )}
                             <Link
                               href={`/admin/products/edit/${p.slug}`}
-                              className="p-2 bg-white text-slate-600 rounded-lg border border-slate-200 hover:border-primary hover:text-primary transition-all"
+                              className="p-2 bg-white text-slate-800 rounded-lg border border-slate-200 hover:border-primary hover:text-primary transition-all"
                               title="Edit Product"
                             >
                               <Edit className="w-4 h-4" />

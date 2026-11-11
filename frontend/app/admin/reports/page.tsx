@@ -107,7 +107,7 @@ export default function ReportsPage() {
 
   if (!data) {
     return (
-      <div className="p-8 text-center text-slate-500 font-bold">
+      <div className="p-8 text-center text-slate-800 font-bold">
         {isKh ? "រកមិនឃើញទិន្នន័យទេ" : "No data available"}
       </div>
     )
@@ -199,7 +199,7 @@ export default function ReportsPage() {
             <BarChart3 className="w-7 h-7 text-primary" />
             {isKh ? "របាយការណ៍លក់ និងស្តុកទំនិញ" : "Sales & Inventory Reports"}
           </h1>
-          <p className="text-xs sm:text-sm font-medium text-slate-500">
+          <p className="text-xs sm:text-sm font-medium text-slate-800">
             {isKh ? "វិភាគប្រាក់ចំណូលពិត វិធីទូទាត់ ទំនិញលក់ដាច់ និងសុខភាពស្តុក" : "Paid revenue analytics, payment breakdown, top products & stock health"}
           </p>
         </div>
@@ -214,7 +214,7 @@ export default function ReportsPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   range === opt.value
                     ? "bg-primary text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    : "text-slate-800 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
                 {isKh ? opt.labelKh : opt.labelEn}
@@ -243,13 +243,13 @@ export default function ReportsPage() {
             {renderGrowth(stats.revenueGrowth)}
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ប្រាក់ចំណូលបានបង់" : "Net Paid Revenue"}
             </p>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
               {formatUsd(stats.revenue, 2)}
             </h3>
-            <p className="text-[11px] font-semibold text-slate-400 mt-1">
+            <p className="text-[11px] font-semibold text-slate-700 mt-1">
               {isKh ? "សរុបគ្រប់ពេល" : "All-time"}: {formatUsd(stats.allTimeRevenue, 0)}
             </p>
           </div>
@@ -263,13 +263,13 @@ export default function ReportsPage() {
             {renderGrowth(stats.ordersGrowth)}
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ការបញ្ជាទិញបានបង់ & មធ្យម" : "Paid Orders & AOV"}
             </p>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
               {stats.orders || 0}
             </h3>
-            <p className="text-[11px] font-semibold text-slate-400 mt-1">
+            <p className="text-[11px] font-semibold text-slate-700 mt-1">
               {isKh ? "តម្លៃមធ្យម/Order" : "Avg. Order Value"}: {formatUsd(stats.aov, 2)}
             </p>
           </div>
@@ -282,13 +282,13 @@ export default function ReportsPage() {
             </div>
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ស្តុកទំនិញពិតសរុប" : "Total Inventory Units"}
             </p>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
               {(stock.totalUnits || 0).toLocaleString()}
             </h3>
-            <p className="text-[11px] font-semibold text-slate-400 mt-1">
+            <p className="text-[11px] font-semibold text-slate-700 mt-1">
               {isKh ? "តម្លៃស្តុក" : "Stock Value"}: {formatUsd(stock.inventoryValue, 0)} ({stock.total || 0} SKU)
             </p>
           </div>
@@ -306,13 +306,13 @@ export default function ReportsPage() {
             )}
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-500">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-slate-800">
               {isKh ? "ទំនិញជិតអស់ / អស់ស្តុក" : "Restock Alerts"}
             </p>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
               {(stock.lowStock || 0) + (stock.outOfStock || 0)}
             </h3>
-            <p className="text-[11px] font-semibold text-slate-400 mt-1">
+            <p className="text-[11px] font-semibold text-slate-700 mt-1">
               {isKh ? "ស្តុកល្អ" : "Healthy"}: {stock.inStock || 0} • {isKh ? "ទាប" : "Low"}: {stock.lowStock || 0}
             </p>
           </div>
@@ -378,7 +378,7 @@ export default function ReportsPage() {
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-slate-400 font-bold uppercase tracking-wider text-xs">
+                <div className="text-slate-700 font-bold uppercase tracking-wider text-xs">
                   {isKh ? "គ្មានទិន្នន័យស្តុក" : "No Stock Data"}
                 </div>
               )}
@@ -413,7 +413,7 @@ export default function ReportsPage() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-[260px] flex items-center justify-center text-xs font-bold text-slate-400">
+              <div className="h-[260px] flex items-center justify-center text-xs font-bold text-slate-700">
                 {isKh ? "មិនទាន់មានការលក់តាមប្រភេទក្នុងរយៈពេលនេះទេ" : "No category sales in this period"}
               </div>
             )}
@@ -429,7 +429,7 @@ export default function ReportsPage() {
           </div>
           <div className="p-6 space-y-4 flex-1">
             {paymentMethods.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400 py-12">
+              <div className="h-full flex items-center justify-center text-xs font-bold text-slate-700 py-12">
                 {isKh ? "មិនទាន់មានការទូទាត់ក្នុងរយៈពេលនេះទេ" : "No paid orders in this period"}
               </div>
             ) : (
@@ -440,13 +440,13 @@ export default function ReportsPage() {
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold text-slate-800">{pm.method}</span>
                       <span className="font-bold text-slate-900">
-                        {formatUsd(pm.revenue, 2)} <span className="text-slate-400 font-semibold">({pm.orders})</span>
+                        {formatUsd(pm.revenue, 2)} <span className="text-slate-700 font-semibold">({pm.orders})</span>
                       </span>
                     </div>
                     <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                       <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${pct}%` }} />
                     </div>
-                    <p className="text-[11px] font-semibold text-slate-400 text-right">{pct}%</p>
+                    <p className="text-[11px] font-semibold text-slate-700 text-right">{pct}%</p>
                   </div>
                 )
               })
@@ -467,20 +467,20 @@ export default function ReportsPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">#</th>
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">{isKh ? "ឈ្មោះទំនិញ" : "Product Name"}</th>
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap">{isKh ? "តម្លៃ" : "Price"}</th>
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap text-right">{isKh ? "ចំនួនលក់ (គ្រឿង)" : "Units Sold"}</th>
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap text-right">{isKh ? "Orders" : "Orders"}</th>
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap text-right">{isKh ? "ស្តុកនៅសល់" : "Stock"}</th>
-                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 whitespace-nowrap text-right">{isKh ? "ប្រាក់ចំណូលពិត" : "Item Revenue"}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap">#</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap">{isKh ? "ឈ្មោះទំនិញ" : "Product Name"}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap">{isKh ? "តម្លៃ" : "Price"}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap text-right">{isKh ? "ចំនួនលក់ (គ្រឿង)" : "Units Sold"}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap text-right">{isKh ? "Orders" : "Orders"}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap text-right">{isKh ? "ស្តុកនៅសល់" : "Stock"}</th>
+                <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 whitespace-nowrap text-right">{isKh ? "ប្រាក់ចំណូលពិត" : "Item Revenue"}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {(data.topProducts || []).map((product: any, index: number) => (
                 <tr key={product.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="p-4">
-                    <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold">
+                    <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center text-xs font-bold">
                       {index + 1}
                     </span>
                   </td>
@@ -488,7 +488,7 @@ export default function ReportsPage() {
                     <Link href={`/admin/products/edit/${product.slug}`} className="font-bold text-slate-900 hover:text-primary transition-colors">
                       {isKh && product.nameKhmer ? product.nameKhmer : product.name}
                     </Link>
-                    <p className="text-[11px] font-medium text-slate-400 mt-0.5">{product.id.substring(0, 8)}</p>
+                    <p className="text-[11px] font-medium text-slate-700 mt-0.5">{product.id.substring(0, 8)}</p>
                   </td>
                   <td className="p-4 font-bold text-slate-700">{formatUsd(product.price, 2)}</td>
                   <td className="p-4 text-right font-bold text-slate-900">{product.unitsSold}</td>
@@ -515,7 +515,7 @@ export default function ReportsPage() {
               ))}
               {(!data.topProducts || data.topProducts.length === 0) && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400 font-bold text-xs uppercase tracking-wider">
+                  <td colSpan={7} className="p-8 text-center text-slate-700 font-bold text-xs uppercase tracking-wider">
                     {isKh ? "មិនទាន់មានទំនិញលក់ដាច់ក្នុងរយៈពេលនេះទេ" : "No product sales in this period"}
                   </td>
                 </tr>
@@ -538,25 +538,25 @@ export default function ReportsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500">#</th>
-                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500">{isKh ? "អតិថិជន" : "Customer"}</th>
-                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500">{isKh ? "ទំនាក់ទំនង" : "Contact"}</th>
-                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 text-right">{isKh ? "Orders" : "Orders"}</th>
-                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-500 text-right">{isKh ? "ចំណាយសរុប" : "Total Spent"}</th>
+                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800">#</th>
+                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800">{isKh ? "អតិថិជន" : "Customer"}</th>
+                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800">{isKh ? "ទំនាក់ទំនង" : "Contact"}</th>
+                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 text-right">{isKh ? "Orders" : "Orders"}</th>
+                  <th className="p-4 text-[11px] uppercase tracking-wider font-bold text-slate-800 text-right">{isKh ? "ចំណាយសរុប" : "Total Spent"}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {(data.topCustomers || []).map((customer: any, index: number) => (
                   <tr key={index} className="hover:bg-slate-50/70 transition-colors">
                     <td className="p-4">
-                      <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-bold">
+                      <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-800 flex items-center justify-center text-xs font-bold">
                         {index + 1}
                       </span>
                     </td>
                     <td className="p-4 font-bold text-slate-900">{customer.customerName}</td>
                     <td className="p-4">
                       <p className="font-medium text-slate-700 text-xs">{customer.customerEmail || "-"}</p>
-                      <p className="text-[11px] text-slate-500">{customer.customerPhone}</p>
+                      <p className="text-[11px] text-slate-800">{customer.customerPhone}</p>
                     </td>
                     <td className="p-4 text-right">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
@@ -568,7 +568,7 @@ export default function ReportsPage() {
                 ))}
                 {(!data.topCustomers || data.topCustomers.length === 0) && (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-slate-400 font-bold text-xs uppercase tracking-wider">
+                    <td colSpan={5} className="p-8 text-center text-slate-700 font-bold text-xs uppercase tracking-wider">
                       {isKh ? "រកមិនឃើញទិន្នន័យអតិថិជនទេ" : "No customer orders in this period"}
                     </td>
                   </tr>
@@ -602,7 +602,7 @@ export default function ReportsPage() {
                     <p className="text-xs font-bold text-slate-900 truncate">
                       {isKh && p.nameKhmer ? p.nameKhmer : p.name}
                     </p>
-                    <p className="text-[11px] text-slate-400 font-medium">
+                    <p className="text-[11px] text-slate-700 font-medium">
                       {p.sku || p.slug} • {formatUsd(p.price, 2)}
                     </p>
                   </div>

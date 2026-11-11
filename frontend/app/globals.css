@@ -86,20 +86,26 @@ html.khmer-mode h4,
 html.khmer-mode h5,
 html.khmer-mode h6 {
   font-family: var(--font-kantumruy), system-ui, sans-serif !important;
-  font-weight: 500 !important;
+  font-weight: 700 !important;
   letter-spacing: normal !important;
 }
 
-html.khmer-mode .font-normal,
-html.khmer-mode .font-medium {
+html.khmer-mode .font-normal {
   font-weight: 400 !important;
 }
 
-html.khmer-mode .font-semibold,
+html.khmer-mode .font-medium {
+  font-weight: 500 !important;
+}
+
+html.khmer-mode .font-semibold {
+  font-weight: 600 !important;
+}
+
 html.khmer-mode .font-bold,
 html.khmer-mode .font-extrabold,
 html.khmer-mode .font-black {
-  font-weight: 500 !important;
+  font-weight: 700 !important;
 }
 
 /* 🔢 Professional E-Commerce Numeral Font for Prices, Quantities & Numbers (English & Khmer Mode) */

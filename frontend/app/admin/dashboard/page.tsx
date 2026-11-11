@@ -256,7 +256,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
             {isKh ? "ផ្ទាំងគ្រប់គ្រង" : "Dashboard"}
           </h1>
-          <p className="text-xs sm:text-sm font-medium text-slate-500">
+          <p className="text-xs sm:text-sm font-medium text-slate-800">
             {isKh ? "ទិដ្ឋភាពទូទៅនៃការលក់ ស្តុក និងសកម្មភាពជាក់ស្តែង" : "Real-time sales performance, inventory alerts & store activity"}
           </p>
         </div>
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   range === opt.value
                     ? "bg-primary text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    : "text-slate-800 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
                 {isKh ? opt.labelKh : opt.labelEn}
@@ -311,9 +311,9 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1">{stat.title}</p>
+              <p className="text-[11px] uppercase tracking-wider font-bold text-slate-800 mb-1">{stat.title}</p>
               <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">{stat.value}</h3>
-              <p className="text-[11px] font-semibold text-slate-400 mt-1">{stat.sub}</p>
+              <p className="text-[11px] font-semibold text-slate-700 mt-1">{stat.sub}</p>
             </div>
           </Link>
         ))}
@@ -367,7 +367,7 @@ export default function AdminDashboard() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-xs font-medium text-slate-400">
+              <div className="h-full flex items-center justify-center text-xs font-medium text-slate-700">
                 {isKh ? "មិនទាន់មានទិន្នន័យចំណូលទេ" : "No revenue data in this period"}
               </div>
             )}
@@ -418,7 +418,7 @@ export default function AdminDashboard() {
                 </div>
               </>
             ) : (
-              <div className="h-56 flex items-center justify-center text-xs font-medium text-slate-400">
+              <div className="h-56 flex items-center justify-center text-xs font-medium text-slate-700">
                 {isKh ? "មិនទាន់មានការបញ្ជាទិញទេ" : "No order data in this period"}
               </div>
             )}
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-slate-100">
                 {recentOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-5 py-12 text-center text-xs font-medium text-slate-400">
+                    <td colSpan={5} className="px-5 py-12 text-center text-xs font-medium text-slate-700">
                       {isKh ? "មិនទាន់មានការបញ្ជាទិញដែលបានបញ្ជាក់ទេ" : "No confirmed orders yet"}
                     </td>
                   </tr>
@@ -465,13 +465,13 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-5 py-3.5">
                         <p className="text-xs font-bold text-slate-900">{order.customerName || t("walkInCustomer")}</p>
-                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        <p className="text-[11px] text-slate-800 font-medium mt-0.5">
                           {new Date(order.createdAt).toLocaleDateString(isKh ? "km-KH" : "en-US")}
                         </p>
                       </td>
                       <td className="px-5 py-3.5">
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
-                          <CreditCard className="w-3 h-3 text-slate-500" />
+                          <CreditCard className="w-3 h-3 text-slate-800" />
                           {order.paymentMethod || "Bakong"}
                         </span>
                       </td>
@@ -519,7 +519,7 @@ export default function AdminDashboard() {
                       <p className="text-xs font-bold text-slate-900 truncate">
                         {isKh && prod.nameKhmer ? prod.nameKhmer : prod.name}
                       </p>
-                      <p className="text-[10px] text-slate-400 font-medium">{prod.sku || prod.slug}</p>
+                      <p className="text-[10px] text-slate-700 font-medium">{prod.sku || prod.slug}</p>
                     </div>
                     <span
                       className={`shrink-0 px-2 py-0.5 rounded-full text-[11px] font-bold ${
@@ -543,7 +543,7 @@ export default function AdminDashboard() {
             </div>
             <div className="p-4 divide-y divide-slate-100 flex-1">
               {recentActivity.length === 0 ? (
-                <div className="py-8 text-center text-xs font-medium text-slate-400">
+                <div className="py-8 text-center text-xs font-medium text-slate-700">
                   {t("noActivityFound") || (isKh ? "មិនទាន់មានសកម្មភាពទេ" : "No recent activity")}
                 </div>
               ) : (
@@ -564,8 +564,8 @@ export default function AdminDashboard() {
                       <p className="text-xs font-bold text-slate-900 truncate group-hover:text-primary transition-colors">
                         {item.title}
                       </p>
-                      <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{item.subtitle}</p>
-                      <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-400 font-medium">
+                      <p className="text-[11px] text-slate-800 font-medium truncate mt-0.5">{item.subtitle}</p>
+                      <div className="flex items-center gap-1 mt-1 text-[10px] text-slate-700 font-medium">
                         <Clock className="w-3 h-3" />
                         <span>{item.createdAt.toLocaleString(isKh ? "km-KH" : "en-US")}</span>
                       </div>

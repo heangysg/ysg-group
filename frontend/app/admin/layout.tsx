@@ -429,7 +429,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors ${
                     hasActiveChild
                       ? "text-primary bg-blue-50/70"
-                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                      : "text-slate-800 hover:text-slate-800 hover:bg-slate-50"
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -455,10 +455,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold transition-all rounded-lg ${
                             isActive
                               ? "bg-primary text-white shadow-sm"
-                              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                              : "text-slate-800 hover:text-slate-900 hover:bg-slate-100/70"
                           }`}
                         >
-                          <item.icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`} />
+                          <item.icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-800"}`} />
                           <span className="truncate">{item.name}</span>
                         </Link>
                       )
@@ -494,7 +494,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
  </button>
  <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
- <div className={`hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
+ <div className={`hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-700 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
  <Link href={isStaff ? "/admin/orders" : "/admin/dashboard"} className="hover:text-primary transition-colors">
  {isSuperAdmin ? t("superadmin") : isStaff ? (language === "kh" ? "បុគ្គលិក" : "Staff") : t("admin")}
  </Link>
@@ -522,7 +522,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
  {/* Quick Navigation Search Bar */}
  <div className="hidden xl:flex relative group max-w-xs w-full ml-4" ref={searchRef}>
- <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+ <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700 group-focus-within:text-primary transition-colors" />
  <input
  type="text"
  value={search}
@@ -539,7 +539,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  }
  }}
  placeholder={t("search") + "..."}
- className="w-full pl-11 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-primary transition-all text-xs font-bold font-medium placeholder:text-slate-400"
+ className="w-full pl-11 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-primary transition-all text-xs font-bold font-medium placeholder:text-slate-800"
  />
  {search && (
  <button
@@ -573,7 +573,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  ))}
  </div>
  ) : (
- <div className="px-4 py-3 text-xs text-slate-400 font-medium">
+ <div className="px-4 py-3 text-xs text-slate-700 font-medium">
  {language === "kh" ? "រកមិនឃើញទំព័រទេ" : "No matching section"}
  </div>
  )}
@@ -643,12 +643,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </div>
  <div className="flex-1 min-w-0">
  <p className="text-xs font-medium text-slate-900 truncate">{t(note.titleKey || note.title)}</p>
- <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">
+ <p className="text-xs text-slate-800 mt-0.5 line-clamp-2 leading-relaxed">
  {note.type === 'order'
  ? `${t("order")} #${note.orderId} - $${note.amount}`
  : (note.rawMessage?.slice(0, 50) + (note.rawMessage?.length > 50 ? '...' : ''))}
  </p>
- <p className="text-[10px] text-slate-400 mt-1 font-medium">{note.time}</p>
+ <p className="text-[10px] text-slate-700 mt-1 font-medium">{note.time}</p>
  </div>
  {isUnread && <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
  </Link>
@@ -660,7 +660,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  <div className="w-12 h-12 bg-slate-50 rounded-md flex items-center justify-center mx-auto mb-3">
  <Bell className="w-6 h-6 text-slate-300" />
  </div>
- <p className="text-xs font-medium text-slate-400">{t("noNewNotifications")}</p>
+ <p className="text-xs font-medium text-slate-700">{t("noNewNotifications")}</p>
  </div>
  )}
  </div>
@@ -690,7 +690,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </div>
  <div className="hidden md:block text-left">
  <p className="text-xs font-bold text-slate-900 leading-none uppercase tracking-wider">{adminName}</p>
- <p className="text-xs font-bold text-slate-500 mt-1 font-medium">
+ <p className="text-xs font-bold text-slate-800 mt-1 font-medium">
  {isSuperAdmin ? t("superadmin") : isStaff ? (language === "kh" ? "បុគ្គលិក" : "Staff") : t("admin")}
  </p>
  </div>
@@ -757,7 +757,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="text-sm font-medium text-slate-400 font-medium ml-1">{t("fullName")}</label>
+                    <label className="text-sm font-medium text-slate-700 font-medium ml-1">{t("fullName")}</label>
                     <input
                       type="text"
                       value={adminName}
@@ -769,7 +769,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                 {/* Bio Section */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-400 font-medium ml-1">{t("backgroundHistory")}</label>
+                  <label className="text-sm font-medium text-slate-700 font-medium ml-1">{t("backgroundHistory")}</label>
                   <textarea
                     value={adminBio}
                     onChange={(e) => setAdminBio(e.target.value)}

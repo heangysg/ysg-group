@@ -270,7 +270,7 @@ export default function AdminProducts() {
               {totalCount}
             </span>
           </div>
-          <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">{t("manageProductInventory")}</p>
+          <p className="text-xs sm:text-sm font-medium text-slate-800 mt-1">{t("manageProductInventory")}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
@@ -343,7 +343,7 @@ export default function AdminProducts() {
       {/* Filters bar */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col lg:flex-row gap-3 items-center">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
           <input
             type="text"
             placeholder={isKh ? "ស្វែងរកតាម ឈ្មោះ ម៉ាក ម៉ូដែល ឬ SKU..." : "Search by name, brand, model, or SKU..."}
@@ -354,7 +354,7 @@ export default function AdminProducts() {
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-700 hover:text-red-600 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -363,7 +363,7 @@ export default function AdminProducts() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full lg:w-auto">
           <div className="relative w-full lg:w-44">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-700" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
@@ -407,7 +407,7 @@ export default function AdminProducts() {
         {loading ? (
           <div className="p-20 flex flex-col items-center justify-center">
             <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-4" />
-            <p className="text-slate-500 font-bold text-xs">{t("loading")}</p>
+            <p className="text-slate-800 font-bold text-xs">{t("loading")}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -454,7 +454,7 @@ export default function AdminProducts() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                            <div className="w-full h-full flex items-center justify-center text-slate-700">
                               <Package className="w-6 h-6" />
                             </div>
                           )}
@@ -473,7 +473,7 @@ export default function AdminProducts() {
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+                          <p className="text-[11px] font-semibold text-slate-700 mt-0.5">
                             {product.sku ? `SKU: ${product.sku}` : `#${product.id.slice(0, 8)}`}
                             {product.brand ? ` • ${product.brand}` : ""}
                           </p>
@@ -509,7 +509,7 @@ export default function AdminProducts() {
                               }`}
                             />
                           </button>
-                          <span className={`text-[11px] font-bold ${product.isPublished !== false ? "text-primary" : "text-slate-400"}`}>
+                          <span className={`text-[11px] font-bold ${product.isPublished !== false ? "text-primary" : "text-slate-700"}`}>
                             {product.isPublished !== false ? (isKh ? "បានផ្សព្វផ្សាយ" : "Published") : (isKh ? "បានលាក់" : "Hidden")}
                           </span>
                         </div>
@@ -520,7 +520,7 @@ export default function AdminProducts() {
                         <Link
                           href={`/products/${product.slug}`}
                           target="_blank"
-                          className="p-2 bg-white text-slate-600 rounded-lg border border-slate-200 hover:border-slate-300 hover:text-slate-900 transition-all"
+                          className="p-2 bg-white text-slate-800 rounded-lg border border-slate-200 hover:border-slate-300 hover:text-slate-900 transition-all"
                           title="View on site"
                         >
                           <Eye className="w-4 h-4" />
@@ -548,7 +548,7 @@ export default function AdminProducts() {
                     <td colSpan={6} className="py-16 text-center">
                       <div className="flex flex-col items-center">
                         <Package className="w-12 h-12 text-slate-200 mb-3" />
-                        <p className="text-slate-400 font-bold text-sm">
+                        <p className="text-slate-700 font-bold text-sm">
                           {isKh ? "រកមិនឃើញផលិតផលទេ" : "No products found"}
                         </p>
                       </div>
@@ -595,7 +595,7 @@ export default function AdminProducts() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">{isKh ? "លុបផលិតផល" : "Delete Product"}</h3>
-                  <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                  <p className="text-sm text-slate-800 mt-1 leading-relaxed">
                     {isKh ? (
                       <>តើអ្នកប្រាកដថាចង់លុប <strong>"{deleteConfirm.name}"</strong> មែនទេ? ផលិតផលនេះនឹងត្រូវបានផ្លាស់ទីទៅធុងសំរាម។</>
                     ) : (
@@ -634,7 +634,7 @@ export default function AdminProducts() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">{isKh ? "លុបផលិតផលច្រើន" : "Bulk Delete Products"}</h3>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <p className="text-sm text-slate-800 mt-1">
                     {isKh
                       ? `តើអ្នកប្រាកដថាចង់ផ្លាស់ទី ${selectedProducts.length} ផលិតផលទៅធុងសំរាមមែនទេ?`
                       : `Move ${selectedProducts.length} selected products to trash?`}

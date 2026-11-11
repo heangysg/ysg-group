@@ -133,7 +133,7 @@ export default function AdminOrders() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mb-4"></div>
-        <p className="text-slate-400 font-medium text-xs">Loading Transactions...</p>
+        <p className="text-slate-700 font-medium text-xs">Loading Transactions...</p>
       </div>
     )
   }
@@ -149,11 +149,11 @@ export default function AdminOrders() {
               {totalCount}
             </span>
           </div>
-          <p className="text-xs sm:text-sm font-medium text-slate-500 mt-1">{t("manageOrders")}</p>
+          <p className="text-xs sm:text-sm font-medium text-slate-800 mt-1">{t("manageOrders")}</p>
         </div>
 
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-700" />
           <input
             type="text"
             placeholder={isKh ? "ស្វែងរកតាម លេខកូដ ឈ្មោះ ឬ ទូរស័ព្ទ..." : "Search ID, name, phone, email..."}
@@ -164,7 +164,7 @@ export default function AdminOrders() {
           {search && (
             <button
               onClick={() => handleSearchChange("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-700 hover:text-red-600 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -182,7 +182,7 @@ export default function AdminOrders() {
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
               statusFilter === tab.id
                 ? "bg-primary text-white border-primary shadow-sm"
-                : "bg-white text-slate-600 border-slate-200 hover:border-primary/40 hover:text-slate-900"
+                : "bg-white text-slate-800 border-slate-200 hover:border-primary/40 hover:text-slate-900"
             }`}
           >
             {isKh ? tab.labelKh : tab.labelEn}
@@ -208,7 +208,7 @@ export default function AdminOrders() {
             <tbody className="divide-y divide-slate-100">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-16 text-center font-bold text-slate-400 text-xs sm:text-sm">
+                  <td colSpan={7} className="px-6 py-16 text-center font-bold text-slate-700 text-xs sm:text-sm">
                     {isKh ? "មិនមានការបញ្ជាទិញទេ" : "No orders found"}
                   </td>
                 </tr>
@@ -224,15 +224,15 @@ export default function AdminOrders() {
                     </td>
                     <td className="px-5 py-3.5">
                       <p className="text-xs sm:text-sm font-bold text-slate-900">{order.customerName || "Customer"}</p>
-                      <p className="text-[11px] text-slate-500 font-medium">{order.customerPhone || order.customerEmail || "-"}</p>
+                      <p className="text-[11px] text-slate-800 font-medium">{order.customerPhone || order.customerEmail || "-"}</p>
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">
-                        <CreditCard className="w-3 h-3 text-slate-500" />
+                        <CreditCard className="w-3 h-3 text-slate-800" />
                         {order.paymentMethod || "Bakong"}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-xs sm:text-sm font-medium text-slate-600">
+                    <td className="px-5 py-3.5 text-xs sm:text-sm font-medium text-slate-800">
                       {new Date(order.createdAt).toLocaleDateString(isKh ? "km-KH" : "en-US")}
                     </td>
                     <td className="px-5 py-3.5 font-black text-slate-900 text-xs sm:text-sm">
@@ -299,7 +299,7 @@ export default function AdminOrders() {
                       <h2 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 leading-snug">
                         {t("orderId")} #{String(selectedOrder.id).slice(0, 8)}
                       </h2>
-                      <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                      <p className="text-xs text-slate-800 mt-0.5 font-medium">
                         {new Date(selectedOrder.createdAt).toLocaleString()}
                       </p>
                     </div>
@@ -317,9 +317,9 @@ export default function AdminOrders() {
                       onClick={() => window.open(`/orders/${selectedOrder.id}/invoice`, "_blank")}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all cursor-pointer whitespace-nowrap rounded-lg"
                     >
-                      <Printer className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                      <Printer className="w-3.5 h-3.5 text-slate-800 shrink-0" />
                       <span>{isKh ? "វិក្កយបត្រ (Invoice)" : "Print Invoice"}</span>
-                      <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+                      <ExternalLink className="w-3 h-3 text-slate-700 shrink-0" />
                     </button>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${getOrderStatusBadgeClass(selectedOrder.status)}`}>
                       {getOrderStatusLabel(selectedOrder.status || "pending", isKh, t)}
@@ -330,28 +330,28 @@ export default function AdminOrders() {
                 {/* Customer & Shipping Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 mb-5">
                   <div className="space-y-2.5 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/80">
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t("customerInfo")}</h3>
+                    <h3 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">{t("customerInfo")}</h3>
                     <div className="space-y-1.5 text-xs sm:text-sm">
                       <div className="flex items-center gap-2 text-slate-900">
-                        <User className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <User className="w-3.5 h-3.5 text-slate-800 shrink-0" />
                         <span className="font-bold text-slate-900 break-words">{selectedOrder.customerName}</span>
                       </div>
                       <div className="flex items-center gap-2 text-slate-900">
-                        <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <Mail className="w-3.5 h-3.5 text-slate-800 shrink-0" />
                         <span className="font-medium break-all text-slate-700">{selectedOrder.customerEmail || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-2 text-slate-900">
-                        <Phone className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                        <Phone className="w-3.5 h-3.5 text-slate-800 shrink-0" />
                         <span className="font-medium text-slate-700">{selectedOrder.customerPhone || "N/A"}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2.5 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/80">
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t("shippingAddress")}</h3>
+                    <h3 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">{t("shippingAddress")}</h3>
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2 text-slate-900 text-xs sm:text-sm">
-                        <MapPin className="w-3.5 h-3.5 text-slate-500 mt-0.5 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-slate-800 mt-0.5 shrink-0" />
                         <span className="font-medium text-slate-800 leading-relaxed break-words">
                           {selectedOrder.address || "Local Pickup / Address not provided"}
                         </span>
@@ -373,7 +373,7 @@ export default function AdminOrders() {
 
                 {/* Order Items */}
                 <div className="space-y-2.5">
-                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{t("orderItems")}</h3>
+                  <h3 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">{t("orderItems")}</h3>
                   <div className="space-y-2">
                     {selectedOrder.items?.map((item: any, idx: number) => (
                       <div key={idx} className="flex items-center justify-between p-2.5 sm:p-3 bg-slate-50 border border-slate-200 rounded-xl gap-3">
@@ -390,12 +390,12 @@ export default function AdminOrders() {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <Package className="w-5 h-5 text-slate-400" />
+                              <Package className="w-5 h-5 text-slate-700" />
                             )}
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">{item.name}</p>
-                            <p className="text-xs text-slate-500 font-medium">
+                            <p className="text-xs text-slate-800 font-medium">
                               {t("qty")}: {item.quantity}
                             </p>
                           </div>
@@ -416,7 +416,7 @@ export default function AdminOrders() {
               {/* Right: Status Update Actions */}
               <div className="w-full md:w-60 lg:w-64 bg-slate-50 border-t md:border-t-0 md:border-l border-slate-200 p-4 sm:p-5 flex flex-col overflow-y-auto custom-scrollbar shrink-0">
                 <div className="flex items-center justify-between md:mb-4 mb-2.5">
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t("updateStatus")}</h3>
+                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{t("updateStatus")}</h3>
                   <button
                     onClick={() => setSelectedOrder(null)}
                     className="hidden md:flex p-1 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 transition-all text-slate-700"
