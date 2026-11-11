@@ -152,31 +152,29 @@ const initializeDatabase = async () => {
   }
 };
 
-app.listen(PORT, async () => {
-  await initializeDatabase();
-  console.log(`🚀 Express Server running on port ${PORT}`);
-});
+const ONE_HOUR_MS = 60 * 60 * 1000;
 
-// ─── Auto-Cleanup: Delete orders & audit logs older than 30 days ──────────────
+// ─── Auto-Cleanup: Remove unpaid pending orders >24h & audit logs >30d ────────
 const runOrderCleanup = async () => {
   try {
     const pgClient = await getPgClient();
     try {
-      // Delete old Orders
-      const orderResult = await pgClient.query(`
+      // 1. Delete unpaid (pending) orders older than 24 hours (paid/completed orders are preserved)
+      const unpaidResult = await pgClient.query(`
         DELETE FROM "Order"
-        WHERE "createdAt" < NOW() - INTERVAL '30 days'
+        WHERE LOWER(COALESCE(status, 'pending')) = 'pending'
+          AND "createdAt" < NOW() - INTERVAL '24 hours'
       `);
-      const deletedOrders = orderResult.rowCount ?? 0;
+      const deletedUnpaidOrders = unpaidResult.rowCount ?? 0;
 
-      // Delete old Audit Logs
+      // 2. Delete old Audit Logs older than 30 days
       const auditResult = await pgClient.query(`
         DELETE FROM "audit_logs"
         WHERE created_at < NOW() - INTERVAL '30 days'
       `);
       const deletedAudit = auditResult.rowCount ?? 0;
 
-      console.log(`🗑️  Auto-cleanup: Deleted ${deletedOrders} order(s) and ${deletedAudit} audit log(s) older than 30 days.`);
+      console.log(`🗑️  Auto-cleanup: Removed ${deletedUnpaidOrders} unpaid order(s) (>24h) and ${deletedAudit} audit log(s) (>30d).`);
     } finally {
       await pgClient.release();
     }
@@ -185,8 +183,11 @@ const runOrderCleanup = async () => {
   }
 };
 
-// Run once on startup, then every 24 hours
-runOrderCleanup();
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-setInterval(runOrderCleanup, TWENTY_FOUR_HOURS);
+app.listen(PORT, async () => {
+  await initializeDatabase();
+  console.log(`🚀 Express Server running on port ${PORT}`);
+  // Run cleanup immediately after DB verification, then every 1 hour
+  await runOrderCleanup();
+  setInterval(runOrderCleanup, ONE_HOUR_MS);
+});
 

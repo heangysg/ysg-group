@@ -370,7 +370,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  return (
  <PublicLayout>
  <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
- <div className="max-w-7xl mx-auto px-4 md:px-8">
+ <div className="max-w-5xl mx-auto px-4 md:px-8">
  
  {/* 🍞 Mobile Responsive Breadcrumbs */}
  <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -487,9 +487,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  </div>
 
 
- <div className="flex flex-col lg:flex-row gap-8">
+ <div className="flex flex-col lg:flex-row gap-5 lg:gap-6">
  {/* Desktop Sidebar Accordion Filters */}
- <aside className="hidden lg:block lg:w-64 shrink-0">
+ <aside className="hidden lg:block lg:w-52 shrink-0">
  <div className="bg-white rounded-xl border border-slate-200 p-3.5 sticky top-24 shadow-2xs">
  <div className="flex items-center justify-between px-2 pb-2.5 mb-2.5 border-b border-slate-100">
  <div className="flex items-center gap-2">
@@ -558,9 +558,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  </AnimatePresence>
 
  {/* Product Grid */}
- <div className="flex-1">
+ <div className="flex-1 min-w-0">
  {loading ? (
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+ <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 -mx-1 sm:mx-0">
  {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
  <div key={n} className="aspect-[4/5] bg-white rounded-md border border-slate-100 animate-pulse shadow-sm" />
  ))}
@@ -586,9 +586,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  if (!shouldGroup) {
  // Flat grid for a specific subcategory
  return (
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+ <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 -mx-1 sm:mx-0">
  {filteredProducts.map((product, idx) => (
- <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
+ <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} compact />
  ))}
  </div>
  )
@@ -638,7 +638,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  const groupedIds = new Set(groups.flatMap(g => g.products.map((p: any) => p.id)))
  const ungrouped = filteredProducts.filter(p => !groupedIds.has(p.id))
 
- const PREVIEW_COUNT = 6 // 2 rows of 3 on desktop, 3 rows of 2 on mobile
+ const PREVIEW_COUNT = 8 // 2 rows of 4 on desktop, 4 rows of 2 on mobile
 
  return (
  <div className="flex flex-col gap-10">
@@ -666,9 +666,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  </div>
 
  {/* Product grid for this group */}
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+ <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 -mx-1 sm:mx-0">
  {displayProducts.map((product, idx) => (
- <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
+ <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} compact />
  ))}
  </div>
 
@@ -722,9 +722,9 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  </span>
  <div className="h-[2px] flex-1 bg-slate-300/80 rounded-full" />
  </div>
- <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-4 md:gap-6 -mx-1 sm:mx-0">
+ <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 -mx-1 sm:mx-0">
  {displayProducts.map((product, idx) => (
- <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} />
+ <ProductCard key={product.id} product={product} index={idx} disableAnimation={isRestored} compact />
  ))}
  </div>
  

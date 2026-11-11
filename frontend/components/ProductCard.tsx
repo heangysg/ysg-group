@@ -24,9 +24,10 @@ type ProductCardProps = {
  }
  index?: number
  disableAnimation?: boolean
+ compact?: boolean
 }
 
-export default function ProductCard({ product, index = 0, disableAnimation = false }: ProductCardProps) {
+export default function ProductCard({ product, index = 0, disableAnimation = false, compact = false }: ProductCardProps) {
  const { language, t } = useLanguage()
  const { addToCart } = useCart()
  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist()
@@ -82,58 +83,74 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
  <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0" aria-label={`View ${product.name}`} />
  
   {/* 🖼️ Image Container */}
-  <div className="relative aspect-square w-full bg-slate-50 flex items-center justify-center p-4 overflow-hidden group/image">
+  <div className={`relative w-full bg-slate-50 flex items-center justify-center overflow-hidden group/image ${
+    compact ? "aspect-[6/5] p-3" : "aspect-square p-4"
+  }`}>
   {imageUrl && imageUrl !== "" ? (
   <Image 
   src={imageUrl} 
   alt={product.name}
   fill
   decoding="async"
-  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-  className="object-contain p-4 transform-gpu transition-transform duration-300 ease-out group-hover:scale-105"
+  sizes={compact ? "(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 18vw" : "(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"}
+  className={`object-contain transform-gpu transition-transform duration-300 ease-out group-hover:scale-105 ${
+    compact ? "p-2.5" : "p-4"
+  }`}
   />
   ) : (
   <div className="w-full h-full flex items-center justify-center bg-slate-50">
-  <Package className="w-10 h-10 text-slate-300" />
+  <Package className={`${compact ? "w-8 h-8" : "w-10 h-10"} text-slate-300`} />
   </div>
   )}
 
   {/* Floating Wishlist Button */}
   <button 
     onClick={handleToggleWishlist}
-    className={`absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center transition-colors transition-opacity duration-200 z-20 pointer-events-auto shadow-sm ${
+    className={`absolute top-2 right-2 rounded-md flex items-center justify-center transition-colors transition-opacity duration-200 z-20 pointer-events-auto shadow-sm ${
+      compact ? "w-7 h-7" : "w-8 h-8"
+    } ${
       inWishlist 
         ? "bg-[#004691] text-white" 
         : "bg-white/95 hover:bg-[#004691] text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0"
     }`}
     title={language === "kh" ? "បញ្ជីចំណូលចិត្ត" : "Wishlist"}
   >
-    <Heart className={`w-4 h-4 ${inWishlist ? "fill-white" : ""}`} />
+    <Heart className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} ${inWishlist ? "fill-white" : ""}`} />
   </button>
 
   {/* Quick Add Overlay */}
-  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 transform-gpu translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-20 pointer-events-auto">
+  <div className={`absolute bottom-0 left-0 right-0 transform-gpu translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-20 pointer-events-auto ${
+    compact ? "p-1.5" : "p-2 sm:p-3"
+  }`}>
     <button 
       onClick={handleAddToCart}
-      className="w-full bg-[#004691] hover:bg-[#003366] text-white py-2 sm:py-2.5 rounded-md font-medium text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-colors"
+      className={`w-full bg-[#004691] hover:bg-[#003366] text-white rounded-md font-medium flex items-center justify-center shadow-lg transition-colors ${
+        compact ? "py-1.5 text-[11px] gap-1.5" : "py-2 sm:py-2.5 text-xs sm:text-sm gap-2"
+      }`}
     >
-      <ShoppingCart className="w-4 h-4" />
-      {language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
+      <ShoppingCart className={compact ? "w-3.5 h-3.5 shrink-0" : "w-4 h-4 shrink-0"} />
+      <span className="truncate">{language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}</span>
     </button>
   </div>
   </div>
 
   {/* 📝 Product Info */}
-  <div className="flex flex-col flex-1 p-3 z-10 pointer-events-none bg-white">
+  <div className={`flex flex-col flex-1 z-10 pointer-events-none bg-white ${
+    compact ? "p-2.5" : "p-3"
+  }`}>
   
   {/* Title */}
-  <h3 className="text-xs sm:text-sm font-medium text-slate-800 leading-snug line-clamp-2 group-hover:text-[#004691] transition-colors duration-200 mb-1 sm:mb-2">
+  <h3 className={`font-medium text-slate-800 leading-snug line-clamp-2 group-hover:text-[#004691] transition-colors duration-200 ${
+    compact ? "text-xs mb-1.5" : "text-xs sm:text-sm mb-1 sm:mb-2"
+  }`}>
   {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
   </h3>
   
   {/* Price */}
   <div className="mt-auto">
-  <span className="text-sm sm:text-lg font-semibold text-red-600 leading-none block">
+  <span className={`font-semibold text-red-600 leading-none block ${
+    compact ? "text-sm sm:text-base" : "text-sm sm:text-lg"
+  }`}>
   ${formatPrice(product.price)}
   </span>
   </div>

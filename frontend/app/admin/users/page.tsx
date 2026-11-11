@@ -15,17 +15,23 @@ import {
  Image as ImageIcon, 
  X, 
  CheckCircle2,
- Trash2
+ Trash2,
+ Power
 } from "lucide-react"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import toast, { Toaster } from "react-hot-toast"
 import Portal from "../../../components/Portal"
 import { getOptimizedImageUrl } from "../../../lib/imageUtils"
+import { logActivity } from "../../../lib/audit"
 
 export default function UsersManagementPage() {
  const [users, setUsers] = useState<any[]>([])
  const [loading, setLoading] = useState(true)
  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+ const [currentUserId, setCurrentUserId] = useState("")
+ const [togglingId, setTogglingId] = useState<string | null>(null)
+ const [deleteTarget, setDeleteTarget] = useState<any | null>(null)
+ const [deleting, setDeleting] = useState(false)
  const [showModal, setShowModal] = useState(false)
  const [isEditing, setIsEditing] = useState(false)
  const [activeTab, setActiveTab] = useState("details")
@@ -35,6 +41,7 @@ export default function UsersManagementPage() {
  const [saving, setSaving] = useState(false)
  const router = useRouter()
  const { t, language } = useLanguage()
+ const isKh = language === "kh"
 
  const [formData, setFormData] = useState({
  id: "",
@@ -56,6 +63,7 @@ export default function UsersManagementPage() {
  return
  }
  setIsSuperAdmin(true)
+ setCurrentUserId(user.id || "")
  fetchUsers()
  }, [router])
 
@@ -156,6 +164,75 @@ export default function UsersManagementPage() {
  }
  }
 
+ const handleToggleActive = async (user: any) => {
+ setTogglingId(user.id)
+ try {
+ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+ const token = localStorage.getItem("ysg_admin_token")
+ const nextActive = user.isActive === false
+ const res = await fetch(`${API_URL}/api/admin/users`, {
+ method: "PATCH",
+ headers: {
+ "Content-Type": "application/json",
+ "Authorization": `Bearer ${token}`
+ },
+ body: JSON.stringify({ id: user.id, isActive: nextActive })
+ })
+ const data = await res.json().catch(() => ({}))
+ if (!res.ok) {
+ toast.error(data.error || (isKh ? "មិនអាចកែប្រែស្ថានភាពគណនីបានទេ" : "Failed to update account status"))
+ } else {
+ setUsers((prev) => prev.map((u) => (u.id === user.id ? data.user : u)))
+ void logActivity({
+ action: "update",
+ entityType: "user",
+ entityId: user.id,
+ details: { name: user.name, email: user.email, status: nextActive ? "activated" : "deactivated" }
+ })
+ toast.success(
+ nextActive
+ ? (isKh ? `បានបើកដំណើរការ "${user.name}" ឡើងវិញ` : `Activated "${user.name}"`)
+ : (isKh ? `បានបិទគណនី "${user.name}"` : `Deactivated "${user.name}"`)
+ )
+ }
+ } catch {
+ toast.error(isKh ? "មានបញ្ហាបណ្ដាញ" : "Network error")
+ } finally {
+ setTogglingId(null)
+ }
+ }
+
+ const handleDeleteUser = async () => {
+ if (!deleteTarget) return
+ setDeleting(true)
+ try {
+ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+ const token = localStorage.getItem("ysg_admin_token")
+ const res = await fetch(`${API_URL}/api/admin/users/${deleteTarget.id}`, {
+ method: "DELETE",
+ headers: { "Authorization": `Bearer ${token}` }
+ })
+ const data = await res.json().catch(() => ({}))
+ if (!res.ok) {
+ toast.error(data.error || (isKh ? "មិនអាចលុបគណនីបានទេ" : "Failed to remove user"))
+ } else {
+ setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id))
+ void logActivity({
+ action: "delete",
+ entityType: "user",
+ entityId: deleteTarget.id,
+ details: { name: deleteTarget.name, email: deleteTarget.email }
+ })
+ toast.success(isKh ? `បានលុបគណនី "${deleteTarget.name}"` : `Removed "${deleteTarget.name}"`)
+ setDeleteTarget(null)
+ }
+ } catch {
+ toast.error(isKh ? "មានបញ្ហាបណ្ដាញ" : "Network error")
+ } finally {
+ setDeleting(false)
+ }
+ }
+
  if (loading) {
  return (
  <div className="flex flex-col items-center justify-center min-h-[60vh]">
@@ -190,6 +267,7 @@ export default function UsersManagementPage() {
  <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("user")}</th>
  <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("emailAddress")}</th>
  <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("role")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("status") || "Status"}</th>
  <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">{t("actions")}</th>
  </tr>
  </thead>
@@ -223,13 +301,46 @@ export default function UsersManagementPage() {
   </span>
   </div>
  </td>
+ <td className="px-6 py-4">
+  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+  user.isActive !== false
+    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+    : "bg-red-50 text-red-700 border-red-200"
+  }`}>
+  {user.isActive !== false ? (isKh ? "សកម្ម" : "Active") : (isKh ? "បានបិទ" : "Inactive")}
+  </span>
+ </td>
  <td className="px-6 py-4 text-right">
+ <div className="inline-flex items-center justify-end gap-2">
  <button 
  onClick={() => openEditModal(user)}
- className="p-2 bg-white text-slate-900 rounded-lg border border-slate-200 hover:border-primary hover:text-primary hover:shadow-sm transition-all"
+ title={isKh ? "កែប្រែ" : "Edit"}
+ className="p-2 bg-white text-slate-900 rounded-lg border border-slate-200 hover:border-primary hover:text-primary hover:shadow-sm transition-all cursor-pointer"
  >
  <Pencil className="w-4 h-4" />
  </button>
+ {user.id !== currentUserId && (
+ <>
+ <button
+ onClick={() => handleToggleActive(user)}
+ disabled={togglingId === user.id}
+ title={user.isActive !== false ? (isKh ? "បិទគណនី" : "Deactivate") : (isKh ? "បើកគណនី" : "Activate")}
+ className={`p-2 bg-white rounded-lg border border-slate-200 hover:shadow-sm transition-all cursor-pointer disabled:opacity-50 ${
+ user.isActive !== false ? "text-amber-600 hover:border-amber-300 hover:bg-amber-50" : "text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50"
+ }`}
+ >
+ <Power className="w-4 h-4" />
+ </button>
+ <button
+ onClick={() => setDeleteTarget(user)}
+ title={isKh ? "លុបគណនី" : "Remove Admin"}
+ className="p-2 bg-white text-red-600 rounded-lg border border-slate-200 hover:border-red-300 hover:bg-red-50 hover:shadow-sm transition-all cursor-pointer"
+ >
+ <Trash2 className="w-4 h-4" />
+ </button>
+ </>
+ )}
+ </div>
  </td>
  </tr>
  ))}
@@ -407,6 +518,48 @@ export default function UsersManagementPage() {
  )}
  
  <Toaster position="top-right" />
+
+ {deleteTarget && (
+ <Portal>
+ <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-[2px] z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => !deleting && setDeleteTarget(null)}>
+ <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md p-6 space-y-5 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+ <div className="flex items-start gap-4">
+ <div className="p-3 bg-red-50 border border-red-200 rounded-xl shrink-0">
+ <Trash2 className="w-5 h-5 text-red-600" />
+ </div>
+ <div>
+ <h3 className="text-base font-bold text-slate-900">
+ {isKh ? "លុបគណនីអ្នកគ្រប់គ្រង" : "Remove Admin Account"}
+ </h3>
+ <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+ {isKh
+ ? <>តើអ្នកប្រាកដថាចង់លុប <strong>{deleteTarget.name}</strong> ({deleteTarget.email}) មែនទេ? គណនីនេះនឹងត្រូវដកហូតសិទ្ធិចូលប្រព័ន្ធភ្លាមៗ។</>
+ : <>Are you sure you want to remove <strong>{deleteTarget.name}</strong> ({deleteTarget.email})? They will immediately lose admin access.</>}
+ </p>
+ </div>
+ </div>
+ <div className="flex items-center justify-end gap-2.5 pt-2">
+ <button
+ type="button"
+ disabled={deleting}
+ onClick={() => setDeleteTarget(null)}
+ className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 text-xs sm:text-sm font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+ >
+ {t("cancel")}
+ </button>
+ <button
+ type="button"
+ disabled={deleting}
+ onClick={handleDeleteUser}
+ className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-medium transition-colors disabled:opacity-60 cursor-pointer"
+ >
+ {deleting ? (isKh ? "កំពុងលុប..." : "Removing...") : (isKh ? "លុបគណនី" : "Remove")}
+ </button>
+ </div>
+ </div>
+ </div>
+ </Portal>
+ )}
  </div>
  )
 }

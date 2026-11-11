@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import { getPgClient } from '../lib/db';
 import { authenticateJWT, AuthRequest } from '../middleware/auth';
-import { sendInquiryReplyEmail } from '../lib/email';
+import { sendInquiryReplyEmail, sendAdminPasswordResetEmail } from '../lib/email';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -66,6 +66,11 @@ router.post('/login', loginLimiter, async (req: Request, res: Response): Promise
       return;
     }
 
+    if (user.isActive === false) {
+      res.status(403).json({ error: "Your account has been deactivated. Please contact Super Admin." });
+      return;
+    }
+
     const token = jwt.sign(
       { id: user.id, email: user.email, isSuperAdmin: user.isSuperAdmin, roleName: user.roleName || 'USER' },
       JWT_SECRET,
@@ -89,6 +94,100 @@ router.post('/login', loginLimiter, async (req: Request, res: Response): Promise
   } catch (err: any) {
     console.error("Login error:", err);
     res.status(500).json({ error: err.message });
+  } finally {
+    if (pgClient) await pgClient.release();
+  }
+});
+
+router.post('/forgot-password', loginLimiter, async (req: Request, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const email = String(req.body?.email || '').trim();
+    if (!email || email.length > 255) {
+      res.status(400).json({ error: "Please enter a valid email address" });
+      return;
+    }
+
+    pgClient = await getPgClient();
+    const { rows } = await pgClient.query(
+      'SELECT id, name, email, password, "isActive" FROM "User" WHERE LOWER(email) = LOWER($1) LIMIT 1',
+      [email]
+    );
+    const user = rows[0];
+
+    if (user && user.isActive !== false) {
+      const resetToken = jwt.sign(
+        { purpose: 'admin-password-reset', userId: user.id, email: user.email },
+        `${JWT_SECRET}${user.password}`,
+        { expiresIn: '15m' }
+      );
+      const frontendBase = (process.env.FRONTEND_URL || 'https://ysg-group.vercel.app').replace(/\/$/, '');
+      const resetUrl = `${frontendBase}/admin/reset-password?token=${encodeURIComponent(resetToken)}&email=${encodeURIComponent(user.email)}`;
+      await sendAdminPasswordResetEmail({ name: user.name, email: user.email }, resetUrl);
+    }
+
+    res.json({
+      success: true,
+      message: "If an active admin account exists for that email, a reset link has been sent."
+    });
+  } catch (err: any) {
+    console.error("Admin forgot password error:", err);
+    res.status(500).json({ error: "Failed to process password reset request" });
+  } finally {
+    if (pgClient) await pgClient.release();
+  }
+});
+
+router.post('/reset-password', loginLimiter, async (req: Request, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const email = String(req.body?.email || '').trim();
+    const token = String(req.body?.token || '').trim();
+    const newPassword = String(req.body?.newPassword || '');
+
+    if (!email || !token) {
+      res.status(400).json({ error: "Invalid or missing password reset token" });
+      return;
+    }
+
+    if (newPassword.length < 8 || newPassword.length > 255) {
+      res.status(400).json({ error: "Password must be between 8 and 255 characters long." });
+      return;
+    }
+
+    pgClient = await getPgClient();
+    const { rows } = await pgClient.query(
+      'SELECT id, email, password, "isActive" FROM "User" WHERE LOWER(email) = LOWER($1) LIMIT 1',
+      [email]
+    );
+    const user = rows[0];
+
+    if (!user || user.isActive === false) {
+      res.status(400).json({ error: "Invalid or expired reset link" });
+      return;
+    }
+
+    try {
+      const decoded: any = jwt.verify(token, `${JWT_SECRET}${user.password}`);
+      if (decoded?.purpose !== 'admin-password-reset' || decoded?.userId !== user.id) {
+        res.status(400).json({ error: "Invalid or expired reset link" });
+        return;
+      }
+    } catch {
+      res.status(400).json({ error: "Invalid or expired reset link" });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pgClient.query(
+      'UPDATE "User" SET password = $1, "updatedAt" = NOW() WHERE id = $2',
+      [hashedPassword, user.id]
+    );
+
+    res.json({ success: true, message: "Password has been reset successfully." });
+  } catch (err: any) {
+    console.error("Admin reset password error:", err);
+    res.status(500).json({ error: "Failed to reset password" });
   } finally {
     if (pgClient) await pgClient.release();
   }
@@ -241,6 +340,28 @@ router.patch('/users', authenticateJWT, async (req: AuthRequest, res: Response):
     }
 
     pgClient = await getPgClient();
+
+    const demotingOrDeactivating =
+      updateData.isActive === false ||
+      updateData.isSuperAdmin === false ||
+      (roleType && roleType !== 'superadmin');
+
+    if (demotingOrDeactivating) {
+      const { rows: targetRows } = await pgClient.query(
+        'SELECT "isSuperAdmin", "isActive" FROM "User" WHERE id = $1 LIMIT 1',
+        [id]
+      );
+      if (targetRows[0]?.isSuperAdmin && targetRows[0]?.isActive) {
+        const { rows: countRows } = await pgClient.query(
+          'SELECT COUNT(*)::int AS cnt FROM "User" WHERE "isSuperAdmin" = true AND "isActive" = true AND id != $1',
+          [id]
+        );
+        if ((countRows[0]?.cnt || 0) === 0) {
+          res.status(400).json({ error: "Cannot deactivate or demote the last active Super Admin account." });
+          return;
+        }
+      }
+    }
     
     if (roleType && req.user?.isSuperAdmin) {
       let roleName = 'USER';
@@ -312,6 +433,62 @@ router.patch('/users', authenticateJWT, async (req: AuthRequest, res: Response):
 
     res.json({ user: updatedUser });
   } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    if (pgClient) await pgClient.release();
+  }
+});
+
+router.delete('/users/:id', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    if (!req.user?.isSuperAdmin) {
+      res.status(403).json({ error: "Only Super Admins can remove admin accounts." });
+      return;
+    }
+
+    const targetId = String(req.params.id || '').trim();
+    if (!targetId) {
+      res.status(400).json({ error: "Missing user ID" });
+      return;
+    }
+
+    if (req.user.id === targetId) {
+      res.status(400).json({ error: "Self-Sabotage Blocked: You cannot delete your own account." });
+      return;
+    }
+
+    pgClient = await getPgClient();
+    const { rows: targetRows } = await pgClient.query(
+      'SELECT id, name, email, "isSuperAdmin", "isActive" FROM "User" WHERE id = $1 LIMIT 1',
+      [targetId]
+    );
+    const targetUser = targetRows[0];
+    if (!targetUser) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (targetUser.isSuperAdmin && targetUser.isActive) {
+      const { rows: countRows } = await pgClient.query(
+        'SELECT COUNT(*)::int AS cnt FROM "User" WHERE "isSuperAdmin" = true AND "isActive" = true AND id != $1',
+        [targetId]
+      );
+      if ((countRows[0]?.cnt || 0) === 0) {
+        res.status(400).json({ error: "Cannot delete the last active Super Admin account." });
+        return;
+      }
+    }
+
+    await pgClient.query('UPDATE "Inquiry" SET "userId" = NULL WHERE "userId" = $1', [targetId]);
+    await pgClient.query('DELETE FROM "User" WHERE id = $1', [targetId]);
+
+    res.json({ success: true, deletedUser: { id: targetUser.id, name: targetUser.name, email: targetUser.email } });
+  } catch (err: any) {
+    if (err?.code === '23503') {
+      res.status(409).json({ error: "This account is referenced by existing records; please deactivate it instead." });
+      return;
+    }
     res.status(500).json({ error: err.message });
   } finally {
     if (pgClient) await pgClient.release();

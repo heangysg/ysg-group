@@ -7,6 +7,7 @@
     "dev": "ts-node-dev src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "reset-superadmin": "ts-node-dev --transpile-only src/scripts/reset-superadmin.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

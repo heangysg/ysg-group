@@ -132,3 +132,52 @@ export const sendInquiryReplyEmail = async (
     return { sent: false, reason: error?.message || "smtp_send_failed" };
   }
 };
+
+export const sendAdminPasswordResetEmail = async (
+  user: { name?: string; email: string },
+  resetUrl: string
+): Promise<{ sent: boolean; reason?: string }> => {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("⚠️ SMTP credentials not configured. Skipping admin reset email.");
+    return { sent: false, reason: "smtp_not_configured" };
+  }
+
+  const displayName = escapeHtml(String(user.name || "Administrator"));
+  const safeUrl = escapeHtml(resetUrl);
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
+      <h2 style="color: #004691; margin-bottom: 12px;">YSG Management System</h2>
+      <p style="color: #334155; font-size: 15px;">Hello <strong>${displayName}</strong>,</p>
+      <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+        A password reset was requested for your admin account. Click the button below to set a new password.
+        This link expires in <strong>15 minutes</strong> and can only be used once.
+      </p>
+      <div style="margin: 24px 0; text-align: center;">
+        <a href="${safeUrl}" style="display: inline-block; background-color: #004691; color: #ffffff; text-decoration: none; font-weight: bold; padding: 12px 24px; border-radius: 8px; font-size: 14px;">
+          Reset Admin Password
+        </a>
+      </div>
+      <p style="color: #64748b; font-size: 12px; word-break: break-all;">
+        Or copy this link: ${safeUrl}
+      </p>
+      <p style="color: #64748b; font-size: 12px; margin-top: 18px;">
+        If you did not request this, you can safely ignore this email.
+      </p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"YSG Machinery Admin" <${process.env.SMTP_USER}>`,
+      to: user.email,
+      subject: "YSG Admin Password Reset Request",
+      html,
+    });
+    console.log(`✉️ Admin password reset email sent to ${user.email}`);
+    return { sent: true };
+  } catch (error: any) {
+    console.error("Failed to send admin password reset email:", error);
+    return { sent: false, reason: error?.message || "smtp_send_failed" };
+  }
+};

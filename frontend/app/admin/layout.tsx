@@ -105,11 +105,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
    return false
  }
 
+ const isAuthPage = pathname === "/admin/login" || pathname === "/admin/reset-password"
+
  useEffect(() => {
  const userStr = localStorage.getItem("ysg_admin_user")
  const tokenStr = localStorage.getItem("ysg_admin_token")
 
- if ((!userStr || !tokenStr) && pathname !== "/admin/login") {
+ if ((!userStr || !tokenStr) && !isAuthPage) {
  router.push("/admin/login")
  return
  }
@@ -401,7 +403,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  }
  }
 
- if (pathname === "/admin/login") return <>{children}</>
+ if (isAuthPage) return <>{children}</>
 
  return (
  <div className="min-h-screen bg-[#F8FAFC] flex font-sans">

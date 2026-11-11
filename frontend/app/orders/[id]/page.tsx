@@ -231,13 +231,14 @@ export default function OrderDetailsPage() {
 
  {/* Status Badge & Print Invoice Action */}
  <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 self-start sm:self-center">
- <button
- onClick={() => window.print()}
+ <Link
+ href={`/orders/${order.id}/invoice`}
+ target="_blank"
  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-md transition-all shadow-2xs cursor-pointer active:scale-95 print:hidden whitespace-nowrap shrink-0"
  >
  <Printer className="w-4 h-4 text-slate-600 shrink-0" />
  <span className="whitespace-nowrap">{language === "kh" ? "បោះពុម្ពវិក្កយបត្រ" : "Print Invoice"}</span>
- </button>
+ </Link>
 
  <div className={`inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-md border shadow-2xs whitespace-nowrap shrink-0 ${
  isPaid
@@ -279,7 +280,9 @@ export default function OrderDetailsPage() {
  {language === "kh" ? "តម្រូវឱ្យទូទាត់ប្រាក់" : "Payment Required"}
  </h3>
  <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-md">
- {language === "kh" ? "សូមបញ្ចប់ការទូទាត់របស់អ្នកតាមរយៈ Bakong KHQR ដើម្បីបញ្ចប់ការបញ្ជាទិញរបស់អ្នក។" : "Please complete your payment via Bakong KHQR to finalize your order."}
+ {language === "kh"
+   ? "សូមបញ្ចប់ការទូទាត់របស់អ្នកតាមរយៈ Bakong KHQR ដើម្បីបញ្ចប់ការបញ្ជាទិញរបស់អ្នក។ (ការបញ្ជាទិញដែលមិនទាន់ទូទាត់នឹងត្រូវលុបចោលដោយស្វ័យប្រវត្តិក្រោយ ២៤ ម៉ោង)"
+   : "Please complete your payment via Bakong KHQR to finalize your order. (Unpaid orders are automatically removed after 24 hours.)"}
  </p>
  </div>
  <button
@@ -421,7 +424,7 @@ export default function OrderDetailsPage() {
  setShowQR(false)
  setShowSuccessModal(true)
  if (order) {
- setOrder({ ...order, status: "paid" })
+ setOrder({ ...order, status: "paid", updatedAt: new Date().toISOString() })
  }
  }}
  onExpire={refreshQR}
@@ -434,6 +437,10 @@ export default function OrderDetailsPage() {
  orderId={order.id}
  amount={order.totalAmount}
  items={order.items}
+ customerName={order.customerName}
+ customerPhone={order.customerPhone}
+ paymentMethod={order.paymentMethod === "Bakong" ? "Bakong KHQR" : order.paymentMethod}
+ paidAt={order.updatedAt || order.createdAt}
  />
  </PublicLayout>
  )

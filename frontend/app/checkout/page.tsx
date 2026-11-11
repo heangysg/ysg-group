@@ -56,6 +56,13 @@ export default function CheckoutPage() {
     expiresAt: number
   } | null>(null)
   const [completedOrderId, setCompletedOrderId] = useState<string>("")
+  const [completedOrderDetails, setCompletedOrderDetails] = useState<{
+    items: any[]
+    customerName: string
+    customerPhone: string
+    paymentMethod: string
+    paidAt: string
+  } | null>(null)
   const [isOrderPlaced, setIsOrderPlaced] = useState(false)
 
   useEffect(() => {
@@ -115,6 +122,22 @@ export default function CheckoutPage() {
       const data = await response.json()
 
       if (response.ok && data.order) {
+        const snapshotItems = items.map(item => ({
+          id: item.id,
+          slug: item.slug,
+          name: item.name,
+          nameKhmer: item.nameKhmer,
+          image: item.image,
+          price: item.price,
+          quantity: item.quantity,
+        }))
+        setCompletedOrderDetails({
+          items: snapshotItems,
+          customerName: formData.customerName,
+          customerPhone: formData.customerPhone,
+          paymentMethod: formData.paymentMethod === "Bakong" ? "Bakong KHQR" : formData.paymentMethod,
+          paidAt: new Date().toISOString(),
+        })
         setIsOrderPlaced(true)
         clearCart()
         
@@ -168,6 +191,7 @@ export default function CheckoutPage() {
   const handleBakongPaymentSuccess = () => {
     if (bakongData) {
       setCompletedOrderId(bakongData.orderId)
+      setCompletedOrderDetails(prev => prev ? { ...prev, paidAt: new Date().toISOString() } : prev)
       setShowBakongModal(false)
       setShowSuccessModal(true)
     }
@@ -368,8 +392,12 @@ export default function CheckoutPage() {
                         onChange={handleInputChange}
                         className="sr-only"
                       />
-                      <div className="w-8 h-8 rounded-full bg-[#E1232E] text-white flex items-center justify-center shrink-0 shadow-xs">
-                        <CreditCard className="w-4 h-4" />
+                      <div className="w-10 h-10 rounded-full bg-[#E1232E] flex items-center justify-center shrink-0 shadow-xs p-1.5">
+                        <img
+                          src="/logo/KHQR Logo.png"
+                          alt="KHQR"
+                          className="w-full h-auto object-contain pointer-events-none"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
@@ -508,6 +536,11 @@ export default function CheckoutPage() {
         }}
         orderId={completedOrderId}
         amount={bakongData?.amount || cartTotal}
+        items={completedOrderDetails?.items}
+        customerName={completedOrderDetails?.customerName}
+        customerPhone={completedOrderDetails?.customerPhone}
+        paymentMethod={completedOrderDetails?.paymentMethod}
+        paidAt={completedOrderDetails?.paidAt}
       />
     </PublicLayout>
   )
