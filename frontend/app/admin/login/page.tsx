@@ -80,7 +80,7 @@ export default function AdminLogin() {
                 អ្នកគ្រប់គ្រងជាន់ខ្ពស់
               </h1>
               <p className="text-slate-500 font-medium text-sm sm:text-base mt-2">
-                វិបផតថលគ្រប់គ្រង
+                ប្រព័ន្ធគ្រប់គ្រង
               </p>
             </div>
 

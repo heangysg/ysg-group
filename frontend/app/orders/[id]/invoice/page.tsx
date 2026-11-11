@@ -5,18 +5,11 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useLanguage } from '../../../../contexts/LanguageContext'
-import {
-  ArrowLeft,
-  Loader2,
-  Mail,
-  MapPin,
-  Phone,
-  Printer,
-  ShieldCheck
-} from 'lucide-react'
+import { ArrowLeft, Loader2, Printer } from 'lucide-react'
 
 interface OrderItem {
   name: string
+  nameKhmer?: string
   sku?: string
   price: number | string
   quantity: number
@@ -31,7 +24,7 @@ interface CompanySettings {
 }
 
 const DEFAULT_COMPANY = {
-  name: 'Yeung Shi Group',
+  name: 'YEUNG SHI GROUP',
   khmerName: 'យើង ស៊ី គ្រុប',
   tagline: 'Industrial Machinery & Equipment Solutions',
   address: 'Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh, Cambodia',
@@ -54,47 +47,49 @@ const getStatusConfig = (status?: string) => {
       return {
         en: 'PAID',
         kh: 'បានទូទាត់',
-        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300'
+        stampClass: 'border-emerald-700 text-emerald-800'
       }
     case 'confirmed':
     case 'processing':
       return {
         en: 'CONFIRMED',
         kh: 'បានបញ្ជាក់',
-        badgeClass: 'bg-blue-50 text-blue-800 border-blue-300'
+        stampClass: 'border-blue-800 text-blue-900'
       }
     case 'shipped':
       return {
         en: 'SHIPPED',
         kh: 'កំពុងដឹកជញ្ជូន',
-        badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-300'
+        stampClass: 'border-slate-700 text-slate-800'
       }
     case 'delivered':
       return {
         en: 'DELIVERED',
         kh: 'បានដឹកដល់',
-        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300'
+        stampClass: 'border-emerald-700 text-emerald-800'
       }
     case 'cancelled':
       return {
         en: 'CANCELLED',
         kh: 'បានបោះបង់',
-        badgeClass: 'bg-rose-50 text-rose-800 border-rose-300'
+        stampClass: 'border-red-700 text-red-800'
       }
     default:
       return {
-        en: 'PENDING',
-        kh: 'កំពុងរង់ចាំ',
-        badgeClass: 'bg-amber-50 text-amber-800 border-amber-300'
+        en: 'UNPAID / PENDING',
+        kh: 'រង់ចាំទូទាត់',
+        stampClass: 'border-amber-700 text-amber-800'
       }
   }
 }
 
-const formatPaymentMethod = (method?: string) => {
-  if (!method) return 'Cash / Bank Transfer'
+const formatPaymentMethod = (method?: string, isKh = false) => {
+  if (!method) return isKh ? 'សាច់ប្រាក់ / ផ្ទេរប្រាក់តាមធនាគារ' : 'Cash / Bank Transfer'
   const lower = method.toLowerCase()
   if (lower.includes('khqr') || lower.includes('bakong')) return 'Bakong KHQR'
-  if (lower.includes('cod') || lower.includes('cash')) return 'Cash on Delivery (COD)'
+  if (lower.includes('cod') || lower.includes('cash')) {
+    return isKh ? 'ទូទាត់ពេលទទួលទំនិញ (COD)' : 'Cash on Delivery (COD)'
+  }
   return method
 }
 
@@ -142,7 +137,10 @@ export default function InvoicePage() {
           if (isMounted) {
             setCompany((prev) => ({
               ...prev,
-              name: s.site_name && s.site_name !== 'YSG Machinery' ? s.site_name : prev.name,
+              name:
+                s.site_name && s.site_name !== 'YSG Machinery'
+                  ? s.site_name.toUpperCase()
+                  : prev.name,
               address:
                 s.address && s.address !== 'Phnom Penh, Cambodia' ? s.address : prev.address,
               phone:
@@ -171,7 +169,7 @@ export default function InvoicePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="min-h-screen flex items-center justify-center bg-slate-200">
         <Loader2 className="w-8 h-8 animate-spin text-[#004691]" />
       </div>
     )
@@ -179,14 +177,14 @@ export default function InvoicePage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-100 text-slate-800 px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-200 text-slate-800 px-4">
         <p className="text-base font-bold">
           {isKh ? 'មិនមានការបញ្ជាទិញនេះទេ' : 'Order Not Found'}
         </p>
         <button
           type="button"
           onClick={() => router.back()}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold bg-white border border-slate-300 rounded hover:bg-slate-50 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           {isKh ? 'ត្រឡប់ក្រោយ' : 'Go Back'}
@@ -206,9 +204,18 @@ export default function InvoicePage() {
   const invoiceShortId = String(order.id).split('-')[0].toUpperCase()
   const statusInfo = getStatusConfig(order.status)
   const issueDate = new Date(order.createdAt)
+  const formattedDate = issueDate.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+
+  // Pad with blank ledger rows so short invoices retain authentic paper proportions
+  const minRows = 6
+  const emptyRowsCount = Math.max(0, minRows - items.length)
 
   return (
-    <div className="min-h-screen bg-slate-200/80 py-6 sm:py-8 print:py-0 print:bg-white text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-300/70 py-6 sm:py-8 print:py-0 print:bg-white text-slate-900 font-sans">
       <style jsx global>{`
         @media print {
           @page {
@@ -223,28 +230,28 @@ export default function InvoicePage() {
         }
       `}</style>
 
-      {/* Top Action Bar (Screen Only) */}
-      <div className="max-w-[210mm] mx-auto mb-5 px-4 sm:px-0 flex flex-wrap items-center justify-between gap-3 print:hidden">
+      {/* Screen-only Action Toolbar */}
+      <div className="max-w-[210mm] mx-auto mb-4 px-4 sm:px-0 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-md text-xs font-bold shadow-xs transition-all cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{isKh ? 'ត្រឡប់ក្រោយ' : 'Back'}</span>
           </button>
-          <span className="hidden sm:inline-block px-3 py-1.5 bg-white/90 border border-slate-300 rounded-lg text-xs font-bold text-slate-700">
+          <span className="hidden sm:inline-block px-3 py-1.5 bg-white border border-slate-300 rounded-md text-xs font-mono font-bold text-slate-700">
             INV-{invoiceShortId}
           </span>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center bg-white border border-slate-300 rounded-lg p-0.5 shadow-xs">
+          <div className="flex items-center bg-white border border-slate-300 rounded-md p-0.5 shadow-xs">
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`px-2.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
                 !isKh ? 'bg-[#004691] text-white' : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -253,7 +260,7 @@ export default function InvoicePage() {
             <button
               type="button"
               onClick={() => setLanguage('kh')}
-              className={`px-2.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded text-xs font-bold transition-colors cursor-pointer ${
                 isKh ? 'bg-[#004691] text-white' : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -264,7 +271,7 @@ export default function InvoicePage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-[#004691] hover:bg-[#003570] text-white px-5 py-2 rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#004691] hover:bg-[#003570] text-white px-5 py-2 rounded-md text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>{isKh ? 'បោះពុម្ព / រក្សាទុក PDF' : 'Print / Save PDF'}</span>
@@ -272,263 +279,307 @@ export default function InvoicePage() {
         </div>
       </div>
 
-      {/* A4 Paper Sheet */}
-      <div className="bg-white mx-auto max-w-[210mm] min-h-[297mm] print:min-h-[275mm] shadow-xl print:shadow-none flex flex-col justify-between overflow-hidden rounded-sm print:rounded-none border border-slate-200 print:border-0">
+      {/* Authentic A4 Commercial Invoice Sheet */}
+      <div className="bg-white mx-auto max-w-[210mm] min-h-[297mm] print:min-h-[275mm] shadow-xl print:shadow-none border border-slate-400 print:border-0 flex flex-col justify-between p-6 sm:p-10 print:p-4">
         <div>
-          {/* Top Brand Accent Bar */}
-          <div className="h-2.5 bg-[#004691] w-full" />
-
-          <div className="p-7 sm:p-11 print:p-6">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-7 border-b-2 border-slate-200">
-              {/* Company Brand & Contact */}
-              <div className="flex items-start gap-4 max-w-md">
-                <div className="w-16 h-16 shrink-0 rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xs flex items-center justify-center">
-                  <img
-                    src="/logo.png"
-                    alt="Yeung Shi Group Logo"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <div>
-                    <h1 className="text-xl sm:text-2xl font-extrabold text-[#004691] tracking-tight leading-none">
-                      {company.name}
-                    </h1>
-                    <p className="text-xs font-bold text-slate-700 mt-1">
-                      {company.khmerName} • {company.tagline}
-                    </p>
-                  </div>
-                  <div className="text-xs text-slate-700 space-y-1 pt-1 leading-snug">
-                    <p className="flex items-start gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#004691] shrink-0 mt-0.5" />
-                      <span>{company.address}</span>
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-[#004691] shrink-0" />
-                      <span>{company.phone}</span>
-                    </p>
-                    <p className="flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-[#004691] shrink-0" />
-                      <span>{company.email}</span>
-                    </p>
-                  </div>
-                </div>
+          {/* Official Company Letterhead */}
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-5 border-b-2 border-slate-900">
+            {/* Left: Logo + Company Details */}
+            <div className="flex items-start gap-4 max-w-md">
+              <img
+                src="/logo.png"
+                alt="Yeung Shi Group Logo"
+                className="w-16 h-16 object-contain shrink-0 mt-0.5"
+              />
+              <div className="text-xs leading-relaxed text-slate-800">
+                <p className="text-sm font-bold text-slate-900">{company.khmerName}</p>
+                <h1 className="text-xl font-black tracking-tight text-[#004691] leading-tight">
+                  {company.name}
+                </h1>
+                <p className="text-[11px] font-semibold text-slate-600 mb-1.5">
+                  {company.tagline}
+                </p>
+                <p>
+                  <span className="font-bold">{isKh ? 'អាសយដ្ឋាន៖ ' : 'Address: '}</span>
+                  {company.address}
+                </p>
+                <p>
+                  <span className="font-bold">{isKh ? 'ទូរស័ព្ទ៖ ' : 'Tel: '}</span>
+                  {company.phone}
+                </p>
+                <p>
+                  <span className="font-bold">{isKh ? 'អ៊ីមែល៖ ' : 'Email: '}</span>
+                  {company.email}
+                </p>
               </div>
+            </div>
 
-              {/* Invoice Title & Meta Card */}
-              <div className="w-full sm:w-auto sm:min-w-[235px] flex flex-col sm:items-end">
-                <div className="sm:text-right mb-3">
-                  <h2 className="text-3xl font-extrabold tracking-wider text-slate-900 uppercase leading-none">
+            {/* Right: Document Title + Stamp + Metadata */}
+            <div className="w-full sm:w-[245px] shrink-0">
+              <div className="flex sm:flex-col sm:items-end justify-between items-center mb-3">
+                <div className="sm:text-right">
+                  <p className="text-sm font-bold text-slate-900">វិក្កយបត្រ</p>
+                  <h2 className="text-3xl font-black tracking-widest text-slate-900 leading-none">
                     INVOICE
                   </h2>
-                  <p className="text-sm font-bold text-[#004691] mt-1">វិក្កយបត្រផ្លូវការ</p>
                 </div>
-
-                <div className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="font-semibold text-slate-600">
-                      {isKh ? 'លេខវិក្កយបត្រ:' : 'Invoice No:'}
-                    </span>
-                    <span className="font-bold text-slate-900 font-mono">INV-{invoiceShortId}</span>
-                  </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="font-semibold text-slate-600">
-                      {isKh ? 'កាលបរិច្ឆេទ:' : 'Issue Date:'}
-                    </span>
-                    <span className="font-bold text-slate-900 tabular-nums">
-                      {issueDate.toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-4 pt-1 border-t border-slate-200/80">
-                    <span className="font-semibold text-slate-600">
-                      {isKh ? 'ស្ថានភាព:' : 'Status:'}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded border text-[10px] font-bold tracking-wide ${statusInfo.badgeClass}`}
-                    >
-                      {isKh ? statusInfo.kh : statusInfo.en}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Customer & Delivery Details Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-              <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-4">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[#004691] mb-2">
-                  Bill To / វិក្កយបត្រជូន
-                </p>
-                <p className="text-sm font-bold text-slate-900">{order.customerName}</p>
-                <div className="mt-1.5 space-y-0.5 text-xs text-slate-700 font-medium">
-                  <p>{order.customerPhone || 'N/A'}</p>
-                  {order.customerEmail && <p className="break-all">{order.customerEmail}</p>}
-                </div>
+                <span
+                  className={`mt-0 sm:mt-2 inline-block px-2.5 py-0.5 border-2 text-[10px] font-black tracking-widest uppercase ${statusInfo.stampClass}`}
+                >
+                  {isKh ? statusInfo.kh : statusInfo.en}
+                </span>
               </div>
 
-              <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-4">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[#004691] mb-2">
-                  Delivery & Payment / ដឹកជញ្ជូន & ការទូទាត់
-                </p>
-                <p className="text-xs text-slate-800 font-medium leading-relaxed">
-                  {order.address || (isKh ? 'មកទទួលផ្ទាល់នៅហាង' : 'Store Pickup / Address not provided')}
-                </p>
-                <p className="mt-2 pt-2 border-t border-slate-200/70 text-xs text-slate-700">
-                  <span className="font-bold text-slate-900">
-                    {isKh ? 'វិធីសាស្ត្រទូទាត់:' : 'Payment:'}
-                  </span>{' '}
-                  <span className="font-semibold text-slate-800">
-                    {formatPaymentMethod(order.paymentMethod)}
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* Items Table */}
-            <div className="border border-slate-200 rounded-xl overflow-hidden mb-7">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-[#004691] text-white">
-                    <th className="py-3 px-3 text-[11px] font-bold uppercase tracking-wider text-center w-12">
-                      #
-                    </th>
-                    <th className="py-3 px-4 text-[11px] font-bold uppercase tracking-wider">
-                      {isKh ? 'បរិយាយទំនិញ (Description)' : 'Item Description'}
-                    </th>
-                    <th className="py-3 px-3 text-[11px] font-bold uppercase tracking-wider text-center w-20">
-                      {isKh ? 'ចំនួន' : 'Qty'}
-                    </th>
-                    <th className="py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-right w-28">
-                      {isKh ? 'តម្លៃរាយ' : 'Unit Price'}
-                    </th>
-                    <th className="py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-right w-32">
-                      {isKh ? 'សរុប' : 'Amount'}
-                    </th>
+              <table className="w-full text-xs border border-slate-400 border-collapse">
+                <tbody>
+                  <tr className="border-b border-slate-300">
+                    <td className="bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 w-[44%] border-r border-slate-300">
+                      {isKh ? 'លេខវិក្កយបត្រ' : 'Invoice No.'}
+                    </td>
+                    <td className="px-2.5 py-1.5 font-mono font-bold text-slate-900 text-right">
+                      INV-{invoiceShortId}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="text-xs sm:text-sm divide-y divide-slate-200">
-                  {items.map((item, idx) => {
-                    const qty = Number(item.quantity) || 1
-                    const price = Number(item.price) || 0
-                    const lineTotal = price * qty
-
-                    return (
-                      <tr key={idx} className="even:bg-slate-50/70">
-                        <td className="py-3.5 px-3 text-center text-slate-600 font-semibold tabular-nums">
-                          {idx + 1}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <p className="font-bold text-slate-900 leading-snug">{item.name}</p>
-                          {(item.sku || item.variant) && (
-                            <p className="text-[11px] text-slate-600 font-medium mt-0.5">
-                              {item.sku ? `SKU: ${item.sku}` : ''}
-                              {item.sku && item.variant ? ' • ' : ''}
-                              {item.variant || ''}
-                            </p>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-3 text-center font-bold text-slate-800 tabular-nums">
-                          {qty}
-                        </td>
-                        <td className="py-3.5 px-4 text-right font-medium text-slate-800 tabular-nums">
-                          {formatCurrency(price)}
-                        </td>
-                        <td className="py-3.5 px-4 text-right font-bold text-slate-900 tabular-nums">
-                          {formatCurrency(lineTotal)}
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  <tr className="border-b border-slate-300">
+                    <td className="bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 border-r border-slate-300">
+                      {isKh ? 'លេខបញ្ជាទិញ' : 'Order Ref.'}
+                    </td>
+                    <td className="px-2.5 py-1.5 font-mono font-semibold text-slate-900 text-right">
+                      #{order.id}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="bg-slate-100 px-2.5 py-1.5 font-bold text-slate-700 border-r border-slate-300">
+                      {isKh ? 'កាលបរិច្ឆេទ' : 'Date'}
+                    </td>
+                    <td className="px-2.5 py-1.5 font-semibold text-slate-900 text-right tabular-nums">
+                      {formattedDate}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
+          </div>
 
-            {/* Terms Note & Totals Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
-              <div className="sm:col-span-7 bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#004691]">
-                  <ShieldCheck className="w-4 h-4 shrink-0" />
-                  <span>{isKh ? 'លក្ខខណ្ឌ និងការធានា' : 'Terms & Warranty Notice'}</span>
-                </div>
-                <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
-                  {isKh
-                    ? 'សូមរក្សាទុកវិក្កយបត្រនេះសម្រាប់សេវាកម្មធានា និងការផ្ទៀងផ្ទាត់ទំនិញ។ ទំនិញដែលបានទិញរួចត្រូវពិនិត្យផ្ទៀងផ្ទាត់មុនពេលចុះហត្ថលេខាទទួល។'
-                    : 'Please retain this official invoice for warranty service and support. All goods should be inspected upon delivery before signing.'}
-                </p>
+          {/* Double rule accent */}
+          <div className="h-[2px] bg-slate-300 mt-0.5 mb-5" />
+
+          {/* Bill To & Delivery Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 border border-slate-400 divide-y sm:divide-y-0 sm:divide-x divide-slate-400 mb-6 text-xs">
+            <div>
+              <div className="bg-slate-100 border-b border-slate-400 px-3 py-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-900">
+                {isKh ? 'អតិថិជន / Bill To' : 'Bill To / អតិថិជន'}
               </div>
-
-              <div className="sm:col-span-5 space-y-2 text-xs sm:text-sm">
-                <div className="flex justify-between py-1.5 px-2 text-slate-700 border-b border-slate-200/80">
-                  <span className="font-medium">{isKh ? 'សរុបរង (Subtotal)' : 'Subtotal'}</span>
-                  <span className="font-semibold text-slate-900 tabular-nums">
-                    {formatCurrency(subtotal)}
+              <div className="p-3 space-y-1 text-slate-800">
+                <p className="text-sm font-bold text-slate-900">{order.customerName}</p>
+                <p>
+                  <span className="font-semibold text-slate-600">
+                    {isKh ? 'ទូរស័ព្ទ៖ ' : 'Tel: '}
                   </span>
-                </div>
-                {shippingOrDiff > 0 && (
-                  <div className="flex justify-between py-1.5 px-2 text-slate-700 border-b border-slate-200/80">
-                    <span className="font-medium">
-                      {isKh ? 'ថ្លៃដឹកជញ្ជូន (Delivery)' : 'Delivery Fee'}
+                  <span className="font-medium tabular-nums">{order.customerPhone || 'N/A'}</span>
+                </p>
+                {order.customerEmail && (
+                  <p className="break-all">
+                    <span className="font-semibold text-slate-600">
+                      {isKh ? 'អ៊ីមែល៖ ' : 'Email: '}
                     </span>
-                    <span className="font-semibold text-slate-900 tabular-nums">
-                      {formatCurrency(shippingOrDiff)}
-                    </span>
-                  </div>
+                    <span>{order.customerEmail}</span>
+                  </p>
                 )}
-                <div className="flex justify-between py-1.5 px-2 text-slate-700 border-b border-slate-200/80">
-                  <span className="font-medium">{isKh ? 'ពន្ធ (Tax 0%)' : 'Tax (0%)'}</span>
-                  <span className="font-semibold text-slate-900 tabular-nums">$0.00</span>
-                </div>
-                <div className="flex justify-between items-center py-3 px-4 bg-[#004691] text-white rounded-xl shadow-xs">
-                  <span className="font-bold text-sm uppercase tracking-wide">
-                    {isKh ? 'សរុបរួម (Total)' : 'Total'}
-                  </span>
-                  <span className="font-extrabold text-lg tabular-nums">
-                    {formatCurrency(grandTotal)}
-                  </span>
-                </div>
               </div>
             </div>
 
-            {/* Signatures */}
-            <div className="grid grid-cols-2 gap-12 sm:gap-20 mt-14 px-2 sm:px-6">
-              <div className="text-center">
-                <div className="h-14" />
-                <div className="border-t border-slate-400 pt-2.5">
-                  <p className="text-xs font-bold text-slate-900">
-                    {isKh ? 'អ្នកចេញវិក្កយបត្រ (Authorized By)' : 'Authorized Signature'}
-                  </p>
-                  <p className="text-[11px] text-slate-600 mt-0.5">{company.name}</p>
-                </div>
+            <div>
+              <div className="bg-slate-100 border-b border-slate-400 px-3 py-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-900">
+                {isKh ? 'ការដឹកជញ្ជូន និងការទូទាត់' : 'Delivery & Payment Details'}
               </div>
-              <div className="text-center">
-                <div className="h-14" />
-                <div className="border-t border-slate-400 pt-2.5">
-                  <p className="text-xs font-bold text-slate-900">
-                    {isKh ? 'អតិថិជន (Customer Signature)' : 'Customer Signature'}
-                  </p>
-                  <p className="text-[11px] text-slate-600 mt-0.5">
-                    {isKh ? 'បានទទួលទំនិញត្រឹមត្រូវ' : 'Received in good condition'}
-                  </p>
+              <div className="p-3 space-y-1.5 text-slate-800">
+                <p className="leading-snug">
+                  <span className="font-semibold text-slate-600">
+                    {isKh ? 'អាសយដ្ឋាន៖ ' : 'Ship To: '}
+                  </span>
+                  <span>
+                    {order.address ||
+                      (isKh ? 'មកទទួលផ្ទាល់នៅហាង' : 'Store Pickup / Address not provided')}
+                  </span>
+                </p>
+                <p>
+                  <span className="font-semibold text-slate-600">
+                    {isKh ? 'ការទូទាត់៖ ' : 'Payment Method: '}
+                  </span>
+                  <span className="font-bold text-slate-900">
+                    {formatPaymentMethod(order.paymentMethod, isKh)}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Line Items Accounting Table */}
+          <table className="w-full border border-slate-800 border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-100 border-b-2 border-slate-800 text-slate-900">
+                <th className="py-2.5 px-2.5 text-center font-bold uppercase tracking-wider border-r border-slate-400 w-11">
+                  {isKh ? 'ល.រ' : 'No.'}
+                </th>
+                <th className="py-2.5 px-3 text-left font-bold uppercase tracking-wider border-r border-slate-400">
+                  {isKh ? 'បរិយាយមុខទំនិញ (Description)' : 'Description of Goods'}
+                </th>
+                <th className="py-2.5 px-2.5 text-center font-bold uppercase tracking-wider border-r border-slate-400 w-16">
+                  {isKh ? 'ចំនួន' : 'Qty'}
+                </th>
+                <th className="py-2.5 px-3 text-right font-bold uppercase tracking-wider border-r border-slate-400 w-28">
+                  {isKh ? 'តម្លៃរាយ' : 'Unit Price'}
+                </th>
+                <th className="py-2.5 px-3 text-right font-bold uppercase tracking-wider w-32">
+                  {isKh ? 'ទឹកប្រាក់សរុប' : 'Amount (USD)'}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-300">
+              {items.map((item, idx) => {
+                const qty = Number(item.quantity) || 1
+                const price = Number(item.price) || 0
+                const lineTotal = price * qty
+                const displayName =
+                  isKh && item.nameKhmer ? item.nameKhmer : item.name
+
+                return (
+                  <tr key={idx}>
+                    <td className="py-2.5 px-2.5 text-center font-semibold text-slate-700 border-r border-slate-300 tabular-nums align-top">
+                      {idx + 1}
+                    </td>
+                    <td className="py-2.5 px-3 border-r border-slate-300 align-top">
+                      <p className="font-bold text-slate-900 leading-snug">{displayName}</p>
+                      {(item.sku || item.variant) && (
+                        <p className="text-[11px] text-slate-600 mt-0.5">
+                          {item.sku ? `SKU: ${item.sku}` : ''}
+                          {item.sku && item.variant ? ' | ' : ''}
+                          {item.variant || ''}
+                        </p>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-2.5 text-center font-semibold text-slate-900 border-r border-slate-300 tabular-nums align-top">
+                      {qty}
+                    </td>
+                    <td className="py-2.5 px-3 text-right text-slate-800 border-r border-slate-300 tabular-nums align-top">
+                      {formatCurrency(price)}
+                    </td>
+                    <td className="py-2.5 px-3 text-right font-bold text-slate-900 tabular-nums align-top">
+                      {formatCurrency(lineTotal)}
+                    </td>
+                  </tr>
+                )
+              })}
+
+              {Array.from({ length: emptyRowsCount }).map((_, idx) => (
+                <tr key={`empty-${idx}`} className="h-9">
+                  <td className="border-r border-slate-300">&nbsp;</td>
+                  <td className="border-r border-slate-300">&nbsp;</td>
+                  <td className="border-r border-slate-300">&nbsp;</td>
+                  <td className="border-r border-slate-300">&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Notes & Totals Attached Footer Block */}
+          <div className="grid grid-cols-1 sm:grid-cols-12 border-x border-b border-slate-800 text-xs">
+            {/* Left: Terms & Notes */}
+            <div className="sm:col-span-7 p-3.5 border-b sm:border-b-0 sm:border-r border-slate-800 flex flex-col justify-between">
+              <div>
+                <p className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-1">
+                  {isKh ? 'កំណត់ចំណាំ និងលក្ខខណ្ឌ' : 'Terms & Warranty Conditions'}
+                </p>
+                <p className="text-[11px] text-slate-700 leading-relaxed whitespace-pre-line">
+                  {isKh
+                    ? '១. សូមរក្សាទុកវិក្កយបត្រនេះសម្រាប់សេវាកម្មធានា និងការផ្ទៀងផ្ទាត់។\n២. សូមពិនិត្យទំនិញឱ្យបានត្រឹមត្រូវមុនពេលចុះហត្ថលេខាទទួល។'
+                    : '1. Please keep this original invoice for warranty service and verification.\n2. Goods sold should be inspected upon delivery before signing.'}
+                </p>
+              </div>
+              <p className="text-[11px] text-slate-600 mt-3 pt-2 border-t border-slate-200">
+                <span className="font-bold text-slate-800">
+                  {isKh ? 'គេហទំព័រ៖ ' : 'Website: '}
+                </span>
+                {company.website}
+              </p>
+            </div>
+
+            {/* Right: Accounting Totals */}
+            <div className="sm:col-span-5 divide-y divide-slate-300">
+              <div className="flex justify-between px-3.5 py-2 text-slate-800">
+                <span className="font-semibold">
+                  {isKh ? 'សរុបរង (Subtotal)' : 'Subtotal'}
+                </span>
+                <span className="font-semibold tabular-nums">{formatCurrency(subtotal)}</span>
+              </div>
+              {shippingOrDiff > 0 && (
+                <div className="flex justify-between px-3.5 py-2 text-slate-800">
+                  <span className="font-semibold">
+                    {isKh ? 'ថ្លៃដឹកជញ្ជូន (Delivery)' : 'Delivery Fee'}
+                  </span>
+                  <span className="font-semibold tabular-nums">
+                    {formatCurrency(shippingOrDiff)}
+                  </span>
                 </div>
+              )}
+              <div className="flex justify-between px-3.5 py-2 text-slate-800">
+                <span className="font-semibold">{isKh ? 'ពន្ធ (VAT 0%)' : 'Tax / VAT (0%)'}</span>
+                <span className="font-semibold tabular-nums">$0.00</span>
+              </div>
+              <div className="flex justify-between items-center px-3.5 py-2.5 bg-slate-100 border-t-2 border-slate-900">
+                <span className="font-black text-xs sm:text-sm uppercase tracking-wide text-slate-900">
+                  {isKh ? 'សរុបរួម (TOTAL)' : 'TOTAL (USD)'}
+                </span>
+                <span className="font-black text-base sm:text-lg text-slate-900 tabular-nums underline decoration-double underline-offset-4">
+                  {formatCurrency(grandTotal)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Handwritten Signature Lines */}
+          <div className="grid grid-cols-2 gap-10 sm:gap-20 mt-14 px-4 sm:px-8 text-xs">
+            <div className="text-center">
+              <div className="h-14" />
+              <div className="border-t border-slate-700 pt-2 space-y-0.5">
+                <p className="font-bold text-slate-900">
+                  {isKh ? 'ហត្ថលេខាអ្នកលក់ / Authorized Signature' : 'Authorized Signature'}
+                </p>
+                <p className="text-[11px] text-slate-600">{company.name}</p>
+                <p className="text-[11px] text-slate-500 pt-1">
+                  {isKh ? 'កាលបរិច្ឆេទ៖ ____ / ____ / ______' : 'Date: ____ / ____ / ______'}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="h-14" />
+              <div className="border-t border-slate-700 pt-2 space-y-0.5">
+                <p className="font-bold text-slate-900">
+                  {isKh ? 'ហត្ថលេខាអ្នកទិញ / Customer Signature' : 'Customer Signature'}
+                </p>
+                <p className="text-[11px] text-slate-600">
+                  {isKh ? 'បានពិនិត្យ និងទទួលទំនិញត្រឹមត្រូវ' : 'Received in good condition'}
+                </p>
+                <p className="text-[11px] text-slate-500 pt-1">
+                  {isKh ? 'កាលបរិច្ឆេទ៖ ____ / ____ / ______' : 'Date: ____ / ____ / ______'}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-7 sm:px-11 pb-6 pt-4 border-t border-slate-200 bg-slate-50/60 text-center space-y-1">
-          <p className="text-xs font-semibold text-slate-800">
+        {/* Minimal Printed Document Footer */}
+        <div className="mt-10 pt-3 border-t border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-1 text-[11px] text-slate-600">
+          <p>
             {isKh
-              ? 'សូមអរគុណសម្រាប់ការជឿទុកចិត្ត និងគាំទ្រ Yeung Shi Group!'
+              ? 'សូមអរគុណសម្រាប់ការគាំទ្រ និងការជឿទុកចិត្តមកលើ Yeung Shi Group!'
               : 'Thank you for your business with Yeung Shi Group!'}
           </p>
-          <p className="text-[11px] text-slate-600">
-            {company.website} • {company.phone} • Ref: {order.id}
+          <p className="font-mono">
+            INV-{invoiceShortId} • {company.phone}
           </p>
         </div>
       </div>

@@ -228,108 +228,193 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
  })
 
- const renderCategoryFilters = (isMobile: boolean = false) => (
- <div className="flex flex-col gap-1">
- {/* Featured Machines Sidebar Button (Top) */}
- <button
- onClick={() => {
- if (isMobile) setShowFilters(false)
- router.push('/products/featured')
- }}
- className={`flex items-center justify-between px-3.5 py-2.5 text-base md:text-lg font-bold rounded-md transition-all ${
- isFeatured ? "bg-[#004691] text-white shadow-2xs" : "text-slate-700 hover:bg-slate-100"
- }`}
- >
- <span>{language === "kh" ? "ម៉ាស៊ីនពិសេស" : "Featured Machines"}</span>
- </button>
+  const getCategoryCount = (cat: any, isMain: boolean) => {
+    const targetIds = isMain
+      ? [cat.id, ...categories.filter((c: any) => c.parentId === cat.id).map((c: any) => c.id)]
+      : [cat.id]
 
- {/* All Products Sidebar Button */}
- <button
- onClick={() => handleCategorySelect("all", isMobile)}
- className={`flex items-center justify-between px-3.5 py-2.5 text-base md:text-lg font-bold rounded-md transition-all ${
- selectedCategory === "all" && !isFeatured ? "bg-[#004691] text-white shadow-2xs" : "text-slate-700 hover:bg-slate-100"
- }`}
- >
- <span>{t("allProducts")}</span>
- </button>
- 
- {categories.filter(c => !c.parentId).map(cat => {
- const isSelected = selectedCategory === cat.slug
- const subCats = categories.filter(sub => sub.parentId === cat.id)
- const hasSubs = subCats.length > 0
- const isExpanded = expandedCategories.includes(cat.slug) || isSelected || subCats.some(s => s.slug === selectedCategory)
+    return allProducts.filter(
+      (p) =>
+        targetIds.includes(p.categoryId) ||
+        p.categorySlug === cat.slug ||
+        p.category?.slug === cat.slug
+    ).length
+  }
 
- return (
- <div key={cat.id} className="flex flex-col">
- <div className={`flex items-center justify-between rounded-md transition-all ${
- isSelected ? "bg-[#004691]/10 text-[#004691]" : "text-slate-800 hover:bg-slate-50"
- }`}>
- <button
- onClick={() => {
- handleCategorySelect(cat.slug, isMobile)
- if (hasSubs && !expandedCategories.includes(cat.slug)) {
- setExpandedCategories([cat.slug])
- }
- }}
- className="flex-1 text-left px-3.5 py-2.5 text-base md:text-lg font-bold"
- >
- {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
- </button>
- 
- {hasSubs && (
- <button
- onClick={(e) => toggleCategoryExpand(cat.slug, e)}
- className="px-3 py-2.5 h-full flex items-center justify-center shrink-0 text-slate-400 hover:text-[#004691]"
- >
- <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90 text-[#004691]' : ''}`} />
- </button>
- )}
- </div>
+  const featuredCount = allProducts.filter((p) => p.isFeatured).length
 
- {/* Smooth Animated Accordion for Nested Subcategories */}
- <AnimatePresence initial={false}>
- {hasSubs && isExpanded && (
- <motion.div
- initial={{ height: 0, opacity: 0 }}
- animate={{ height: "auto", opacity: 1 }}
- exit={{ height: 0, opacity: 0 }}
- transition={{ duration: 0.2, ease: "easeInOut" }}
- className="overflow-hidden ml-3 pl-3 border-l-2 border-[#004691]/20 flex flex-col gap-1 my-1"
- >
- {/* Option to view all products under this main category */}
- <button
- onClick={() => handleCategorySelect(cat.slug, isMobile)}
- className={`text-left px-2.5 py-2 text-[15px] md:text-[17px] font-bold rounded-md transition-all ${
- selectedCategory === cat.slug ? "text-[#004691] bg-blue-50" : "text-slate-500 hover:text-[#004691] hover:bg-slate-50"
- }`}
- >
- {language === "kh" ? `ទំនិញទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
- </button>
+  const renderCategoryFilters = (isMobile: boolean = false) => (
+    <div className="flex flex-col gap-1">
+      {/* Quick Views */}
+      <div className="space-y-1">
+        <button
+          onClick={() => {
+            if (isMobile) setShowFilters(false)
+            router.push('/products/featured')
+          }}
+          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+            isFeatured
+              ? "bg-[#004691] text-white shadow-2xs"
+              : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+        >
+          <span className="flex items-center gap-2.5 truncate">
+            <Star className={`w-4 h-4 shrink-0 ${isFeatured ? "text-amber-300 fill-amber-300" : "text-amber-500"}`} />
+            <span className="truncate">{language === "kh" ? "ម៉ាស៊ីនពិសេស" : "Featured Machines"}</span>
+          </span>
+          {featuredCount > 0 && (
+            <span
+              className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
+                isFeatured ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              {featuredCount}
+            </span>
+          )}
+        </button>
 
- {subCats.map(sub => (
- <button
- key={sub.id}
- onClick={() => handleCategorySelect(sub.slug, isMobile)}
- className={`text-left px-2.5 py-2 text-[15px] md:text-[17px] rounded-md transition-all ${
- selectedCategory === sub.slug ? "text-[#004691] font-bold bg-blue-50" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
- }`}
- >
- {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
- </button>
- ))}
- </motion.div>
- )}
- </AnimatePresence>
- </div>
- )
- })}
- </div>
- )
+        <button
+          onClick={() => handleCategorySelect("all", isMobile)}
+          className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+            selectedCategory === "all" && !isFeatured
+              ? "bg-[#004691] text-white shadow-2xs"
+              : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+          }`}
+        >
+          <span className="flex items-center gap-2.5 truncate">
+            <Package className={`w-4 h-4 shrink-0 ${selectedCategory === "all" && !isFeatured ? "text-blue-200" : "text-slate-400"}`} />
+            <span className="truncate">{language === "kh" ? "ផលិតផលទាំងអស់" : "All Products"}</span>
+          </span>
+          {!loading && (
+            <span
+              className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
+                selectedCategory === "all" && !isFeatured ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              {allProducts.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Category Tree Divider */}
+      <div className="my-2.5 border-t border-slate-100" />
+      <p className="px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+        {language === "kh" ? "ប្រភេទផលិតផល" : "Categories"}
+      </p>
+
+      <div className="space-y-0.5">
+        {categories.filter(c => !c.parentId).map(cat => {
+          const isSelected = selectedCategory === cat.slug
+          const subCats = categories.filter(sub => sub.parentId === cat.id)
+          const hasSubs = subCats.length > 0
+          const hasSelectedSub = subCats.some(s => s.slug === selectedCategory)
+          const isExpanded = expandedCategories.includes(cat.slug) || isSelected || hasSelectedSub
+          const mainCount = getCategoryCount(cat, true)
+
+          return (
+            <div key={cat.id} className="flex flex-col">
+              <div
+                className={`flex items-center justify-between rounded-lg transition-all ${
+                  isSelected
+                    ? "bg-[#004691]/10 text-[#004691]"
+                    : hasSelectedSub
+                    ? "bg-slate-50 text-[#004691]"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <button
+                  onClick={() => {
+                    handleCategorySelect(cat.slug, isMobile)
+                    if (hasSubs && !expandedCategories.includes(cat.slug)) {
+                      setExpandedCategories([cat.slug])
+                    }
+                  }}
+                  className="flex-1 min-w-0 flex items-center justify-between gap-2 text-left px-3 py-2 text-sm font-semibold cursor-pointer"
+                >
+                  <span className="truncate">
+                    {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
+                  </span>
+                  {!loading && (
+                    <span
+                      className={`text-[11px] font-semibold px-1.5 py-0.5 rounded tabular-nums shrink-0 ${
+                        isSelected ? "bg-[#004691]/15 text-[#004691]" : "text-slate-400"
+                      }`}
+                    >
+                      {mainCount}
+                    </span>
+                  )}
+                </button>
+
+                {hasSubs && (
+                  <button
+                    onClick={(e) => toggleCategoryExpand(cat.slug, e)}
+                    aria-label="Toggle subcategories"
+                    className="pr-2.5 pl-1 py-2 flex items-center justify-center shrink-0 text-slate-400 hover:text-[#004691] cursor-pointer"
+                  >
+                    <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-90 text-[#004691]' : ''}`} />
+                  </button>
+                )}
+              </div>
+
+              {/* Smooth Animated Accordion for Nested Subcategories */}
+              <AnimatePresence initial={false}>
+                {hasSubs && isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="overflow-hidden ml-3.5 pl-2.5 border-l border-slate-200 flex flex-col gap-0.5 my-1"
+                  >
+                    <button
+                      onClick={() => handleCategorySelect(cat.slug, isMobile)}
+                      className={`text-left px-2.5 py-1.5 text-[13px] rounded-md transition-all cursor-pointer ${
+                        selectedCategory === cat.slug
+                          ? "text-[#004691] font-bold bg-blue-50/80"
+                          : "text-slate-500 font-medium hover:text-[#004691] hover:bg-slate-50"
+                      }`}
+                    >
+                      {language === "kh" ? `ទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
+                    </button>
+
+                    {subCats.map(sub => {
+                      const subCount = getCategoryCount(sub, false)
+                      return (
+                        <button
+                          key={sub.id}
+                          onClick={() => handleCategorySelect(sub.slug, isMobile)}
+                          className={`flex items-center justify-between gap-2 text-left px-2.5 py-1.5 text-[13px] rounded-md transition-all cursor-pointer ${
+                            selectedCategory === sub.slug
+                              ? "text-[#004691] font-bold bg-blue-50/80"
+                              : "text-slate-600 font-medium hover:text-slate-900 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span className="truncate">
+                            {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                          </span>
+                          {!loading && (
+                            <span className="text-[11px] text-slate-400 tabular-nums shrink-0">
+                              {subCount}
+                            </span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 
  return (
  <PublicLayout>
  <main className="bg-white min-h-screen pb-24 pt-4 md:pt-6 font-sans">
- <div className="max-w-5xl mx-auto px-4 md:px-8">
+ <div className="max-w-7xl mx-auto px-4 md:px-8">
  
  {/* 🍞 Mobile Responsive Breadcrumbs */}
  <div className="flex items-center gap-2 text-sm sm:text-base text-slate-600 font-medium mb-4 overflow-hidden whitespace-nowrap">
@@ -361,7 +446,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
 
  {/* Header Bar: Category Title + Count + Custom Sort & Filter */}
  <div className="flex flex-row justify-between items-center pb-4 mb-6 border-b border-slate-200 gap-3">
- <div className="min-w-0">
+ <div className="min-w-0 flex items-baseline gap-2.5">
  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#004691] truncate">
  {(() => {
  if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
@@ -372,6 +457,11 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  return language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name
  })()}
  </h1>
+ {!loading && (
+ <span className="text-xs sm:text-sm font-semibold text-slate-400 tabular-nums shrink-0">
+ ({filteredProducts.length})
+ </span>
+ )}
  </div>
 
  <div className="flex items-center gap-2 shrink-0 text-sm font-semibold text-slate-700">
@@ -447,10 +537,23 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  <div className="flex flex-col lg:flex-row gap-8">
  {/* Desktop Sidebar Accordion Filters */}
  <aside className="hidden lg:block lg:w-64 shrink-0">
- <div className="bg-white rounded-md border border-slate-200 p-4 sticky top-28 shadow-2xs">
- <h3 className="text-base font-bold text-[#004691] uppercase tracking-wider mb-3 px-2">
- {t("categories")}
+ <div className="bg-white rounded-xl border border-slate-200 p-3.5 sticky top-24 shadow-2xs">
+ <div className="flex items-center justify-between px-2 pb-2.5 mb-2.5 border-b border-slate-100">
+ <div className="flex items-center gap-2">
+ <SlidersHorizontal className="w-3.5 h-3.5 text-[#004691]" />
+ <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+ {language === "kh" ? "តម្រងស្វែងរក" : "Filter"}
  </h3>
+ </div>
+ {(selectedCategory !== "all" || isFeatured) && (
+ <button
+ onClick={() => handleCategorySelect("all", false)}
+ className="text-[11px] font-bold text-[#004691] hover:underline cursor-pointer"
+ >
+ {language === "kh" ? "កំណត់ឡើងវិញ" : "Reset"}
+ </button>
+ )}
+ </div>
  {renderCategoryFilters(false)}
  </div>
  </aside>
@@ -582,7 +685,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  const groupedIds = new Set(groups.flatMap(g => g.products.map((p: any) => p.id)))
  const ungrouped = filteredProducts.filter(p => !groupedIds.has(p.id))
 
- const PREVIEW_COUNT = 4 // products shown before "See all"
+ const PREVIEW_COUNT = 6 // 2 rows of 3 on desktop, 3 rows of 2 on mobile
 
  return (
  <div className="flex flex-col gap-10">
