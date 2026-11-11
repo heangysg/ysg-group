@@ -338,13 +338,18 @@ export default function AccountPage() {
           </div>
 
           {/* Clean Profile Header Card */}
-          <section className="relative bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
-            <div className="h-20 sm:h-24 bg-gradient-to-r from-[#004691] via-[#0a5bb5] to-[#1a73d9]" />
+          <section className="relative bg-white rounded-2xl border border-slate-200/80 shadow-sm">
+            {/* Banner */}
+            <div className="h-24 sm:h-28 bg-gradient-to-r from-[#004691] via-[#0a5bb5] to-[#1a73d9] rounded-t-2xl" />
 
-            <div className="px-5 sm:px-7 pb-6">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 sm:-mt-11">
-                <div className="flex items-end gap-4 min-w-0">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#004691] text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md ring-4 ring-white overflow-hidden shrink-0">
+            {/* Profile info row */}
+            <div className="px-5 sm:px-7 pb-5 sm:pb-6">
+              {/* Avatar — pulled up to overlap the banner */}
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4">
+                {/* Left: avatar + name stacked nicely */}
+                <div className="flex flex-col sm:flex-row sm:items-end gap-0 sm:gap-4 min-w-0">
+                  {/* Avatar circle */}
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#004691] text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-lg ring-4 ring-white overflow-hidden shrink-0 relative z-10 -mt-12 sm:-mt-14">
                     {avatarUrl ? (
                       <img
                         src={avatarUrl}
@@ -357,25 +362,27 @@ export default function AccountPage() {
                     )}
                   </div>
 
-                  <div className="min-w-0 pt-2 sm:pb-1">
+                  {/* Name + email — flows naturally below avatar on mobile */}
+                  <div className="min-w-0 mt-3 sm:mt-0 sm:pb-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="text-lg sm:text-2xl font-bold text-slate-900 truncate">
+                      <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
                         {displayName}
                       </h1>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#004691] border border-blue-200/80 text-[11px] font-semibold">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-[#004691] border border-blue-200/80 text-[11px] font-semibold whitespace-nowrap">
                         <CheckCircle2 className="w-3 h-3" />
                         {isKh ? "បានផ្ទៀងផ្ទាត់" : "Verified"}
                       </span>
                     </div>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium truncate mt-0.5">
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 break-all sm:break-normal sm:truncate">
                       {user?.email}
                     </p>
                   </div>
                 </div>
 
+                {/* Logout button — bottom-right on desktop, below on mobile */}
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl font-semibold text-xs sm:text-sm transition-all shadow-2xs shrink-0 self-start sm:self-end cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl font-semibold text-xs sm:text-sm transition-all shadow-sm shrink-0 self-start sm:self-end cursor-pointer w-fit"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>{t("logout")}</span>
@@ -477,44 +484,44 @@ export default function AccountPage() {
               {activeTab === "overview" && (
                 <div className="space-y-6">
                   {/* 3 Clean Summary Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#004691] flex items-center justify-center shrink-0">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-50 text-[#004691] flex items-center justify-center shrink-0">
                         <CreditCard className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-slate-500">
+                        <p className="text-[11px] sm:text-xs font-medium text-slate-500">
                           {isKh ? "ចំណាយសរុប" : "Total Spent"}
                         </p>
-                        <p className="text-xl font-bold text-slate-900 tabular-nums truncate mt-0.5">
+                        <p className="text-base sm:text-xl font-bold text-slate-900 tabular-nums truncate mt-0.5">
                           {formatUsd(totalSpentAll)}
                         </p>
                       </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                         <Package className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-slate-500">
+                        <p className="text-[11px] sm:text-xs font-medium text-slate-500">
                           {isKh ? "ការបញ្ជាទិញ" : "Total Orders"}
                         </p>
-                        <p className="text-xl font-bold text-slate-900 tabular-nums mt-0.5">
+                        <p className="text-base sm:text-xl font-bold text-slate-900 tabular-nums mt-0.5">
                           {orders.length}
                         </p>
                       </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                    <div className="col-span-2 sm:col-span-1 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
                         <Calendar className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-slate-500">
+                        <p className="text-[11px] sm:text-xs font-medium text-slate-500">
                           {isKh ? "សមាជិកតាំងពី" : "Member Since"}
                         </p>
-                        <p className="text-xl font-bold text-slate-900 tabular-nums truncate mt-0.5">
+                        <p className="text-base sm:text-xl font-bold text-slate-900 tabular-nums truncate mt-0.5">
                           {memberSince}
                         </p>
                       </div>
@@ -554,7 +561,7 @@ export default function AccountPage() {
                             <Link
                               key={order.id}
                               href={`/orders/${order.id}`}
-                              className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-slate-50/80 transition-colors group"
+                              className="px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between gap-3 hover:bg-slate-50/80 transition-colors group"
                             >
                               <div className="flex items-center gap-3.5 min-w-0">
                                 <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-[#004691] flex items-center justify-center shrink-0 transition-colors">
@@ -688,7 +695,7 @@ export default function AccountPage() {
                                     {formatUsd(item.price)} × {item.quantity}
                                   </p>
                                 </div>
-                                <p className="text-xs sm:text-sm font-bold text-slate-900 tabular-nums shrink-0">
+                                <p className="text-xs sm:text-sm font-bold text-slate-900 tabular-nums shrink-0 ml-auto pl-2">
                                   {formatUsd(
                                     (Number(item.price) || 0) *
                                       (Number(item.quantity) || 1)
@@ -699,7 +706,7 @@ export default function AccountPage() {
                           </div>
 
                           {/* Order Card Footer */}
-                          <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                          <div className="px-4 sm:px-5 py-3.5 sm:py-4 bg-slate-50/50 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                             <div>
                               <p className="text-[11px] font-medium text-slate-500">
                                 {isKh ? "តម្លៃសរុប" : "Total Amount"}
@@ -709,18 +716,18 @@ export default function AccountPage() {
                               </p>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 shrink-0">
                               <Link
                                 href={`/orders/${order.id}/invoice`}
                                 target="_blank"
-                                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-all"
+                                className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-all"
                               >
                                 <Printer className="w-3.5 h-3.5" />
                                 <span>{isKh ? "វិក្កយបត្រ" : "Receipt"}</span>
                               </Link>
                               <Link
                                 href={`/orders/${order.id}`}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#004691] hover:bg-[#003570] text-white text-xs font-semibold rounded-xl shadow-xs transition-all"
+                                className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-[#004691] hover:bg-[#003570] text-white text-xs font-semibold rounded-xl shadow-xs transition-all"
                               >
                                 <span>{isKh ? "មើលលម្អិត" : "Details"}</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
@@ -845,7 +852,7 @@ export default function AccountPage() {
                       <button
                         type="submit"
                         disabled={updating}
-                        className="px-6 py-2.5 bg-[#004691] hover:bg-[#003570] text-white font-semibold text-xs sm:text-sm rounded-xl transition-all shadow-xs active:scale-98 disabled:opacity-50 cursor-pointer"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-[#004691] hover:bg-[#003570] text-white font-semibold text-sm rounded-xl transition-all shadow-xs active:scale-98 disabled:opacity-50 cursor-pointer"
                       >
                         {updating ? t("updating") : t("saveChanges")}
                       </button>
@@ -938,7 +945,7 @@ export default function AccountPage() {
                       <button
                         type="submit"
                         disabled={updatingPassword}
-                        className="px-6 py-2.5 bg-[#004691] hover:bg-[#003570] text-white font-semibold text-xs sm:text-sm rounded-xl transition-all shadow-xs active:scale-98 disabled:opacity-50 cursor-pointer"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-[#004691] hover:bg-[#003570] text-white font-semibold text-sm rounded-xl transition-all shadow-xs active:scale-98 disabled:opacity-50 cursor-pointer"
                       >
                         {updatingPassword ? t("updating") : t("updatePassword")}
                       </button>
