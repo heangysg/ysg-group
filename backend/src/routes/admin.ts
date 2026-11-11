@@ -523,11 +523,12 @@ router.get('/customers', authenticateJWT, async (req: AuthRequest, res: Response
         "customerEmail" as email, 
         "customerPhone" as phone,
         MAX("address") as address,
-        COUNT(*) as order_count, 
-        SUM("totalAmount") as total_spent,
+        COUNT(*) FILTER (WHERE LOWER(status) IN ('paid', 'confirmed', 'shipping', 'completed')) as order_count, 
+        COALESCE(SUM("totalAmount") FILTER (WHERE LOWER(status) IN ('paid', 'confirmed', 'shipping', 'completed')), 0) as total_spent,
         MAX("createdAt") as last_order_date
       FROM "Order" 
       WHERE "customerName" IS NOT NULL
+        AND LOWER(status) IN ('paid', 'confirmed', 'shipping', 'completed')
       GROUP BY "customerName", "customerEmail", "customerPhone" 
       ORDER BY last_order_date DESC
     `);

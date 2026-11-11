@@ -20,15 +20,16 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
     const inquiriesCountQuery = `SELECT count(*) as count FROM "Inquiry"`;
     const ordersCountQuery = `SELECT count(*) as count FROM "Order"`;
 
-    // 2. Revenue and Status Stats
-    const revenueQuery = `SELECT SUM("totalAmount") as total FROM "Order" WHERE status NOT IN ('cancelled', 'failed')`;
+    // 2. Revenue and Status Stats (Only count paid / confirmed / shipping / completed orders as revenue)
+    const PAID_STATUS_FILTER = `LOWER(status) IN ('paid', 'confirmed', 'shipping', 'completed')`;
+    const revenueQuery = `SELECT COALESCE(SUM("totalAmount"), 0) as total FROM "Order" WHERE ${PAID_STATUS_FILTER}`;
     const statusQuery = `SELECT status, count(*) as count FROM "Order" GROUP BY status`;
     
     // 3. Revenue by Date (last 30 days)
     const revenueByDateQuery = `
       SELECT DATE("createdAt") as date, SUM("totalAmount") as revenue 
       FROM "Order" 
-      WHERE status NOT IN ('cancelled', 'failed') 
+      WHERE ${PAID_STATUS_FILTER}
         AND "createdAt" >= NOW() - INTERVAL '30 days'
       GROUP BY DATE("createdAt") 
       ORDER BY date ASC
@@ -45,7 +46,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
         SUM("totalAmount") as revenue,
         COUNT(*) as orders
       FROM "Order"
-      WHERE status NOT IN ('cancelled', 'failed')
+      WHERE ${PAID_STATUS_FILTER}
         AND "createdAt" >= NOW() - INTERVAL '12 months'
       GROUP BY DATE_TRUNC('month', "createdAt")
       ORDER BY month ASC
@@ -61,7 +62,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       FROM "Product" WHERE "isActive" = true
     `;
 
-    // 7. Top Products (by how many orders reference them by name search)
+    // 7. Top Products (by how many paid/confirmed orders reference them)
     const topProductsQuery = `
       SELECT 
         p.id,
@@ -73,7 +74,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
         SUM(o."totalAmount") as total_revenue
       FROM "Product" p
       LEFT JOIN "Order" o ON o."items"::text LIKE '%' || p.id::text || '%'
-        AND o.status NOT IN ('cancelled', 'failed')
+        AND LOWER(o.status) IN ('paid', 'confirmed', 'shipping', 'completed')
       WHERE p."isActive" = true
       GROUP BY p.id, p.name, p."nameKhmer", p.price, p."categoryId"
       ORDER BY order_count DESC, p."createdAt" DESC
@@ -87,7 +88,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
         SUM("totalAmount") as revenue,
         COUNT(*) as orders
       FROM "Order"
-      WHERE status NOT IN ('cancelled', 'failed')
+      WHERE ${PAID_STATUS_FILTER}
       GROUP BY EXTRACT(YEAR FROM "createdAt")
       ORDER BY year DESC
       LIMIT 5
@@ -102,7 +103,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
         COUNT(*) as order_count, 
         SUM("totalAmount") as total_spent 
       FROM "Order" 
-      WHERE status NOT IN ('cancelled', 'failed') 
+      WHERE ${PAID_STATUS_FILTER}
         AND "customerName" IS NOT NULL
       GROUP BY "customerName", "customerEmail", "customerPhone" 
       ORDER BY total_spent DESC 
