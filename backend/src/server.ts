@@ -105,11 +105,28 @@ const initializeDatabase = async () => {
         )
       `);
       await pgClient.query(`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "bakongMd5" TEXT;`);
-      // Ensure Inquiry table has all required columns
+      // Ensure Inquiry table has all required columns and compatible text status
       await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS email TEXT;`);
       await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS "companyName" TEXT;`);
       await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS source TEXT;`);
       await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS "customerPhone" TEXT;`);
+      await pgClient.query(`ALTER TABLE "Inquiry" ADD COLUMN IF NOT EXISTS notes TEXT;`);
+      await pgClient.query(`
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'Inquiry'
+              AND column_name = 'status'
+              AND data_type <> 'text'
+              AND udt_name <> 'varchar'
+          ) THEN
+            ALTER TABLE "Inquiry" ALTER COLUMN status DROP DEFAULT;
+            ALTER TABLE "Inquiry" ALTER COLUMN status TYPE TEXT USING status::text;
+            ALTER TABLE "Inquiry" ALTER COLUMN status SET DEFAULT 'new';
+          END IF;
+        END $$;
+      `);
       // Ensure audit_logs table exists
       await pgClient.query(`
         CREATE TABLE IF NOT EXISTS audit_logs (

@@ -93,22 +93,22 @@ export default function AdminCustomers() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-primary border-b border-slate-200">
-                <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">
+                <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">
                   {language === 'kh' ? 'អតិថិជន' : 'Customer'}
                 </th>
-                <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">
+                <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">
                   {language === 'kh' ? 'ទំនាក់ទំនង' : 'Contact Info'}
                 </th>
-                <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">
+                <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">
                   {language === 'kh' ? 'អាសយដ្ឋានចុងក្រោយ' : 'Last Address'}
                 </th>
-                <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">
+                <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">
                   {language === 'kh' ? 'កាលបរិច្ឆេទបញ្ជាទិញចុងក្រោយ' : 'Last Order Date'}
                 </th>
-                <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-center">
+                <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-center">
                   {language === 'kh' ? 'ចំនួនការបញ្ជាទិញ' : 'Total Orders'}
                 </th>
-                <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">
+                <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">
                   {language === 'kh' ? 'ចំណាយសរុប' : 'Total Spent'}
                 </th>
               </tr>

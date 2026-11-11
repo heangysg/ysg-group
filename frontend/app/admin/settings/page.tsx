@@ -27,7 +27,8 @@ export default function AdminSettings() {
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const isKh = language === "kh"
 
   useEffect(() => {
     fetchSettings()
@@ -47,7 +48,7 @@ export default function AdminSettings() {
         if (data && data.length > 0) {
           const newSettings = { ...settings }
           data.forEach((row: any) => {
-            if (newSettings.hasOwnProperty(row.key)) {
+            if (Object.prototype.hasOwnProperty.call(newSettings, row.key)) {
               (newSettings as any)[row.key] = row.value
             }
           })
@@ -64,7 +65,7 @@ export default function AdminSettings() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    
+
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const token = localStorage.getItem("ysg_admin_token")
@@ -87,11 +88,11 @@ export default function AdminSettings() {
           })
         }
       }
-      
-      toast.success("Settings saved successfully!")
+
+      toast.success(isKh ? "រក្សាទុកការកំណត់បានជោគជ័យ!" : "Settings saved successfully!")
     } catch (err) {
       console.error("Failed to save settings:", err)
-      toast.error("Failed to save settings")
+      toast.error(isKh ? "មិនអាចរក្សាទុកការកំណត់បានទេ" : "Failed to save settings")
     } finally {
       setSaving(false)
     }
@@ -105,7 +106,7 @@ export default function AdminSettings() {
     )
   }
 
-  const inputClasses = "w-full py-3 px-4 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-[11px]"
+  const inputClasses = "w-full py-3 px-4 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-xs"
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 w-full">
@@ -120,16 +121,17 @@ export default function AdminSettings() {
 
       <div className="solid-card bg-white overflow-hidden">
         <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-10">
-          
           {/* General Information Section */}
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-bold uppercase text-slate-900 flex items-center gap-2">
                 <Settings className="w-5 h-5 text-primary" />
-                General Information
+                {isKh ? "ព័ត៌មានទូទៅ" : "General Information"}
               </h3>
               <p className="mt-1 text-xs font-medium text-slate-500">
-                Update your primary website details and contact information.
+                {isKh
+                  ? "ធ្វើបច្ចុប្បន្នភាពព័ត៌មានលម្អិតសំខាន់ៗ និងព័ត៌មានទំនាក់ទំនងនៃគេហទំព័ររបស់អ្នក។"
+                  : "Update your primary website details and contact information."}
               </p>
             </div>
 
@@ -165,7 +167,9 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">{t("phoneNumber") || "Phone Number"}</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "លេខទូរស័ព្ទទំនាក់ទំនង" : "Phone Number"}
+                </label>
                 <div className="relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Phone className="h-4 w-4 text-primary" />
@@ -180,7 +184,7 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1 md:col-span-2">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">{t("address") || "Address"}</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">{t("address")}</label>
                 <div className="relative rounded-md shadow-sm">
                   <div className="absolute top-3 left-3 flex items-start pointer-events-none">
                     <MapPin className="h-4 w-4 text-primary" />
@@ -203,16 +207,20 @@ export default function AdminSettings() {
             <div>
               <h3 className="text-lg font-bold uppercase text-slate-900 flex items-center gap-2">
                 <Link2 className="w-5 h-5 text-primary" />
-                Social Media & Links
+                {isKh ? "បណ្តាញសង្គម និងតំណភ្ជាប់" : "Social Media & Links"}
               </h3>
               <p className="mt-1 text-xs font-medium text-slate-500">
-                Manage your external profiles and contact links.
+                {isKh
+                  ? "គ្រប់គ្រងគណនីបណ្តាញសង្គម និងតំណភ្ជាប់ទំនាក់ទំនងខាងក្រៅរបស់អ្នក។"
+                  : "Manage your external profiles and contact links."}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Facebook URL</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "តំណភ្ជាប់ Facebook (URL)" : "Facebook URL"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -223,7 +231,9 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">WhatsApp Number</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "លេខទូរស័ព្ទ WhatsApp" : "WhatsApp Number"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -234,7 +244,9 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Telegram Username/Link</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "ឈ្មោះ ឬតំណភ្ជាប់ Telegram" : "Telegram Username/Link"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -245,7 +257,9 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">LinkedIn URL</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "តំណភ្ជាប់ LinkedIn (URL)" : "LinkedIn URL"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -255,7 +269,9 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Twitter URL</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "តំណភ្ជាប់ Twitter / X (URL)" : "Twitter URL"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -273,16 +289,20 @@ export default function AdminSettings() {
             <div>
               <h3 className="text-lg font-bold uppercase text-slate-900 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-primary" />
-                Website Statistics
+                {isKh ? "ស្ថិតិគេហទំព័រ" : "Website Statistics"}
               </h3>
               <p className="mt-1 text-xs font-medium text-slate-500">
-                Update the numbers shown on your website's statistics sections.
+                {isKh
+                  ? "ធ្វើបច្ចុប្បន្នភាពតួលេខដែលបង្ហាញនៅលើផ្នែកស្ថិតិនៃគេហទំព័ររបស់អ្នក។"
+                  : "Update the numbers shown on your website's statistics sections."}
               </p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Years Experience</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "បទពិសោធន៍ (ឆ្នាំ)" : "Years Experience"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -291,7 +311,9 @@ export default function AdminSettings() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Total Branches</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "សាខាសរុប" : "Total Branches"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -300,7 +322,9 @@ export default function AdminSettings() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Machinery Units</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "ចំនួនគ្រឿងចក្រ" : "Machinery Units"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -309,7 +333,9 @@ export default function AdminSettings() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Trusted Clients</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "អតិថិជនដែលទុកចិត្ត" : "Trusted Clients"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -318,7 +344,9 @@ export default function AdminSettings() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Trusted Brands</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "ម៉ាកល្បីៗដែលទុកចិត្ត" : "Trusted Brands"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -327,7 +355,9 @@ export default function AdminSettings() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">Regions Served</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "តំបន់សេវាកម្ម" : "Regions Served"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -345,16 +375,20 @@ export default function AdminSettings() {
             <div>
               <h3 className="text-lg font-bold uppercase text-slate-900 flex items-center gap-2">
                 <Search className="w-5 h-5 text-primary" />
-                SEO Settings
+                {isKh ? "ការកំណត់ SEO" : "SEO Settings"}
               </h3>
               <p className="mt-1 text-xs font-medium text-slate-500">
-                Manage how your website appears on search engines.
+                {isKh
+                  ? "គ្រប់គ្រងរបៀបដែលគេហទំព័ររបស់អ្នកបង្ហាញនៅលើម៉ាស៊ីនស្វែងរក Google។"
+                  : "Manage how your website appears on search engines."}
               </p>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">SEO Title</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "ចំណងជើង SEO" : "SEO Title"}
+                </label>
                 <input
                   type="text"
                   className={inputClasses}
@@ -364,7 +398,9 @@ export default function AdminSettings() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">SEO Description</label>
+                <label className="text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-1.5 block">
+                  {isKh ? "ការពិពណ៌នា SEO" : "SEO Description"}
+                </label>
                 <textarea
                   rows={3}
                   className={`${inputClasses} resize-none`}
@@ -384,7 +420,7 @@ export default function AdminSettings() {
               {saving ? (
                 <>
                   <div className="animate-spin -ml-1 mr-2 h-4 w-4 text-white border-2 border-t-transparent rounded-full" />
-                  {t("saving") || "Saving..."}
+                  {t("saving")}
                 </>
               ) : (
                 <>
@@ -396,6 +432,7 @@ export default function AdminSettings() {
           </div>
         </form>
       </div>
+      <Toaster position="top-right" />
     </div>
   )
 }

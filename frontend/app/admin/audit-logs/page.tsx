@@ -142,19 +142,19 @@ export default function AuditLogsPage() {
  </div>
 
  {/* Logs Table */}
- <div className="solid-card bg-white p-0 overflow-hidden">
+ <div className="solid-card bg-white p-0 overflow-hidden border border-slate-200 shadow-sm rounded-2xl">
  <div className="overflow-x-auto">
  <table className="w-full text-left">
  <thead className="bg-primary border-b border-slate-200">
  <tr>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("user")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("action")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">Entity</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("details")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("date")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("user")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("action")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">Entity</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("details")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("date")}</th>
  </tr>
  </thead>
- <tbody className="divide-y-2 divide-slate-900">
+ <tbody className="divide-y divide-slate-100">
  {loading ? (
  <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500 font-bold font-medium text-xs">{t("loading")}</td></tr>
  ) : filteredLogs.length === 0 ? (

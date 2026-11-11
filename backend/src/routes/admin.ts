@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import { getPgClient } from '../lib/db';
 import { authenticateJWT, AuthRequest } from '../middleware/auth';
+import { sendInquiryReplyEmail } from '../lib/email';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -33,7 +34,14 @@ router.post('/login', loginLimiter, async (req: Request, res: Response): Promise
     }
     pgClient = await getPgClient();
 
-    const { rows } = await pgClient.query('SELECT * FROM "User" WHERE email = $1 LIMIT 1', [email]);
+    const { rows } = await pgClient.query(
+      `SELECT u.*, r.name as "roleName"
+       FROM "User" u
+       LEFT JOIN "Role" r ON u."roleId" = r.id
+       WHERE u.email = $1
+       LIMIT 1`,
+      [email]
+    );
     const user = rows[0];
 
     if (!user) {
@@ -59,7 +67,7 @@ router.post('/login', loginLimiter, async (req: Request, res: Response): Promise
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, isSuperAdmin: user.isSuperAdmin },
+      { id: user.id, email: user.email, isSuperAdmin: user.isSuperAdmin, roleName: user.roleName || 'USER' },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -72,6 +80,7 @@ router.post('/login', loginLimiter, async (req: Request, res: Response): Promise
         email: user.email,
         name: user.name,
         isSuperAdmin: user.isSuperAdmin,
+        roleName: user.roleName || (user.isSuperAdmin ? 'ADMIN' : 'USER'),
         avatar: user.avatar,
         image: user.image,
         bio: user.bio
@@ -526,6 +535,51 @@ router.get('/customers', authenticateJWT, async (req: AuthRequest, res: Response
   } catch (err: any) {
     console.error("Fetch customers error:", err);
     res.status(500).json({ error: "Failed to fetch customers" });
+  } finally {
+    if (pgClient) pgClient.release();
+  }
+});
+
+router.post('/inquiries/:id/reply', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const { id } = req.params;
+    const replyMessage = typeof req.body?.replyMessage === 'string' ? req.body.replyMessage.trim() : '';
+    const status = typeof req.body?.status === 'string' && req.body.status.trim() ? req.body.status.trim() : 'replied';
+
+    pgClient = await getPgClient();
+
+    const { rows } = await pgClient.query(
+      `UPDATE "Inquiry"
+       SET status = $1,
+           notes = CASE WHEN $2 <> '' THEN $2 ELSE notes END,
+           "updatedAt" = NOW()
+       WHERE id = $3
+       RETURNING *`,
+      [status, replyMessage, id]
+    );
+
+    if (rows.length === 0) {
+      res.status(404).json({ error: "Inquiry not found" });
+      return;
+    }
+
+    const updatedInquiry = rows[0];
+    let emailResult: { sent: boolean; reason?: string } = { sent: false, reason: "no_reply_message" };
+
+    if (replyMessage) {
+      emailResult = await sendInquiryReplyEmail(updatedInquiry, replyMessage);
+    }
+
+    res.json({
+      success: true,
+      inquiry: updatedInquiry,
+      emailSent: emailResult.sent,
+      emailReason: emailResult.reason,
+    });
+  } catch (err: any) {
+    console.error("Inquiry reply error:", err);
+    res.status(500).json({ error: err.message || "Failed to update inquiry" });
   } finally {
     if (pgClient) pgClient.release();
   }

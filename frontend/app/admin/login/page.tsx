@@ -7,53 +7,64 @@ import { logActivity } from "../../../lib/audit"
 import { motion } from "framer-motion"
 
 export default function AdminLogin() {
- const [email, setEmail] = useState("")
- const [password, setPassword] = useState("")
- const [error, setError] = useState("")
- const [loading, setLoading] = useState(false)
- const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
- const handleLogin = async (e: React.FormEvent) => {
-   e.preventDefault()
-   setLoading(true)
-   setError("")
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
-   try {
-     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-     const res = await fetch(`${API_URL}/api/admin/login`, {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ email, password })
-     })
-     const data = await res.json()
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await res.json()
 
-     if (!res.ok) {
-       setError(data.error || "Login failed")
-     } else {
-       localStorage.setItem("ysg_admin_user", JSON.stringify(data.user))
-       localStorage.setItem("ysg_admin_token", data.token)
-       
-       try {
-         await logActivity({
-           action: "login",
-           entityType: "auth",
-           details: { email: data.user.email, role: data.user.isSuperAdmin ? "Superadmin" : "Admin" }
-         })
-       } catch (e) {}
+      if (!res.ok) {
+        setError(data.error || "Login failed")
+      } else {
+        localStorage.setItem("ysg_admin_user", JSON.stringify(data.user))
+        localStorage.setItem("ysg_admin_token", data.token)
 
-       router.push("/admin/dashboard")
-     }
-   } catch (err) {
-     setError("An error occurred during login")
-   }
+        try {
+          await logActivity({
+            action: "login",
+            entityType: "auth",
+            details: {
+              email: data.user.email,
+              role: data.user.isSuperAdmin
+                ? "Superadmin"
+                : data.user.roleName === "STAFF"
+                  ? "Staff"
+                  : "Admin"
+            }
+          })
+        } catch (e) { }
 
-   setLoading(false)
- }
+        if (data.user?.roleName === "STAFF" && !data.user?.isSuperAdmin) {
+         router.push("/admin/orders")
+       } else {
+         router.push("/admin/dashboard")
+       }
+      }
+    } catch (err) {
+      setError("An error occurred during login")
+    }
+
+    setLoading(false)
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between p-4 sm:p-6 font-sans">
       <div className="flex-1 flex items-center justify-center py-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
@@ -81,7 +92,7 @@ export default function AdminLogin() {
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-4">
-                
+
                 {/* Email Input */}
                 <div className="space-y-1.5">
                   <label className="text-xs sm:text-sm font-bold text-slate-700 block">

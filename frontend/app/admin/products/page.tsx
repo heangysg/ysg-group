@@ -332,18 +332,18 @@ export default function AdminProducts() {
  </div>
 
  {/* Products Table */}
- <div className="solid-card bg-white overflow-hidden p-0 flex flex-col">
+ <div className="solid-card bg-white overflow-hidden p-0 flex flex-col border border-slate-200 shadow-sm rounded-2xl">
  {loading ? (
  <div className="p-20 flex flex-col items-center justify-center">
  <div className="w-10 h-10 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mb-4" />
- <p className="text-slate-500 font-bold text-xs font-medium">Loading Inventory...</p>
+ <p className="text-slate-500 font-bold text-xs font-medium">{t("loading")}</p>
  </div>
  ) : (
  <div className="overflow-x-auto">
  <table className="w-full text-left">
  <thead>
  <tr className="bg-primary border-b border-slate-200">
- <th className="px-6 py-4 w-12">
+ <th className="px-6 py-3 w-12">
  <input 
  type="checkbox" 
  className="w-5 h-5 border border-slate-200 accent-primary shadow-sm cursor-pointer"
@@ -351,14 +351,14 @@ export default function AdminProducts() {
  onChange={toggleSelectAll}
  />
  </th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("productInfo")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("category")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("price")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("status")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("productInfo")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("category")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("price")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("status")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
  </tr>
  </thead>
- <tbody className="divide-y-2 divide-slate-900">
+ <tbody className="divide-y divide-slate-100">
  {products.map((product) => (
  <tr key={product.id} className="group hover:bg-primary/5 transition-all duration-200">
  <td className="px-6 py-4">

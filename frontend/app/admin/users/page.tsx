@@ -186,10 +186,10 @@ export default function UsersManagementPage() {
  <table className="w-full text-left border-collapse">
  <thead>
  <tr className="bg-primary border-b border-slate-200">
- <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("user")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("emailAddress")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("role")}</th>
- <th className="px-6 py-4 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">{t("actions")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("user")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("emailAddress")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap">{t("role")}</th>
+ <th className="px-6 py-3 text-xs font-bold text-white uppercase tracking-wider whitespace-nowrap text-right">{t("actions")}</th>
  </tr>
  </thead>
  <tbody className="divide-y-2 divide-slate-100">
@@ -243,25 +243,25 @@ export default function UsersManagementPage() {
  <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200">
  <div className="solid-card bg-white w-full max-w-2xl overflow-hidden p-0 flex flex-col animate-in zoom-in-95 duration-200">
  {/* Header */}
- <div className="p-5 border-b border-slate-200 bg-primary text-white">
- <div className="flex justify-between items-start">
+ <div className="px-5 py-3 border-b border-slate-200 bg-primary text-white">
+ <div className="flex justify-between items-center">
  <div>
- <h2 className="text-2xl font-bold text-white font-medium">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
- <p className="text-xs font-bold text-white mt-2 font-medium">
+ <h2 className="text-base font-bold text-white font-medium">{isEditing ? t("manageAdminProfile") : t("addNewAdmin")}</h2>
+ <p className="text-xs font-medium text-blue-100 mt-0.5">
  {isEditing ? t("updateCredentialsProfile") : t("createCredentialsNewAdmin")}
  </p>
  </div>
  <button 
  onClick={() => setShowModal(false)} 
- className="p-3 bg-white text-slate-900 border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all"
+ className="p-2 bg-white text-slate-900 border border-slate-200 shadow-sm hover:translate-y-0.5 hover:shadow-none transition-all"
  >
- <X className="w-5 h-5" />
+ <X className="w-4 h-4" />
  </button>
  </div>
 
  {/* Tabs */}
  {isEditing && (
- <div className="flex gap-5 mt-8">
+ <div className="flex gap-4 mt-3">
  {[
  { id: "details", label: t("details"), icon: User },
  { id: "history", label: t("backgroundHistory"), icon: History }
@@ -365,7 +365,7 @@ export default function UsersManagementPage() {
  {historyLoading ? (
  <div className="py-16 flex flex-col items-center justify-center">
  <div className="w-10 h-10 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mb-6" />
- <p className="text-xs font-bold text-slate-500 font-medium">Fetching Personnel Logs...</p>
+ <p className="text-xs font-bold text-slate-500 font-medium">{t("loading")}</p>
  </div>
  ) : userHistory.length === 0 ? (
  <div className="solid-card bg-white p-16 text-center border border-slate-200 border-dashed">

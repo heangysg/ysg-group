@@ -158,23 +158,25 @@ export default function AdminOrders() {
         </div>
       </div>
 
-      <div className="solid-card bg-white overflow-hidden p-0">
+      <div className="solid-card bg-white overflow-hidden p-0 border border-slate-200 shadow-sm rounded-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-primary text-white border-b border-slate-200">
-                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("orderId")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("customer")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("date")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("amount")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-white font-medium">{t("status")}</th>
-                <th className="px-6 py-4 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
+                <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("orderId")}</th>
+                <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("customer")}</th>
+                <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("date")}</th>
+                <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("amount")}</th>
+                <th className="px-6 py-3 text-xs font-bold text-white font-medium">{t("status")}</th>
+                <th className="px-6 py-3 text-xs font-bold text-white font-medium text-right">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y-2 divide-slate-900">
+            <tbody className="divide-y divide-slate-100">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-20 text-center font-bold text-slate-500 font-medium text-xs">No orders found</td>
+                  <td colSpan={6} className="px-6 py-20 text-center font-bold text-slate-500 font-medium text-xs">
+                    {language === "kh" ? "មិនមានការបញ្ជាទិញទេ" : "No orders found"}
+                  </td>
                 </tr>
               ) : orders.map((order) => (
                 <tr key={order.id} className="group hover:bg-primary/5 transition-all duration-200">

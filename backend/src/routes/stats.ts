@@ -7,6 +7,11 @@ const router = Router();
 router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   let pgClient;
   try {
+    if (req.user?.roleName === 'STAFF' && !req.user?.isSuperAdmin) {
+      res.status(403).json({ error: "Access denied: Staff accounts cannot view reports or revenue dashboard." });
+      return;
+    }
+
     pgClient = await getPgClient();
 
     // 1. Basic counts

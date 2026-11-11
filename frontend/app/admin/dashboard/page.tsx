@@ -48,8 +48,16 @@ export default function AdminDashboard() {
  const [loading, setLoading] = useState(true)
 
  useEffect(() => {
+ const userStr = localStorage.getItem("ysg_admin_user")
+ if (userStr) {
+ const user = JSON.parse(userStr)
+ if (!user.isSuperAdmin && user.roleName === "STAFF") {
+ router.replace("/admin/orders")
+ return
+ }
+ }
  fetchData()
- }, [])
+ }, [router])
 
  async function fetchData() {
  setLoading(true)
@@ -184,9 +192,9 @@ export default function AdminDashboard() {
 
  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
  {/* Recent Orders Table */}
- <div className="lg:col-span-2 solid-card bg-white flex flex-col">
- <div className="p-6 border-b border-slate-200 flex items-center justify-between bg-primary">
- <h2 className="text-lg font-bold text-white font-medium">{t("recentOrders")}</h2>
+ <div className="lg:col-span-2 solid-card bg-white flex flex-col rounded-2xl overflow-hidden border border-slate-200">
+ <div className="px-5 py-3 border-b border-slate-200 flex items-center justify-between bg-primary">
+ <h2 className="text-base font-bold text-white font-medium">{t("recentOrders")}</h2>
  <Link href="/admin/orders" className="text-xs font-bold text-white hover:text-slate-200 transition-colors flex items-center gap-1 font-medium">
  {t("viewAll")} <ChevronRight className="w-3 h-3" />
  </Link>
@@ -201,7 +209,7 @@ export default function AdminDashboard() {
  <th className="px-6 py-4 text-xs font-bold text-slate-900 font-medium text-right">{t("status")}</th>
  </tr>
  </thead>
- <tbody className="divide-y-2 divide-slate-900">
+ <tbody className="divide-y divide-slate-100">
  {recentOrders.map((order) => (
  <tr key={order.id} className="hover:bg-primary/5 transition-all">
  <td className="px-6 py-5">

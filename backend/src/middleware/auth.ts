@@ -19,20 +19,32 @@ export const authenticateJWT = async (req: AuthRequest, res: Response, next: Nex
 
     try {
       const decoded: any = jwt.verify(token, JWT_SECRET);
-      
+
       const pgClient = await getPgClient();
+      let liveUser: any;
       try {
-        const { rows } = await pgClient.query('SELECT "isActive" FROM "User" WHERE id = $1 LIMIT 1', [decoded.id]);
-        
+        const { rows } = await pgClient.query(
+          `SELECT u."isActive", u."isSuperAdmin", r.name as "roleName"
+           FROM "User" u
+           LEFT JOIN "Role" r ON u."roleId" = r.id
+           WHERE u.id = $1 LIMIT 1`,
+          [decoded.id]
+        );
+
         if (rows.length === 0 || !rows[0].isActive) {
-           res.status(403).json({ error: "Your account has been deactivated or deleted" });
-           return;
+          res.status(403).json({ error: "Your account has been deactivated or deleted" });
+          return;
         }
+        liveUser = rows[0];
       } finally {
         await pgClient.release();
       }
 
-      req.user = decoded;
+      req.user = {
+        ...decoded,
+        isSuperAdmin: liveUser.isSuperAdmin === true,
+        roleName: liveUser.roleName || decoded.roleName || 'USER'
+      };
       next();
     } catch (err) {
       res.status(403).json({ error: "Invalid or expired token" });

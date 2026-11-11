@@ -292,9 +292,9 @@ export default function AdminCategories() {
       </div>
 
       <div className="solid-card bg-white overflow-hidden p-0">
-        <div className="p-6 border-b border-slate-200 bg-primary text-white">
-          <h2 className="text-2xl font-bold text-white">{t("categoryStructure")}</h2>
-          <p className="text-sm font-medium text-blue-100 mt-2">{t("cannotDeleteCategories")}</p>
+        <div className="px-5 py-3 border-b border-slate-200 bg-primary text-white flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-base font-bold text-white">{t("categoryStructure")}</h2>
+          <p className="text-xs font-medium text-blue-100">{t("cannotDeleteCategories")}</p>
         </div>
         <div className="divide-y divide-slate-200">
           {categories.map((cat: any) => {
@@ -378,10 +378,10 @@ export default function AdminCategories() {
         <Portal>
           <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowAddModal(false)}>
             <div className="solid-card bg-white max-w-lg w-full max-h-[90vh] overflow-y-auto p-0 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
-              <div className="sticky top-0 bg-primary text-white border-b border-slate-200 px-4 py-3 z-10 flex justify-between items-center">
+              <div className="sticky top-0 bg-primary text-white border-b border-slate-200 px-5 py-3 z-10 flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold uppercase text-white">{editingItem ? t("editCategory") : t("addMainCategory")}</h2>
-                  <p className="text-sm font-medium text-blue-100 mt-2">
+                  <h2 className="text-base font-bold uppercase text-white">{editingItem ? t("editCategory") : t("addMainCategory")}</h2>
+                  <p className="text-xs font-medium text-blue-100 mt-0.5">
                     {editingItem ? t("modifyCategoryInfo") : t("createNewTopLevel")}
                   </p>
                 </div>

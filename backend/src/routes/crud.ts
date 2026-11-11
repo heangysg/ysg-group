@@ -16,6 +16,11 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       return;
     }
 
+    if (table === 'Setting' && !req.user?.isSuperAdmin) {
+      res.status(403).json({ error: "Only Super Admins can modify site settings." });
+      return;
+    }
+
     if (!['insert', 'update', 'delete'].includes(action)) {
       res.status(400).json({ error: `Invalid action: ${action}` });
       return;

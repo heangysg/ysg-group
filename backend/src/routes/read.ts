@@ -16,6 +16,11 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       return;
     }
 
+    if (['User', 'audit_logs'].includes(table) && !req.user?.isSuperAdmin) {
+      res.status(403).json({ error: `Only Super Admins can read '${table}'` });
+      return;
+    }
+
     const isValidIdentifier = (str: string) => /^[a-zA-Z0-9_]+$/.test(str);
     
     const PROTECTED_COLUMNS = ['password'];

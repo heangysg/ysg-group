@@ -1,23 +1,34 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts"
-import { BarChart3, Package, DollarSign, TrendingUp, PackageSearch, History, Users } from "lucide-react"
+import { BarChart3, Package, DollarSign, TrendingUp, PackageSearch, History, Users, Download } from "lucide-react"
 
 export default function ReportsPage() {
   const { t, language } = useLanguage()
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<any>(null)
 
   useEffect(() => {
+    const userStr = localStorage.getItem("ysg_admin_user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (!user.isSuperAdmin && user.roleName === "STAFF") {
+        router.replace("/admin/orders")
+        return
+      }
+    }
     fetchStats()
-  }, [])
+  }, [router])
 
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem("ysg_admin_token")
-      const res = await fetch("http://localhost:5000/api/admin/stats", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const res = await fetch(`${API_URL}/api/admin/stats`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,6 +98,30 @@ export default function ReportsPage() {
     labelKhmer: translateMonth(d.label)
   })) || [];
 
+  const exportReportsCSV = () => {
+    const rows: string[] = [];
+    rows.push("Section,Name,Orders,Amount");
+    (data.monthlyRevenue || []).forEach((m: any) => {
+      rows.push(`"Monthly Revenue","${m.label}",${m.orders || 0},${Number(m.revenue || 0).toFixed(2)}`);
+    });
+    (data.topProducts || []).forEach((p: any) => {
+      const safeName = String(p.name || "").replace(/"/g, '""');
+      rows.push(`"Top Product","${safeName}",${p.order_count || 0},${Number(p.total_revenue || 0).toFixed(2)}`);
+    });
+    (data.topCustomers || []).forEach((c: any) => {
+      const safeName = String(c.customerName || "Customer").replace(/"/g, '""');
+      rows.push(`"Top Customer","${safeName}",${c.order_count || 0},${Number(c.total_spent || 0).toFixed(2)}`);
+    });
+
+    const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `ysg-sales-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -99,6 +134,14 @@ export default function ReportsPage() {
             {language === 'kh' ? 'តាមដានសកម្មភាពលក់ និងស្តុកទំនិញ' : 'Track sales performance and inventory'}
           </p>
         </div>
+        <button
+          type="button"
+          onClick={exportReportsCSV}
+          className="btn-primary px-4 py-2.5 text-xs flex items-center gap-2 shrink-0"
+        >
+          <Download className="w-4 h-4" />
+          {language === 'kh' ? 'ទាញយក CSV' : 'Export CSV'}
+        </button>
       </div>
 
       {/* Summary Cards */}

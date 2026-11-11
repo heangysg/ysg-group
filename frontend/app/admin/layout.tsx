@@ -37,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  const [adminName, setAdminName] = useState("Admin")
  const [isAdminRole, setIsAdminRole] = useState(false)
  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+ const [isStaff, setIsStaff] = useState(false)
  const [adminProfileImage, setAdminProfileImage] = useState<string | null>(null)
  const [adminBio, setAdminBio] = useState("")
  const [showProfileModal, setShowProfileModal] = useState(false)
@@ -45,13 +46,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
  const [showNotifications, setShowNotifications] = useState(false)
  const [notifications, setNotifications] = useState<any[]>([])
+ const [notificationsReadAt, setNotificationsReadAt] = useState<number>(0)
  const [search, setSearch] = useState("")
+ const [showSearchResults, setShowSearchResults] = useState(false)
  const notificationRef = useRef<HTMLDivElement>(null)
+ const searchRef = useRef<HTMLDivElement>(null)
 
  useEffect(() => {
  function handleClickOutside(event: MouseEvent) {
  if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
  setShowNotifications(false)
+ }
+ if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+ setShowSearchResults(false)
  }
  }
  document.addEventListener("mousedown", handleClickOutside)
@@ -71,12 +78,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  router.push("/admin/login")
  return
  }
+ const savedReadAt = Number(localStorage.getItem("ysg_notifications_read_at") || "0")
+ if (!Number.isNaN(savedReadAt)) {
+ setNotificationsReadAt(savedReadAt)
+ }
  if (userStr) {
  const user = JSON.parse(userStr)
+ const superAdmin = user.isSuperAdmin === true
+ const staffUser = !superAdmin && user.roleName === "STAFF"
+
  setAdminName(user.name || "Admin")
- setIsSuperAdmin(user.isSuperAdmin === true)
+ setIsSuperAdmin(superAdmin)
+ setIsStaff(staffUser)
  setAdminProfileImage(user.avatar || null)
  setAdminBio(user.bio || "")
+
+ const superAdminPaths = ["/admin/users", "/admin/audit-logs", "/admin/settings"]
+ const staffBlockedPaths = ["/admin/dashboard", "/admin/reports", ...superAdminPaths]
+
+ if (staffUser && staffBlockedPaths.some((p) => pathname?.startsWith(p))) {
+ router.replace("/admin/orders")
+ return
+ }
+ if (!superAdmin && superAdminPaths.some((p) => pathname?.startsWith(p))) {
+ router.replace("/admin/dashboard")
+ return
+ }
  }
 
  let isFetching = false;
@@ -186,12 +213,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  }, [])
 
  const menuItems = [
+ ...(!isStaff ? [
  { name: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
  { name: t("reports"), href: "/admin/reports", icon: BarChart3 },
+ ] : []),
+ { name: t("orders"), href: "/admin/orders", icon: History },
+ { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
  { name: t("products"), href: "/admin/products", icon: Package },
  { name: t("categories"), href: "/admin/categories", icon: FolderOpen },
- { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
- { name: t("orders"), href: "/admin/orders", icon: History },
  { name: t("customers") || "Customers", href: "/admin/customers", icon: Users },
  { name: t("profile"), href: "/admin/profile", icon: User },
  ...(isSuperAdmin ? [
@@ -203,8 +232,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
  const handleLogout = () => {
  localStorage.removeItem("ysg_admin_user")
+ localStorage.removeItem("ysg_admin_token")
+ localStorage.removeItem("ysg_notifications_read_at")
  router.push("/admin/login")
  }
+
+ const markAllNotificationsRead = () => {
+ const now = Date.now()
+ setNotificationsReadAt(now)
+ localStorage.setItem("ysg_notifications_read_at", String(now))
+ toast.success(language === "kh" ? "បានសម្គាល់ថាបានអានទាំងអស់" : "All notifications marked as read")
+ }
+
+ const unreadCount = notifications.filter((n) => n.createdAt && n.createdAt.getTime() > notificationsReadAt).length
+
+ const filteredMenuItems = search.trim()
+ ? menuItems.filter(
+ (item) =>
+ item.name.toLowerCase().includes(search.toLowerCase()) ||
+ item.href.toLowerCase().includes(search.toLowerCase())
+ )
+ : []
 
  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
  const file = e.target.files?.[0]
@@ -285,12 +333,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
  {/* Sidebar */}
  <aside className={`
- fixed lg:static inset-y-0 left-0 z-[50]
+ fixed lg:sticky lg:top-0 inset-y-0 left-0 z-[50] lg:h-screen shrink-0
  bg-white border-r border-slate-200 transition-all duration-300 ease-in-out
  flex flex-col overflow-hidden
  ${sidebarOpen
  ? "w-72 translate-x-0 opacity-100"
- : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0"}
+ : "w-0 -translate-x-full lg:translate-x-0 opacity-0 lg:w-0 border-r-0"}
  `}>
  {/* Logo */}
  <div className="h-20 flex items-center px-8 border-b border-slate-200 shrink-0 bg-primary">
@@ -300,7 +348,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </div>
  <div>
  <h1 className="text-sm font-bold text-white leading-tight uppercase">
- {isSuperAdmin ? t("superadmin") : t("admin")}
+ {isSuperAdmin ? t("superadmin") : isStaff ? (language === "kh" ? "បុគ្គលិក" : "Staff") : t("admin")}
  </h1>
  <p className="text-xs font-bold text-blue-100 font-medium mt-0.5">
  {t("managementPortal")}
@@ -345,9 +393,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </aside>
 
  {/* Main Content */}
- <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-slate-50">
+ <div className="flex-1 flex flex-col min-w-0 min-h-screen bg-slate-50">
  {/* Header */}
- <header className="h-20 bg-white border-b border-slate-200 px-6 lg:px-8 flex items-center justify-between shrink-0 z-[30]">
+ <header className="sticky top-0 h-20 bg-white border-b border-slate-200 px-6 lg:px-8 flex items-center justify-between shrink-0 z-[30]">
  <div className="flex items-center gap-4">
  <button
  onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -357,15 +405,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </button>
  <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
  <div className={`hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400 whitespace-nowrap ${language !== 'kh' ? 'uppercase tracking-[0.2em]' : ''}`}>
- <Link href="/admin/dashboard" className="hover:text-primary transition-colors">{t("admin")}</Link>
+ <Link href={isStaff ? "/admin/orders" : "/admin/dashboard"} className="hover:text-primary transition-colors">
+ {isSuperAdmin ? t("superadmin") : isStaff ? (language === "kh" ? "បុគ្គលិក" : "Staff") : t("admin")}
+ </Link>
  <span className="text-slate-200 text-[14px] font-normal leading-none -mt-0.5">/</span>
  <span className="text-slate-900">
  {pathname === "/admin/dashboard" ? t("dashboard") :
  pathname.includes("/admin/reports") ? t("reports") :
+ pathname.includes("/admin/products/trash") ? (language === "kh" ? "ធុងសំរាម" : "Trash") :
+ pathname.includes("/admin/products/new") ? (language === "kh" ? "បន្ថែមផលិតផល" : "New Product") :
+ pathname.includes("/admin/products/edit") ? (language === "kh" ? "កែប្រែផលិតផល" : "Edit Product") :
  pathname.includes("/admin/products") ? t("products") :
  pathname.includes("/admin/categories") ? t("categories") :
  pathname.includes("/admin/inquiries") ? t("inquiries") :
  pathname.includes("/admin/orders") ? t("orders") :
+ pathname.includes("/admin/customers") ? (t("customers") || "Customers") :
+ pathname.includes("/admin/profile") ? t("profile") :
  pathname.includes("/admin/users") ? t("users") :
  pathname.includes("/admin/activity") ? t("activity") :
  pathname.includes("/admin/audit-logs") ? t("auditLogs") :
@@ -374,23 +429,64 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </span>
  </div>
 
- {/* Global Search Bar */}
- <div className="hidden xl:flex relative group max-w-xs w-full ml-4">
+ {/* Quick Navigation Search Bar */}
+ <div className="hidden xl:flex relative group max-w-xs w-full ml-4" ref={searchRef}>
  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
  <input
  type="text"
  value={search}
- onChange={(e) => setSearch(e.target.value)}
+ onFocus={() => setShowSearchResults(true)}
+ onChange={(e) => {
+ setSearch(e.target.value)
+ setShowSearchResults(true)
+ }}
+ onKeyDown={(e) => {
+ if (e.key === "Enter" && filteredMenuItems.length > 0) {
+ router.push(filteredMenuItems[0].href)
+ setSearch("")
+ setShowSearchResults(false)
+ }
+ }}
  placeholder={t("search") + "..."}
- className="w-full pl-11 pr-9 py-2 bg-slate-50 border border-slate-200 outline-none focus:bg-white transition-all text-xs font-bold font-medium placeholder:text-slate-400"
+ className="w-full pl-11 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:bg-white focus:border-primary transition-all text-xs font-bold font-medium placeholder:text-slate-400"
  />
  {search && (
  <button
- onClick={() => setSearch("")}
+ onClick={() => {
+ setSearch("")
+ setShowSearchResults(false)
+ }}
  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-900 hover:text-red-600 transition-colors z-10"
  >
  <X className="w-4 h-4" />
  </button>
+ )}
+ {showSearchResults && search.trim() && (
+ <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden z-[100]">
+ {filteredMenuItems.length > 0 ? (
+ <div className="py-1">
+ {filteredMenuItems.map((item) => (
+ <button
+ key={item.href}
+ type="button"
+ onClick={() => {
+ router.push(item.href)
+ setSearch("")
+ setShowSearchResults(false)
+ }}
+ className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-primary/5 hover:text-primary flex items-center gap-2.5 transition-colors"
+ >
+ <item.icon className="w-4 h-4 text-primary shrink-0" />
+ <span>{item.name}</span>
+ </button>
+ ))}
+ </div>
+ ) : (
+ <div className="px-4 py-3 text-xs text-slate-400 font-medium">
+ {language === "kh" ? "រកមិនឃើញទំព័រទេ" : "No matching section"}
+ </div>
+ )}
+ </div>
  )}
  </div>
  </div>
@@ -421,38 +517,52 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  className={`p-2 transition-all border-2 ${showNotifications ? 'bg-primary text-white border-primary shadow-sm' : 'text-slate-900 border-transparent hover:border-slate-200 hover:shadow-sm'}`}
  >
  <Bell className="w-5 h-5" />
- {notifications.length > 0 && (
- <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 border border-slate-200 animate-pulse"></span>
+ {unreadCount > 0 && (
+ <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 border border-slate-200 rounded-full animate-pulse"></span>
  )}
  </button>
 
  {/* Notification Dropdown */}
  {showNotifications && (
- <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-4 lg:w-80 bg-white border border-slate-200 shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
- <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-primary text-white">
+ <div className="fixed inset-x-4 top-20 lg:absolute lg:right-0 lg:left-auto lg:mt-4 lg:w-80 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-5 duration-200 z-[100]">
+ <div className="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between bg-primary text-white">
  <h3 className="font-bold text-white font-medium text-xs">{t("notifications")}</h3>
- <button className="text-xs font-bold text-blue-200 hover:text-white transition-colors font-medium">{t("markAllRead")}</button>
+ <button
+ type="button"
+ onClick={markAllNotificationsRead}
+ className="text-xs font-bold text-blue-100 hover:text-white transition-colors font-medium"
+ >
+ {t("markAllRead")}
+ </button>
  </div>
  <div className="max-h-[350px] overflow-y-auto">
  {notifications.length > 0 ? (
- <div className="divide-y divide-slate-50">
- {notifications.map((note) => (
- <div key={note.id} className="p-4 hover:bg-slate-50 transition-colors flex gap-3 group">
- <div className={`shrink-0 w-10 h-10 rounded-md ${note.bg} ${note.color} flex items-center justify-center`}>
- <note.icon className="w-5 h-5" />
+ <div className="divide-y divide-slate-100">
+ {notifications.map((note) => {
+ const isUnread = note.createdAt && note.createdAt.getTime() > notificationsReadAt
+ return (
+ <Link
+ key={`${note.type}-${note.id}`}
+ href={note.type === 'order' ? '/admin/orders' : '/admin/inquiries'}
+ onClick={() => setShowNotifications(false)}
+ className="p-3.5 hover:bg-slate-50 transition-colors flex gap-3 group"
+ >
+ <div className={`shrink-0 w-9 h-9 rounded-md ${note.bg} ${note.color} flex items-center justify-center`}>
+ <note.icon className="w-4 h-4" />
  </div>
  <div className="flex-1 min-w-0">
  <p className="text-xs font-medium text-slate-900 truncate">{t(note.titleKey || note.title)}</p>
  <p className="text-xs text-slate-500 mt-0.5 line-clamp-2 leading-relaxed">
-    {note.type === 'order' 
-      ? `${t("order")} #${note.orderId} - $${note.amount}`
-      : (note.rawMessage?.slice(0, 50) + (note.rawMessage?.length > 50 ? '...' : ''))}
-  </p>
- <p className="text-[9px] text-slate-400 mt-1 font-medium">{note.time}</p>
+ {note.type === 'order'
+ ? `${t("order")} #${note.orderId} - $${note.amount}`
+ : (note.rawMessage?.slice(0, 50) + (note.rawMessage?.length > 50 ? '...' : ''))}
+ </p>
+ <p className="text-[10px] text-slate-400 mt-1 font-medium">{note.time}</p>
  </div>
- <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
- </div>
- ))}
+ {isUnread && <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
+ </Link>
+ )
+ })}
  </div>
  ) : (
  <div className="p-8 text-center">
@@ -490,7 +600,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  <div className="hidden md:block text-left">
  <p className="text-xs font-bold text-slate-900 leading-none uppercase tracking-wider">{adminName}</p>
  <p className="text-xs font-bold text-slate-500 mt-1 font-medium">
- {isSuperAdmin ? t("superadmin") : t("admin")}
+ {isSuperAdmin ? t("superadmin") : isStaff ? (language === "kh" ? "បុគ្គលិក" : "Staff") : t("admin")}
  </p>
  </div>
  <ChevronDown className="w-4 h-4 text-slate-900 hidden md:block group-hover:translate-y-0.5 transition-transform" />
@@ -499,7 +609,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </header>
 
  {/* Content Area */}
- <main className="flex-1 overflow-y-auto p-6 lg:p-10 custom-scrollbar">
+ <main className="flex-1 p-6 lg:p-10">
  <div className="max-w-7xl mx-auto">
  {children}
  </div>
@@ -511,11 +621,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Portal>
           <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-6 animate-in fade-in duration-200">
             <div className="solid-card bg-white w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-              <div className="p-6 border-b border-slate-200 bg-primary text-white">
-                <div className="flex justify-between items-start">
+              <div className="px-5 py-3 border-b border-slate-200 bg-primary text-white">
+                <div className="flex justify-between items-center">
                   <div>
-                    <h2 className="text-xl font-bold uppercase text-white">My Profile</h2>
-                    <p className="text-xs font-medium text-blue-100 mt-1">{t("updatePhotoAndHistory")}</p>
+                    <h2 className="text-base font-bold uppercase text-white">{t("myProfile")}</h2>
+                    <p className="text-xs font-medium text-blue-100 mt-0.5">{t("updatePhotoAndHistory")}</p>
                   </div>
                   <button
                     onClick={() => setShowProfileModal(false)}

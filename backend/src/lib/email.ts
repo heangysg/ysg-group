@@ -71,3 +71,64 @@ export const sendOrderStatusEmail = async (order: any) => {
     console.error("Failed to send order status email:", error);
   }
 };
+
+const escapeHtml = (str: string) =>
+  str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+export const sendInquiryReplyEmail = async (
+  inquiry: any,
+  replyMessage: string
+): Promise<{ sent: boolean; reason?: string }> => {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn("⚠️ SMTP credentials not configured. Skipping inquiry reply email.");
+    return { sent: false, reason: "smtp_not_configured" };
+  }
+
+  if (!inquiry?.email) {
+    return { sent: false, reason: "missing_customer_email" };
+  }
+
+  const customerName = escapeHtml(String(inquiry.customerName || inquiry.name || "Customer"));
+  const safeOriginal = escapeHtml(String(inquiry.message || "")).replace(/\n/g, "<br/>");
+  const safeReply = escapeHtml(replyMessage).replace(/\n/g, "<br/>");
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h2 style="color: #0f172a; text-transform: uppercase;">YSG Machinery</h2>
+      <p style="color: #475569; font-size: 15px;">Hello <strong>${customerName}</strong>,</p>
+      <p style="color: #475569; font-size: 14px;">Thank you for contacting YSG Machinery. Here is our response to your inquiry:</p>
+      <div style="margin: 20px 0; padding: 16px; background-color: #f8fafc; border-left: 4px solid #1d4ed8; color: #0f172a; font-size: 14px; line-height: 1.6;">
+        ${safeReply}
+      </div>
+      ${safeOriginal ? `
+        <p style="color: #64748b; font-size: 12px; margin-bottom: 6px;">Your original message:</p>
+        <blockquote style="margin: 0; padding: 12px; background-color: #f1f5f9; border-radius: 6px; color: #475569; font-size: 13px;">
+          ${safeOriginal}
+        </blockquote>
+      ` : ""}
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+      <p style="color: #94a3b8; font-size: 12px; text-align: center;">
+        YSG Machinery &copy; ${new Date().getFullYear()} All Rights Reserved.
+      </p>
+    </div>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"YSG Machinery" <${process.env.SMTP_USER}>`,
+      to: inquiry.email,
+      subject: `Re: Your Inquiry at YSG Machinery`,
+      html,
+    });
+    console.log(`✉️ Inquiry reply email sent to ${inquiry.email} for inquiry ${inquiry.id}`);
+    return { sent: true };
+  } catch (error: any) {
+    console.error("Failed to send inquiry reply email:", error);
+    return { sent: false, reason: error?.message || "smtp_send_failed" };
+  }
+};
