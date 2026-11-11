@@ -99,15 +99,7 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
       const result = await pgClient.query(query, values);
       const newOrder = result.rows[0];
 
-      // Deep Thesis Fix: Real-time Stock Reduction
-      for (const item of validatedItems) {
-        try {
-          const identifier = item.id || item.slug;
-          await pgClient.query('UPDATE "Product" SET stock = GREATEST(stock - $1, 0) WHERE id = $2 OR slug = $2', [item.quantity, identifier]);
-        } catch (err) {
-          console.error("Stock reduction failed for item:", item, err);
-        }
-      }
+      // Stock is deducted atomically in markOrderAsPaid once payment succeeds (not on unpaid pending checkout).
       
       // Dispatch Telegram Sales Notification Alert (Background)
       const botToken = process.env.TELEGRAM_BOT_TOKEN;

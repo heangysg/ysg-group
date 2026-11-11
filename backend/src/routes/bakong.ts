@@ -27,13 +27,30 @@ async function markOrderAsPaid(orderId: string): Promise<void> {
        SET status = 'paid'
        WHERE (UPPER(TRIM(id)) = UPPER(TRIM($1)) OR id = $1)
          AND status <> 'paid'
-       RETURNING id, "customerName", "customerPhone", "totalAmount"`,
+       RETURNING id, "customerName", "customerPhone", "totalAmount", items`,
       [orderId]
     );
 
     if (rows.length > 0) {
       const order = rows[0];
       console.log(`✅ Order ${order.id} marked as PAID!`);
+
+      // Deduct product stock atomically once payment is confirmed
+      const items = Array.isArray(order.items) ? order.items : [];
+      for (const item of items) {
+        const qty = Math.max(1, parseInt(item?.quantity) || 1);
+        const identifier = item?.id || item?.slug;
+        if (!identifier) continue;
+        try {
+          await pgClient.query(
+            'UPDATE "Product" SET stock = GREATEST(stock - $1, 0) WHERE id = $2 OR slug = $2',
+            [qty, identifier]
+          );
+        } catch (stockErr) {
+          console.error("Stock deduction failed for paid order item:", item, stockErr);
+        }
+      }
+
       const total = Number(order.totalAmount || 0).toFixed(2);
       sendTelegramNotification(
         `✅ *ទូទាត់ប្រាក់ជោគជ័យ (PAYMENT PAID)*\n\n*Order ID:* \`${order.id}\`\n*Customer:* ${order.customerName}\n*Phone:* ${order.customerPhone}\n*Amount:* $${total}`

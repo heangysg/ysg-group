@@ -23,7 +23,9 @@ import {
  Plus,
  ShoppingBag,
  Image as ImageIcon,
- BarChart3
+ BarChart3,
+ Boxes,
+ ChevronRight
 } from "lucide-react"
 import { Check, Loader2, Upload, Trash2, Edit2, Shield, Key, Edit, ListPlus, MessageSquare } from "lucide-react"
 import { useLanguage } from "../../contexts/LanguageContext"
@@ -49,6 +51,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  const [notificationsReadAt, setNotificationsReadAt] = useState<number>(0)
  const [search, setSearch] = useState("")
  const [showSearchResults, setShowSearchResults] = useState(false)
+ const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+   overview: true,
+   sales: true,
+   catalog: true,
+   system: false,
+ })
  const notificationRef = useRef<HTMLDivElement>(null)
  const searchRef = useRef<HTMLDivElement>(null)
 
@@ -212,23 +220,73 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  return () => window.removeEventListener("resize", handleResize)
  }, [])
 
- const menuItems = [
- ...(!isStaff ? [
- { name: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
- { name: t("reports"), href: "/admin/reports", icon: BarChart3 },
- ] : []),
- { name: t("orders"), href: "/admin/orders", icon: History },
- { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
- { name: t("products"), href: "/admin/products", icon: Package },
- { name: t("categories"), href: "/admin/categories", icon: FolderOpen },
- { name: t("customers") || "Customers", href: "/admin/customers", icon: Users },
- { name: t("profile"), href: "/admin/profile", icon: User },
- ...(isSuperAdmin ? [
- { name: t("users"), href: "/admin/users", icon: Users },
- { name: t("auditLogs"), href: "/admin/audit-logs", icon: History },
- { name: t("settings"), href: "/admin/settings", icon: Settings }
- ] : [])
- ]
+  const isKh = language === "kh"
+
+  const menuGroups = [
+    ...(!isStaff
+      ? [
+          {
+            id: "overview",
+            label: isKh ? "ទិដ្ឋភាពទូទៅ" : "Overview",
+            icon: LayoutDashboard,
+            items: [
+              { name: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
+              { name: t("reports"), href: "/admin/reports", icon: BarChart3 },
+            ],
+          },
+        ]
+      : []),
+    {
+      id: "sales",
+      label: isKh ? "ការលក់ & អតិថិជន" : "Sales & Orders",
+      icon: ShoppingBag,
+      items: [
+        { name: t("orders"), href: "/admin/orders", icon: ShoppingBag },
+        { name: t("inquiries"), href: "/admin/inquiries", icon: Mail },
+        { name: t("customers") || "Customers", href: "/admin/customers", icon: Users },
+      ],
+    },
+    {
+      id: "catalog",
+      label: isKh ? "ផលិតផល & ស្តុក" : "Catalog & Stock",
+      icon: Package,
+      items: [
+        { name: t("products"), href: "/admin/products", icon: Package },
+        { name: isKh ? "បន្ថែមផលិតផល" : "Add Product", href: "/admin/products/new", icon: Plus },
+        { name: isKh ? "ស្តុកទំនិញ (Stock)" : "Stock / Inventory", href: "/admin/inventory", icon: Boxes },
+        { name: t("categories"), href: "/admin/categories", icon: FolderOpen },
+        { name: isKh ? "ធុងសំរាម" : "Trash", href: "/admin/products/trash", icon: Trash2 },
+      ],
+    },
+    {
+      id: "system",
+      label: isKh ? "ប្រព័ន្ធ & ការកំណត់" : "System",
+      icon: Settings,
+      items: [
+        { name: t("profile"), href: "/admin/profile", icon: User },
+        ...(isSuperAdmin
+          ? [
+              { name: t("users"), href: "/admin/users", icon: Shield },
+              { name: t("auditLogs"), href: "/admin/audit-logs", icon: History },
+              { name: t("settings"), href: "/admin/settings", icon: Settings },
+            ]
+          : []),
+      ],
+    },
+  ]
+
+  const menuItems = menuGroups.flatMap((g) => g.items)
+
+  const toggleGroup = (id: string) => {
+    setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  useEffect(() => {
+    const matchedGroup = menuGroups.find((g) => g.items.some((item) => pathname === item.href || (item.href !== "/admin/products" && pathname?.startsWith(item.href))))
+    if (matchedGroup && !openGroups[matchedGroup.id]) {
+      setOpenGroups((prev) => ({ ...prev, [matchedGroup.id]: true }))
+    }
+  }, [pathname])
 
  const handleLogout = () => {
  localStorage.removeItem("ysg_admin_user")
@@ -357,28 +415,60 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  </div>
  </div>
 
- {/* Navigation */}
- <nav className="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar">
- {menuItems.map((item) => {
- const isActive = pathname === item.href
- return (
- <Link
- key={item.name}
- href={item.href}
- onClick={() => { if (isMobile) setSidebarOpen(false) }}
- className={`
- flex items-center gap-3 px-4 py-3 font-bold text-xs font-medium transition-all border-2
- ${isActive
- ? "bg-primary text-white border-transparent mx-2 rounded-md"
- : "text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50 mx-2 rounded-md"}
- `}
- >
- <item.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-500"}`} />
- {item.name}
- </Link>
- )
- })}
- </nav>
+        {/* Navigation (Grouped Collapsible Dropdowns) */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-2 custom-scrollbar">
+          {menuGroups.map((group) => {
+            const hasActiveChild = group.items.some((item) => pathname === item.href)
+            const isOpen = openGroups[group.id] ?? hasActiveChild
+
+            return (
+              <div key={group.id} className="space-y-1">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                    hasActiveChild
+                      ? "text-primary bg-blue-50/70"
+                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <group.icon className="w-3.5 h-3.5" />
+                    {group.label}
+                  </span>
+                  {isOpen ? (
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  ) : (
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  )}
+                </button>
+
+                {isOpen && (
+                  <div className="space-y-0.5 pl-2">
+                    {group.items.map((item) => {
+                      const isActive = pathname === item.href
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => { if (isMobile) setSidebarOpen(false) }}
+                          className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold transition-all rounded-lg ${
+                            isActive
+                              ? "bg-primary text-white shadow-sm"
+                              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/70"
+                          }`}
+                        >
+                          <item.icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`} />
+                          <span className="truncate">{item.name}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </nav>
 
  {/* Logout */}
  <div className="p-4 border-t border-slate-200">
@@ -412,6 +502,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
  <span className="text-slate-900">
  {pathname === "/admin/dashboard" ? t("dashboard") :
  pathname.includes("/admin/reports") ? t("reports") :
+ pathname.includes("/admin/inventory") ? (isKh ? "ស្តុកទំនិញ" : "Stock / Inventory") :
  pathname.includes("/admin/products/trash") ? (language === "kh" ? "ធុងសំរាម" : "Trash") :
  pathname.includes("/admin/products/new") ? (language === "kh" ? "បន្ថែមផលិតផល" : "New Product") :
  pathname.includes("/admin/products/edit") ? (language === "kh" ? "កែប្រែផលិតផល" : "Edit Product") :
