@@ -64,6 +64,7 @@ function BannerSlider() {
   const [index, setIndex] = useState(0);
   const { language } = useLanguage();
   const router = useRouter();
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -72,8 +73,29 @@ function BannerSlider() {
     return () => clearInterval(timer);
   }, []);
 
+  const goPrev = () => setIndex((prev) => (prev - 1 + bannerData.length) % bannerData.length);
+  const goNext = () => setIndex((prev) => (prev + 1) % bannerData.length);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) goNext();
+      else goPrev();
+    }
+    touchStartX.current = null;
+  };
+
   return (
-    <>
+    <div
+      className="relative w-full h-full"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <AnimatePresence initial={false}>
         <motion.div
           key={index}
@@ -88,63 +110,77 @@ function BannerSlider() {
             alt={`Banner ${index + 1}`}
             fetchPriority={index === 0 ? "high" : "auto"}
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center"
           />
           {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/15 sm:via-black/45 sm:to-transparent" />
 
-          <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-16 lg:px-24 max-w-3xl">
+          <div className="absolute inset-0 flex flex-col justify-center px-12 sm:px-16 md:px-20 pb-5 sm:pb-6 max-w-2xl md:max-w-3xl">
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-white text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tight mb-2 sm:mb-4 leading-tight"
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-white text-lg sm:text-3xl md:text-4xl lg:text-[44px] font-black uppercase tracking-tight mb-1.5 sm:mb-3 leading-snug sm:leading-tight"
             >
               {language === 'kh' ? bannerData[index].titleKhmer : bannerData[index].title}
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-white/90 text-xs sm:text-base md:text-lg font-medium mb-4 sm:mb-8 max-w-xl line-clamp-2"
+              transition={{ delay: 0.35, duration: 0.5 }}
+              className="text-white/90 text-xs sm:text-sm md:text-base font-medium mb-3.5 sm:mb-6 max-w-md sm:max-w-lg line-clamp-2 leading-relaxed"
             >
               {language === 'kh' ? bannerData[index].subtitleKhmer : bannerData[index].subtitle}
             </motion.p>
             <motion.button
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
               onClick={() => router.push(bannerData[index].href)}
-              className="w-fit bg-[#004691] hover:bg-blue-800 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+              className="w-fit bg-[#004691] hover:bg-[#003570] text-white font-bold py-2 px-4 sm:py-2.5 sm:px-6 md:py-3 md:px-7 text-xs sm:text-sm rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 flex items-center gap-1.5 sm:gap-2 cursor-pointer"
             >
-              {language === 'kh' ? bannerData[index].ctaKhmer : bannerData[index].cta} <ArrowRight className="w-4 h-4" />
+              <span>{language === 'kh' ? bannerData[index].ctaKhmer : bannerData[index].cta}</span>
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             </motion.button>
           </div>
         </motion.div>
       </AnimatePresence>
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+
+      {/* Pagination Dots */}
+      <div className="absolute bottom-2.5 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 z-10">
         {bannerData.map((_, i) => (
           <button
             key={i}
+            type="button"
+            aria-label={`Slide ${i + 1}`}
             onClick={() => setIndex(i)}
-            className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full transition-all shadow-sm ${i === index ? "bg-[#004691] w-6 md:w-8" : "bg-white/50 hover:bg-white/80"
-              }`}
+            className={`h-1.5 sm:h-2 rounded-full transition-all shadow-sm cursor-pointer ${
+              i === index
+                ? "bg-white w-5 sm:w-7"
+                : "bg-white/45 hover:bg-white/75 w-1.5 sm:w-2"
+            }`}
           />
         ))}
       </div>
+
+      {/* Previous / Next Controls */}
       <button
-        onClick={() => setIndex((prev) => (prev - 1 + bannerData.length) % bannerData.length)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/35 hover:bg-black/55 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10"
+        type="button"
+        aria-label="Previous slide"
+        onClick={goPrev}
+        className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-black/35 hover:bg-black/60 text-white flex items-center justify-center opacity-80 sm:opacity-70 group-hover:opacity-100 transition-all z-10 cursor-pointer"
       >
-        <ChevronRight className="w-4 h-4 md:w-6 md:h-6 rotate-180" />
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 rotate-180" />
       </button>
       <button
-        onClick={() => setIndex((prev) => (prev + 1) % bannerData.length)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/35 hover:bg-black/55 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10"
+        type="button"
+        aria-label="Next slide"
+        onClick={goNext}
+        className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 w-7 h-7 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-black/35 hover:bg-black/60 text-white flex items-center justify-center opacity-80 sm:opacity-70 group-hover:opacity-100 transition-all z-10 cursor-pointer"
       >
-        <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
+        <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
-    </>
+    </div>
   );
 }
 
@@ -315,7 +351,7 @@ export default function HomePage() {
       <div className="bg-white min-h-screen pb-24 font-sans">
         <div className="max-w-5xl mx-auto px-4 md:px-8 pt-4 md:pt-6 space-y-6 md:space-y-10">
           {/* Hero skeleton */}
-          <div className="rounded-md md:rounded-md bg-slate-100 animate-pulse h-[180px] sm:h-[240px] md:h-[380px]" />
+          <div className="rounded-xl bg-slate-100 animate-pulse h-[230px] sm:h-[300px] md:h-[360px] lg:h-[400px]" />
           {/* Category row skeleton */}
           <div className="flex overflow-x-auto gap-3 pb-4">
             {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -346,7 +382,7 @@ export default function HomePage() {
     <div className="bg-white min-h-screen pb-24 font-sans selection:bg-[#004691]/20">
       <div className="max-w-5xl mx-auto px-4 md:px-8 pt-4 md:pt-6 relative z-20 space-y-6 md:space-y-10">
         {/* Hero Banner Showcase */}
-        <section className="relative rounded-md md:rounded-md overflow-hidden bg-slate-100 h-[180px] sm:h-[240px] md:h-[380px] shadow-2xs border border-slate-200 group">
+        <section className="relative rounded-xl overflow-hidden bg-slate-100 h-[230px] sm:h-[300px] md:h-[360px] lg:h-[400px] shadow-2xs border border-slate-200 group">
           <BannerSlider />
         </section>
 
