@@ -106,11 +106,11 @@ export default function ReportsPage() {
     });
     (data.topProducts || []).forEach((p: any) => {
       const safeName = String(p.name || "").replace(/"/g, '""');
-      rows.push(`"Top Product","${safeName}",${p.order_count || 0},${Number(p.total_revenue || 0).toFixed(2)}`);
+      rows.push(`"Top Product","${safeName}",${p.orderCount ?? p.order_count ?? 0},${Number(p.totalRevenue ?? p.total_revenue ?? 0).toFixed(2)}`);
     });
     (data.topCustomers || []).forEach((c: any) => {
       const safeName = String(c.customerName || "Customer").replace(/"/g, '""');
-      rows.push(`"Top Customer","${safeName}",${c.order_count || 0},${Number(c.total_spent || 0).toFixed(2)}`);
+      rows.push(`"Top Customer","${safeName}",${c.orderCount ?? c.order_count ?? 0},${Number(c.totalSpent ?? c.total_spent ?? 0).toFixed(2)}`);
     });
 
     const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
