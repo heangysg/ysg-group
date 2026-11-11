@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { X, Loader2, Download, Check, CheckCircle2 } from 'lucide-react'
+import { X, Loader2, Download, Check } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
 import { checkBakongTransactionDetailed } from '../lib/bakong'
 import toast, { Toaster } from 'react-hot-toast'
@@ -36,7 +36,6 @@ export default function BakongQRModal({
   const [timeLeft, setTimeLeft] = useState(300)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadSuccess, setDownloadSuccess] = useState(false)
-  const [isVerifying, setIsVerifying] = useState(false)
   const [verifyError, setVerifyError] = useState<string | null>(null)
 
   // 📱 Touch drag state for pull-to-dismiss gesture
@@ -86,18 +85,14 @@ export default function BakongQRModal({
   }, [timeLeft, isOpen, onExpire])
 
   useEffect(() => {
-    if (!isOpen || !md5) return
+    if (!isOpen || (!md5 && !orderId)) return
 
     let isSubscribed = true
     let isFetching = false
 
-    const pollInterval = setInterval(async () => {
+    const runCheck = async (skipHiddenCheck = false) => {
       if (!isSubscribed || isFetching) return
-
-      // Save requests: Do not poll if user minimized or switched tab
-      if (typeof document !== 'undefined' && document.hidden) return
-
-      // Save requests: Stop immediately if QR code has expired
+      if (!skipHiddenCheck && typeof document !== 'undefined' && document.hidden) return
       if (expiresAt && Date.now() > expiresAt) {
         clearInterval(pollInterval)
         return
@@ -120,11 +115,34 @@ export default function BakongQRModal({
       } finally {
         isFetching = false
       }
-    }, 4500)
+    }
+
+    const pollInterval = setInterval(() => {
+      void runCheck(false)
+    }, 2500)
+
+    const handleVisibilityOrFocus = () => {
+      if (typeof document === 'undefined' || !document.hidden) {
+        void runCheck(true)
+      }
+    }
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityOrFocus)
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleVisibilityOrFocus)
+    }
 
     return () => {
       isSubscribed = false
       clearInterval(pollInterval)
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityOrFocus)
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleVisibilityOrFocus)
+      }
     }
   }, [isOpen, md5, orderId, expiresAt])
 
@@ -143,37 +161,6 @@ export default function BakongQRModal({
       // Quietly continue
     } finally {
       setIsChecking(false)
-    }
-  }
-
-  const handleManualVerify = async () => {
-    if ((!md5 && !orderId) || isVerifying) return
-    setIsVerifying(true)
-    try {
-      const res = await checkBakongTransactionDetailed(md5, orderId)
-      if (res.paid) {
-        setVerifyError(null)
-        handleSuccess()
-      } else if (res.error) {
-        setVerifyError(res.error)
-        toast.error(res.error, { duration: 5000 })
-      } else {
-        setVerifyError(null)
-        toast(
-          language === "kh"
-            ? "កំពុងរង់ចាំការបញ្ជាក់ពីប្រព័ន្ធ Bakong... ប្រសិនបើអ្នកបានផ្ទេររួច សូមរង់ចាំបន្តិច"
-            : "Waiting for bank confirmation... If you just transferred, please wait a moment.",
-          { icon: "⏳", duration: 4000 }
-        )
-      }
-    } catch {
-      toast.error(
-        language === "kh"
-          ? "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេដើម្បីផ្ទៀងផ្ទាត់ការទូទាត់បានទេ។"
-          : "Unable to connect to server to verify payment."
-      )
-    } finally {
-      setIsVerifying(false)
     }
   }
 
@@ -519,25 +506,15 @@ export default function BakongQRModal({
               )}
             </button>
 
-            {/* Manual Verification Button */}
-            <button
-              type="button"
-              onClick={handleManualVerify}
-              disabled={isVerifying || isChecking}
-              className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-xs mb-2 cursor-pointer whitespace-nowrap"
-            >
-              {isVerifying || isChecking ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>{language === "kh" ? "កំពុងផ្ទៀងផ្ទាត់..." : "Checking payment..."}</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{language === "kh" ? "បានទូទាត់រួច — ផ្ទៀងផ្ទាត់" : "I've Paid — Verify Now"}</span>
-                </>
-              )}
-            </button>
+            {/* Automatic Live Payment Status Indicator */}
+            <div className="flex items-center justify-center gap-1.5 py-1.5 mb-1.5 text-[11px] font-medium text-emerald-700 bg-emerald-50/70 border border-emerald-200/70 rounded-xl">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>
+                {language === "kh"
+                  ? "កំពុងរង់ចាំការបញ្ជាក់ដោយស្វ័យប្រវត្តិ..."
+                  : "Waiting for automatic confirmation..."}
+              </span>
+            </div>
 
             {verifyError && (
               <div className="mb-2 px-2.5 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-[11px] font-medium text-center leading-snug">

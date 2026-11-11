@@ -43,7 +43,8 @@ async function parseJsonSafe(res: globalThis.Response): Promise<any> {
 }
 
 /**
- * Verifies a CutLuy payment by paymentId, with fallback lookup by merchant order reference_id.
+ * Verifies a CutLuy payment via `GET /v1/payments/:id` and the documented
+ * `GET /v1/payments?status=paid&limit=100` endpoint matching paymentId or order reference_id.
  */
 async function checkCutluyPayment(
   cutluyKey: string,
@@ -62,56 +63,71 @@ async function checkCutluyPayment(
   let lastOk = false;
 
   if (paymentId) {
-    const res = await fetch(`${CUTLUY_API_BASE}/${encodeURIComponent(paymentId)}`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${cutluyKey}` },
-    });
-    lastHttpStatus = res.status;
-    lastOk = res.ok;
-    lastData = await parseJsonSafe(res);
-    const parsed = parseCutluyPaymentStatus(lastData);
-    lastRawStatus = parsed.rawStatus;
-
-    if (res.ok && parsed.isPaid) {
-      return { ok: true, httpStatus: res.status, isPaid: true, rawStatus: parsed.rawStatus, data: lastData };
-    }
-  }
-
-  if (orderId) {
     try {
-      const listRes = await fetch(
-        `${CUTLUY_API_BASE}?reference_id=${encodeURIComponent(orderId)}`,
-        { method: 'GET', headers: { Authorization: `Bearer ${cutluyKey}` } }
-      );
-      if (listRes.ok) {
-        const listData = await parseJsonSafe(listRes);
-        const candidates = Array.isArray(listData)
-          ? listData
-          : Array.isArray(listData?.data)
-            ? listData.data
-            : Array.isArray(listData?.payments)
-              ? listData.payments
-              : Array.isArray(listData?.data?.payments)
-                ? listData.data.payments
-                : [listData?.payment, listData?.data?.payment, listData].filter(Boolean);
+      const res = await fetch(`${CUTLUY_API_BASE}/${encodeURIComponent(paymentId)}`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${cutluyKey}` },
+      });
+      lastHttpStatus = res.status;
+      lastOk = res.ok;
+      lastData = await parseJsonSafe(res);
+      const parsed = parseCutluyPaymentStatus(lastData);
+      lastRawStatus = parsed.rawStatus;
 
-        for (const candidate of candidates) {
-          const candidateRef = String(candidate?.reference_id ?? candidate?.referenceId ?? '').trim();
-          if (candidateRef && candidateRef.toUpperCase() !== orderId.trim().toUpperCase()) {
-            continue;
-          }
-          const parsed = parseCutluyPaymentStatus(candidate);
-          if (parsed.isPaid) {
-            return { ok: true, httpStatus: listRes.status, isPaid: true, rawStatus: parsed.rawStatus, data: candidate };
-          }
-        }
+      if (res.ok && parsed.isPaid) {
+        return { ok: true, httpStatus: res.status, isPaid: true, rawStatus: parsed.rawStatus, data: lastData };
       }
     } catch (err) {
-      console.warn(`[CutLuy Lookup Fallback] Failed reference_id check for ${orderId}:`, err);
+      console.warn(`[CutLuy Single Check] Failed for ${paymentId}:`, err);
     }
   }
 
-  return { ok: lastOk, httpStatus: lastHttpStatus, isPaid: false, rawStatus: lastRawStatus, data: lastData };
+  // Official CutLuy list endpoint fallback (`GET /v1/payments?status=paid&limit=100`)
+  try {
+    const listRes = await fetch(
+      `${CUTLUY_API_BASE}?status=paid&limit=100`,
+      { method: 'GET', headers: { Authorization: `Bearer ${cutluyKey}` } }
+    );
+    const listData = await parseJsonSafe(listRes);
+    if (listRes.ok) {
+      lastOk = true;
+      lastHttpStatus = listRes.status;
+      const candidates = Array.isArray(listData)
+        ? listData
+        : Array.isArray(listData?.data)
+          ? listData.data
+          : Array.isArray(listData?.payments)
+            ? listData.payments
+            : Array.isArray(listData?.data?.payments)
+              ? listData.data.payments
+              : [];
+
+      const normalizedOrderId = String(orderId || '').trim().toUpperCase();
+      const normalizedPaymentId = String(paymentId || '').trim();
+
+      for (const candidate of candidates) {
+        const candidateId = String(candidate?.id ?? '').trim();
+        const candidateRef = String(candidate?.reference_id ?? candidate?.referenceId ?? '').trim().toUpperCase();
+        const matchesPayment = Boolean(normalizedPaymentId && candidateId === normalizedPaymentId);
+        const matchesOrder = Boolean(normalizedOrderId && candidateRef === normalizedOrderId);
+
+        if (!matchesPayment && !matchesOrder) {
+          continue;
+        }
+        const parsed = parseCutluyPaymentStatus(candidate);
+        if (parsed.isPaid) {
+          return { ok: true, httpStatus: listRes.status, isPaid: true, rawStatus: parsed.rawStatus, data: candidate };
+        }
+      }
+    } else if (!lastOk) {
+      lastHttpStatus = listRes.status;
+      lastData = listData;
+    }
+  } catch (err) {
+    console.warn(`[CutLuy List Check] Failed for order ${orderId}:`, err);
+  }
+
+  return { ok: lastOk, httpStatus: lastHttpStatus, isPaid: false, rawStatus: lastRawStatus || 'pending', data: lastData };
 }
 
 const pollingLimiter = rateLimit({
