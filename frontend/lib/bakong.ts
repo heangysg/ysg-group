@@ -24,7 +24,16 @@ export const generateBakongQR = async (amount: number, orderId: string, expiresA
  * @param md5 The MD5 hash of the generated KHQR
  * @returns boolean indicating if payment was successful
  */
-export const checkBakongTransaction = async (md5: string, orderId: string): Promise<boolean> => {
+export interface BakongCheckResult {
+  paid: boolean;
+  error?: string;
+  status?: string;
+}
+
+export const checkBakongTransactionDetailed = async (
+  md5: string,
+  orderId: string
+): Promise<BakongCheckResult> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     const response = await fetch(`${API_URL}/api/bakong/check-status`, {
@@ -35,10 +44,27 @@ export const checkBakongTransaction = async (md5: string, orderId: string): Prom
       body: JSON.stringify({ md5, orderId })
     });
 
-    if (!response.ok) return false;
-    const result = await response.json();
-    return result?.responseCode === 0;
-  } catch {
-    return false;
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return {
+        paid: false,
+        error: payload?.error || payload?.message || `Verification error (HTTP ${response.status})`
+      };
+    }
+
+    return {
+      paid: payload?.responseCode === 0,
+      status: payload?.data?.status || payload?.responseMessage
+    };
+  } catch (err) {
+    return {
+      paid: false,
+      error: err instanceof Error ? err.message : "Network error while checking payment"
+    };
   }
+};
+
+export const checkBakongTransaction = async (md5: string, orderId: string): Promise<boolean> => {
+  const result = await checkBakongTransactionDetailed(md5, orderId);
+  return result.paid;
 };

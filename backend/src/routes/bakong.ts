@@ -1,6 +1,4 @@
 import { Router, Request, Response } from 'express';
-// @ts-expect-error missing type definitions for bakong-khqr
-import { BakongKHQR, MerchantInfo } from 'bakong-khqr';
 import { getPgClient } from '../lib/db';
 import { sendTelegramNotification } from '../services/telegram';
 import rateLimit from 'express-rate-limit';
@@ -8,6 +6,113 @@ import rateLimit from 'express-rate-limit';
 const router = Router();
 
 const CUTLUY_API_BASE = 'https://cutluy.com/v1/payments';
+const PAID_STATUS_VALUES = new Set(['paid', 'completed', 'succeeded', 'success']);
+
+/**
+ * Extracts payment status and paid boolean across flat or nested CutLuy API/webhook payloads.
+ */
+function parseCutluyPaymentStatus(payload: any): { rawStatus: string; isPaid: boolean } {
+  const rawStatus = String(
+    payload?.status ??
+    payload?.data?.status ??
+    payload?.payment?.status ??
+    payload?.data?.payment?.status ??
+    ''
+  ).trim();
+  const normalized = rawStatus.toLowerCase();
+  const explicitPaidFlag =
+    payload?.paid === true ||
+    payload?.data?.paid === true ||
+    payload?.payment?.paid === true ||
+    payload?.data?.payment?.paid === true;
+
+  return {
+    rawStatus,
+    isPaid: explicitPaidFlag || PAID_STATUS_VALUES.has(normalized),
+  };
+}
+
+async function parseJsonSafe(res: globalThis.Response): Promise<any> {
+  const text = await res.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { rawText: text };
+  }
+}
+
+/**
+ * Verifies a CutLuy payment by paymentId, with fallback lookup by merchant order reference_id.
+ */
+async function checkCutluyPayment(
+  cutluyKey: string,
+  paymentId?: string,
+  orderId?: string
+): Promise<{
+  ok: boolean;
+  httpStatus: number;
+  isPaid: boolean;
+  rawStatus: string;
+  data: any;
+}> {
+  let lastHttpStatus = 200;
+  let lastData: any = {};
+  let lastRawStatus = '';
+  let lastOk = false;
+
+  if (paymentId) {
+    const res = await fetch(`${CUTLUY_API_BASE}/${encodeURIComponent(paymentId)}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${cutluyKey}` },
+    });
+    lastHttpStatus = res.status;
+    lastOk = res.ok;
+    lastData = await parseJsonSafe(res);
+    const parsed = parseCutluyPaymentStatus(lastData);
+    lastRawStatus = parsed.rawStatus;
+
+    if (res.ok && parsed.isPaid) {
+      return { ok: true, httpStatus: res.status, isPaid: true, rawStatus: parsed.rawStatus, data: lastData };
+    }
+  }
+
+  if (orderId) {
+    try {
+      const listRes = await fetch(
+        `${CUTLUY_API_BASE}?reference_id=${encodeURIComponent(orderId)}`,
+        { method: 'GET', headers: { Authorization: `Bearer ${cutluyKey}` } }
+      );
+      if (listRes.ok) {
+        const listData = await parseJsonSafe(listRes);
+        const candidates = Array.isArray(listData)
+          ? listData
+          : Array.isArray(listData?.data)
+            ? listData.data
+            : Array.isArray(listData?.payments)
+              ? listData.payments
+              : Array.isArray(listData?.data?.payments)
+                ? listData.data.payments
+                : [listData?.payment, listData?.data?.payment, listData].filter(Boolean);
+
+        for (const candidate of candidates) {
+          const candidateRef = String(candidate?.reference_id ?? candidate?.referenceId ?? '').trim();
+          if (candidateRef && candidateRef.toUpperCase() !== orderId.trim().toUpperCase()) {
+            continue;
+          }
+          const parsed = parseCutluyPaymentStatus(candidate);
+          if (parsed.isPaid) {
+            return { ok: true, httpStatus: listRes.status, isPaid: true, rawStatus: parsed.rawStatus, data: candidate };
+          }
+        }
+      }
+    } catch (err) {
+      console.warn(`[CutLuy Lookup Fallback] Failed reference_id check for ${orderId}:`, err);
+    }
+  }
+
+  return { ok: lastOk, httpStatus: lastHttpStatus, isPaid: false, rawStatus: lastRawStatus, data: lastData };
+}
 
 const pollingLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -78,10 +183,17 @@ async function markOrderAsPaid(orderId: string): Promise<void> {
 
 router.post('/generate', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { orderId, expiresAtTimestamp } = req.body;
+    const { orderId } = req.body;
 
     if (!orderId) {
       res.status(400).json({ error: "orderId is required to generate payment QR" });
+      return;
+    }
+
+    const cutluyKey = process.env.CUTLUY_API_KEY?.trim();
+    if (!cutluyKey) {
+      console.error("CutLuy QR Generation Failed: CUTLUY_API_KEY is missing on server");
+      res.status(500).json({ error: "Payment gateway is not configured on server (missing CUTLUY_API_KEY)" });
       return;
     }
 
@@ -112,112 +224,55 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 1. CutLuy Gateway Mode (Bypasses NBC foreign-IP geo-blocking on cloud hosts like Render)
-    const cutluyKey = process.env.CUTLUY_API_KEY?.trim();
-    const hasLocalBakongId = Boolean((process.env.NEXT_PUBLIC_BAKONG_ACCOUNT_ID || process.env.BAKONG_ACCOUNT_ID || '').trim());
-    let cutluyErrorMsg = "";
+    const cutluyRes = await fetch(CUTLUY_API_BASE, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cutluyKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        amount: Number(secureAmount.toFixed(2)),
+        currency: 'USD',
+        reference_id: String(orderId)
+      })
+    });
 
-    if (cutluyKey && process.env.BAKONG_MOCK !== 'true') {
-      try {
-        const cutluyRes = await fetch(CUTLUY_API_BASE, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${cutluyKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            amount: Number(secureAmount.toFixed(2)),
-            currency: 'USD',
-            reference_id: String(orderId)
-          })
-        });
+    const cutluyData = await parseJsonSafe(cutluyRes);
+    const paymentId = String(cutluyData?.id ?? cutluyData?.data?.id ?? '').trim();
+    const qrString = String(cutluyData?.qr_string ?? cutluyData?.data?.qr_string ?? '').trim();
+    const checkoutUrl = cutluyData?.checkout_url ?? cutluyData?.data?.checkout_url;
 
-        const cutluyData: any = await cutluyRes.json().catch(() => ({}));
-
-        if (cutluyRes.ok && cutluyData?.qr_string && cutluyData?.id) {
-          const saveClient = await getPgClient();
-          try {
-            // Store CutLuy payment ID in bakongMd5 so /check-status can poll CutLuy directly
-            await saveClient.query(`UPDATE "Order" SET "bakongMd5" = $1 WHERE id = $2`, [cutluyData.id, orderId]);
-          } catch (err) {
-            console.error("Failed to save CutLuy payment ID to order:", err);
-          } finally {
-            await saveClient.release();
-          }
-
-          res.json({
-            qrString: cutluyData.qr_string,
-            md5: cutluyData.id,
-            checkoutUrl: cutluyData.checkout_url
-          });
-          return;
-        }
-
-        cutluyErrorMsg = cutluyData?.message || cutluyData?.error || `CutLuy error (${cutluyRes.status})`;
-        console.error("CutLuy QR Generation Failed:", cutluyRes.status, cutluyData);
-      } catch (cutluyErr: any) {
-        cutluyErrorMsg = cutluyErr?.message || "CutLuy network error";
-        console.error("CutLuy QR Request Error:", cutluyErr);
-      }
-
-      if (!hasLocalBakongId) {
-        res.status(502).json({ error: cutluyErrorMsg || "Failed to generate CutLuy KHQR" });
-        return;
-      }
-      console.warn("Falling back to local BakongKHQR generation because CutLuy failed:", cutluyErrorMsg);
-    }
-
-    // 2. Direct NBC Bakong KHQR Fallback (Local / Mock / Non-CutLuy)
-    const merchantInfo = new MerchantInfo();
-    merchantInfo.bakongAccountID = process.env.NEXT_PUBLIC_BAKONG_ACCOUNT_ID || process.env.BAKONG_ACCOUNT_ID || "";
-    merchantInfo.merchantName = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_NAME || process.env.BAKONG_MERCHANT_NAME || "YSG";
-    merchantInfo.merchantCity = process.env.NEXT_PUBLIC_BAKONG_MERCHANT_CITY || process.env.BAKONG_MERCHANT_CITY || "Phnom Penh";
-    merchantInfo.merchantID = "123456";
-    merchantInfo.acquiringBank = "YSG Machinery";
-    merchantInfo.currency = 840;
-    merchantInfo.amount = secureAmount;
-    merchantInfo.billNumber = orderId.slice(0, 20);
-    merchantInfo.storeLabel = process.env.NEXT_PUBLIC_BAKONG_STORE_LABEL || process.env.BAKONG_STORE_LABEL || "SITE-D";
-    merchantInfo.terminalLabel = process.env.NEXT_PUBLIC_BAKONG_TERMINAL_LABEL || process.env.BAKONG_TERMINAL_LABEL || "WEB-D";
-    merchantInfo.expirationTimestamp = expiresAtTimestamp || (Date.now() + 5 * 60 * 1000);
-
-    if (!merchantInfo.bakongAccountID) {
-      console.error("Bakong QR Generation Failed: Bakong Account ID is missing in .env");
-      res.status(500).json({ error: "Configuration Error: Missing Account ID" });
+    if (!cutluyRes.ok || !qrString || !paymentId) {
+      const cutluyErrorMsg =
+        cutluyData?.message ||
+        cutluyData?.error ||
+        `CutLuy QR generation failed (HTTP ${cutluyRes.status})`;
+      console.error("CutLuy QR Generation Failed:", cutluyRes.status, cutluyData);
+      res.status(cutluyRes.status >= 400 ? cutluyRes.status : 502).json({ error: cutluyErrorMsg });
       return;
     }
 
-    const khqr = new BakongKHQR();
-    const response = khqr.generateMerchant(merchantInfo);
-
-    if (response.status.code === 0) {
-      const saveClient = await getPgClient();
-      try {
-        await saveClient.query(`UPDATE "Order" SET "bakongMd5" = $1 WHERE id = $2`, [response.data.md5, orderId]);
-      } catch (err) {
-        console.error("Failed to save MD5 to order:", err);
-      } finally {
-        await saveClient.release();
-      }
-
-      res.json({
-        qrString: response.data.qr,
-        md5: response.data.md5
-      });
-      return;
+    const saveClient = await getPgClient();
+    try {
+      await saveClient.query(`UPDATE "Order" SET "bakongMd5" = $1 WHERE id = $2`, [paymentId, orderId]);
+    } catch (err) {
+      console.error("Failed to save CutLuy payment ID to order:", err);
+    } finally {
+      await saveClient.release();
     }
 
-    console.error("Bakong QR Generation Failed:", response.status.message);
-    res.status(400).json({ error: response.status.message });
-    return;
+    res.json({
+      qrString,
+      md5: paymentId,
+      checkoutUrl
+    });
   } catch (error) {
-    console.error("Server-side Bakong Generate Error:", error);
-    res.status(500).json({ error: "Failed to generate QR" });
-    return;
+    console.error("Server-side CutLuy Generate Error:", error);
+    res.status(500).json({ error: "Failed to generate CutLuy QR" });
   }
 });
 
-// In-memory short-lived status cache to prevent redundant API hits
+// In-memory short-lived status cache for confirmed paid responses
 const statusCache = new Map<string, { result: any; timestamp: number }>();
 
 router.post('/check-status', pollingLimiter, async (req: Request, res: Response): Promise<void> => {
@@ -225,7 +280,7 @@ router.post('/check-status', pollingLimiter, async (req: Request, res: Response)
     const { md5, orderId } = req.body;
     let savedPaymentRef: string | undefined;
 
-    // 1. Check local Database first (instant return if already paid)
+    // 1. Check local Database first (instant return if webhook or earlier check already marked paid)
     if (orderId) {
       const pgClient = await getPgClient();
       try {
@@ -247,122 +302,121 @@ router.post('/check-status', pollingLimiter, async (req: Request, res: Response)
       }
     }
 
-    // 2. Short-lived cache (3.5 seconds TTL)
+    // 2. Short-lived cache for confirmed SUCCESS responses only
     const cacheKey = md5 || savedPaymentRef;
     if (cacheKey && statusCache.has(cacheKey)) {
       const cached = statusCache.get(cacheKey)!;
-      if (Date.now() - cached.timestamp < 3500) {
+      if (cached.result?.responseCode === 0 && Date.now() - cached.timestamp < 30000) {
+        if (orderId) await markOrderAsPaid(orderId);
         res.json(cached.result);
         return;
       }
     }
 
-    // 3. Mock Simulation Mode
-    if (process.env.BAKONG_MOCK === "true") {
-      console.log("Bakong Mock Mode: Simulating successful payment for ref:", cacheKey);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      if (orderId) await markOrderAsPaid(orderId);
-      res.json({ responseCode: 0, responseMessage: "Success", data: { status: "SUCCESS" } });
+    // 3. CutLuy Gateway Verification
+    const cutluyKey = process.env.CUTLUY_API_KEY?.trim();
+    if (!cutluyKey) {
+      res.status(500).json({ error: "Payment gateway verification is not configured on server (missing CUTLUY_API_KEY)" });
       return;
     }
 
-    // 4. CutLuy Gateway Mode
-    const cutluyKey = process.env.CUTLUY_API_KEY?.trim();
-    if (cutluyKey) {
-      const paymentId = md5 || savedPaymentRef;
-      if (!paymentId) {
-        res.status(400).json({ error: "CutLuy payment ID is required" });
-        return;
-      }
+    const paymentId = String(md5 || savedPaymentRef || '').trim() || undefined;
+    if (!paymentId && !orderId) {
+      res.status(400).json({ error: "CutLuy payment ID or orderId is required" });
+      return;
+    }
 
-      const cutluyRes = await fetch(`${CUTLUY_API_BASE}/${encodeURIComponent(paymentId)}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${cutluyKey}`
-        }
-      });
+    const cutluyCheck = await checkCutluyPayment(cutluyKey, paymentId, orderId);
 
-      const cutluyData: any = await cutluyRes.json();
-      const rawCutluyStatus = cutluyData?.status ?? cutluyData?.data?.status;
-      const normalizedStatus = String(rawCutluyStatus || '').toLowerCase();
-      console.log(`[CutLuy Check] Order: ${orderId} | Payment: ${paymentId} | Status: ${rawCutluyStatus}`);
+    console.log(
+      `[CutLuy Check] Order: ${orderId} | Payment: ${paymentId} | HTTP: ${cutluyCheck.httpStatus} | Paid: ${cutluyCheck.isPaid} | Status: ${cutluyCheck.rawStatus}`
+    );
 
-      const isPaid = cutluyRes.ok && (normalizedStatus === 'paid' || normalizedStatus === 'completed' || cutluyData?.paid === true);
-      const formattedResult = isPaid
-        ? { responseCode: 0, responseMessage: "Success", data: { status: "SUCCESS", cutluy: cutluyData } }
-        : { responseCode: 1, responseMessage: rawCutluyStatus || "Pending", data: { status: rawCutluyStatus || "PENDING" } };
-
-      if (isPaid && orderId) {
-        await markOrderAsPaid(orderId);
-      }
-
-      statusCache.set(paymentId, { result: formattedResult, timestamp: Date.now() });
+    if (cutluyCheck.isPaid) {
+      const formattedResult = {
+        responseCode: 0,
+        responseMessage: "Success",
+        data: { status: "SUCCESS", cutluy: cutluyCheck.data },
+      };
+      if (orderId) await markOrderAsPaid(orderId);
+      if (paymentId) statusCache.set(paymentId, { result: formattedResult, timestamp: Date.now() });
       res.json(formattedResult);
       return;
     }
 
-    // 5. Direct NBC Bakong Open API Fallback
-    const token = process.env.BAKONG_TOKEN;
-    if (!token) {
-      res.status(500).json({ error: "Bakong Token missing on server" });
+    if (!cutluyCheck.ok) {
+      const errMsg =
+        cutluyCheck.data?.message ||
+        cutluyCheck.data?.error ||
+        `CutLuy verification failed (HTTP ${cutluyCheck.httpStatus})`;
+      res.status(cutluyCheck.httpStatus >= 400 ? cutluyCheck.httpStatus : 502).json({ error: errMsg });
       return;
     }
 
-    const isSandbox = (process.env.BAKONG_ACCOUNT_ID || '').includes('@bkrt') || process.env.BAKONG_ENV === 'testnet';
-    const primaryUrl = isSandbox
-      ? 'https://api-bakong-sandbox.nbc.gov.kh/v1/check_transaction_by_md5'
-      : 'https://api-bakong.nbc.gov.kh/v1/check_transaction_by_md5';
-
-    let result: any = null;
-    try {
-      const response = await fetch(primaryUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ md5 })
-      });
-      result = await response.json();
-    } catch (err) {
-      console.warn(`[Bakong Check] Primary API (${primaryUrl}) failed:`, err instanceof Error ? err.message : 'Unknown error');
-      result = { responseCode: 1, responseMessage: "Primary API error" };
-    }
-
-    // Dual-gateway verification fallback
-    if (result?.responseCode !== 0 && result?.errorCode !== 17) {
-      try {
-        const secondaryUrl = isSandbox
-          ? 'https://api-bakong.nbc.gov.kh/v1/check_transaction_by_md5'
-          : 'https://api-bakong-sandbox.nbc.gov.kh/v1/check_transaction_by_md5';
-        const secRes = await fetch(secondaryUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-          body: JSON.stringify({ md5 })
-        });
-        const secResult = await secRes.json();
-        if (secResult && secResult.responseCode === 0) {
-          result = secResult;
-        }
-      } catch {}
-    }
-
-    console.log(`[Bakong Check] Order: ${orderId} | MD5: ${md5} | ResponseCode: ${result?.responseCode} | Msg: ${result?.responseMessage}`);
-
-    if (result && result.responseCode === 0 && orderId) {
-      await markOrderAsPaid(orderId);
-    }
-
-    if (md5 && result) {
-      statusCache.set(md5, { result, timestamp: Date.now() });
-    }
-
-    res.json(result);
-    return;
+    res.json({
+      responseCode: 1,
+      responseMessage: cutluyCheck.rawStatus || "Pending",
+      data: { status: cutluyCheck.rawStatus || "PENDING" },
+    });
   } catch (error) {
-    console.error("Server-side Bakong Check Error:", error);
+    console.error("Server-side CutLuy Check Error:", error);
     res.status(500).json({ error: "Failed to check transaction" });
-    return;
+  }
+});
+
+/**
+ * CutLuy Webhook Endpoint (`POST /api/bakong/webhook`)
+ * Receives payment events (e.g. `payment.completed`) and authoritatively verifies
+ * against CutLuy API before marking the order paid and firing Telegram alerts.
+ */
+router.post('/webhook', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const cutluyKey = process.env.CUTLUY_API_KEY?.trim();
+    if (!cutluyKey) {
+      res.status(503).json({ error: "CUTLUY_API_KEY not configured on server" });
+      return;
+    }
+
+    const paymentObj = req.body?.data?.payment ?? req.body?.payment ?? req.body?.data ?? req.body ?? {};
+    const paymentId = String(paymentObj?.id ?? req.body?.payment_id ?? '').trim();
+    const referenceId = String(paymentObj?.reference_id ?? paymentObj?.referenceId ?? req.body?.reference_id ?? '').trim();
+
+    if (!paymentId && !referenceId) {
+      res.status(400).json({ error: "Missing payment id or reference_id in webhook payload" });
+      return;
+    }
+
+    // Always verify authoritatively with CutLuy API before updating DB state
+    const verified = await checkCutluyPayment(cutluyKey, paymentId || undefined, referenceId || undefined);
+    const resolvedOrderId =
+      referenceId ||
+      String(
+        verified.data?.reference_id ??
+        verified.data?.data?.reference_id ??
+        verified.data?.payment?.reference_id ??
+        ''
+      ).trim();
+
+    console.log(
+      `[CutLuy Webhook] Event: ${req.body?.type || req.body?.event || 'unknown'} | Payment: ${paymentId} | Order: ${resolvedOrderId} | VerifiedPaid: ${verified.isPaid}`
+    );
+
+    if (verified.isPaid && resolvedOrderId) {
+      await markOrderAsPaid(resolvedOrderId);
+      const cachedResult = {
+        responseCode: 0,
+        responseMessage: "Success",
+        data: { status: "SUCCESS", cutluy: verified.data },
+      };
+      if (paymentId) {
+        statusCache.set(paymentId, { result: cachedResult, timestamp: Date.now() });
+      }
+    }
+
+    res.status(200).json({ received: true, verified: verified.isPaid, orderId: resolvedOrderId || null });
+  } catch (error) {
+    console.error("[CutLuy Webhook] Processing error:", error);
+    res.status(500).json({ error: "Failed to process webhook" });
   }
 });
 

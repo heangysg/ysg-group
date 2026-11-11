@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { X, Loader2, Download, Check, CheckCircle2 } from 'lucide-react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { checkBakongTransaction } from '../lib/bakong'
+import { checkBakongTransactionDetailed } from '../lib/bakong'
 import toast, { Toaster } from 'react-hot-toast'
 import Portal from './Portal'
 
@@ -37,6 +37,7 @@ export default function BakongQRModal({
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadSuccess, setDownloadSuccess] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
+  const [verifyError, setVerifyError] = useState<string | null>(null)
 
   // 📱 Touch drag state for pull-to-dismiss gesture
   const [dragY, setDragY] = useState(0)
@@ -50,6 +51,7 @@ export default function BakongQRModal({
   useEffect(() => {
     if (!isOpen) {
       hasSucceededRef.current = false
+      setVerifyError(null)
       return
     }
 
@@ -103,10 +105,15 @@ export default function BakongQRModal({
 
       isFetching = true
       try {
-        const isPaid = await checkBakongTransaction(md5, orderId)
-        if (isPaid && isSubscribed) {
+        const res = await checkBakongTransactionDetailed(md5, orderId)
+        if (res.paid && isSubscribed) {
+          setVerifyError(null)
           clearInterval(pollInterval)
           handleSuccess()
+        } else if (res.error && isSubscribed) {
+          setVerifyError(res.error)
+        } else if (isSubscribed) {
+          setVerifyError(null)
         }
       } catch {
         // Silently ignore transient network drops during background polling
@@ -140,13 +147,18 @@ export default function BakongQRModal({
   }
 
   const handleManualVerify = async () => {
-    if (!md5 || isVerifying) return
+    if ((!md5 && !orderId) || isVerifying) return
     setIsVerifying(true)
     try {
-      const isPaid = await checkBakongTransaction(md5, orderId)
-      if (isPaid) {
+      const res = await checkBakongTransactionDetailed(md5, orderId)
+      if (res.paid) {
+        setVerifyError(null)
         handleSuccess()
+      } else if (res.error) {
+        setVerifyError(res.error)
+        toast.error(res.error, { duration: 5000 })
       } else {
+        setVerifyError(null)
         toast(
           language === "kh"
             ? "កំពុងរង់ចាំការបញ្ជាក់ពីប្រព័ន្ធ Bakong... ប្រសិនបើអ្នកបានផ្ទេររួច សូមរង់ចាំបន្តិច"
@@ -155,7 +167,11 @@ export default function BakongQRModal({
         )
       }
     } catch {
-      toast(language === "kh" ? "កំពុងរង់ចាំការបញ្ជាក់ពីធនាគារ..." : "Checking payment status...", { icon: "⏳" })
+      toast.error(
+        language === "kh"
+          ? "មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេដើម្បីផ្ទៀងផ្ទាត់ការទូទាត់បានទេ។"
+          : "Unable to connect to server to verify payment."
+      )
     } finally {
       setIsVerifying(false)
     }
@@ -502,6 +518,32 @@ export default function BakongQRModal({
                 </>
               )}
             </button>
+
+            {/* Manual Verification Button */}
+            <button
+              type="button"
+              onClick={handleManualVerify}
+              disabled={isVerifying || isChecking}
+              className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-xs mb-2 cursor-pointer whitespace-nowrap"
+            >
+              {isVerifying || isChecking ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>{language === "kh" ? "កំពុងផ្ទៀងផ្ទាត់..." : "Checking payment..."}</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>{language === "kh" ? "បានទូទាត់រួច — ផ្ទៀងផ្ទាត់" : "I've Paid — Verify Now"}</span>
+                </>
+              )}
+            </button>
+
+            {verifyError && (
+              <div className="mb-2 px-2.5 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-[11px] font-medium text-center leading-snug">
+                {verifyError}
+              </div>
+            )}
 
             {/* Expiry Timer */}
             <div className="flex flex-col items-center pt-2 border-t border-slate-100">
