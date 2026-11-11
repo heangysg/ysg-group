@@ -75,7 +75,7 @@ export default function AdminCustomers() {
             placeholder={t("search") || (language === 'kh' ? 'ស្វែងរកអតិថិជន...' : 'Search...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs"
+            className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all text-slate-900 font-medium text-xs sm:text-sm"
           />
           {search && (
             <button 

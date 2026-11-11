@@ -16,7 +16,7 @@ export default function Footer() {
     contact_phone: "010 / 011 / 012 / 070 : 309 302",
     contact_email: "yeungshigroup123@gmail.com",
     working_hours: "8 : 00 am – 5:30pm ( Mon – Sat )",
-    facebook_url: "https://www.facebook.com/YeungShiGroupHeadOffice/",
+    facebook_url: "https://www.facebook.com/ysgheadoffice",
     youtube_url: "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
     telegram_url: ""
   })
@@ -28,7 +28,15 @@ export default function Footer() {
         const res = await fetch(`${API_URL}/api/public/settings`)
         if (res.ok) {
           const { data } = await res.json()
-          if (data) setSettings((prev: any) => ({ ...prev, ...data }))
+          if (data) {
+            setSettings((prev: any) => {
+              const next = { ...prev, ...data }
+              if (!next.facebook_url || /YeungShiGroupHeadOffice/i.test(next.facebook_url)) {
+                next.facebook_url = "https://www.facebook.com/ysgheadoffice"
+              }
+              return next
+            })
+          }
         }
       } catch {
         // Silently fallback to default settings on network errors

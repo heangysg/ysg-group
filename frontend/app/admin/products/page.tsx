@@ -154,7 +154,7 @@ export default function AdminProducts() {
     if (!res.ok) {
       toast.error("Failed to move product to trash")
     } else {
-      await logActivity({ action: "delete", entityType: "product", entityId: id, details: { name, type: "soft_delete" } })
+      void logActivity({ action: "delete", entityType: "product", entityId: id, details: { name, type: "soft_delete" } })
       toast.success(isKh ? "បានផ្លាស់ទីទៅធុងសំរាម" : "Product moved to trash")
       fetchProducts(currentPage)
     }
@@ -181,7 +181,7 @@ export default function AdminProducts() {
       toast.error("Failed to update status")
       setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, isPublished: currentStatus } : p)))
     } else {
-      await logActivity({
+      void logActivity({
         action: "update",
         entityType: "product",
         entityId: id,

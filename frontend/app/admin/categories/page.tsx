@@ -78,19 +78,15 @@ export default function AdminCategories() {
     const token = localStorage.getItem("ysg_admin_token")
     const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
     
-    const [mainRes, subRes] = await Promise.all([
-      fetch(`${API_URL}/api/admin/read`, {
-        method: "POST", headers,
-        body: JSON.stringify({ table: "Category", isNull: ["parentId"], order: { column: "sortOrder", ascending: true } })
-      }).then(r => r.json()),
-      fetch(`${API_URL}/api/admin/read`, {
-        method: "POST", headers,
-        body: JSON.stringify({ table: "Category", isNotNull: ["parentId"], order: { column: "sortOrder", ascending: true } })
-      }).then(r => r.json())
-    ])
-    
-    setCategories(mainRes.data || [])
-    setSubcategories(subRes.data || [])
+    const res = await fetch(`${API_URL}/api/admin/read`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ table: "Category", order: { column: "sortOrder", ascending: true } })
+    }).then(r => r.json())
+
+    const allCats = res.data || []
+    setCategories(allCats.filter((c: any) => !c.parentId))
+    setSubcategories(allCats.filter((c: any) => Boolean(c.parentId)))
   }
 
   const getSubcategories = (parentId: string) => {
@@ -220,30 +216,47 @@ export default function AdminCategories() {
 
     const token = localStorage.getItem("ysg_admin_token")
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-    let error
-    if (editingItem) {
-      const res = await fetch(`${API_URL}/api/admin/crud`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ table: "Category", action: "update", match: { id: editingItem.id }, data: dataToSave })
-      })
-      if (!res.ok) error = new Error("Failed to update")
-    } else {
-      const res = await fetch(`${API_URL}/api/admin/crud`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-        body: JSON.stringify({ table: "Category", action: "insert", data: { ...dataToSave, createdAt: new Date().toISOString() } })
-      })
-      if (!res.ok) error = new Error("Failed to insert")
-    }
-    
-    if (error) {
+    const res = await fetch(`${API_URL}/api/admin/crud`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify(
+        editingItem
+          ? { table: "Category", action: "update", match: { id: editingItem.id }, data: dataToSave }
+          : { table: "Category", action: "insert", data: { ...dataToSave, createdAt: new Date().toISOString() } }
+      )
+    })
+
+    if (!res.ok) {
       toast.error("Error saving category")
     } else {
-      await logActivity({
+      const jsonRes = await res.json().catch(() => ({}))
+      const savedRecord = Array.isArray(jsonRes.data) ? jsonRes.data[0] : jsonRes.data
+
+      if (savedRecord) {
+        const sortByOrder = (a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+        if (savedRecord.parentId) {
+          setCategories((prev) => prev.filter((c) => c.id !== savedRecord.id))
+          setSubcategories((prev) => {
+            const exists = prev.some((c) => c.id === savedRecord.id)
+            const next = exists ? prev.map((c) => (c.id === savedRecord.id ? savedRecord : c)) : [...prev, savedRecord]
+            return next.sort(sortByOrder)
+          })
+        } else {
+          setSubcategories((prev) => prev.filter((c) => c.id !== savedRecord.id))
+          setCategories((prev) => {
+            const exists = prev.some((c) => c.id === savedRecord.id)
+            const next = exists ? prev.map((c) => (c.id === savedRecord.id ? savedRecord : c)) : [...prev, savedRecord]
+            return next.sort(sortByOrder)
+          })
+        }
+      } else {
+        fetchCategories()
+      }
+
+      void logActivity({
         action: editingItem ? "update" : "create",
         entityType: "category",
-        entityId: editingItem?.id,
+        entityId: editingItem?.id || savedRecord?.id,
         details: { name: formData.name }
       })
       toast.success(editingItem ? "Category updated" : "Category created")
@@ -253,7 +266,6 @@ export default function AdminCategories() {
       setPendingImageFile(null)
       setPreviewImage("")
       setFormData({ name: "", nameKhmer: "", slug: "", description: "", descriptionKhmer: "", parentId: "", isActive: true, isFeatured: false, sortOrder: 0, image: "" })
-      fetchCategories()
     }
     setUploadingImage(false)
   }
@@ -271,17 +283,32 @@ export default function AdminCategories() {
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
     const token = localStorage.getItem("ysg_admin_token")
+    const headers = { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
 
-    const productCheck = await fetch(`${API_URL}/api/admin/read`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-      body: JSON.stringify({ 
-        table: "Product", 
-        or: [`categoryId.eq.${item.id}`, `subcategoryId.eq.${item.id}`] 
-      })
-    })
-    const productData = await productCheck.json()
-    const productCount = productData.data?.length || 0
+    const [catCheckRes, subCheckRes] = await Promise.all([
+      fetch(`${API_URL}/api/admin/read`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ table: "Product", select: "id", eq: { categoryId: item.id } })
+      }),
+      fetch(`${API_URL}/api/admin/read`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ table: "Product", select: "id", eq: { subcategoryId: item.id } })
+      }),
+    ])
+
+    if (!catCheckRes.ok || !subCheckRes.ok) {
+      toast.error(language === "kh" ? "មិនអាចផ្ទៀងផ្ទាត់ផលិតផលក្នុងប្រភេទនេះបានទេ" : "Failed to verify products in this category")
+      return
+    }
+
+    const [catData, subData] = await Promise.all([catCheckRes.json(), subCheckRes.json()])
+    const matchingProductIds = new Set<string>([
+      ...(catData.data || []).map((p: any) => p.id),
+      ...(subData.data || []).map((p: any) => p.id),
+    ])
+    const productCount = matchingProductIds.size
 
     if (productCount > 0) {
       toast.error(language === "kh"
@@ -301,14 +328,15 @@ export default function AdminCategories() {
       if (!res.ok) {
         toast.error("Error deleting category")
       } else {
-        await logActivity({
+        setCategories((prev) => prev.filter((c) => c.id !== item.id))
+        setSubcategories((prev) => prev.filter((c) => c.id !== item.id))
+        void logActivity({
           action: "delete",
           entityType: "category",
           entityId: item.id,
           details: { name: item.name }
         })
         toast.success(`"${item.name}" deleted`)
-        fetchCategories()
       }
     }
   }
@@ -324,14 +352,14 @@ export default function AdminCategories() {
         </div>
         <button
           onClick={openAddMainModal}
-          className="btn-primary px-6 py-3 flex items-center gap-2 text-xs"
+          className="btn-primary rounded-xl px-6 py-3 flex items-center gap-2 text-xs"
         >
           <Plus className="w-4 h-4" />
           {t("addMainCategory")}
         </button>
       </div>
 
-      <div className="solid-card bg-white overflow-hidden p-0">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-0">
         <div className="px-5 py-3 border-b border-slate-200 bg-primary text-white flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base font-bold text-white">{t("categoryStructure")}</h2>
           <p className="text-xs font-medium text-blue-100">{t("cannotDeleteCategories")}</p>
@@ -347,18 +375,18 @@ export default function AdminCategories() {
                 <div className="flex items-center justify-between p-4 hover:bg-primary/5 transition-all group">
                   <div className="flex items-center gap-4 flex-1">
                     {hasChildren && (
-                      <button onClick={() => toggleExpand(cat.id)} className="p-1 border border-slate-200 shadow-sm bg-white hover:translate-y-0.5 transition-all">
+                      <button onClick={() => toggleExpand(cat.id)} className="p-1.5 rounded-lg border border-slate-200 shadow-sm bg-white hover:bg-slate-50 transition-all cursor-pointer">
                         {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       </button>
                     )}
                     {!hasChildren && <div className="w-8" />}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="font-bold text-slate-900 text-base md:text-lg">{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
-                        <span className={`text-xs font-bold px-2.5 py-1 font-medium border-2 shadow-sm ${cat.isActive ? 'bg-emerald-50 text-emerald-900 border-emerald-900' : 'bg-slate-100 text-slate-900 border-slate-200'}`}>
+                        <span className="font-semibold text-slate-900 text-base md:text-lg">{language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}</span>
+                        <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${cat.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
                           {cat.isActive ? t('active') : t('inactive')}
                         </span>
-                        {cat.isFeatured && <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 text-amber-900 border-2 border-amber-900 shadow-sm font-medium">{t('featured')}</span>}
+                        {cat.isFeatured && <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">{t('featured')}</span>}
                       </div>
                       {(cat.description || cat.descriptionKhmer) && (
                         <div className="text-xs font-medium text-slate-700 mt-1">
@@ -368,14 +396,14 @@ export default function AdminCategories() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => openAddSubModal(cat)} className="px-3 py-1.5 text-xs font-bold font-medium bg-emerald-50 border-2 border-emerald-900 text-emerald-900 shadow-sm hover:translate-y-0.5 transition-all flex items-center gap-2">
+                    <button onClick={() => openAddSubModal(cat)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition-all flex items-center gap-1.5 cursor-pointer">
                       <Plus className="w-3 h-3" />
                       {t("addSub")}
                     </button>
-                    <button onClick={() => openEditModal(cat)} className="p-1.5 bg-white border border-slate-200 shadow-sm hover:translate-y-0.5 transition-all">
+                    <button onClick={() => openEditModal(cat)} className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm hover:border-primary hover:text-primary transition-all cursor-pointer">
                       <Edit className="w-4 h-4 text-slate-900" />
                     </button>
-                    <button onClick={() => handleDelete(cat, hasChildren, subItems.length)} className="p-1.5 bg-white border border-slate-200 shadow-sm hover:shadow-sm-red hover:border-red-600 transition-all">
+                    <button onClick={() => handleDelete(cat, hasChildren, subItems.length)} className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer">
                       <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
                   </div>
@@ -386,8 +414,8 @@ export default function AdminCategories() {
                       <div key={sub.id} className="flex items-center justify-between p-4 hover:bg-white transition-all group">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 flex-wrap">
-                            <span className="font-bold text-slate-900">{language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}</span>
-                            <span className={`text-xs font-bold px-2.5 py-1 font-medium border-2 shadow-sm ${sub.isActive ? 'bg-emerald-50 text-emerald-900 border-emerald-900' : 'bg-slate-100 text-slate-900 border-slate-200'}`}>
+                            <span className="font-semibold text-slate-900">{language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}</span>
+                            <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${sub.isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-700 border-slate-200'}`}>
                               {sub.isActive ? t('active') : t('inactive')}
                             </span>
                           </div>
@@ -398,10 +426,10 @@ export default function AdminCategories() {
                           )}
                         </div>
                         <div className="flex gap-2">
-                          <button onClick={() => openEditModal(sub)} className="p-1.5 bg-white border border-slate-200 shadow-sm hover:translate-y-0.5 transition-all">
+                          <button onClick={() => openEditModal(sub)} className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm hover:border-primary hover:text-primary transition-all cursor-pointer">
                             <Edit className="w-4 h-4 text-slate-900" />
                           </button>
-                          <button onClick={() => handleDelete(sub, false, 0)} className="p-1.5 bg-white border border-slate-200 shadow-sm hover:shadow-sm-red hover:border-red-600 transition-all">
+                          <button onClick={() => handleDelete(sub, false, 0)} className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer">
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
                         </div>

@@ -114,7 +114,7 @@ export default function AdminTrashProducts() {
  if (!res.ok) {
  toast.error("Failed to permanently delete product")
  } else {
- await logActivity({ action: "delete", entityType: "product", entityId: id, details: { name, type: "permanent_delete" } })
+ void logActivity({ action: "delete", entityType: "product", entityId: id, details: { name, type: "permanent_delete" } })
  toast.success("Product permanently deleted")
  fetchProducts(currentPage)
  }
@@ -142,7 +142,7 @@ export default function AdminTrashProducts() {
  toast.error("Failed to restore product")
  fetchProducts(currentPage) // revert
  } else {
- await logActivity({ action: "update", entityType: "product", entityId: id, details: { name, action: "restore" } })
+ void logActivity({ action: "update", entityType: "product", entityId: id, details: { name, action: "restore" } })
  toast.success("Product restored successfully")
  }
  }
@@ -206,11 +206,11 @@ export default function AdminTrashProducts() {
  {deleteConfirm && (
  <Portal>
  <div className="fixed inset-0 bg-slate-900/60 z-[99999] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
- <div className="solid-card bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-md p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+ <div className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
  {/* drag handle for mobile */}
- <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-md mx-auto mb-2" />
+ <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mb-2" />
  <div className="flex items-start gap-4">
- <div className="p-3 bg-red-50 border-2 border-red-500 shrink-0">
+ <div className="p-3 bg-red-50 border border-red-200 rounded-xl shrink-0">
  <Trash2 className="w-5 h-5 text-red-600" />
  </div>
  <div>
@@ -223,13 +223,13 @@ export default function AdminTrashProducts() {
  <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
  <button
  onClick={() => setDeleteConfirm(null)}
- className="w-full sm:w-auto px-6 py-3 bg-white border border-slate-200 text-slate-900 text-xs font-bold font-medium shadow-sm hover:translate-y-0.5 hover:shadow-none transition-all"
+ className="w-full sm:w-auto px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs font-medium shadow-sm hover:bg-slate-50 transition-all cursor-pointer"
  >
  បោះបង់
  </button>
  <button
  onClick={() => deleteProduct(deleteConfirm.id, deleteConfirm.name)}
- className="w-full sm:w-auto px-6 py-3 bg-red-600 border-2 border-red-700 text-white text-xs font-bold font-medium hover:bg-red-700 transition-all"
+ className="w-full sm:w-auto px-6 py-2.5 bg-red-600 border border-red-700 rounded-xl text-white text-xs font-medium hover:bg-red-700 transition-all cursor-pointer"
  >
  លុបជាអចិន្ត្រៃយ៍
  </button>
@@ -248,7 +248,7 @@ export default function AdminTrashProducts() {
  <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full md:w-auto">
  <Link
  href="/admin/products"
- className="btn-primary w-full sm:w-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-2 text-xs"
+ className="btn-primary rounded-xl w-full sm:w-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-2 text-xs"
  >
  <ArrowLeft className="w-4 h-4" />
  {language === "kh" ? "ត្រឡប់ទៅផលិតផល" : "Back to Products"}
@@ -258,12 +258,12 @@ export default function AdminTrashProducts() {
 
  {/* Bulk Actions Bar */}
  {selectedProducts.length > 0 && (
- <div className="solid-card bg-primary p-4 flex flex-wrap items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4">
+ <div className="bg-primary text-white rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-4">
  <div className="flex items-center gap-3">
- <span className="px-3 py-1 bg-white text-slate-900 font-bold text-sm border border-slate-200 shadow-sm">
+ <span className="px-3 py-1 bg-white text-primary font-bold text-sm rounded-lg shadow-sm">
  {selectedProducts.length}
  </span>
- <span className="text-slate-900 font-bold font-medium text-sm">
+ <span className="text-white font-medium text-sm">
  {language === "kh" ? "បានជ្រើសរើស" : "Selected"}
  </span>
  </div>
@@ -271,7 +271,7 @@ export default function AdminTrashProducts() {
  <button
  onClick={() => handleBulkAction('restore')}
  disabled={bulkActionLoading}
- className="px-4 py-2 bg-white text-slate-900 font-bold text-xs border border-slate-200 shadow-sm font-medium hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center gap-2"
+ className="px-4 py-2 bg-white text-slate-900 rounded-xl text-xs border border-slate-200 shadow-sm font-medium hover:bg-blue-50 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
  >
  <RefreshCcw className="w-3 h-3" />
  {language === "kh" ? "ស្តារឡើងវិញ" : "Restore"}
@@ -279,7 +279,7 @@ export default function AdminTrashProducts() {
  <button
  onClick={() => handleBulkAction('delete')}
  disabled={bulkActionLoading}
- className="px-4 py-2 bg-red-600 text-white font-bold text-xs border-2 border-red-700 shadow-sm font-medium hover:-translate-y-0.5 transition-all disabled:opacity-50"
+ className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs border border-red-500 shadow-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50 cursor-pointer"
  >
  {language === "kh" ? "លុបជាអចិន្ត្រៃយ៍" : "Delete Permanently"}
  </button>
@@ -288,7 +288,7 @@ export default function AdminTrashProducts() {
  )}
 
  {/* Filters bar */}
- <div className="solid-card bg-white p-4 flex flex-col md:flex-row gap-4 items-center">
+ <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col md:flex-row gap-4 items-center">
  <div className="relative flex-1 w-full">
  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
  <input
@@ -296,7 +296,7 @@ export default function AdminTrashProducts() {
  placeholder={t("search") || "Search..."}
  value={search}
  onChange={(e) => setSearch(e.target.value)}
- className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs"
+ className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all text-slate-900 font-medium text-xs sm:text-sm"
  />
  {search && (
  <button 
@@ -314,7 +314,7 @@ export default function AdminTrashProducts() {
  <select
  value={selectedCategory}
  onChange={(e) => setSelectedCategory(e.target.value)}
- className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs appearance-none"
+ className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all text-slate-900 font-medium text-xs appearance-none"
  >
  <option value="">{t("allCategories")}</option>
  {categories.map((cat) => (
@@ -329,7 +329,7 @@ export default function AdminTrashProducts() {
  <select
  value={statusFilter}
  onChange={(e) => setStatusFilter(e.target.value)}
- className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 focus:bg-white outline-none transition-all font-bold text-slate-900 font-medium text-xs appearance-none"
+ className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none transition-all text-slate-900 font-medium text-xs appearance-none"
  >
  <option value="all">{language === "kh" ? "ស្ថានភាពទាំងអស់" : "All Status"}</option>
  <option value="published">{language === "kh" ? "បានផ្សព្វផ្សាយ" : "Published"}</option>
@@ -340,7 +340,7 @@ export default function AdminTrashProducts() {
  </div>
 
  {/* Products Table */}
- <div className="solid-card bg-white overflow-hidden p-0 flex flex-col">
+ <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-0 flex flex-col">
  {loading ? (
  <div className="p-20 flex flex-col items-center justify-center">
  <div className="w-10 h-10 border-4 border-slate-200 border-t-transparent rounded-full animate-spin mb-4" />
@@ -379,7 +379,7 @@ export default function AdminTrashProducts() {
  </td>
  <td className="px-6 py-4">
  <div className="flex items-center gap-4">
- <div className="w-14 h-14 bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm transition-transform">
+ <div className="w-14 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-200 shadow-sm transition-transform">
  {product.images && product.images[0] ? (
  <img src={getOptimizedImageUrl(product.images[0], 'thumb')} alt={product.name} className="w-full h-full object-cover" />
  ) : product.thumbnail ? (
@@ -399,7 +399,7 @@ export default function AdminTrashProducts() {
  </div>
  </td>
  <td className="px-6 py-4">
- <span className="text-xs font-bold text-slate-900 bg-white border border-slate-200 px-3 py-1.5 font-medium shadow-sm">
+ <span className="text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 font-medium">
  {(() => {
  const cat = categories.find(c => c.id === product.categoryId);
  if (!cat) return t("general");
@@ -413,11 +413,11 @@ export default function AdminTrashProducts() {
  <td className="px-6 py-4">
  <div className="flex flex-col gap-3">
  <div className="flex items-center gap-2">
- <div className="w-2 h-2 border border-slate-200 bg-emerald-500 shadow-sm" />
- <span className="text-xs font-bold text-slate-900 font-medium">{t("inStock") || "In Stock"}</span>
+ <div className="w-2 h-2 rounded-full bg-emerald-500" />
+ <span className="text-xs text-slate-900 font-medium">{t("inStock") || "In Stock"}</span>
  </div>
  <div className="flex items-center gap-2">
- <span className="text-xs font-bold text-red-600 bg-red-50 border-2 border-red-200 px-3 py-1 font-medium shadow-sm">
+ <span className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-full px-3 py-0.5 font-medium">
  {language === "kh" ? "បានលុប" : "Deleted"}
  </span>
  </div>
@@ -427,14 +427,14 @@ export default function AdminTrashProducts() {
  <div className="flex items-center justify-end gap-2">
  <button
  onClick={() => restoreProduct(product.id, product.name)}
- className="p-2 bg-white text-emerald-600 border border-transparent hover:border-slate-200 hover:shadow-sm transition-all"
+ className="p-2 rounded-lg bg-white text-emerald-600 border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all cursor-pointer"
  title="Restore"
  >
  <RefreshCcw className="w-4 h-4" />
  </button>
  <button
  onClick={() => setDeleteConfirm({ id: product.id, name: product.name })}
- className="p-2 bg-white text-red-600 border border-transparent hover:border-slate-200 hover:shadow-sm-red transition-all"
+ className="p-2 rounded-lg bg-white text-red-600 border border-slate-200 hover:border-red-300 hover:bg-red-50 transition-all cursor-pointer"
  title="Delete"
  >
  <Trash2 className="w-4 h-4" />
@@ -464,17 +464,17 @@ export default function AdminTrashProducts() {
  <button 
  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
  disabled={currentPage === 1}
- className="px-4 py-2 bg-white border border-slate-200 font-bold text-xs font-medium shadow-sm hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+ className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium shadow-sm hover:bg-slate-100 disabled:opacity-50 disabled:shadow-none transition-all cursor-pointer"
  >
  {t("previous") || "Previous"}
  </button>
- <span className="text-xs font-bold text-slate-900 font-medium">
+ <span className="text-xs font-medium text-slate-900">
  Page {currentPage} of {totalPages}
  </span>
  <button 
  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
  disabled={currentPage === totalPages}
- className="px-4 py-2 bg-white border border-slate-200 font-bold text-xs font-medium shadow-sm hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+ className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-medium shadow-sm hover:bg-slate-100 disabled:opacity-50 disabled:shadow-none transition-all cursor-pointer"
  >
  {t("next") || "Next"}
  </button>

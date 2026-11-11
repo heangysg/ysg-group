@@ -162,26 +162,35 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       }
     }
 
-    if (or && typeof or === 'string') {
-      const conditions = or.split(',');
-      const orClauses = [];
-      for (const cond of conditions) {
-        const parts = cond.split('.ilike.');
-        if (parts.length === 2) {
-          const col = parts[0];
-          const val = parts[1];
-          if (!isValidIdentifier(col)) {
-            res.status(400).json({ error: `Invalid column in OR: ${col}` });
-            return;
-          }
-          if (isProtectedColumn(col)) {
-            res.status(403).json({ error: `Cannot query protected column: ${col}` });
-            return;
-          }
-          orClauses.push(`"${col}" ILIKE $${counter}`);
-          values.push(val);
-          counter++;
+    if (or && (typeof or === 'string' || Array.isArray(or))) {
+      const conditions = Array.isArray(or)
+        ? or.filter((c): c is string => typeof c === 'string')
+        : or.split(',');
+      const orClauses: string[] = [];
+      const supportedOps: Array<{ token: string; sqlOp: string }> = [
+        { token: '.ilike.', sqlOp: 'ILIKE' },
+        { token: '.eq.', sqlOp: '=' },
+      ];
+
+      for (const rawCond of conditions) {
+        const cond = rawCond.trim();
+        const matched = supportedOps.find(({ token }) => cond.includes(token));
+        if (!matched) continue;
+
+        const sepIdx = cond.indexOf(matched.token);
+        const col = cond.slice(0, sepIdx).trim();
+        const val = cond.slice(sepIdx + matched.token.length).trim();
+        if (!isValidIdentifier(col)) {
+          res.status(400).json({ error: `Invalid column in OR: ${col}` });
+          return;
         }
+        if (isProtectedColumn(col)) {
+          res.status(403).json({ error: `Cannot query protected column: ${col}` });
+          return;
+        }
+        orClauses.push(`"${col}" ${matched.sqlOp} $${counter}`);
+        values.push(val);
+        counter++;
       }
       if (orClauses.length > 0) {
         whereClauses.push(`(${orClauses.join(' OR ')})`);

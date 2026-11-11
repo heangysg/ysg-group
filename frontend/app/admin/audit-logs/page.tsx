@@ -106,16 +106,16 @@ export default function AuditLogsPage() {
  <div className="flex gap-4 mb-8 flex-wrap">
  <button
  onClick={() => setFilter("all")}
- className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
- filter === "all" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+ className={`px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium transition-all flex items-center gap-2 cursor-pointer ${
+ filter === "all" ? "bg-primary text-white border-primary shadow-sm" : "bg-white text-slate-900 shadow-sm hover:bg-slate-50"
  }`}
  >
  {t("allActivities")}
  </button>
  <button
  onClick={() => setFilter("product")}
- className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
- filter === "product" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+ className={`px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium transition-all flex items-center gap-2 cursor-pointer ${
+ filter === "product" ? "bg-primary text-white border-primary shadow-sm" : "bg-white text-slate-900 shadow-sm hover:bg-slate-50"
  }`}
  >
  <Package className="w-4 h-4" />
@@ -123,8 +123,8 @@ export default function AuditLogsPage() {
  </button>
  <button
  onClick={() => setFilter("category")}
- className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
- filter === "category" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+ className={`px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium transition-all flex items-center gap-2 cursor-pointer ${
+ filter === "category" ? "bg-primary text-white border-primary shadow-sm" : "bg-white text-slate-900 shadow-sm hover:bg-slate-50"
  }`}
  >
  <FolderOpen className="w-4 h-4" />
@@ -132,8 +132,8 @@ export default function AuditLogsPage() {
  </button>
  <button
  onClick={() => setFilter("inquiry")}
- className={`px-5 py-3 border border-slate-200 font-bold text-xs font-medium transition-all flex items-center gap-2 ${
- filter === "inquiry" ? "bg-primary text-white translate-y-1 translate-x-1" : "bg-white text-slate-900 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+ className={`px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium transition-all flex items-center gap-2 cursor-pointer ${
+ filter === "inquiry" ? "bg-primary text-white border-primary shadow-sm" : "bg-white text-slate-900 shadow-sm hover:bg-slate-50"
  }`}
  >
  <Mail className="w-4 h-4" />
@@ -203,17 +203,17 @@ export default function AuditLogsPage() {
  <button 
  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
  disabled={currentPage === 1}
- className="px-4 py-2 bg-white border border-slate-200 font-bold text-xs font-medium shadow-sm hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+ className="px-4 py-2 bg-white border border-slate-200 rounded-xl font-medium text-xs shadow-sm hover:bg-slate-100 disabled:opacity-50 disabled:shadow-none transition-all cursor-pointer"
  >
  {t("previous") || "Previous"}
  </button>
- <span className="text-xs font-bold text-slate-900 font-medium">
+ <span className="text-xs font-medium text-slate-900">
  Page {currentPage} of {totalPages}
  </span>
  <button 
  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
  disabled={currentPage === totalPages}
- className="px-4 py-2 bg-white border border-slate-200 font-bold text-xs font-medium shadow-sm hover:translate-y-0.5 hover:shadow-sm disabled:opacity-50 disabled:shadow-none transition-all"
+ className="px-4 py-2 bg-white border border-slate-200 rounded-xl font-medium text-xs shadow-sm hover:bg-slate-100 disabled:opacity-50 disabled:shadow-none transition-all cursor-pointer"
  >
  {t("next") || "Next"}
  </button>

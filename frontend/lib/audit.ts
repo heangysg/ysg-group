@@ -1,5 +1,3 @@
-import { createClient } from "./supabase/client"
-
 export interface AuditLogEntry {
  action: string
  entityType: string
@@ -16,6 +14,7 @@ export async function logActivity(entry: AuditLogEntry) {
  
  await fetch(`${API_URL}/api/admin/audit`, {
  method: 'POST',
+ keepalive: true,
  headers: {
  'Content-Type': 'application/json',
  'Authorization': `Bearer ${token}`

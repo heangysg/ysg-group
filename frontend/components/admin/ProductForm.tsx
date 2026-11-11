@@ -380,7 +380,7 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
         }
       }
 
-      await logActivity({
+      void logActivity({
         action: mode === "create" ? "create" : "update",
         entityType: "product",
         entityId: savedId,

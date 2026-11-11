@@ -175,7 +175,7 @@ export default function UsersManagementPage() {
  </div>
  <button
  onClick={openAddModal}
- className="btn-primary px-6 py-3 flex items-center gap-2 text-xs"
+ className="btn-primary rounded-xl px-6 py-3 flex items-center gap-2 text-xs"
  >
  <UserPlus className="w-4 h-4" />
  {t("addNewAdmin")}
@@ -372,19 +372,19 @@ export default function UsersManagementPage() {
  <p className="text-xs font-bold text-slate-500 font-medium">{t("loading")}</p>
  </div>
  ) : userHistory.length === 0 ? (
- <div className="solid-card bg-white p-16 text-center border border-slate-200 border-dashed">
- <History className="w-12 h-12 text-slate-400 mx-auto mb-6" />
- <p className="text-xs font-bold text-slate-500 font-medium">{t("noActivityFound")}</p>
+ <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 border-dashed">
+ <History className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+ <p className="text-xs font-medium text-slate-500">{t("noActivityFound")}</p>
  </div>
  ) : (
- <div className="space-y-6">
+ <div className="space-y-4">
  {userHistory.map((log, idx) => (
- <div key={idx} className="p-6 bg-white border border-slate-200 shadow-sm hover:translate-y-1 hover:translate-x-1 hover:shadow-none transition-all group">
- <div className="flex items-center justify-between mb-4">
- <span className={`text-xs font-bold px-3 py-1.5 border-2 shadow-sm font-medium ${
- log.action === 'login' ? 'bg-blue-50 text-blue-900 border-blue-900' :
- log.action === 'create' ? 'bg-emerald-50 text-emerald-900 border-emerald-900' :
- log.action === 'delete' ? 'bg-red-50 text-red-900 border-red-900' : 'bg-amber-50 text-amber-900 border-amber-900'
+ <div key={idx} className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm transition-all group">
+ <div className="flex items-center justify-between mb-3">
+ <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+ log.action === 'login' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+ log.action === 'create' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+ log.action === 'delete' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200'
  }`}>
  {log.action}
  </span>

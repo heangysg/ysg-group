@@ -149,7 +149,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="solid-card bg-white overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <form onSubmit={handleSubmit} className="p-6 md:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
@@ -180,7 +180,7 @@ export default function ProfilePage() {
                       required
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                       required
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export default function ProfilePage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
                     />
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function ProfilePage() {
                       value={formData.bio}
                       onChange={handleInputChange}
                       placeholder={t("writeBio") || "Write a short bio or history about yourself..."}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm h-32 resize-none"
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm h-32 resize-none"
                     />
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export default function ProfilePage() {
                       name="currentPassword"
                       value={formData.currentPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
+                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                       <button
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                       name="newPassword"
                       value={formData.newPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
+                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                       <button
@@ -322,7 +322,7 @@ export default function ProfilePage() {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
-                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 font-semibold text-slate-900 outline-none focus:bg-white transition-all text-xs sm:text-sm"
+                      className="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
                     />
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                       <button
@@ -343,7 +343,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="btn-primary px-6 py-3 flex items-center justify-center gap-2 text-xs w-full sm:w-auto"
+              className="btn-primary rounded-xl px-6 py-3 flex items-center justify-center gap-2 text-xs w-full sm:w-auto"
             >
               {saving ? (
                 <>

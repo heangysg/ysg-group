@@ -5,7 +5,7 @@ import Link from "next/link"
 import PublicLayout from "./PublicLayout"
 import ProductCard from "./ProductCard"
 import { useLanguage } from "../contexts/LanguageContext"
-import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDown, Check, ArrowRight, Star } from "lucide-react"
+import { Search, SlidersHorizontal, X, Filter, Package, ChevronRight, ChevronDown, Check, ArrowRight } from "lucide-react"
 import { useRouter, useParams, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -220,28 +220,23 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  return true
  })
 
- // Sort Filter
+ // Sort Filter (works consistently in both Khmer and English)
  filteredProducts.sort((a, b) => {
- if (sortBy === "price_asc") return a.price - b.price
- if (sortBy === "price_desc") return b.price - a.price
- if (sortBy === "name_az") return a.name.localeCompare(b.name)
- return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+ if (sortBy === "price_asc") {
+ const priceA = Number(a.price || 0)
+ const priceB = Number(b.price || 0)
+ if (priceA <= 0 && priceB > 0) return 1
+ if (priceB <= 0 && priceA > 0) return -1
+ return priceA - priceB
+ }
+ if (sortBy === "price_desc") return Number(b.price || 0) - Number(a.price || 0)
+ if (sortBy === "name_az") {
+ const nameA = (language === "kh" && a.nameKhmer ? a.nameKhmer : a.name) || ""
+ const nameB = (language === "kh" && b.nameKhmer ? b.nameKhmer : b.name) || ""
+ return nameA.localeCompare(nameB, language === "kh" ? "km" : "en", { sensitivity: "base" })
+ }
+ return new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime()
  })
-
-  const getCategoryCount = (cat: any, isMain: boolean) => {
-    const targetIds = isMain
-      ? [cat.id, ...categories.filter((c: any) => c.parentId === cat.id).map((c: any) => c.id)]
-      : [cat.id]
-
-    return allProducts.filter(
-      (p) =>
-        targetIds.includes(p.categoryId) ||
-        p.categorySlug === cat.slug ||
-        p.category?.slug === cat.slug
-    ).length
-  }
-
-  const featuredCount = allProducts.filter((p) => p.isFeatured).length
 
   const renderCategoryFilters = (isMobile: boolean = false) => (
     <div className="flex flex-col gap-1">
@@ -258,19 +253,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
               : "text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900"
           }`}
         >
-          <span className="flex items-center gap-2.5 truncate">
-            <Star className={`w-4 h-4 shrink-0 ${isFeatured ? "text-amber-300 fill-amber-300" : "text-amber-500"}`} />
-            <span className="truncate">{language === "kh" ? "ម៉ាស៊ីនពិសេស" : "Featured Machines"}</span>
-          </span>
-          {featuredCount > 0 && (
-            <span
-              className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
-                isFeatured ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-              }`}
-            >
-              {featuredCount}
-            </span>
-          )}
+          <span className="truncate">{language === "kh" ? "ម៉ាស៊ីនពិសេស" : "Featured Machines"}</span>
         </button>
 
         <button
@@ -285,15 +268,6 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
             <Package className={`w-4 h-4 shrink-0 ${selectedCategory === "all" && !isFeatured ? "text-blue-200" : "text-slate-400"}`} />
             <span className="truncate">{language === "kh" ? "ផលិតផលទាំងអស់" : "All Products"}</span>
           </span>
-          {!loading && (
-            <span
-              className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md tabular-nums shrink-0 ${
-                selectedCategory === "all" && !isFeatured ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
-              }`}
-            >
-              {allProducts.length}
-            </span>
-          )}
         </button>
       </div>
 
@@ -310,7 +284,6 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           const hasSubs = subCats.length > 0
           const hasSelectedSub = subCats.some(s => s.slug === selectedCategory)
           const isExpanded = expandedCategories.includes(cat.slug) || isSelected || hasSelectedSub
-          const mainCount = getCategoryCount(cat, true)
 
           return (
             <div key={cat.id} className="flex flex-col">
@@ -335,15 +308,6 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                   <span className="truncate">
                     {language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name}
                   </span>
-                  {!loading && (
-                    <span
-                      className={`text-[11px] font-normal px-1.5 py-0.5 rounded tabular-nums shrink-0 ${
-                        isSelected ? "bg-[#004691]/15 text-[#004691]" : "text-slate-400"
-                      }`}
-                    >
-                      {mainCount}
-                    </span>
-                  )}
                 </button>
 
                 {hasSubs && (
@@ -378,29 +342,21 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
                       {language === "kh" ? `ទាំងអស់ក្នុង ${cat.nameKhmer || cat.name}` : `All ${cat.name}`}
                     </button>
 
-                    {subCats.map(sub => {
-                      const subCount = getCategoryCount(sub, false)
-                      return (
-                        <button
-                          key={sub.id}
-                          onClick={() => handleCategorySelect(sub.slug, isMobile)}
-                          className={`flex items-center justify-between gap-2 text-left px-2.5 py-1.5 text-[13px] rounded-md transition-all cursor-pointer ${
-                            selectedCategory === sub.slug
-                              ? "text-[#004691] font-medium bg-blue-50/80"
-                              : "text-slate-600 font-normal hover:text-slate-900 hover:bg-slate-50"
-                          }`}
-                        >
-                          <span className="truncate">
-                            {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
-                          </span>
-                          {!loading && (
-                            <span className="text-[11px] font-normal text-slate-400 tabular-nums shrink-0">
-                              {subCount}
-                            </span>
-                          )}
-                        </button>
-                      )
-                    })}
+                    {subCats.map(sub => (
+                      <button
+                        key={sub.id}
+                        onClick={() => handleCategorySelect(sub.slug, isMobile)}
+                        className={`flex items-center justify-between gap-2 text-left px-2.5 py-1.5 text-[13px] rounded-md transition-all cursor-pointer ${
+                          selectedCategory === sub.slug
+                            ? "text-[#004691] font-medium bg-blue-50/80"
+                            : "text-slate-600 font-normal hover:text-slate-900 hover:bg-slate-50"
+                        }`}
+                      >
+                        <span className="truncate">
+                          {language === "kh" && sub.nameKhmer ? sub.nameKhmer : sub.name}
+                        </span>
+                      </button>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -447,40 +403,36 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  {/* Header Bar: Category Title + Count + Custom Sort & Filter */}
  <div className="flex flex-row justify-between items-center pb-4 mb-6 border-b border-slate-200 gap-3">
  <div className="min-w-0 flex items-baseline gap-2.5">
- <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#004691] truncate">
- {(() => {
- if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
- if (isFeatured) return language === "kh" ? "ផលិតផលពិសេស" : "Featured Machines"
- if (selectedCategory === "all") return t("allProducts")
- const cat = categories.find(c => c.slug === selectedCategory)
- if (!cat) return t("allProducts")
- return language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name
- })()}
- </h1>
- {!loading && (
- <span className="text-xs sm:text-sm font-semibold text-slate-400 tabular-nums shrink-0">
- ({filteredProducts.length})
- </span>
- )}
- </div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[#004691] truncate">
+              {(() => {
+                if (searchQuery) return language === "kh" ? `លទ្ធផលស្វែងរក: "${searchQuery}"` : `Search results: "${searchQuery}"`
+                if (isFeatured) return language === "kh" ? "ផលិតផលពិសេស" : "Featured Machines"
+                if (selectedCategory === "all") return t("allProducts")
+                const cat = categories.find(c => c.slug === selectedCategory)
+                if (!cat) return t("allProducts")
+                return language === "kh" && cat.nameKhmer ? cat.nameKhmer : cat.name
+              })()}
+            </h1>
+          </div>
 
- <div className="flex items-center gap-2 shrink-0 text-sm font-semibold text-slate-700">
+ <div className="flex items-center gap-2 shrink-0 text-sm font-medium text-slate-700">
  <div className="flex items-center gap-2">
- <span className="hidden sm:inline font-bold text-sm sm:text-base text-slate-800">
+ <span className="hidden sm:inline font-medium text-sm sm:text-base text-slate-700">
  {language === "kh" ? "តម្រៀបតាម" : "Sort by"}:
  </span>
  
  {/* 🤍 Custom White Dropdown Popover */}
  <div className="relative">
  <button
+ type="button"
  onClick={() => setSortOpen(!sortOpen)}
- className="flex items-center gap-1.5 py-1.5 px-3 bg-white border border-slate-200 rounded-md text-xs sm:text-sm font-bold text-slate-800 shadow-2xs hover:bg-slate-50 transition-all whitespace-nowrap"
+ className="flex items-center gap-1.5 py-1.5 px-3 bg-white border border-slate-200 rounded-md text-xs sm:text-sm font-medium text-slate-800 shadow-2xs hover:bg-slate-50 transition-all whitespace-nowrap cursor-pointer"
  >
  <span>
  {sortBy === "newest" && (language === "kh" ? "ថ្មីបំផុត" : "Newest")}
  {sortBy === "price_asc" && (language === "kh" ? "តម្លៃ (ទាប→ខ្ពស់)" : "Price ↑")}
  {sortBy === "price_desc" && (language === "kh" ? "តម្លៃ (ខ្ពស់→ទាប)" : "Price ↓")}
- {sortBy === "name_az" && (language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z")}
+ {sortBy === "name_az" && (language === "kh" ? "ឈ្មោះ ក-អ / A-Z" : "Name A-Z")}
  </span>
  <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${sortOpen ? "rotate-180 text-[#004691]" : ""}`} />
  </button>
@@ -499,16 +451,17 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  { value: "newest", label: language === "kh" ? "ថ្មីបំផុត" : "Newest" },
  { value: "price_asc", label: language === "kh" ? "តម្លៃ (ទាប ទៅ ខ្ពស់)" : "Price (Low to High)" },
  { value: "price_desc", label: language === "kh" ? "តម្លៃ (ខ្ពស់ ទៅ ទាប)" : "Price (High to Low)" },
- { value: "name_az", label: language === "kh" ? "ឈ្មោះ A-Z" : "Name A-Z" },
+ { value: "name_az", label: language === "kh" ? "ឈ្មោះ (ក-អ / A-Z)" : "Name A-Z" },
  ].map((option) => (
  <button
+ type="button"
  key={option.value}
  onClick={() => {
  setSortBy(option.value)
  setSortOpen(false)
  }}
- className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left font-semibold transition-colors ${
- sortBy === option.value ? "bg-blue-50 text-[#004691] font-bold" : "text-slate-700 hover:bg-slate-50"
+ className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left font-medium transition-colors cursor-pointer ${
+ sortBy === option.value ? "bg-blue-50 text-[#004691] font-semibold" : "text-slate-700 hover:bg-slate-50"
  }`}
  >
  <span>{option.label}</span>
@@ -628,7 +581,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  const subCatsOfSelected = selectedCatObj
  ? categories.filter(c => c.parentId === selectedCatObj.id)
  : []
- const shouldGroup = isParentSelected && (selectedCategory === "all" || subCatsOfSelected.length > 0)
+ const shouldGroup = isParentSelected && (selectedCategory === "all" || subCatsOfSelected.length > 0) && sortBy === "newest" && !searchQuery
 
  if (!shouldGroup) {
  // Flat grid for a specific subcategory
@@ -744,7 +697,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  {isExpanded ? (
  <>{language === "kh" ? "បង្ហាញតិច" : "Show less"}</>
  ) : (
- <>{language === "kh" ? `មើលទាំងអស់ (${group.products.length})` : `See all ${group.products.length}`} <ChevronRight className="w-3 h-3" /></>
+ <>{language === "kh" ? "មើលទាំងអស់" : "See all"} <ChevronRight className="w-3 h-3" /></>
  )}
  </button>
  <div className="h-px flex-1 bg-slate-200" />
@@ -800,7 +753,7 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  {isExpanded ? (
  <>{language === "kh" ? "បង្ហាញតិច" : "Show less"}</>
  ) : (
- <>{language === "kh" ? `មើលទាំងអស់ (${ungrouped.length})` : `See all ${ungrouped.length}`} <ChevronRight className="w-3 h-3" /></>
+ <>{language === "kh" ? "មើលទាំងអស់" : "See all"} <ChevronRight className="w-3 h-3" /></>
  )}
  </button>
  <div className="h-px flex-1 bg-slate-200" />

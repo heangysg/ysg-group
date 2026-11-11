@@ -11,7 +11,7 @@ export default function AdminSettings() {
     contact_email: "info@ysgmachinery.com",
     contact_phone: "+855 XX XXX XXXX",
     address: "Phnom Penh, Cambodia",
-    facebook_url: "",
+    facebook_url: "https://www.facebook.com/ysgheadoffice",
     whatsapp_url: "",
     telegram_url: "",
     linkedin_url: "",
@@ -106,7 +106,7 @@ export default function AdminSettings() {
     )
   }
 
-  const inputClasses = "w-full py-3 px-4 bg-slate-50 border border-slate-200 font-bold text-slate-900 outline-none focus:bg-white transition-all text-xs"
+  const inputClasses = "w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 outline-none focus:bg-white focus:border-primary transition-all text-xs sm:text-sm"
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 w-full">
@@ -119,7 +119,7 @@ export default function AdminSettings() {
         </div>
       </div>
 
-      <div className="solid-card bg-white overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-10">
           {/* General Information Section */}
           <div className="space-y-6">
@@ -226,7 +226,7 @@ export default function AdminSettings() {
                   className={inputClasses}
                   value={settings.facebook_url}
                   onChange={(e) => setSettings({ ...settings, facebook_url: e.target.value })}
-                  placeholder="https://facebook.com/ysgmachinery"
+                  placeholder="https://www.facebook.com/ysgheadoffice"
                 />
               </div>
 
@@ -415,7 +415,7 @@ export default function AdminSettings() {
             <button
               type="submit"
               disabled={saving}
-              className="btn-primary px-6 py-3 flex items-center justify-center gap-2 text-xs w-full sm:w-auto"
+              className="btn-primary rounded-xl px-6 py-3 flex items-center justify-center gap-2 text-xs w-full sm:w-auto"
             >
               {saving ? (
                 <>

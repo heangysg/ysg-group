@@ -116,7 +116,7 @@ export default function AdminInventoryPage() {
         delete copy[product.id]
         return copy
       })
-      await logActivity({
+      void logActivity({
         action: "update",
         entityType: "product",
         entityId: product.id,
