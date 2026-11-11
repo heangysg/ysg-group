@@ -95,17 +95,29 @@ export default function ProductForm({ mode, slug }: ProductFormProps) {
 
   const { translated: autoName, isTranslating: isTranslatingName } = useAutoTranslate(formData.nameKhmer)
   const { translated: autoDesc, isTranslating: isTranslatingDesc } = useAutoTranslate(formData.descriptionKhmer)
+  const lastAutoNameRef = useRef("")
+  const lastAutoDescRef = useRef("")
 
   useEffect(() => {
-    if (autoName && !formData.name) {
-      setFormData((prev) => ({ ...prev, name: autoName }))
-    }
+    if (!autoName) return
+    setFormData((prev) => {
+      if (!prev.name || prev.name === lastAutoNameRef.current) {
+        lastAutoNameRef.current = autoName
+        return { ...prev, name: autoName }
+      }
+      return prev
+    })
   }, [autoName])
 
   useEffect(() => {
-    if (autoDesc && !formData.description) {
-      setFormData((prev) => ({ ...prev, description: autoDesc }))
-    }
+    if (!autoDesc) return
+    setFormData((prev) => {
+      if (!prev.description || prev.description === lastAutoDescRef.current) {
+        lastAutoDescRef.current = autoDesc
+        return { ...prev, description: autoDesc }
+      }
+      return prev
+    })
   }, [autoDesc])
 
   useEffect(() => {

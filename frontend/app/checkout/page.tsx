@@ -137,6 +137,12 @@ export default function CheckoutPage() {
               setBakongData(qrPayload)
               setShowBakongModal(true)
             } else {
+              toast.error(
+                generated?.error ||
+                  (language === "kh"
+                    ? "មិនអាចបង្កើត Bakong QR បានទេ សូមព្យាយាមម្តងទៀត"
+                    : "Could not generate Bakong QR code. Please try again.")
+              )
               router.push(`/orders/${data.order.id}`)
             }
           } catch (qrErr) {

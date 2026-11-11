@@ -103,10 +103,13 @@ router.post('/checkout', async (req: Request, res: Response): Promise<void> => {
       // Stock is deducted atomically in markOrderAsPaid once payment succeeds (not on unpaid pending checkout).
       
       // Dispatch Telegram Sales Notification Alert (Background)
-      const sanitizeMd = (val: unknown) => String(val || '').replace(/[*_`[\]]/g, '');
-      const itemsText = validatedItems.map(i => `- ${sanitizeMd(i.name)} (x${i.quantity}) - $${(i.price * i.quantity).toFixed(2)}`).join('\n');
-      const tgText = `🛍️ *ការបញ្ជាទិញថ្មី (NEW ORDER)* 🛍️\n\n*Order ID:* \`${newOrder.id}\`\n*Customer:* ${sanitizeMd(customerName)}\n*Phone:* ${sanitizeMd(customerPhone)}\n*Payment:* ${sanitizeMd(paymentMethod)}\n*Total:* $${totalAmount.toFixed(2)}\n\n*Items:*\n${itemsText}`;
-      sendTelegramNotification(tgText).catch(err => console.error("Telegram Order Alert Error:", err));
+      // For Bakong orders, wait until payment is confirmed in markOrderAsPaid so Telegram isn't alerted for unpaid orders.
+      if (String(paymentMethod).toLowerCase() !== 'bakong') {
+        const sanitizeMd = (val: unknown) => String(val || '').replace(/[*_`[\]]/g, '');
+        const itemsText = validatedItems.map(i => `- ${sanitizeMd(i.name)} (x${i.quantity}) - $${(i.price * i.quantity).toFixed(2)}`).join('\n');
+        const tgText = `🛍️ *ការបញ្ជាទិញថ្មី (NEW ORDER - COD)* 🛍️\n\n*Order ID:* \`${newOrder.id}\`\n*Customer:* ${sanitizeMd(customerName)}\n*Phone:* ${sanitizeMd(customerPhone)}\n*Payment:* ${sanitizeMd(paymentMethod)}\n*Total:* $${totalAmount.toFixed(2)}\n\n*Items:*\n${itemsText}`;
+        sendTelegramNotification(tgText).catch(err => console.error("Telegram Order Alert Error:", err));
+      }
 
       res.json({ order: newOrder });
     } finally {

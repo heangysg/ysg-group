@@ -9,11 +9,13 @@ export const generateBakongQR = async (amount: number, orderId: string, expiresA
       body: JSON.stringify({ amount, orderId, expiresAtTimestamp })
     });
     
-    if (!response.ok) return null;
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.qrString) {
+      return { error: data?.error || `Failed to generate QR (${response.status})` };
+    }
     return data;
-  } catch {
-    return null;
+  } catch (err: any) {
+    return { error: err?.message || "Network error generating QR" };
   }
 };
 

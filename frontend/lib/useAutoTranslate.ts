@@ -43,9 +43,26 @@ export function useAutoTranslate(
   const res = await fetch(url, { signal: controller.signal })
   const data = await res.json()
 
-  if (data && data[0] && data[0][0] && data[0][0][0]) {
-  const result = data[0][0][0] as string
-  setTranslated(result)
+  if (Array.isArray(data?.[0])) {
+   const joined = data[0]
+    .map((chunk: any) => (typeof chunk?.[0] === "string" ? chunk[0] : ""))
+    .join("")
+    .trim()
+   if (joined) {
+    setTranslated(joined)
+    return
+   }
+  }
+
+  // Fallback to MyMemory free API if Google Translate returned empty
+  const mmRes = await fetch(
+   `https://api.mymemory.translated.net/get?q=${encodeURIComponent(sourceText)}&langpair=${sourceLang}|${targetLang}`,
+   { signal: controller.signal }
+  )
+  const mmData = await mmRes.json()
+  const mmText = mmData?.responseData?.translatedText
+  if (typeof mmText === "string" && mmText.trim()) {
+   setTranslated(mmText.trim())
   }
  } catch (err: any) {
  if (err?.name !== "AbortError") {

@@ -60,10 +60,13 @@ async function markOrderAsPaid(orderId: string): Promise<void> {
       }
 
       const total = Number(order.totalAmount || 0).toFixed(2);
-      const safeName = String(order.customerName || '').replace(/[*_`[\]]/g, '');
-      const safePhone = String(order.customerPhone || '').replace(/[*_`[\]]/g, '');
+      const safeMd = (v: unknown) => String(v || '').replace(/[*_`[\]]/g, '');
+      const itemsText = items
+        .map((i: any) => `- ${safeMd(i?.name || 'Item')} (x${Math.max(1, parseInt(i?.quantity) || 1)}) - $${((Number(i?.price) || 0) * Math.max(1, parseInt(i?.quantity) || 1)).toFixed(2)}`)
+        .join('\n');
+      const itemsSection = itemsText ? `\n\n*Items:*\n${itemsText}` : '';
       sendTelegramNotification(
-        `✅ *ទូទាត់ប្រាក់ជោគជ័យ (PAYMENT PAID)*\n\n*Order ID:* \`${order.id}\`\n*Customer:* ${safeName}\n*Phone:* ${safePhone}\n*Amount:* $${total}`
+        `✅ *ទូទាត់ប្រាក់ជោគជ័យ (PAYMENT PAID)*\n\n*Order ID:* \`${order.id}\`\n*Customer:* ${safeMd(order.customerName)}\n*Phone:* ${safeMd(order.customerPhone)}\n*Payment:* Bakong (KHQR)\n*Total:* $${total}${itemsSection}`
       ).catch((err) => console.error("Telegram Payment Alert Error:", err));
     }
   } catch (err) {
@@ -111,46 +114,57 @@ router.post('/generate', async (req: Request, res: Response): Promise<void> => {
 
     // 1. CutLuy Gateway Mode (Bypasses NBC foreign-IP geo-blocking on cloud hosts like Render)
     const cutluyKey = process.env.CUTLUY_API_KEY?.trim();
+    const hasLocalBakongId = Boolean((process.env.NEXT_PUBLIC_BAKONG_ACCOUNT_ID || process.env.BAKONG_ACCOUNT_ID || '').trim());
+    let cutluyErrorMsg = "";
+
     if (cutluyKey && process.env.BAKONG_MOCK !== 'true') {
-      const cutluyRes = await fetch(CUTLUY_API_BASE, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${cutluyKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: secureAmount,
-          currency: 'USD',
-          reference_id: String(orderId)
-        })
-      });
-
-      const cutluyData: any = await cutluyRes.json();
-
-      if (!cutluyRes.ok || !cutluyData?.qr_string || !cutluyData?.id) {
-        console.error("CutLuy QR Generation Failed:", cutluyRes.status, cutluyData);
-        res.status(cutluyRes.status >= 400 ? cutluyRes.status : 502).json({
-          error: cutluyData?.message || cutluyData?.error || "Failed to generate CutLuy KHQR"
+      try {
+        const cutluyRes = await fetch(CUTLUY_API_BASE, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${cutluyKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount: Number(secureAmount.toFixed(2)),
+            currency: 'USD',
+            reference_id: String(orderId)
+          })
         });
+
+        const cutluyData: any = await cutluyRes.json().catch(() => ({}));
+
+        if (cutluyRes.ok && cutluyData?.qr_string && cutluyData?.id) {
+          const saveClient = await getPgClient();
+          try {
+            // Store CutLuy payment ID in bakongMd5 so /check-status can poll CutLuy directly
+            await saveClient.query(`UPDATE "Order" SET "bakongMd5" = $1 WHERE id = $2`, [cutluyData.id, orderId]);
+          } catch (err) {
+            console.error("Failed to save CutLuy payment ID to order:", err);
+          } finally {
+            await saveClient.release();
+          }
+
+          res.json({
+            qrString: cutluyData.qr_string,
+            md5: cutluyData.id,
+            checkoutUrl: cutluyData.checkout_url
+          });
+          return;
+        }
+
+        cutluyErrorMsg = cutluyData?.message || cutluyData?.error || `CutLuy error (${cutluyRes.status})`;
+        console.error("CutLuy QR Generation Failed:", cutluyRes.status, cutluyData);
+      } catch (cutluyErr: any) {
+        cutluyErrorMsg = cutluyErr?.message || "CutLuy network error";
+        console.error("CutLuy QR Request Error:", cutluyErr);
+      }
+
+      if (!hasLocalBakongId) {
+        res.status(502).json({ error: cutluyErrorMsg || "Failed to generate CutLuy KHQR" });
         return;
       }
-
-      const saveClient = await getPgClient();
-      try {
-        // Store CutLuy payment ID in bakongMd5 so /check-status can poll CutLuy directly
-        await saveClient.query(`UPDATE "Order" SET "bakongMd5" = $1 WHERE id = $2`, [cutluyData.id, orderId]);
-      } catch (err) {
-        console.error("Failed to save CutLuy payment ID to order:", err);
-      } finally {
-        await saveClient.release();
-      }
-
-      res.json({
-        qrString: cutluyData.qr_string,
-        md5: cutluyData.id,
-        checkoutUrl: cutluyData.checkout_url
-      });
-      return;
+      console.warn("Falling back to local BakongKHQR generation because CutLuy failed:", cutluyErrorMsg);
     }
 
     // 2. Direct NBC Bakong KHQR Fallback (Local / Mock / Non-CutLuy)

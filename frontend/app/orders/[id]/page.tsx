@@ -110,6 +110,8 @@ export default function OrderDetailsPage() {
               localStorage.setItem(cacheKey, JSON.stringify(qrPayload))
             }
             setShowQR(true)
+          } else if (isMounted && generated?.error) {
+            toast.error(generated.error, { id: "qr_gen_error" })
           }
         }
       } catch {
@@ -177,9 +179,10 @@ export default function OrderDetailsPage() {
  const qrPayload = { ...generated, expiresAt: expirationToUse }
  setQrData(qrPayload)
  localStorage.setItem(`bakong_qr_${order.id}`, JSON.stringify(qrPayload))
+ setShowQR(true)
  toast.success("QR Code Refreshed", { id: "qr_refresh" })
  } else {
- toast.error(language === "kh" ? "មិនអាចបង្កើតកូដ QR ថ្មីបានទេ" : "Failed to refresh payment QR");
+ toast.error(generated?.error || (language === "kh" ? "មិនអាចបង្កើតកូដ QR ថ្មីបានទេ" : "Failed to refresh payment QR"));
  }
  }
  }
@@ -279,7 +282,13 @@ export default function OrderDetailsPage() {
  </p>
  </div>
  <button
- onClick={() => setShowQR(true)}
+ onClick={() => {
+   if (qrData?.qrString) {
+     setShowQR(true)
+   } else {
+     refreshQR()
+   }
+ }}
  className="px-6 py-3 bg-[#004691] hover:bg-[#003366] text-white font-bold text-xs sm:text-sm rounded-md shadow-md transition-all shrink-0 flex items-center gap-2 active:scale-95"
  >
  <CreditCard className="w-4 h-4" />

@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2, Edit, ChevronRight, ChevronDown, Folder, Image as ImageIcon, X, Check, Edit2, Loader2, Search } from "lucide-react"
 import toast, { Toaster } from "react-hot-toast"
 import { logActivity } from "../../../lib/audit"
 import { useLanguage } from "../../../contexts/LanguageContext"
 import { uploadImageToSecureProxy } from "../../../lib/upload"
+import { useAutoTranslate } from "../../../lib/useAutoTranslate"
 import Portal from "../../../components/Portal"
 
 export default function AdminCategories() {
@@ -34,6 +35,38 @@ export default function AdminCategories() {
   })
   const router = useRouter()
   const { t, language } = useLanguage()
+  const isKh = language === "kh"
+
+  const { translated: autoName, isTranslating: isTranslatingName } = useAutoTranslate(
+    showAddModal ? formData.nameKhmer : ""
+  )
+  const { translated: autoDesc, isTranslating: isTranslatingDesc } = useAutoTranslate(
+    showAddModal ? formData.descriptionKhmer : ""
+  )
+  const lastAutoNameRef = useRef("")
+  const lastAutoDescRef = useRef("")
+
+  useEffect(() => {
+    if (!showAddModal || !autoName) return
+    setFormData((prev) => {
+      if (!prev.name || prev.name === lastAutoNameRef.current) {
+        lastAutoNameRef.current = autoName
+        return { ...prev, name: autoName }
+      }
+      return prev
+    })
+  }, [autoName, showAddModal])
+
+  useEffect(() => {
+    if (!showAddModal || !autoDesc) return
+    setFormData((prev) => {
+      if (!prev.description || prev.description === lastAutoDescRef.current) {
+        lastAutoDescRef.current = autoDesc
+        return { ...prev, description: autoDesc }
+      }
+      return prev
+    })
+  }, [autoDesc, showAddModal])
 
   useEffect(() => {
     fetchCategories()
@@ -86,6 +119,8 @@ export default function AdminCategories() {
   }
 
   const openAddMainModal = () => {
+    lastAutoNameRef.current = ""
+    lastAutoDescRef.current = ""
     setModalType("main")
     setEditingItem(null)
     setFormData({
@@ -106,6 +141,8 @@ export default function AdminCategories() {
   }
 
   const openAddSubModal = (parent: any) => {
+    lastAutoNameRef.current = ""
+    lastAutoDescRef.current = ""
     setModalType("sub")
     setSelectedParent(parent)
     setEditingItem(null)
@@ -127,6 +164,8 @@ export default function AdminCategories() {
   }
 
   const openEditModal = (item: any) => {
+    lastAutoNameRef.current = ""
+    lastAutoDescRef.current = ""
     setModalType(item.parentId ? "sub" : "main")
     setEditingItem(item)
     setSelectedParent(item.parentId ? categories.find(c => c.id === item.parentId) : null)
@@ -320,7 +359,11 @@ export default function AdminCategories() {
                         </span>
                         {cat.isFeatured && <span className="text-xs font-bold px-2.5 py-1 bg-amber-50 text-amber-900 border-2 border-amber-900 shadow-sm font-medium">{t('featured')}</span>}
                       </div>
-                      {cat.description && <div className="text-xs font-bold text-slate-500 mt-1 font-medium">{cat.description}</div>}
+                      {(cat.description || cat.descriptionKhmer) && (
+                        <div className="text-xs font-medium text-slate-700 mt-1">
+                          {isKh && cat.descriptionKhmer ? cat.descriptionKhmer : cat.description}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -347,7 +390,11 @@ export default function AdminCategories() {
                               {sub.isActive ? t('active') : t('inactive')}
                             </span>
                           </div>
-                          {sub.description && <div className="text-xs font-bold text-slate-500 mt-1 font-medium">{sub.description}</div>}
+                          {(sub.description || sub.descriptionKhmer) && (
+                            <div className="text-xs font-medium text-slate-700 mt-1">
+                              {isKh && sub.descriptionKhmer ? sub.descriptionKhmer : sub.description}
+                            </div>
+                          )}
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => openEditModal(sub)} className="p-1.5 bg-white border border-slate-200 shadow-sm hover:translate-y-0.5 transition-all">
@@ -397,19 +444,37 @@ export default function AdminCategories() {
               <form onSubmit={handleSubmit} className="p-5 space-y-5">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("categoryName")} (Khmer) *</label>
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                      {t("categoryName")} ({isKh ? "ភាសាខ្មែរ" : "Khmer"}) *
+                    </label>
                     <input type="text" required className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all" value={formData.nameKhmer} onChange={(e) => setFormData({...formData, nameKhmer: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("categoryName")} (English) *</label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-800 mb-1.5">
+                      <span>{t("categoryName")} ({isKh ? "ភាសាអង់គ្លេស" : "English"}) *</span>
+                      {isTranslatingName && (
+                        <span className="text-[11px] font-semibold text-primary animate-pulse">
+                          {isKh ? "កំពុងបកប្រែ..." : "Auto-translating..."}
+                        </span>
+                      )}
+                    </label>
                     <input type="text" required className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("description")} (Khmer)</label>
+                    <label className="block text-xs font-bold text-slate-800 mb-1.5">
+                      {t("description")} ({isKh ? "ភាសាខ្មែរ" : "Khmer"})
+                    </label>
                     <textarea rows={3} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all resize-none" value={formData.descriptionKhmer} onChange={(e) => setFormData({...formData, descriptionKhmer: e.target.value})} />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-800 mb-1.5">{t("description")} (English)</label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-800 mb-1.5">
+                      <span>{t("description")} ({isKh ? "ភាសាអង់គ្លេស" : "English"})</span>
+                      {isTranslatingDesc && (
+                        <span className="text-[11px] font-semibold text-primary animate-pulse">
+                          {isKh ? "កំពុងបកប្រែ..." : "Auto-translating..."}
+                        </span>
+                      )}
+                    </label>
                     <textarea rows={3} className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary outline-none font-medium text-xs sm:text-sm text-slate-900 transition-all resize-none" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
                   </div>
                   <div>
