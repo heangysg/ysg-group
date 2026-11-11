@@ -122,6 +122,7 @@ router.get('/categories', async (req: Request, res: Response): Promise<void> => 
     const pgClient = await getPgClient();
     try {
       const { rows } = await pgClient.query('SELECT * FROM "Category" WHERE "isActive" = true ORDER BY "sortOrder" ASC NULLS LAST');
+      res.set('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=600');
       res.json({ data: rows });
     } finally {
       await pgClient.release();
@@ -153,7 +154,7 @@ router.get('/products', async (req: Request, res: Response): Promise<void> => {
       }
 
       const { rows } = await pgClient.query(query, values);
-      res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+      res.set('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=600');
       res.json({ data: rows });
     } finally {
       await pgClient.release();
@@ -184,7 +185,7 @@ router.get('/products/:slug', async (req: Request, res: Response): Promise<void>
       if (gallery.length === 0 && product.thumbnail) {
         gallery.push(product.thumbnail);
       }
-      res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+      res.set('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=600');
       res.json({ data: { ...product, images: gallery } });
     } finally {
       await pgClient.release();

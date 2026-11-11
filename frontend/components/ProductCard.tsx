@@ -8,7 +8,6 @@ import { useCart } from "../contexts/CartContext"
 import { useWishlist } from "../contexts/WishlistContext"
 import toast from "react-hot-toast"
 import { getValidImages, getOptimizedImageUrl } from "../lib/imageUtils"
-import { motion } from "framer-motion"
 
 type ProductCardProps = {
  product: {
@@ -76,12 +75,9 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
  let imageUrl = getOptimizedImageUrl(images[0] || "", 'card')
 
  return (
- <motion.div 
- initial={disableAnimation ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
- whileInView={{ opacity: 1, y: 0 }}
- viewport={{ once: true, margin: "-40px" }}
- transition={{ duration: 0.5, ease: "easeOut", delay: disableAnimation ? 0 : Math.min(index * 0.05, 0.3) }}
- className="group flex flex-col h-full relative bg-white transition-all duration-300 border border-slate-200 rounded-md overflow-hidden hover:shadow-xl hover:shadow-[#004691]/5"
+ <div
+ style={{ contain: "layout style" }}
+ className="group flex flex-col h-full relative bg-white transition-shadow duration-200 border border-slate-200 rounded-md overflow-hidden hover:shadow-xl hover:shadow-[#004691]/5"
  >
  <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0" aria-label={`View ${product.name}`} />
  
@@ -92,8 +88,9 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   src={imageUrl} 
   alt={product.name}
   fill
+  decoding="async"
   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-  className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-110"
+  className="object-contain p-4 transform-gpu transition-transform duration-300 ease-out group-hover:scale-105"
   />
   ) : (
   <div className="w-full h-full flex items-center justify-center bg-slate-50">
@@ -104,10 +101,10 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   {/* Floating Wishlist Button */}
   <button 
     onClick={handleToggleWishlist}
-    className={`absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center transition-all z-20 pointer-events-auto shadow-sm ${
+    className={`absolute top-2 right-2 w-8 h-8 rounded-md flex items-center justify-center transition-colors transition-opacity duration-200 z-20 pointer-events-auto shadow-sm ${
       inWishlist 
         ? "bg-[#004691] text-white" 
-        : "bg-white/90 hover:bg-[#004691] text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0"
+        : "bg-white/95 hover:bg-[#004691] text-slate-400 hover:text-white opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0"
     }`}
     title={language === "kh" ? "បញ្ជីចំណូលចិត្ត" : "Wishlist"}
   >
@@ -115,10 +112,10 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   </button>
 
   {/* Quick Add Overlay */}
-  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20 pointer-events-auto">
+  <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 transform-gpu translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-20 pointer-events-auto">
     <button 
       onClick={handleAddToCart}
-      className="w-full bg-[#004691]/90 backdrop-blur-sm hover:bg-[#004691] text-white py-2 sm:py-2.5 rounded-md font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-colors"
+      className="w-full bg-[#004691] hover:bg-[#003366] text-white py-2 sm:py-2.5 rounded-md font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition-colors"
     >
       <ShoppingCart className="w-4 h-4" />
       {language === "kh" ? "បន្ថែមទៅកន្ត្រក" : "Add to Cart"}
@@ -130,7 +127,7 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   <div className="flex flex-col flex-1 p-3 z-10 pointer-events-none bg-white">
   
   {/* Title */}
-  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 leading-snug line-clamp-2 group-hover:text-[#004691] transition-colors duration-300 mb-1 sm:mb-2">
+  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 leading-snug line-clamp-2 group-hover:text-[#004691] transition-colors duration-200 mb-1 sm:mb-2">
   {language === "kh" && product.nameKhmer ? product.nameKhmer : product.name}
   </h3>
   
@@ -141,6 +138,6 @@ export default function ProductCard({ product, index = 0, disableAnimation = fal
   </span>
   </div>
   </div>
-  </motion.div>
+  </div>
  )
 }

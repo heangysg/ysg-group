@@ -83,12 +83,26 @@ export default function PublicLayout({
  }, [searchQuery])
 
  useEffect(() => {
- const handleScroll = () => {
- setScrolled(window.scrollY > 20)
- setShowBackToTop(window.scrollY > 300)
+ let rafId = 0
+ const updateScrollState = () => {
+ rafId = 0
+ const y = window.scrollY
+ const nextScrolled = y > 20
+ const nextBackToTop = y > 300
+ setScrolled(prev => (prev === nextScrolled ? prev : nextScrolled))
+ setShowBackToTop(prev => (prev === nextBackToTop ? prev : nextBackToTop))
  }
- window.addEventListener("scroll", handleScroll)
- return () => window.removeEventListener("scroll", handleScroll)
+ const handleScroll = () => {
+ if (!rafId) {
+ rafId = window.requestAnimationFrame(updateScrollState)
+ }
+ }
+ updateScrollState()
+ window.addEventListener("scroll", handleScroll, { passive: true })
+ return () => {
+ window.removeEventListener("scroll", handleScroll)
+ if (rafId) window.cancelAnimationFrame(rafId)
+ }
  }, [])
 
  // Cmd+K / Ctrl+K Global Search Shortcut
@@ -120,13 +134,6 @@ export default function PublicLayout({
  setUser(session?.user || null)
  setIsAuthChecking(false)
  })
-
- if (typeof window !== "undefined") {
- if ('scrollRestoration' in window.history) {
- window.history.scrollRestoration = 'manual'
- }
- window.scrollTo(0, 0)
- }
 
  if (typeof window !== "undefined" && window.location.search.includes("code=")) {
  const url = new URL(window.location.href)
@@ -785,7 +792,7 @@ export default function PublicLayout({
  </header>
  )}
 
- <main className={`transition-all ${!hideNav ? "pt-16 lg:pt-20 pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
+ <main className={`${!hideNav ? "pt-16 lg:pt-20 pb-[calc(72px+env(safe-area-inset-bottom)+1rem)] md:pb-0" : ""} min-h-screen`}>
  <Toaster position="top-center" />
  {children}
  </main>

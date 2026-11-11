@@ -79,12 +79,14 @@ function BannerSlider() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.45 }}
           className="absolute inset-0 w-full h-full"
         >
           <img
             src={bannerData[index].src}
             alt={`Banner ${index + 1}`}
+            fetchPriority={index === 0 ? "high" : "auto"}
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Gradient Overlay for Text Readability */}
@@ -131,13 +133,13 @@ function BannerSlider() {
       </div>
       <button
         onClick={() => setIndex((prev) => (prev - 1 + bannerData.length) % bannerData.length)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/35 hover:bg-black/55 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10"
       >
         <ChevronRight className="w-4 h-4 md:w-6 md:h-6 rotate-180" />
       </button>
       <button
         onClick={() => setIndex((prev) => (prev + 1) % bannerData.length)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/35 hover:bg-black/55 text-white flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity z-10"
       >
         <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
       </button>
@@ -179,13 +181,35 @@ export default function HomePage() {
   );
 
   useEffect(() => {
+    // Hydrate instantly from sessionStorage snapshot if module cache is empty (e.g., hard reload)
+    if (_cachedPopularProducts.length === 0 && typeof window !== "undefined") {
+      try {
+        const raw = sessionStorage.getItem("ysg_home_cache_v1");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed?.categories) && parsed.categories.length > 0) {
+            _cachedTopCategories = parsed.categories;
+            setTopCategories(parsed.categories);
+          }
+          if (Array.isArray(parsed?.hot) && Array.isArray(parsed?.popular) && parsed.popular.length > 0) {
+            _cachedHotProducts = parsed.hot;
+            _cachedPopularProducts = parsed.popular;
+            setHotProducts(parsed.hot);
+            setPopularProducts(parsed.popular);
+            setLoading(false);
+            setIsReady(true);
+          }
+        }
+      } catch {}
+    }
+
     async function fetchHomeData() {
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       try {
         const safeFetch = async (url: string) => {
           try {
-            const res = await fetch(url, { cache: "no-store" });
+            const res = await fetch(url);
             if (!res.ok) return { data: [] };
             return await res.json();
           } catch {
@@ -198,20 +222,33 @@ export default function HomePage() {
           safeFetch(`${API_URL}/api/public/products`),
         ]);
 
+        let nextCats = _cachedTopCategories;
+        let nextHot = _cachedHotProducts;
+        let nextPopular = _cachedPopularProducts;
+
         if (catData?.data && Array.isArray(catData.data) && catData.data.length > 0) {
-          const mainCats = catData.data.filter((c: any) => !c.parentId);
-          _cachedTopCategories = mainCats;
-          setTopCategories(mainCats);
+          nextCats = catData.data.filter((c: any) => !c.parentId);
+          _cachedTopCategories = nextCats;
+          setTopCategories(nextCats);
         }
 
         if (prodData?.data && Array.isArray(prodData.data) && prodData.data.length > 0) {
           const prods = prodData.data;
-          const hot = prods.filter((p: any) => p.isFeatured === true);
-          const popular = prods.filter((p: any) => !p.isFeatured);
-          _cachedHotProducts = hot;
-          _cachedPopularProducts = popular;
-          setHotProducts(hot);
-          setPopularProducts(popular);
+          nextHot = prods.filter((p: any) => p.isFeatured === true);
+          nextPopular = prods.filter((p: any) => !p.isFeatured);
+          _cachedHotProducts = nextHot;
+          _cachedPopularProducts = nextPopular;
+          setHotProducts(nextHot);
+          setPopularProducts(nextPopular);
+        }
+
+        if (typeof window !== "undefined" && (nextCats.length > 0 || nextPopular.length > 0)) {
+          try {
+            sessionStorage.setItem(
+              "ysg_home_cache_v1",
+              JSON.stringify({ categories: nextCats, hot: nextHot, popular: nextPopular })
+            );
+          } catch {}
         }
       } catch {
         // Quietly fallback to existing cached categories/products
@@ -254,16 +291,22 @@ export default function HomePage() {
       }
     }
 
-    // 2. Track scrolling to save for when user hits Back button
+    // 2. Debounce scroll persistence so synchronous sessionStorage writes never stutter scrolling
+    let scrollTimer: ReturnType<typeof setTimeout> | null = null;
     const handleScroll = () => {
-      // Prevent Next.js router from overwriting with 0 during page transitions
-      if (window.scrollY > 10) {
-        sessionStorage.setItem("ysg_home_scroll", window.scrollY.toString());
-      }
+      if (scrollTimer) clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        if (window.scrollY > 10) {
+          sessionStorage.setItem("ysg_home_scroll", window.scrollY.toString());
+        }
+      }, 150);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimer) clearTimeout(scrollTimer);
+    };
   }, [isReady]);
 
   if (!isReady) {

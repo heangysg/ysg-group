@@ -42,21 +42,40 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
  }
  }, [urlCategory])
 
- useEffect(() => {
- async function fetchData() {
- // Only show loading skeleton if we have no cached data yet
- if (_cachedProducts.length === 0) setLoading(true)
- else {
- // Show cached data immediately while refreshing in background
- setAllProducts(_cachedProducts)
- setCategories(_cachedCategories)
- setLoading(false)
- }
- const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
- try {
+  useEffect(() => {
+  async function fetchData() {
+  const storageKey = `ysg_products_cache_${isFeatured ? 'featured' : 'all'}`
+  // Only show loading skeleton if we have no cached data yet
+  if (_cachedProducts.length === 0 && typeof window !== "undefined") {
+  try {
+  const saved = sessionStorage.getItem(storageKey)
+  if (saved) {
+  const parsed = JSON.parse(saved)
+  if (Array.isArray(parsed?.products) && parsed.products.length > 0) {
+  _cachedProducts = parsed.products
+  setAllProducts(parsed.products)
+  setLoading(false)
+  }
+  if (Array.isArray(parsed?.categories) && parsed.categories.length > 0) {
+  _cachedCategories = parsed.categories
+  setCategories(parsed.categories)
+  }
+  }
+  } catch {}
+  }
+
+  if (_cachedProducts.length === 0) setLoading(true)
+  else {
+  // Show cached data immediately while refreshing in background
+  setAllProducts(_cachedProducts)
+  setCategories(_cachedCategories)
+  setLoading(false)
+  }
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+  try {
         const safeFetch = async (url: string) => {
           try {
-            const res = await fetch(url, { cache: 'no-store' })
+            const res = await fetch(url)
             if (!res.ok) return { data: [] }
             return await res.json()
           } catch {
@@ -78,6 +97,11 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
           _cachedCategories = cats
           setCategories(cats)
         }
+        if (typeof window !== "undefined" && (prods.length > 0 || cats.length > 0)) {
+          try {
+            sessionStorage.setItem(storageKey, JSON.stringify({ products: prods, categories: cats }))
+          } catch {}
+        }
       } catch {
         // Quietly fallback to existing cached products/categories
       } finally {
@@ -85,40 +109,46 @@ export default function ProductsList({ initialCategory = "all", initialFeatured 
       }
     }
     fetchData()
- }, [isFeatured])
+  }, [isFeatured])
 
- // 🎯 Bulletproof Manual Scroll Restoration for Products Page
- useEffect(() => {
- if (loading) return
+  // 🎯 Bulletproof Manual Scroll Restoration for Products Page
+  useEffect(() => {
+  if (loading) return
 
- // 1. Check if this was a page refresh
- const navEntries = window.performance.getEntriesByType("navigation")
- const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload"
+  // 1. Check if this was a page refresh
+  const navEntries = window.performance.getEntriesByType("navigation")
+  const isReload = navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload"
 
- if (isReload) {
- sessionStorage.removeItem(`ysg_products_scroll_${selectedCategory}`)
- window.scrollTo({ top: 0, behavior: 'instant' })
- } else {
- // Restore previous scroll position instantly if navigating back
- const savedScroll = sessionStorage.getItem(`ysg_products_scroll_${selectedCategory}`)
- if (savedScroll) {
- setTimeout(() => {
- window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' })
- }, 50)
- }
- }
+  if (isReload) {
+  sessionStorage.removeItem(`ysg_products_scroll_${selectedCategory}`)
+  window.scrollTo({ top: 0, behavior: 'instant' })
+  } else {
+  // Restore previous scroll position instantly if navigating back
+  const savedScroll = sessionStorage.getItem(`ysg_products_scroll_${selectedCategory}`)
+  if (savedScroll) {
+  setTimeout(() => {
+  window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' })
+  }, 50)
+  }
+  }
 
- // 2. Track scrolling to save for when user hits Back button
- const handleScroll = () => {
- // Prevent Next.js router from overwriting with 0 during page transitions
- if (window.scrollY > 10) {
- sessionStorage.setItem(`ysg_products_scroll_${selectedCategory}`, window.scrollY.toString())
- }
- }
+  // 2. Debounce scroll persistence so synchronous sessionStorage writes never stutter scrolling
+  let scrollTimer: ReturnType<typeof setTimeout> | null = null
+  const handleScroll = () => {
+  if (scrollTimer) clearTimeout(scrollTimer)
+  scrollTimer = setTimeout(() => {
+  if (window.scrollY > 10) {
+  sessionStorage.setItem(`ysg_products_scroll_${selectedCategory}`, window.scrollY.toString())
+  }
+  }, 150)
+  }
 
- window.addEventListener('scroll', handleScroll, { passive: true })
- return () => window.removeEventListener('scroll', handleScroll)
- }, [loading, selectedCategory])
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  return () => {
+  window.removeEventListener('scroll', handleScroll)
+  if (scrollTimer) clearTimeout(scrollTimer)
+  }
+  }, [loading, selectedCategory])
 
  const toggleCategoryExpand = (slug: string, e: React.MouseEvent) => {
  e.stopPropagation()

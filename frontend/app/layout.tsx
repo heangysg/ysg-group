@@ -93,6 +93,14 @@ export default function RootLayout({
  <head>
  <meta charSet="utf-8" />
  <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+ <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+ <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+ {process.env.NEXT_PUBLIC_API_URL && (
+ <>
+ <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL} crossOrigin="anonymous" />
+ <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_API_URL} />
+ </>
+ )}
  <link rel="manifest" href="/manifest.json" />
  <link rel="icon" href="/logo.png" type="image/png" />
  <link rel="apple-touch-icon" href="/logo.png" />
