@@ -4,12 +4,12 @@ import { authenticateJWT, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-const ALLOWED_TABLES = ['Product', 'Category', 'Order', 'Inquiry', 'Setting', 'User', 'audit_logs'];
+const ALLOWED_TABLES = ['Product', 'ProductImage', 'Category', 'Order', 'Inquiry', 'Setting', 'User', 'audit_logs'];
 
 router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   let pgClient;
   try {
-    const { table, select, eq, neq, ilike, or, order, limit, offset, countExact } = req.body;
+    const { table, select, eq, neq, lte, gte, ilike, or, order, limit, offset, countExact } = req.body;
 
     if (!ALLOWED_TABLES.includes(table)) {
       res.status(403).json({ error: `Table '${table}' is not allowed` });
@@ -133,6 +133,30 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
           return;
         }
         whereClauses.push(`"${key}" ILIKE $${counter}`);
+        values.push(val);
+        counter++;
+      }
+    }
+
+    if (lte && typeof lte === 'object') {
+      for (const [key, val] of Object.entries(lte)) {
+        if (!isValidIdentifier(key) || isProtectedColumn(key)) {
+          res.status(400).json({ error: `Invalid column in lte: ${key}` });
+          return;
+        }
+        whereClauses.push(`"${key}" <= $${counter}`);
+        values.push(val);
+        counter++;
+      }
+    }
+
+    if (gte && typeof gte === 'object') {
+      for (const [key, val] of Object.entries(gte)) {
+        if (!isValidIdentifier(key) || isProtectedColumn(key)) {
+          res.status(400).json({ error: `Invalid column in gte: ${key}` });
+          return;
+        }
+        whereClauses.push(`"${key}" >= $${counter}`);
         values.push(val);
         counter++;
       }

@@ -162,8 +162,19 @@ router.get('/products/:slug', async (req: Request, res: Response): Promise<void>
         res.status(404).json({ error: "Product not found" });
         return;
       }
+      const product = rows[0];
+      const { rows: imageRows } = await pgClient.query(
+        'SELECT "imageUrl", url FROM "ProductImage" WHERE "productId" = $1 ORDER BY "isPrimary" DESC, "sortOrder" ASC',
+        [product.id]
+      );
+      const gallery = imageRows
+        .map((r: any) => r.imageUrl || r.url)
+        .filter((u: any) => typeof u === 'string' && u.trim().length > 0);
+      if (gallery.length === 0 && product.thumbnail) {
+        gallery.push(product.thumbnail);
+      }
       res.set('Cache-Control', 'public, max-age=300, s-maxage=300');
-      res.json({ data: rows[0] });
+      res.json({ data: { ...product, images: gallery } });
     } finally {
       await pgClient.release();
     }

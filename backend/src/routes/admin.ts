@@ -586,4 +586,41 @@ router.post('/inquiries/:id/reply', authenticateJWT, async (req: AuthRequest, re
   }
 });
 
+router.post('/products/:id/images', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
+  let pgClient;
+  try {
+    const { id } = req.params;
+    const rawImages = Array.isArray(req.body?.images) ? req.body.images : [];
+    const cleanImages = rawImages
+      .filter((u: unknown): u is string => typeof u === 'string' && u.trim().length > 0)
+      .map((u: string) => u.trim());
+
+    pgClient = await getPgClient();
+    await pgClient.query('BEGIN');
+    await pgClient.query('DELETE FROM "ProductImage" WHERE "productId" = $1', [id]);
+
+    for (let i = 0; i < cleanImages.length; i++) {
+      await pgClient.query(
+        `INSERT INTO "ProductImage" (id, "productId", "imageUrl", url, "isPrimary", "sortOrder", "createdAt", "updatedAt")
+         VALUES (gen_random_uuid()::text, $1, $2, $2, $3, $4, NOW(), NOW())`,
+        [id, cleanImages[i], i === 0, i]
+      );
+    }
+
+    await pgClient.query(
+      'UPDATE "Product" SET thumbnail = $1, "updatedAt" = NOW() WHERE id = $2',
+      [cleanImages[0] || null, id]
+    );
+    await pgClient.query('COMMIT');
+
+    res.json({ success: true, images: cleanImages });
+  } catch (err: any) {
+    if (pgClient) await pgClient.query('ROLLBACK').catch(() => {});
+    console.error("Save product images error:", err);
+    res.status(500).json({ error: err.message || "Failed to save product images" });
+  } finally {
+    if (pgClient) pgClient.release();
+  }
+});
+
 export default router;
