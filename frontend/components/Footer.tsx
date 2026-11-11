@@ -1,29 +1,30 @@
 "use client"
 
 import Link from "next/link"
-import { MapPin, Phone, Mail, CreditCard, Clock } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, ChevronRight, ShieldCheck, CreditCard } from "lucide-react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faFacebook, faYoutube, faTelegram } from "@fortawesome/free-brands-svg-icons"
 import { useLanguage } from "../contexts/LanguageContext"
 import { useEffect, useState } from "react"
 
 export default function Footer() {
- const { t, language } = useLanguage()
- const currentYear = new Date().getFullYear()
- const [settings, setSettings] = useState<any>({
- address: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
- contact_phone: "010 / 011 / 012 / 070 : 309 302",
- contact_email: "yeungshigroup123@gmail.com",
- working_hours: "8 : 00 am – 5:30pm ( Mon – Sat )",
- facebook_url: "https://www.facebook.com/YeungShiGroupHeadOffice/",
- youtube_url: "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
- telegram_url: ""
- })
+  const { language } = useLanguage()
+  const isKh = language === "kh"
+  const currentYear = new Date().getFullYear()
+  const [settings, setSettings] = useState<any>({
+    address: "Building 230, St. 271, Sangkat Toul Tompong II, Khan Chamkamon, Phnom Penh.",
+    contact_phone: "010 / 011 / 012 / 070 : 309 302",
+    contact_email: "yeungshigroup123@gmail.com",
+    working_hours: "8 : 00 am – 5:30pm ( Mon – Sat )",
+    facebook_url: "https://www.facebook.com/YeungShiGroupHeadOffice/",
+    youtube_url: "https://www.youtube.com/channel/UCeml0xmg8lf6Kt8w25dOGWA",
+    telegram_url: ""
+  })
 
- useEffect(() => {
+  useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
         const res = await fetch(`${API_URL}/api/public/settings`)
         if (res.ok) {
           const { data } = await res.json()
@@ -36,126 +37,197 @@ export default function Footer() {
     fetchSettings()
   }, [])
 
- const linkClass = "text-[13px] sm:text-sm font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-2"
+  const navLinks = [
+    { href: "/", label: isKh ? "ទំព័រដើម" : "Home" },
+    { href: "/products", label: isKh ? "ផលិតផលទាំងអស់" : "All Products" },
+    { href: "/categories", label: isKh ? "ប្រភេទផលិតផល" : "Categories" },
+    { href: "/about", label: isKh ? "អំពីយើង" : "About Us" },
+    { href: "/contact", label: isKh ? "ទំនាក់ទំនង" : "Contact Us" },
+  ]
 
- return (
- <footer className="bg-[#00224a] text-slate-300 pt-16 pb-24 md:pb-12 mt-12 font-sans border-t border-white/10">
- <div className="max-w-7xl mx-auto px-6 md:px-10">
+  const supportLinks = [
+    { href: "/inquiry", label: isKh ? "ស្នើសុំតម្លៃ / ព័ត៌មាន" : "Request Inquiry" },
+    { href: "/track-order", label: isKh ? "តាមដានការបញ្ជាទិញ" : "Track Order" },
+    { href: "/shipping", label: isKh ? "ការដឹកជញ្ជូន" : "Shipping Info" },
+    { href: "/help", label: isKh ? "មជ្ឈមណ្ឌលជំនួយ" : "Help Center" },
+  ]
 
- {/* Main Grid: 1-col mobile → 4-col desktop */}
- <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-12 mb-12">
+  const linkClass =
+    "group inline-flex items-center gap-1.5 text-[13px] font-medium text-slate-300 hover:text-white transition-colors"
 
- {/* Col 1: Branding */}
- <div className="lg:col-span-4 flex flex-col gap-5">
- <Link href="/" className="inline-block w-[140px] hover:opacity-80 transition-opacity">
- <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="w-full h-auto object-contain" />
- </Link>
- <div className="text-sm leading-relaxed text-slate-400 max-w-sm mt-2">
- {language === "kh" ? (
- <p>
- <strong className="text-white">ក្រុមហ៊ុនយ៉ាងស៊ីគ្រុប (Yeung Shi Group)</strong> ត្រូវបានបង្កើតឡើងនៅទីក្រុងក្វាងចូវ ប្រទេសចិនតាំងពីទសវត្សរ៍ឆ្នាំ ១៩៩០ និងបានពង្រីកប្រតិបត្តិការមកកាន់ប្រទេសកម្ពុជានៅឆ្នាំ ២០០៥។ យើងគឺជាអ្នកផ្គត់ផ្គង់គ្រឿងម៉ាស៊ីន និងឧបករណ៍ឧស្សាហកម្មឈានមុខគេនៅកម្ពុជា។
- </p>
- ) : (
- <p>
- <strong className="text-white">Yeung Shi Group Co., Ltd.</strong> was established in Guangzhou, China in the 1990s and expanded to Cambodia in 2005. We are a premium industrial machinery and equipment supplier in Cambodia.
- </p>
- )}
- </div>
- </div>
+  return (
+    <footer className="relative bg-[#071e38] text-slate-200 mt-14 font-sans border-t-4 border-[#004691]">
+      <div className="max-w-7xl mx-auto px-6 md:px-10 pt-14 pb-10">
 
- {/* Col 2: Quick Links */}
- <div className="lg:col-span-3">
- <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-white mb-6">
- {language === "kh" ? "តំណរភ្ជាប់" : "Quick Links"}
- </h3>
- <ul className="flex flex-col gap-y-3.5">
- {[
- { href: "/", label: language === "kh" ? "ទំព័រដើម" : "Home" },
- { href: "/products", label: language === "kh" ? "ផលិតផលទាំងអស់" : "All Products" },
- { href: "/categories", label: language === "kh" ? "ប្រភេទផលិតផល" : "Categories" },
- { href: "/about", label: language === "kh" ? "អំពីយើង" : "About Us" },
- { href: "/contact", label: language === "kh" ? "ទំនាក់ទំនង" : "Contact Us" },
- { href: "/track-order", label: language === "kh" ? "តាមដានការបញ្ជាទិញ" : "Track Order" },
- { href: "/help", label: language === "kh" ? "មជ្ឈមណ្ឌលជំនួយ" : "Help Center" },
- ].map(item => (
- <li key={item.href}>
- <Link href={item.href} className={linkClass}>{item.label}</Link>
- </li>
- ))}
- </ul>
- </div>
+        {/* Main 4-Column Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-8 gap-y-10 pb-12 border-b border-white/10">
 
- {/* Col 3: Contact */}
- <div className="lg:col-span-3">
- <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-white mb-6">
- {language === "kh" ? "ទំនាក់ទំនង" : "Contact Us"}
- </h3>
- <ul className="flex flex-col gap-y-4">
- <li>
- <a href={`tel:${settings.contact_phone?.replace(/\s/g, "")}`} className="group flex items-start gap-3 text-sm text-slate-400 hover:text-white transition-colors">
- <Phone className="w-[18px] h-[18px] text-slate-500 group-hover:text-white transition-colors mt-0.5" />
- <span className="font-[family-name:var(--font-inter)] tracking-wide">{settings.contact_phone}</span>
- </a>
- </li>
- <li>
- <a href={`mailto:${settings.contact_email}`} className="group flex items-start gap-3 text-sm text-slate-400 hover:text-white transition-colors">
- <Mail className="w-[18px] h-[18px] text-slate-500 group-hover:text-white transition-colors mt-0.5" />
- <span className="break-all font-[family-name:var(--font-inter)] tracking-wide">{settings.contact_email}</span>
- </a>
- </li>
- <li>
- <div className="flex items-start gap-3 text-sm text-slate-400">
- <Clock className="w-[18px] h-[18px] text-slate-500 mt-0.5" />
- <span className="font-[family-name:var(--font-inter)] tracking-wide">{settings.working_hours || "8 : 00 am – 5:30pm ( Mon – Sat )"}</span>
- </div>
- </li>
- </ul>
- </div>
+          {/* Col 1: Brand & Social */}
+          <div className="lg:col-span-4 flex flex-col gap-5">
+            <Link
+              href="/"
+              className="inline-flex items-center w-fit bg-white px-3.5 py-2 rounded-lg shadow-sm hover:opacity-95 transition-opacity"
+            >
+              <img src="/logo/ysg-logo.png" alt="Yeung Shi Group" className="h-9 w-auto object-contain" />
+            </Link>
 
- {/* Col 4: Social */}
- <div className="lg:col-span-2">
- <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-white mb-6">
- {language === "kh" ? "តាមដានពួកយើង" : "Follow Us"}
- </h3>
- <div className="flex flex-wrap gap-4">
- {settings.facebook_url && (
- <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" 
-    className="w-10 h-10 rounded-full border border-slate-600 flex items-center justify-center hover:bg-white hover:border-white group transition-all">
- <FontAwesomeIcon icon={faFacebook} className="w-[18px] h-[18px] text-white group-hover:text-[#00224a] transition-colors" />
- </a>
- )}
- {settings.youtube_url && (
- <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" 
-    className="w-10 h-10 rounded-full border border-slate-600 flex items-center justify-center hover:bg-white hover:border-white group transition-all">
- <FontAwesomeIcon icon={faYoutube} className="w-[18px] h-[18px] text-white group-hover:text-[#00224a] transition-colors" />
- </a>
- )}
- {settings.telegram_url && (
- <a href={settings.telegram_url.startsWith("http") ? settings.telegram_url : `https://t.me/${settings.telegram_url.replace("@", "")}`} target="_blank" rel="noopener noreferrer" 
-    className="w-10 h-10 rounded-full border border-slate-600 flex items-center justify-center hover:bg-white hover:border-white group transition-all">
- <FontAwesomeIcon icon={faTelegram} className="w-[18px] h-[18px] text-white group-hover:text-[#00224a] transition-colors" />
- </a>
- )}
- </div>
- </div>
+            <p className="text-[13px] leading-relaxed text-slate-300 max-w-sm">
+              {isKh ? (
+                <>
+                  <strong className="text-white">ក្រុមហ៊ុន យ៉ាង ស៊ី គ្រុប (Yeung Shi Group)</strong> ត្រូវបានបង្កើតឡើងតាំងពីទសវត្សរ៍ឆ្នាំ ១៩៩០ និងពង្រីកប្រតិបត្តិការមកកម្ពុជានៅឆ្នាំ ២០០៥ ដោយផ្គត់ផ្គង់ម៉ាស៊ីន និងឧបករណ៍ឧស្សាហកម្មគុណភាពខ្ពស់។
+                </>
+              ) : (
+                <>
+                  <strong className="text-white">Yeung Shi Group Co., Ltd.</strong> — established in Guangzhou in the 1990s and operating in Cambodia since 2005, supplying reliable industrial, food, and packaging machinery.
+                </>
+              )}
+            </p>
 
- </div>
+            {/* Social Channels */}
+            <div className="flex items-center gap-2.5 pt-1">
+              {settings.facebook_url && (
+                <a
+                  href={settings.facebook_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center text-slate-200 hover:bg-[#1877F2] hover:border-[#1877F2] hover:text-white transition-colors"
+                >
+                  <FontAwesomeIcon icon={faFacebook} className="w-4 h-4" />
+                </a>
+              )}
+              {settings.youtube_url && (
+                <a
+                  href={settings.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center text-slate-200 hover:bg-[#FF0000] hover:border-[#FF0000] hover:text-white transition-colors"
+                >
+                  <FontAwesomeIcon icon={faYoutube} className="w-4 h-4" />
+                </a>
+              )}
+              {settings.telegram_url && (
+                <a
+                  href={
+                    settings.telegram_url.startsWith("http")
+                      ? settings.telegram_url
+                      : `https://t.me/${settings.telegram_url.replace("@", "")}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Telegram"
+                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center text-slate-200 hover:bg-[#229ED9] hover:border-[#229ED9] hover:text-white transition-colors"
+                >
+                  <FontAwesomeIcon icon={faTelegram} className="w-4 h-4" />
+                </a>
+              )}
+            </div>
+          </div>
 
- {/* Bottom Bar */}
- <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
- <p className="text-xs text-slate-500 text-center md:text-left">
- &copy; {currentYear} Yeung Shi Group Co., Ltd. {language === "kh" ? "រក្សាសិទ្ធិគ្រប់យ៉ាង។" : "All rights reserved."}
- </p>
- <div className="flex items-center gap-6">
- <Link href="/privacy" className="text-xs text-slate-500 hover:text-white transition-colors">
- {language === "kh" ? "គោលការណ៍ឯកជនភាព" : "Privacy Policy"}
- </Link>
- <Link href="/terms" className="text-xs text-slate-500 hover:text-white transition-colors">
- {language === "kh" ? "លក្ខខណ្ឌសេវាកម្ម" : "Terms of Service"}
- </Link>
- </div>
- </div>
- </div>
- </footer>
- )
+          {/* Col 2: Quick Links */}
+          <div className="lg:col-span-2">
+            <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-white mb-4 pb-2 border-b border-white/10">
+              {isKh ? "តំណរភ្ជាប់" : "Company"}
+            </h3>
+            <ul className="flex flex-col gap-y-2.5">
+              {navLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={linkClass}>
+                    <ChevronRight className="w-3.5 h-3.5 text-blue-400/70 group-hover:translate-x-0.5 group-hover:text-white transition-transform" />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 3: Customer Support */}
+          <div className="lg:col-span-2">
+            <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-white mb-4 pb-2 border-b border-white/10">
+              {isKh ? "សេវាកម្មអតិថិជន" : "Support"}
+            </h3>
+            <ul className="flex flex-col gap-y-2.5">
+              {supportLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={linkClass}>
+                    <ChevronRight className="w-3.5 h-3.5 text-blue-400/70 group-hover:translate-x-0.5 group-hover:text-white transition-transform" />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 4: Contact Information & Payment Badges */}
+          <div className="lg:col-span-4">
+            <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-white mb-4 pb-2 border-b border-white/10">
+              {isKh ? "ព័ត៌មានទំនាក់ទំនង" : "Contact & Showroom"}
+            </h3>
+            <ul className="flex flex-col gap-y-3">
+              <li>
+                <a
+                  href={`tel:${settings.contact_phone?.replace(/\s/g, "")}`}
+                  className="group flex items-start gap-2.5 text-[13px] text-slate-300 hover:text-white transition-colors"
+                >
+                  <Phone className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                  <span className="font-medium tracking-wide">{settings.contact_phone}</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${settings.contact_email}`}
+                  className="group flex items-start gap-2.5 text-[13px] text-slate-300 hover:text-white transition-colors"
+                >
+                  <Mail className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                  <span className="break-all font-medium">{settings.contact_email}</span>
+                </a>
+              </li>
+              {settings.address && (
+                <li className="flex items-start gap-2.5 text-[13px] text-slate-300">
+                  <MapPin className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                  <span className="leading-snug">{settings.address}</span>
+                </li>
+              )}
+              <li className="flex items-start gap-2.5 text-[13px] text-slate-300">
+                <Clock className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                <span>{settings.working_hours || "8 : 00 am – 5:30pm ( Mon – Sat )"}</span>
+              </li>
+            </ul>
+
+            {/* Payment & Trust Badges */}
+            <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/15 text-[11px] font-semibold text-slate-200">
+                <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
+                {isKh ? "ទូទាត់តាម KHQR" : "KHQR Payment"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/5 border border-white/15 text-[11px] font-semibold text-slate-200">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                {isKh ? "ធានាគុណភាព និងសេវាកម្ម" : "Warranty & Support"}
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom Legal Bar */}
+        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-300">
+          <p className="text-center sm:text-left">
+            &copy; {currentYear} <span className="text-white font-semibold">Yeung Shi Group Co., Ltd.</span>{" "}
+            {isKh ? "រក្សាសិទ្ធិគ្រប់យ៉ាង។" : "All rights reserved."}
+          </p>
+          <div className="flex items-center gap-5">
+            <Link href="/privacy" className="text-slate-300 hover:text-white transition-colors">
+              {isKh ? "គោលការណ៍ឯកជនភាព" : "Privacy Policy"}
+            </Link>
+            <span className="text-white/20">•</span>
+            <Link href="/terms" className="text-slate-300 hover:text-white transition-colors">
+              {isKh ? "លក្ខខណ្ឌសេវាកម្ម" : "Terms of Service"}
+            </Link>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+  )
 }
